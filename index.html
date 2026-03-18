@@ -333,8 +333,8 @@ async function callClaude(messages, systemPrompt, maxTokens) {
    ボディ: { contents: [{role, parts:[{text}]}], generationConfig?: {maxOutputTokens}, systemInstruction?: {parts:[{text}]} }
    注意:
      - role は "user" または "model" (assistantではない)
-     - 429は無料枠レート制限 (gemini-1.5-flashが安定)
-     - モデル: gemini-1.5-flash (安定・高速), gemini-2.0-flash (新しいが429多め)
+     - gemini-1.5-flash は廃止。現行モデルは gemini-2.0-flash / gemini-2.5-flash
+     - モデル: gemini-2.0-flash (標準・安定), gemini-2.5-flash (高性能・フォールバック)
 */
 async function callGemini(messages, systemPrompt, maxTokens) {
   var key = getKey('gemini');
@@ -355,8 +355,8 @@ async function callGemini(messages, systemPrompt, maxTokens) {
     body.systemInstruction = { parts: [{ text: systemPrompt }] };
   }
 
-  // gemini-1.5-flashを優先（429が少ない）、失敗時はgemini-2.0-flashにフォールバック
-  var models = ['gemini-1.5-flash', 'gemini-2.0-flash'];
+  // gemini-2.0-flashを優先、404/429時はgemini-2.5-flashにフォールバック
+  var models = ['gemini-2.0-flash', 'gemini-2.5-flash'];
   var lastErr = null;
   for (var i = 0; i < models.length; i++) {
     var model = models[i];
@@ -380,6 +380,17 @@ async function callGemini(messages, systemPrompt, maxTokens) {
         continue;
       }
       throw new Error('Gemini 429: レート制限超過。無料枠の上限に達しました。\n・しばらく時間をおいてから再試行してください\n・Google AI Studioで使用量を確認してください');
+    }
+    if (res.status === 404) {
+      // 404はモデルが存在しない or このAPIバージョンでサポートされていない
+      if (i < models.length - 1) {
+        lastErr = new Error('Gemini 404: モデル ' + model + ' が見つかりません。次のモデルを試します...');
+        continue;
+      }
+      var e404 = {};
+      try { e404 = await res.json(); } catch(ex) {}
+      var msg404 = e404.error ? e404.error.message : '';
+      throw new Error('Gemini 404: モデルが見つかりません。' + (msg404 ? ' (' + msg404 + ')' : '') + '\nAPIキーが正しいか、Google AI Studioで確認してください。');
     }
     if (res.status === 400) {
       var e400 = {};
@@ -431,7 +442,7 @@ async function callChatGPT(messages, systemPrompt, maxTokens) {
       'Authorization': 'Bearer ' + key
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
+      model: 'gpt-4.1',
       max_tokens: maxTokens || 4000,
       messages: msgs
     })
@@ -461,29 +472,49 @@ async function callGrok(messages, systemPrompt, maxTokens) {
   var msgs = systemPrompt
     ? [{ role: 'system', content: systemPrompt }].concat(messages)
     : messages;
-  var res = await fetch('https://api.x.ai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + key
-    },
-    body: JSON.stringify({
-      model: 'grok-3',
-      max_tokens: maxTokens || 4000,
-      messages: msgs
-    })
-  });
-  if (!res.ok) {
-    var eData = {};
-    try { eData = await res.json(); } catch(e) {}
-    var eMsg = eData.error ? eData.error.message : '';
-    if (res.status === 401) throw new Error('Grok 401: APIキーが無効です。console.x.aiで確認してください。');
-    if (res.status === 429) throw new Error('Grok 429: レート制限超過。しばらく待ってから再試行してください。');
-    throw new Error('Grok APIエラー ' + res.status + (eMsg ? ': ' + eMsg : ''));
+
+  // grok-3（標準・広く利用可能）→ grok-4（最新フラッグシップ、一部制限あり）の順でフォールバック
+  var grokModels = ['grok-3', 'grok-4'];
+  var lastErr = null;
+  for (var gi = 0; gi < grokModels.length; gi++) {
+    var grokModel = grokModels[gi];
+    var grokRes;
+    try {
+      grokRes = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + key
+        },
+        body: JSON.stringify({
+          model: grokModel,
+          max_tokens: maxTokens || 4000,
+          messages: msgs
+        })
+      });
+    } catch(e) {
+      lastErr = new Error('Grok: ネットワークエラー - ' + e.message);
+      continue;
+    }
+    if (grokRes.status === 404 || grokRes.status === 400) {
+      if (gi < grokModels.length - 1) {
+        lastErr = new Error('Grok: モデル ' + grokModel + ' が利用不可。次を試します...');
+        continue;
+      }
+    }
+    if (!grokRes.ok) {
+      var eData = {};
+      try { eData = await grokRes.json(); } catch(e) {}
+      var eMsg = eData.error ? eData.error.message : '';
+      if (grokRes.status === 401) throw new Error('Grok 401: APIキーが無効です。console.x.aiで確認してください。');
+      if (grokRes.status === 429) throw new Error('Grok 429: レート制限超過。しばらく待ってから再試行してください。');
+      throw new Error('Grok APIエラー ' + grokRes.status + (eMsg ? ': ' + eMsg : ''));
+    }
+    var data = await grokRes.json();
+    if (!data.choices || !data.choices.length) throw new Error('Grok: 空のレスポンスが返りました');
+    return data.choices[0].message.content || '';
   }
-  var data = await res.json();
-  if (!data.choices || !data.choices.length) throw new Error('Grok: 空のレスポンスが返りました');
-  return data.choices[0].message.content || '';
+  throw lastErr || new Error('Grok: すべてのモデルで失敗しました');
 }
 
 /* --- 統合AI呼び出し関数 --- */
