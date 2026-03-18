@@ -673,11 +673,11 @@ var NOTE_THEMES = [
   { id:'other',        label:'📝 その他' },
 ];
 var NOTE_TONES = [
-  { id:'story',    label:'📖 体験談ストーリー系' },
-  { id:'howto',    label:'📋 ハウツー解説系' },
-  { id:'secret',   label:'🔥 秘密・裏知識系' },
-  { id:'contrast', label:'⚡ 比較・対比系' },
-  { id:'warm',     label:'💓 共感・温かい系' },
+  { id:'story',    label:'📖 体験談ストーリー系', preview:'「あの日、口座残高が3桁になった。だから私は動いた——」実体験から読者を引き込む感情的な語り口。' },
+  { id:'howto',    label:'📋 ハウツー解説系',   preview:'「Step1: まず〇〇する。Step2: 次に〇〇を設定する」手順を明確にして読者が行動しやすい構成。' },
+  { id:'secret',   label:'🔥 秘密・裏知識系',   preview:'「実は99%の人が知らない方法があります。私が3年かけて発見した裏技を公開します」好奇心を煽る。' },
+  { id:'contrast', label:'⚡ 比較・対比系',      preview:'「月収30万と300万の人の違いはたった1つ」対比を使って問題点と解決策を鮮明に浮かび上がらせる。' },
+  { id:'warm',     label:'💓 共感・温かい系',    preview:'「あなたの気持ち、すごくわかります。私も同じように悩んでいました」読者に寄り添う優しいトーン。' },
 ];
 var NOTE_AGES = [
   { id:'10s', label:'10代' }, { id:'20s', label:'20代' },
@@ -758,6 +758,15 @@ function NoteGenerator(props) {
   var copiedState = useState({});
   var copied = copiedState[0]; var setCopied = copiedState[1];
 
+  // 生成タイマー・プログレスのstate
+  var genStartState = useState(0);
+  var genStart = genStartState[0]; var setGenStart = genStartState[1];
+  var genElapsedState = useState(0);
+  var genElapsed = genElapsedState[0]; var setGenElapsed = genElapsedState[1];
+  var genProgressState = useState(0);
+  var genProgress = genProgressState[0]; var setGenProgress = genProgressState[1];
+  var genTimerRefState = useRef(null);
+
   // Web検索例のstate
   var topicExState = useState({ items:[], loading:false });
   var topicEx = topicExState[0]; var setTopicEx = topicExState[1];
@@ -784,6 +793,12 @@ function NoteGenerator(props) {
   // === Web検索例取得関数 ===
 
   // テーマ変更時に例を自動更新（初回マウント時も実行）
+  // age変更で状況・悩みを自動クリア（ユーザーが明示入力している場合は保持しない）
+  useEffect(function() {
+    setSituation('');
+    setWorry('');
+  }, [age]);
+
   useEffect(function() {
     // インラインで実行してBabel依存関係警告を回避
     var themeKey = theme;
@@ -827,37 +842,90 @@ function NoteGenerator(props) {
       return results.slice(0, 3);
     }
 
-    Promise.all([safeFetch(q1), safeFetch(q2), safeFetch(q3)]).then(function(results) {
-      var d1 = results[0], d2 = results[1], d3 = results[2];
-      var topicItems = extractPhrases(d1, 45);
-      var sitItems = extractPhrases(d2, 45);
-      var worryItems = extractPhrases(d3, 45);
+    // フォールバックデータ（組み込みの高品質な例）
+    var fb  = { money:['月5万円副業を3ヶ月で達成した方法','節約で年間100万円貯めた実践記録','サラリーマンが副業で収入を2倍にした秘訣'], health:['1ヶ月-8kg減量ダイエット完全ガイド','リバウンドしない食事改善の習慣術','40代から始める体質改善メソッド'], career:['未経験からWebエンジニアに転職した全記録','副業で月収10万円を稼ぐフリーランス入門','年収UPのための交渉術と転職タイミング'], mindset:['成功者が実践する朝のルーティン7選','先延ばし癖をなくす行動心理学テクニック','自己肯定感を高める思考習慣の作り方'], relationship:['彼女ができない男性が変わった3つのきっかけ','職場の人間関係を劇的に改善した会話術','SNSで好感度を上げるコミュニケーション法'], productivity:['タスク管理で残業ゼロになった仕事術','集中力を3倍にする環境づくりと習慣','ノートアプリ活用で仕事効率が激変した話'], parenting:['イヤイヤ期を乗り越えた育児のコツ','子どもの自己肯定感を育てる声かけ方法','共働きでも子どもとの時間を増やす工夫'], other:['人生が変わった本10冊の読み方と実践法','断捨離で部屋も心もスッキリした体験記','ストレスフリーな生活を手に入れた方法'] };
+    var fbs = { money:['会社員で副業を始めたいが何から手をつければいいか迷っている','毎月赤字で貯金ゼロ、家計を立て直したい','子育て中でお金の余裕がなく将来が不安'], health:['ダイエットを何度も挫折してきた','運動する時間がなくて体型が崩れてきた','食事制限で体重は落ちたがリバウンドしてしまった'], career:['今の仕事に不満はないが将来性が不安','30代で転職を考えているがスキルに自信がない','フリーランスに興味があるが収入が安定するか心配'], mindset:['やる気が続かず目標を達成できない','他人の目が気になって行動できない','ネガティブ思考が止まらず毎日がしんどい'], relationship:['好きな人がいるが告白できずにいる','職場のコミュニケーションが苦手で孤立している','SNSで発信したいがどう思われるか怖い'], productivity:['仕事量が多くて残業が続いている','タスクが多すぎて何から手をつけるか分からない','集中できずついスマホを見てしまう'], parenting:['子供のイヤイヤ期で毎日ストレスが溜まっている','仕事と育児の両立で疲れ果てている','子供に怒りすぎてしまい自己嫌悪になる'], other:['毎日同じことの繰り返しで人生に変化がない','友達が少なくて休日が孤独','やりたいことが見つからず将来が漠然と不安'] };
+    var fbw = { money:['副業で稼げるか不安、詐欺に引っかかりそう','収入を上げたいのに具体的な方法が分からない','節約を頑張っても全然貯まらない'], health:['運動を続けられない、三日坊主になってしまう','食事制限が辛くてストレスになる','健康的に痩せたいが何が正解か分からない'], career:['転職活動をどこから始めればいいか分からない','スキルがなくて市場価値が低いと感じる','面接が苦手で選考に通らない'], mindset:['頭では分かっているが行動できない','自分に自信が持てず挑戦を諦めてしまう','モチベーションが続かず中途半端になる'], relationship:['会話が続かず人間関係が浅い','感情的になってしまい後から後悔する','好きな人にどうアプローチすればいいか分からない'], productivity:['やることが多すぎて優先順位がつけられない','集中力が続かず作業が終わらない','スマホやSNSが気になって仕事に集中できない'], parenting:['子供の気持ちが理解できず対応に困る','怒らない育児を試みるが限界がくる','子供の学力や将来が心配で焦っている'], other:['何か変えたいが何から始めればいいか分からない','行動しようとしても続かず自己嫌悪になる','周りの目を気にしてチャレンジできない'] };
 
-      var fb = { money:['月5万円副業を3ヶ月で達成した方法','節約で年間100万円貯めた実践記録','サラリーマンが副業で収入を2倍にした秘訣'], health:['1ヶ月-8kg減量ダイエット完全ガイド','リバウンドしない食事改善の習慣術','40代から始める体質改善メソッド'], career:['未経験からWebエンジニアに転職した全記録','副業で月収10万円を稼ぐフリーランス入門','年収UPのための交渉術と転職タイミング'], mindset:['成功者が実践する朝のルーティン7選','先延ばし癖をなくす行動心理学テクニック','自己肯定感を高める思考習慣の作り方'], relationship:['彼女ができない男性が変わった3つのきっかけ','職場の人間関係を劇的に改善した会話術','SNSで好感度を上げるコミュニケーション法'], productivity:['タスク管理で残業ゼロになった仕事術','集中力を3倍にする環境づくりと習慣','ノートアプリ活用で仕事効率が激変した話'], parenting:['イヤイヤ期を乗り越えた育児のコツ','子どもの自己肯定感を育てる声かけ方法','共働きでも子どもとの時間を増やす工夫'], other:['人生が変わった本10冊の読み方と実践法','断捨離で部屋も心もスッキリした体験記','ストレスフリーな生活を手に入れた方法'] };
-      var fbs = { money:['会社員で副業を始めたいが何から手をつければいいか迷っている','毎月赤字で貯金ゼロ、家計を立て直したい','子育て中でお金の余裕がなく将来が不安'], health:['ダイエットを何度も挫折してきた','運動する時間がなくて体型が崩れてきた','食事制限で体重は落ちたがリバウンドしてしまった'], career:['今の仕事に不満はないが将来性が不安','30代で転職を考えているがスキルに自信がない','フリーランスに興味があるが収入が安定するか心配'], mindset:['やる気が続かず目標を達成できない','他人の目が気になって行動できない','ネガティブ思考が止まらず毎日がしんどい'], relationship:['好きな人がいるが告白できずにいる','職場のコミュニケーションが苦手で孤立している','SNSで発信したいがどう思われるか怖い'], productivity:['仕事量が多くて残業が続いている','タスクが多すぎて何から手をつけるか分からない','集中できずついスマホを見てしまう'], parenting:['子供のイヤイヤ期で毎日ストレスが溜まっている','仕事と育児の両立で疲れ果てている','子供に怒りすぎてしまい自己嫌悪になる'], other:['毎日同じことの繰り返しで人生に変化がない','友達が少なくて休日が孤独','やりたいことが見つからず将来が漠然と不安'] };
-      var fbw = { money:['副業で稼げるか不安、詐欺に引っかかりそう','収入を上げたいのに具体的な方法が分からない','節約を頑張っても全然貯まらない'], health:['運動を続けられない、三日坊主になってしまう','食事制限が辛くてストレスになる','健康的に痩せたいが何が正解か分からない'], career:['転職活動をどこから始めればいいか分からない','スキルがなくて市場価値が低いと感じる','面接が苦手で選考に通らない'], mindset:['頭では分かっているが行動できない','自分に自信が持てず挑戦を諦めてしまう','モチベーションが続かず中途半端になる'], relationship:['会話が続かず人間関係が浅い','感情的になってしまい後から後悔する','好きな人にどうアプローチすればいいか分からない'], productivity:['やることが多すぎて優先順位がつけられない','集中力が続かず作業が終わらない','スマホやSNSが気になって仕事に集中できない'], parenting:['子供の気持ちが理解できず対応に困る','怒らない育児を試みるが限界がくる','子供の学力や将来が心配で焦っている'], other:['何か変えたいが何から始めればいいか分からない','行動しようとしても続かず自己嫌悪になる','周りの目を気にしてチャレンジできない'] };
+    var ageLabel = { '10s':'10代', '20s':'20代', '30s':'30代', '40s':'40代', '50s':'50代以上', 'all':'全年齢' }[age] || '';
 
-      setTopicEx({ items: topicItems.length >= 2 ? topicItems : (fb[themeKey] || fb['other']), loading: false });
-      setSitEx({ items: sitItems.length >= 2 ? sitItems : (fbs[themeKey] || fbs['other']), loading: false });
-      setWorryEx({ items: worryItems.length >= 2 ? worryItems : (fbw[themeKey] || fbw['other']), loading: false });
-    });
-  }, [theme]);
+    // AIキーがあればAIで高精度な例を生成、なければDDG→フォールバックの順
+    var aiKey = getKey('claude') || getKey('gemini') || getKey('chatgpt') || getKey('grok');
+    var aiIdForEx = getKey('claude') ? 'claude' : getKey('gemini') ? 'gemini' : getKey('chatgpt') ? 'chatgpt' : getKey('grok') ? 'grok' : null;
+
+    if (aiIdForEx) {
+      // AI生成: 高精度な例を一括生成
+      var aiPrompt = 'note記事生成ツールのUI用に、以下の条件でリストを3件ずつ生成してください。\n\nジャンル: ' + cleanLabel + '\n対象年齢: ' + ageLabel + '\n\n出力形式はJSONのみ（前置きなし）:\n{"topics":["テーマ例1","テーマ例2","テーマ例3"],"situations":["読者の状況例1","状況例2","状況例3"],"worries":["読者の悩み例1","悩み例2","悩み例3"]}\n\n各項目:\n- topics: このジャンルのnote有料記事として売れそうな具体的なタイトル（20〜35文字）\n- situations: 対象年齢の読者がよく置かれている状況（15〜35文字）\n- worries: 対象年齢の読者がよく抱える悩み（15〜30文字）';
+
+      callAI(aiIdForEx, [{ role:'user', content: aiPrompt }], null, 500)
+        .then(function(aiResult) {
+          try {
+            var clean = aiResult.replace(/```json/g,'').replace(/```/g,'').trim();
+            var parsed = JSON.parse(clean);
+            setTopicEx({ items: (parsed.topics || []).slice(0,3), loading: false });
+            setSitEx({ items: (parsed.situations || []).slice(0,3), loading: false });
+            setWorryEx({ items: (parsed.worries || []).slice(0,3), loading: false });
+          } catch(e) {
+            // JSON解析失敗時はフォールバック
+            setTopicEx({ items: fb[themeKey] || fb['other'], loading: false });
+            setSitEx({ items: fbs[themeKey] || fbs['other'], loading: false });
+            setWorryEx({ items: fbw[themeKey] || fbw['other'], loading: false });
+          }
+        })
+        .catch(function() {
+          setTopicEx({ items: fb[themeKey] || fb['other'], loading: false });
+          setSitEx({ items: fbs[themeKey] || fbs['other'], loading: false });
+          setWorryEx({ items: fbw[themeKey] || fbw['other'], loading: false });
+        });
+    } else {
+      // APIキーなし: DuckDuckGo → フォールバック
+      Promise.all([safeFetch(q1), safeFetch(q2), safeFetch(q3)]).then(function(results) {
+        var d1 = results[0], d2 = results[1], d3 = results[2];
+        var topicItems = extractPhrases(d1, 45);
+        var sitItems = extractPhrases(d2, 45);
+        var worryItems = extractPhrases(d3, 45);
+        setTopicEx({ items: topicItems.length >= 2 ? topicItems : (fb[themeKey] || fb['other']), loading: false });
+        setSitEx({ items: sitItems.length >= 2 ? sitItems : (fbs[themeKey] || fbs['other']), loading: false });
+        setWorryEx({ items: worryItems.length >= 2 ? worryItems : (fbw[themeKey] || fbw['other']), loading: false });
+      });
+    }
+  }, [theme, age]);
 
   var handleGenerate = useCallback(function() {
     var currentAiId = aiIdRef.current;
-    setError(''); setLoading(true);
-    setLoadMsg('⏳ ' + currentAI.label + 'で記事を生成中...');
+    setError(''); setLoading(true); setGenProgress(0); setGenElapsed(0);
+    var startTime = Date.now();
+    setGenStart(startTime);
+    setLoadMsg('');
+
+    // プログレスアニメーション（非線形: 最初速く、後半ゆっくり）
+    var tick = 0;
+    if (genTimerRefState.current) clearInterval(genTimerRefState.current);
+    genTimerRefState.current = setInterval(function() {
+      tick++;
+      var elapsed = (Date.now() - startTime) / 1000;
+      setGenElapsed(Math.floor(elapsed));
+      // 90秒想定で最大95%まで進む曲線
+      var pct = 95 * (1 - Math.exp(-elapsed / 40));
+      setGenProgress(Math.min(95, pct));
+    }, 500);
+
     var prompt = buildNotePrompt({ theme, topic, tone, price, freeWC, paidWC, age, situation, worry });
     var sys = 'あなたは人気noteクリエイターです。指定された構成で必ず記事を書いてください。マークダウン形式で、コードブロックなしで出力してください。';
     callAI(currentAiId, [{ role:'user', content: prompt }], sys, 8000)
       .then(function(result) {
+        clearInterval(genTimerRefState.current);
+        var elapsed = Math.round((Date.now() - startTime) / 100) / 10;
+        setGenProgress(100);
         var text = result.replace(/```[\w]*\n?/gm, '').replace(/```$/gm, '').trim();
         if (text.length < 200) throw new Error('生成されたテキストが短すぎます');
         setGenText(text); setEditText(text); setTab('edit');
-        setLoading(false); setLoadMsg('');
+        setLoading(false); setGenElapsed(elapsed);
       })
       .catch(function(err) {
-        setError(err.message); setLoading(false); setLoadMsg('');
+        clearInterval(genTimerRefState.current);
+        setGenProgress(0);
+        setError(err.message); setLoading(false);
       });
   }, [theme, topic, tone, price, freeWC, paidWC, age, situation, worry]);
 
@@ -879,7 +947,7 @@ function NoteGenerator(props) {
 
   return (
     <div style={{ minHeight:'100vh', background:'linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0a1628 100%)' }}>
-      <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}</style>
+      <style>{'@keyframes spin{to{transform:rotate(360deg)}} @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}'}</style>
       {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} />}
 
       {/* ヘッダー */}
@@ -980,17 +1048,26 @@ function NoteGenerator(props) {
             {/* 文体 */}
             <div style={cardStyle}>
               <span style={lblStyle}>🎨 文体スタイル</span>
-              <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:12 }}>
                 {NOTE_TONES.map(function(t) {
                   var isA = tone === t.id;
                   return (
                     <button key={t.id} onClick={function() { setTone(t.id); }}
-                      style={{ background: isA ? 'rgba(233,69,96,0.2)' : 'rgba(255,255,255,0.05)', border: isA ? '2px solid #e94560' : '1px solid rgba(255,255,255,0.1)', borderRadius:10, padding:'8px 14px', fontSize:13, cursor:'pointer', color: isA ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: isA ? 700 : 400 }}>
+                      style={{ background: isA ? 'rgba(233,69,96,0.2)' : 'rgba(255,255,255,0.05)', border: isA ? '2px solid #e94560' : '1px solid rgba(255,255,255,0.1)', borderRadius:10, padding:'8px 14px', fontSize:13, cursor:'pointer', color: isA ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: isA ? 700 : 400, transition:'all 0.15s' }}>
                       {t.label}
                     </button>
                   );
                 })}
               </div>
+              {/* 選択中の文体プレビュー */}
+              {NOTE_TONES.filter(function(t) { return t.id === tone; }).map(function(t) {
+                return (
+                  <div key={t.id} style={{ background:'rgba(233,69,96,0.06)', border:'1px solid rgba(233,69,96,0.2)', borderRadius:10, padding:'12px 14px' }}>
+                    <div style={{ fontSize:10, color:'#e94560', fontWeight:800, letterSpacing:'0.08em', marginBottom:6 }}>📝 文体イメージ</div>
+                    <div style={{ fontSize:12, color:'rgba(255,255,255,0.7)', lineHeight:1.75, fontStyle:'italic' }}>{t.preview}</div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* ターゲット読者 */}
@@ -1122,12 +1199,35 @@ function NoteGenerator(props) {
               </div>
             )}
 
-            {/* 生成ボタン */}
+            {/* 生成ボタン + プログレスゲージ */}
             <button onClick={handleGenerate} disabled={loading}
-              style={{ width:'100%', background: loading ? 'rgba(233,69,96,0.25)' : 'linear-gradient(135deg,#e94560,#c2185b)', border:'none', borderRadius:14, padding:18, color:'#fff', fontSize:16, fontWeight:900, cursor: loading ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 8px 30px rgba(233,69,96,0.45)', letterSpacing:'0.06em' }}>
-              {loading
-                ? (loadMsg || '⏳ 生成中...')
-                : currentAI.icon + ' ' + currentAI.label + ' で記事を生成する'}
+              style={{ width:'100%', background: loading ? 'rgba(233,69,96,0.15)' : 'linear-gradient(135deg,#e94560,#c2185b)', border: loading ? '1px solid rgba(233,69,96,0.3)' : 'none', borderRadius:14, padding:0, color:'#fff', fontSize:16, fontWeight:900, cursor: loading ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 8px 30px rgba(233,69,96,0.45)', overflow:'hidden', letterSpacing:'0.06em', position:'relative' }}>
+              {/* ゲージバー */}
+              {loading && (
+                <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.35)', borderRadius:14, zIndex:0 }} />
+              )}
+              {loading && (
+                <div style={{ position:'absolute', left:0, top:0, bottom:0, width: genProgress + '%', background:'linear-gradient(135deg,#e94560,#c2185b)', borderRadius: genProgress >= 99 ? 14 : '14px 0 0 14px', transition:'width 0.5s ease', zIndex:1 }} />
+              )}
+              <div style={{ position:'relative', zIndex:2, padding:'18px 24px', display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
+                {loading ? (
+                  <div>
+                    <div style={{ display:'flex', alignItems:'center', gap:8, justifyContent:'center', marginBottom:4 }}>
+                      <span style={{ display:'inline-block', animation:'spin 0.8s linear infinite', fontSize:16 }}>⚙️</span>
+                      <span style={{ fontSize:15 }}>{currentAI.label} で生成中...</span>
+                    </div>
+                    <div style={{ display:'flex', gap:16, fontSize:12, opacity:0.85, justifyContent:'center' }}>
+                      <span>⏱ {typeof genElapsed === 'number' ? genElapsed : 0}秒</span>
+                      <span>|</span>
+                      <span>{Math.round(genProgress)}%</span>
+                      <span>|</span>
+                      <span>{genProgress < 30 ? 'プロンプト送信中...' : genProgress < 60 ? 'AIが執筆中...' : genProgress < 90 ? '記事を仕上げています...' : '最終チェック中...'}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <span>{currentAI.icon + ' ' + currentAI.label + ' で記事を生成する'}</span>
+                )}
+              </div>
             </button>
           </div>
         )}
@@ -1503,6 +1603,15 @@ function ImagePromptGenerator(props) {
   var error = errState[0]; var setError = errState[1];
   var copiedState = useState({});
   var copied = copiedState[0]; var setCopied = copiedState[1];
+
+  // 生成タイマー・プログレスのstate
+  var genStartState = useState(0);
+  var genStart = genStartState[0]; var setGenStart = genStartState[1];
+  var genElapsedState = useState(0);
+  var genElapsed = genElapsedState[0]; var setGenElapsed = genElapsedState[1];
+  var genProgressState = useState(0);
+  var genProgress = genProgressState[0]; var setGenProgress = genProgressState[1];
+  var genTimerRefState = useRef(null);
 
   // Web検索例のstate
 
