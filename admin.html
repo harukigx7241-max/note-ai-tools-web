@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>note AI Tools — 管理者パネル</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", sans-serif;
+    background: #0a0a0f;
+    color: #e2e2e2;
+    min-height: 100vh;
+  }
+  #root { min-height: 100vh; }
+
+  /* LOGIN */
+  .login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0a0a0f 0%, #12091e 60%, #080f1e 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .login-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 500px 400px at 30% 50%, rgba(233,69,96,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 400px 400px at 80% 30%, rgba(99,102,241,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .login-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .login-box {
+    position: relative;
+    z-index: 1;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 48px;
+    width: 420px;
+    max-width: calc(100vw - 32px);
+  }
+  .login-logo {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .login-logo-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #e94560, #c2185b);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    margin: 0 auto 16px;
+  }
+  .login-logo h1 {
+    font-size: 22px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .login-logo p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .login-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .login-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 13px 16px;
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.15s;
+    font-family: monospace;
+    letter-spacing: 0.05em;
+  }
+  .login-input:focus { border-color: rgba(233,69,96,0.5); }
+  .login-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #e94560, #c2185b);
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 20px;
+    letter-spacing: 0.04em;
+    transition: opacity 0.15s;
+    font-family: inherit;
+  }
+  .login-btn:hover { opacity: 0.9; }
+  .login-error {
+    margin-top: 12px;
+    background: rgba(239,68,68,0.12);
+    border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #f87171;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  /* ADMIN LAYOUT */
+  .admin-layout {
+    display: flex;
+    min-height: 100vh;
+  }
+  .sidebar {
+    width: 240px;
+    background: #0d0d15;
+    border-right: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+  }
+  .sidebar-brand {
+    padding: 24px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .sidebar-brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(233,69,96,0.15);
+    border: 1px solid rgba(233,69,96,0.3);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 800;
+    color: #e94560;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .sidebar-brand h2 {
+    font-size: 16px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 2px;
+  }
+  .sidebar-brand p {
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+  }
+  .sidebar-nav {
+    flex: 1;
+    padding: 16px 12px;
+    overflow-y: auto;
+  }
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0 8px;
+    margin: 16px 0 6px;
+  }
+  .nav-section-label:first-child { margin-top: 0; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    width: 100%;
+    background: transparent;
+    text-align: left;
+    font-family: inherit;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.8); }
+  .nav-item.active { background: rgba(233,69,96,0.12); border-color: rgba(233,69,96,0.25); color: #fff; font-weight: 700; }
+  .nav-item .nav-icon { font-size: 16px; width: 22px; text-align: center; }
+  .sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .logout-btn {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 9px;
+    color: rgba(255,255,255,0.45);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .logout-btn:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
+
+  /* MAIN */
+  .admin-main {
+    flex: 1;
+    margin-left: 240px;
+    display: flex;
+    flex-direction: column;
+  }
+  .admin-topbar {
+    background: rgba(13,13,21,0.8);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 14px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    backdrop-filter: blur(10px);
+  }
+  .admin-topbar h1 { font-size: 18px; font-weight: 800; color: #fff; }
+  .admin-topbar p { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+  .admin-content {
+    flex: 1;
+    padding: 32px;
+    max-width: 1100px;
+    width: 100%;
+  }
+
+  /* CARDS */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+    padding: 22px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .stat-card.red::before { background: #e94560; }
+  .stat-card.indigo::before { background: #6366f1; }
+  .stat-card.pink::before { background: #ec4899; }
+  .stat-card.amber::before { background: #fbbf24; }
+  .stat-card.green::before { background: #22c55e; }
+  .stat-card.blue::before { background: #3b82f6; }
+  .stat-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .stat-value {
+    font-size: 32px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+  }
+
+  .section-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .section-card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .section-card-header h3 { font-size: 16px; font-weight: 700; color: #fff; }
+  .section-card-body { padding: 24px; }
+
+  /* TABLE */
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .admin-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0 0 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .admin-table td {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.65);
+    vertical-align: top;
+  }
+  .admin-table tr:last-child td { border-bottom: none; }
+  .admin-table td.mono { font-family: monospace; font-size: 12px; color: #e07b39; }
+
+  /* BADGE */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .badge.green { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .badge.red    { background: rgba(239,68,68,0.15); color: #f87171; }
+  .badge.amber  { background: rgba(251,191,36,0.15); color: #fbbf24; }
+  .badge.blue   { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .badge.purple { background: rgba(168,85,247,0.15); color: #c084fc; }
+
+  /* ACTION BUTTONS */
+  .action-btn {
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    border: 1px solid transparent;
+  }
+  .action-btn.danger {
+    background: rgba(239,68,68,0.1);
+    border-color: rgba(239,68,68,0.25);
+    color: #f87171;
+  }
+  .action-btn.danger:hover { background: rgba(239,68,68,0.2); }
+  .action-btn.primary {
+    background: rgba(233,69,96,0.15);
+    border-color: rgba(233,69,96,0.3);
+    color: #e94560;
+  }
+  .action-btn.primary:hover { background: rgba(233,69,96,0.25); }
+  .action-btn.secondary {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.6);
+  }
+  .action-btn.secondary:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+  /* FORM */
+  .admin-input {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 9px 14px;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  .admin-input:focus { border-color: rgba(233,69,96,0.4); }
+  .admin-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.06em;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* DIFF VIEWER */
+  .diff-added { background: rgba(34,197,94,0.1); color: #4ade80; }
+  .diff-removed { background: rgba(239,68,68,0.1); color: #f87171; text-decoration: line-through; }
+
+  /* CONFIRM DIALOG */
+  .confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .confirm-box {
+    background: #1a1a2e;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 32px;
+    width: 420px;
+    max-width: 100%;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+    .sidebar.open { transform: translateX(0); }
+    .admin-main { margin-left: 0; }
+    .admin-content { padding: 20px 16px; }
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useCallback, useRef } = React;
+
+// ============================================================
+// CONSTANTS
+// ============================================================
+var ADMIN_KEY = "admin_session_v1";
+var ADMIN_PASSWORD = "admin1234";
+var MULTI_AI_KEY = "multiAiKeys_v1";
+var STORAGE_PREFIX = "notetools_shared_";
+
+var AI_CONFIGS = [
+  { id: "claude",  label: "Claude",  icon: "🟠", color: "#e07b39" },
+  { id: "gemini",  label: "Gemini",  icon: "🔵", color: "#4285f4" },
+  { id: "chatgpt", label: "ChatGPT", icon: "🟢", color: "#10a37f" },
+  { id: "grok",    label: "Grok",    icon: "⚫", color: "#9ca3af" },
+];
+var TOOLS = [
+  { id: "note-generator", label: "📝 note記事生成",  file: "note-generator-v3.jsx",   lines: 794, color: "#e07b39" },
+  { id: "bonus-generator",label: "🎁 特典生成",      file: "bonus-generator.jsx",      lines: 419, color: "#6366f1" },
+  { id: "image-prompt",   label: "🎨 画像プロンプト",file: "image-prompt-generator.jsx",lines: 364, color: "#ec4899" },
+  { id: "dashboard",      label: "📊 ダッシュボード", file: "note-dashboard.jsx",        lines: 438, color: "#22c55e" },
+];
+
+// ============================================================
+// STORAGE HELPERS
+// ============================================================
+function dashGet(key) {
+  try { var v = localStorage.getItem(STORAGE_PREFIX + key); if (v === null) return null; return JSON.parse(v); }
+  catch(e) { return null; }
+}
+function dashSet(key, val) {
+  try { localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(val)); return true; }
+  catch(e) { return false; }
+}
+function dashDel(key) {
+  try { localStorage.removeItem(STORAGE_PREFIX + key); return true; }
+  catch(e) { return false; }
+}
+function dashList(prefix) {
+  var keys = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (k && k.indexOf(STORAGE_PREFIX) === 0) {
+      var stripped = k.slice(STORAGE_PREFIX.length);
+      if (!prefix || stripped.indexOf(prefix) === 0) keys.push(stripped);
+    }
+  }
+  return keys;
+}
+function loadApiKeys() {
+  try { return JSON.parse(localStorage.getItem(MULTI_AI_KEY) || "{}"); } catch(e) { return {}; }
+}
+function saveApiKey(aiId, key) {
+  var k = loadApiKeys(); k[aiId] = key;
+  localStorage.setItem(MULTI_AI_KEY, JSON.stringify(k));
+}
+function deleteApiKey(aiId) {
+  var k = loadApiKeys(); delete k[aiId];
+  localStorage.setItem(MULTI_AI_KEY, JSON.stringify(k));
+}
+
+// ============================================================
+// SESSION CHECK
+// ============================================================
+function checkSession() {
+  try {
+    var s = localStorage.getItem(ADMIN_KEY);
+    if (!s) return false;
+    var parsed = JSON.parse(s);
+    return parsed.authed === true && (Date.now() - parsed.ts < 1000 * 60 * 60 * 8); // 8時間
+  } catch(e) { return false; }
+}
+function saveSession() {
+  localStorage.setItem(ADMIN_KEY, JSON.stringify({ authed: true, ts: Date.now() }));
+}
+function clearSession() {
+  localStorage.removeItem(ADMIN_KEY);
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+function LoginPage(props) {
+  var onLogin = props.onLogin;
+  var ps = useState(""); var pw = ps[0]; var setPw = ps[1];
+  var es = useState(""); var error = es[0]; var setError = es[1];
+  var ls = useState(false); var loading = ls[0]; var setLoading = ls[1];
+  var ss = useState(false); var showPw = ss[0]; var setShowPw = ss[1];
+
+  function handleSubmit() {
+    if (!pw) { setError("パスワードを入力してください"); return; }
+    setLoading(true);
+    setTimeout(function() {
+      if (pw === ADMIN_PASSWORD) {
+        saveSession();
+        onLogin();
+      } else {
+        setError("パスワードが正しくありません");
+        setLoading(false);
+      }
+    }, 600);
+  }
+
+  function handleKeyDown(e) { if (e.key === "Enter") handleSubmit(); }
+
+  return (
+    <div className="login-wrap">
+      <div className="login-grid"></div>
+      <div className="login-box">
+        <div className="login-logo">
+          <div className="login-logo-icon">👑</div>
+          <h1>note AI Tools</h1>
+          <p>Admin Panel</p>
+        </div>
+        <label className="login-label">管理者パスワード</label>
+        <div style={{ position: "relative" }}>
+          <input
+            className="login-input"
+            type={showPw ? "text" : "password"}
+            value={pw}
+            onChange={function(e) { setPw(e.target.value); setError(""); }}
+            onKeyDown={handleKeyDown}
+            placeholder="パスワードを入力"
+            autoFocus
+          />
+          <button onClick={function() { setShowPw(function(v) { return !v; }); }}
+            style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "rgba(255,255,255,0.4)" }}>
+            {showPw ? "🙈" : "👁"}
+          </button>
+        </div>
+        <button className="login-btn" onClick={handleSubmit} disabled={loading}>
+          {loading ? <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><span style={{ display: "inline-block", width: 14, height: 14, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />認証中...</span> : "🔐 管理者としてログイン"}
+        </button>
+        {error && <div className="login-error">{error}</div>}
+        <p style={{ textAlign: "center", marginTop: 20, fontSize: 11, color: "rgba(255,255,255,0.2)" }}>
+          セッションは8時間有効です
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// CONFIRM DIALOG
+// ============================================================
+function ConfirmDialog(props) {
+  var title = props.title; var message = props.message;
+  var onConfirm = props.onConfirm; var onCancel = props.onCancel;
+  var danger = props.danger || false;
+  return (
+    <div className="confirm-overlay">
+      <div className="confirm-box">
+        <h3 style={{ fontSize: 18, fontWeight: 800, color: "#fff", marginBottom: 12 }}>{title}</h3>
+        <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.7, marginBottom: 28 }}>{message}</p>
+        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+          <button className="action-btn secondary" onClick={onCancel}>キャンセル</button>
+          <button className={"action-btn " + (danger ? "danger" : "primary")} onClick={onConfirm}>確認</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// PAGES
+// ============================================================
+
+// ---- OVERVIEW ----
+function OverviewPage() {
+  var usage = dashGet("dashboard:usage") || [];
+  var toolCounts = {};
+  TOOLS.forEach(function(t) { toolCounts[t.id] = 0; });
+  usage.forEach(function(u) { if (toolCounts[u.toolId] !== undefined) toolCounts[u.toolId]++; });
+  var apiKeys = loadApiKeys();
+  var totalKeys = AI_CONFIGS.filter(function(a) { return !!apiKeys[a.id]; }).length;
+  var allKeys = dashList("");
+  var storageUsed = allKeys.length;
+
+  // 最近7日の利用
+  var now = Date.now();
+  var recent7 = usage.filter(function(u) { return now - new Date(u.timestamp).getTime() < 7 * 24 * 60 * 60 * 1000; });
+
+  return (
+    <div>
+      <div className="stat-grid">
+        <div className="stat-card red">
+          <div className="stat-label">総利用回数</div>
+          <div className="stat-value">{usage.length}</div>
+          <div className="stat-sub">全ツール合計</div>
+        </div>
+        <div className="stat-card blue">
+          <div className="stat-label">直近7日</div>
+          <div className="stat-value">{recent7.length}</div>
+          <div className="stat-sub">過去7日間の利用</div>
+        </div>
+        <div className="stat-card amber">
+          <div className="stat-label">APIキー登録数</div>
+          <div className="stat-value">{totalKeys}<span style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginLeft: 4 }}>/4</span></div>
+          <div className="stat-sub">設定済みAI</div>
+        </div>
+        <div className="stat-card green">
+          <div className="stat-label">Storageエントリ</div>
+          <div className="stat-value">{storageUsed}</div>
+          <div className="stat-sub">localStorage保存数</div>
+        </div>
+      </div>
+
+      {/* ツール別統計 */}
+      <div className="section-card">
+        <div className="section-card-header">
+          <h3>ツール別利用統計</h3>
+        </div>
+        <div className="section-card-body" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
+          {TOOLS.map(function(tool) {
+            var count = toolCounts[tool.id] || 0;
+            var pct = usage.length > 0 ? Math.round((count / usage.length) * 100) : 0;
+            return (
+              <div key={tool.id} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: 20 }}>
+                <div style={{ fontSize: 22, marginBottom: 10 }}>{tool.label.split(" ")[0]}</div>
+                <div style={{ fontWeight: 700, fontSize: 14, color: "#fff", marginBottom: 4 }}>{tool.label.split(" ").slice(1).join(" ")}</div>
+                <div style={{ fontSize: 26, fontWeight: 900, color: tool.color, marginBottom: 6 }}>{count}<span style={{ fontSize: 13, fontWeight: 400, color: "rgba(255,255,255,0.4)", marginLeft: 4 }}>回</span></div>
+                <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 4, height: 4, overflow: "hidden" }}>
+                  <div style={{ width: pct + "%", height: "100%", background: tool.color, borderRadius: 4, transition: "width 0.5s ease" }}></div>
+                </div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 4 }}>{pct}%</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* APIキー状態 */}
+      <div className="section-card">
+        <div className="section-card-header">
+          <h3>APIキー状態</h3>
+        </div>
+        <div className="section-card-body">
+          <table className="admin-table">
+            <thead><tr><th>AI</th><th>モデル</th><th>状態</th><th>キープレフィックス</th></tr></thead>
+            <tbody>
+              {AI_CONFIGS.map(function(ai) {
+                var key = apiKeys[ai.id] || "";
+                var hasKey = !!key;
+                var models = { claude: "claude-sonnet-4-20250514", gemini: "gemini-2.0-flash", chatgpt: "gpt-4o", grok: "grok-3" };
+                return (
+                  <tr key={ai.id}>
+                    <td><span style={{ fontSize: 16, marginRight: 8 }}>{ai.icon}</span>{ai.label}</td>
+                    <td className="mono">{models[ai.id]}</td>
+                    <td><span className={"badge " + (hasKey ? "green" : "red")}>{hasKey ? "✓ 設定済み" : "未設定"}</span></td>
+                    <td className="mono" style={{ color: "rgba(255,255,255,0.3)" }}>{hasKey ? key.slice(0, 12) + "..." : "—"}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---- USAGE LOG ----
+function UsagePage() {
+  var cs = useState(null); var confirm = cs[0]; var setConfirm = cs[1];
+  var usage = dashGet("dashboard:usage") || [];
+  var fs = useState(""); var filter = fs[0]; var setFilter = fs[1];
+  var ss = useState(50); var showCount = ss[0]; var setShowCount = ss[1];
+  var ts = useState({}); var toast = ts[0]; var setToast = ts[1];
+
+  var filtered = usage.filter(function(u) { return !filter || u.toolId.indexOf(filter) !== -1; });
+
+  function handleClearAll() {
+    setConfirm({
+      title: "利用履歴をすべて削除",
+      message: "全ての利用履歴（" + usage.length + "件）が削除されます。この操作は取り消せません。",
+      danger: true,
+      onConfirm: function() {
+        dashDel("dashboard:usage");
+        setConfirm(null);
+        setToast({ msg: "利用履歴をクリアしました", type: "success" });
+        setTimeout(function() { setToast({}); }, 2500);
+        window.location.reload();
+      }
+    });
+  }
+
+  function handleExportCSV() {
+    var rows = [["ツールID", "日時"]];
+    usage.forEach(function(u) { rows.push([u.toolId, new Date(u.timestamp).toLocaleString("ja-JP")]); });
+    var csv = rows.map(function(r) { return r.join(","); }).join("\n");
+    var blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "usage_log.csv"; a.click();
+  }
+
+  return (
+    <div>
+      {confirm && <ConfirmDialog title={confirm.title} message={confirm.message} danger={confirm.danger} onConfirm={confirm.onConfirm} onCancel={function() { setConfirm(null); }} />}
+      {toast.msg && (
+        <div style={{ position: "fixed", top: 20, right: 20, background: toast.type === "success" ? "rgba(34,197,94,0.2)" : "rgba(239,68,68,0.2)", border: "1px solid " + (toast.type === "success" ? "rgba(34,197,94,0.4)" : "rgba(239,68,68,0.4)"), borderRadius: 10, padding: "12px 20px", color: toast.type === "success" ? "#4ade80" : "#f87171", fontSize: 14, fontWeight: 700, zIndex: 9999 }}>
+          {toast.msg}
+        </div>
+      )}
+      <div className="section-card">
+        <div className="section-card-header">
+          <h3>利用履歴 ({filtered.length}件)</h3>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button className="action-btn secondary" onClick={handleExportCSV}>📥 CSV書き出し</button>
+            <button className="action-btn danger" onClick={handleClearAll}>🗑 全削除</button>
+          </div>
+        </div>
+        <div style={{ padding: "16px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {[{ id: "", label: "すべて" }].concat(TOOLS.map(function(t) { return { id: t.id, label: t.label }; })).map(function(opt) {
+              return (
+                <button key={opt.id} onClick={function() { setFilter(opt.id); }}
+                  style={{ padding: "5px 12px", borderRadius: 6, border: filter === opt.id ? "1px solid rgba(233,69,96,0.5)" : "1px solid rgba(255,255,255,0.1)", background: filter === opt.id ? "rgba(233,69,96,0.12)" : "rgba(255,255,255,0.03)", color: filter === opt.id ? "#e94560" : "rgba(255,255,255,0.5)", fontSize: 12, cursor: "pointer", fontWeight: filter === opt.id ? 700 : 400 }}>
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div className="section-card-body" style={{ padding: 0 }}>
+          {filtered.length === 0 ? (
+            <div style={{ textAlign: "center", padding: 40, color: "rgba(255,255,255,0.3)" }}>
+              <div style={{ fontSize: 40, marginBottom: 12 }}>📋</div>
+              <div>利用履歴がありません</div>
+            </div>
+          ) : (
+            <>
+              <table className="admin-table" style={{ margin: 0 }}>
+                <thead><tr style={{ padding: "0 24px" }}><th style={{ padding: "12px 24px" }}>ツール</th><th style={{ padding: "12px 24px" }}>日時</th><th style={{ padding: "12px 24px" }}>経過時間</th></tr></thead>
+                <tbody>
+                  {filtered.slice(0, showCount).map(function(u, idx) {
+                    var tool = TOOLS.find(function(t) { return t.id === u.toolId; });
+                    var d = new Date(u.timestamp);
+                    var elapsed = Math.floor((Date.now() - d.getTime()) / 60000);
+                    var elapsedStr = elapsed < 60 ? elapsed + "分前" : elapsed < 1440 ? Math.floor(elapsed / 60) + "時間前" : Math.floor(elapsed / 1440) + "日前";
+                    return (
+                      <tr key={idx}>
+                        <td style={{ padding: "12px 24px" }}>
+                          <span style={{ fontSize: 15, marginRight: 8 }}>{tool ? tool.label.split(" ")[0] : "?"}</span>
+                          <span style={{ color: "#fff" }}>{tool ? tool.label.split(" ").slice(1).join(" ") : u.toolId}</span>
+                        </td>
+                        <td style={{ padding: "12px 24px" }} className="mono" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "monospace", fontSize: 12, padding: "12px 24px" }}>
+                          {d.toLocaleDateString("ja-JP")} {d.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}
+                        </td>
+                        <td style={{ padding: "12px 24px" }}>
+                          <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>{elapsedStr}</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              {filtered.length > showCount && (
+                <div style={{ padding: 16, textAlign: "center" }}>
+                  <button className="action-btn secondary" onClick={function() { setShowCount(function(c) { return c + 50; }); }}>
+                    さらに表示 ({filtered.length - showCount}件)
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---- API KEYS ----
+function ApiKeysPage() {
+  var ks = useState(loadApiKeys()); var keys = ks[0]; var setKeys = ks[1];
+  var ss = useState({}); var show = ss[0]; var setShow = ss[1];
+  var vs = useState({}); var saved = vs[0]; var setSaved = vs[1];
+  var cs = useState(null); var confirm = cs[0]; var setConfirm = cs[1];
+
+  function doSave(id) {
+    saveApiKey(id, keys[id] || "");
+    setSaved(function(s) { var n = Object.assign({}, s); n[id] = true; return n; });
+    setTimeout(function() { setSaved(function(s) { var n = Object.assign({}, s); n[id] = false; return n; }); }, 2000);
+  }
+
+  function doDelete(id, label) {
+    setConfirm({
+      title: label + " のAPIキーを削除",
+      message: "このAPIキーをlocalStorageから完全に削除します。再度使用するには再入力が必要です。",
+      danger: true,
+      onConfirm: function() {
+        deleteApiKey(id);
+        setKeys(function(k) { var n = Object.assign({}, k); delete n[id]; return n; });
+        setConfirm(null);
+      }
+    });
+  }
+
+  var models = { claude: "claude-sonnet-4-20250514", gemini: "gemini-2.0-flash", chatgpt: "gpt-4o", grok: "grok-3" };
+  var endpoints = { claude: "api.anthropic.com", gemini: "generativelanguage.googleapis.com", chatgpt: "api.openai.com", grok: "api.x.ai" };
+
+  return (
+    <div>
+      {confirm && <ConfirmDialog title={confirm.title} message={confirm.message} danger={confirm.danger} onConfirm={confirm.onConfirm} onCancel={function() { setConfirm(null); }} />}
+      <div className="section-card" style={{ marginBottom: 24 }}>
+        <div className="section-card-header">
+          <h3>APIキー管理</h3>
+          <span className="badge amber">ブラウザ保存</span>
+        </div>
+        <div className="section-card-body">
+          <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 10, padding: "12px 16px", marginBottom: 24, fontSize: 13, color: "#fbbf24" }}>
+            ⚠️ APIキーはブラウザのlocalStorageに保存されます。共有環境での使用は推奨しません。
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            {AI_CONFIGS.map(function(ai) {
+              var hasKey = !!keys[ai.id];
+              return (
+                <div key={ai.id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: "18px 20px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontSize: 22 }}>{ai.icon}</span>
+                      <div>
+                        <div style={{ fontWeight: 700, color: "#fff", fontSize: 15 }}>{ai.label}</div>
+                        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "monospace" }}>{models[ai.id]}</div>
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span className={"badge " + (hasKey ? "green" : "red")}>{hasKey ? "✓ 設定済み" : "未設定"}</span>
+                      <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", fontFamily: "monospace" }}>{endpoints[ai.id]}</span>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <div style={{ position: "relative", flex: 1 }}>
+                      <input type={show[ai.id] ? "text" : "password"} className="admin-input"
+                        value={keys[ai.id] || ""}
+                        onChange={function(e) { var v = e.target.value; setKeys(function(k) { var n = Object.assign({}, k); n[ai.id] = v; return n; }); }}
+                        placeholder={ai.label + " APIキーを入力"} />
+                    </div>
+                    <button onClick={function() { setShow(function(s) { var n = Object.assign({}, s); n[ai.id] = !s[ai.id]; return n; }); }}
+                      style={{ padding: "0 12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: 16, minWidth: 44 }}>
+                      {show[ai.id] ? "🙈" : "👁"}
+                    </button>
+                    <button onClick={function() { doSave(ai.id); }}
+                      style={{ padding: "0 18px", background: saved[ai.id] ? "rgba(34,197,94,0.2)" : "rgba(233,69,96,0.15)", border: saved[ai.id] ? "1px solid rgba(34,197,94,0.4)" : "1px solid rgba(233,69,96,0.3)", borderRadius: 8, color: saved[ai.id] ? "#4ade80" : "#e94560", cursor: "pointer", fontWeight: 700, fontSize: 13, minWidth: 70, fontFamily: "inherit" }}>
+                      {saved[ai.id] ? "✅ 保存" : "保存"}
+                    </button>
+                    {hasKey && (
+                      <button onClick={function() { doDelete(ai.id, ai.label); }} className="action-btn danger" style={{ minWidth: 56 }}>削除</button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---- FILES ----
+function FilesPage() {
+  var BUGS = [
+    { id: 1, file: "bonus-generator.jsx", line: 341, severity: "critical", symptom: "JSX構文エラー", desc: "}>.txt となっているJSX構文エラー", fix: "}>.txt → }>に修正済み（Webサイト版）" },
+    { id: 2, file: "note-dashboard.jsx",  line: 165, severity: "medium",   symptom: "タブ切り替え不可（潜在的）", desc: "map()内クロージャによるstale closure（元コードでは発生しにくいが移植時に注意）", fix: "DashTabBtnとして独立コンポーネント化済み" },
+    { id: 3, file: "bonus-generator.jsx / image-prompt-generator.jsx / note-dashboard.jsx", line: "catch", severity: "low", symptom: "Babelパースエラー（環境依存）", desc: "catch(e)なしのbindingless catch — Babel旧版では非対応", fix: "catch(e) {} に統一済み" },
+  ];
+
+  var severityColors = { critical: "red", medium: "amber", low: "blue" };
+  var severityLabels = { critical: "Critical", medium: "Medium", low: "Low" };
+
+  return (
+    <div>
+      {/* ファイル一覧 */}
+      <div className="section-card" style={{ marginBottom: 24 }}>
+        <div className="section-card-header">
+          <h3>ファイル一覧</h3>
+          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>GitHub: harukigx7241-max/note_ai_tools</span>
+        </div>
+        <div className="section-card-body">
+          <table className="admin-table">
+            <thead><tr><th>ファイル</th><th>機能</th><th>行数</th><th>状態</th></tr></thead>
+            <tbody>
+              {TOOLS.map(function(tool) {
+                return (
+                  <tr key={tool.id}>
+                    <td className="mono">{tool.file}</td>
+                    <td style={{ color: "#fff" }}>{tool.label}</td>
+                    <td style={{ fontFamily: "monospace", color: "rgba(255,255,255,0.5)" }}>{tool.lines} L</td>
+                    <td><span className="badge green">✓ Webサイト版に変換済み</span></td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* バグレポート */}
+      <div className="section-card">
+        <div className="section-card-header">
+          <h3>バグ診断レポート</h3>
+          <span className="badge green">全修正済み（Webサイト版）</span>
+        </div>
+        <div className="section-card-body">
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {BUGS.map(function(bug) {
+              return (
+                <div key={bug.id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: "16px 20px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+                    <div style={{ display: "flex", align: "center", gap: 10 }}>
+                      <span className={"badge " + severityColors[bug.severity]} style={{ marginRight: 10 }}>{severityLabels[bug.severity]}</span>
+                      <span style={{ fontWeight: 700, color: "#fff", fontSize: 14 }}>{bug.symptom}</span>
+                    </div>
+                    <span style={{ fontFamily: "monospace", fontSize: 11, color: "rgba(255,255,255,0.3)" }}>L{bug.line}</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", fontFamily: "monospace", marginBottom: 6 }}>{bug.file}</div>
+                  <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 8 }}>{bug.desc}</div>
+                  <div style={{ fontSize: 13, color: "#4ade80" }}>✅ {bug.fix}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---- STORAGE ----
+function StoragePage() {
+  var cs = useState(null); var confirm = cs[0]; var setConfirm = cs[1];
+  var rs = useState(0); var refreshKey = rs[0]; var setRefreshKey = rs[1];
+
+  function refresh() { setRefreshKey(function(k) { return k + 1; }); }
+  var allKeys = dashList("");
+  var apiKeys = loadApiKeys();
+
+  function handleDeleteKey(storageKey) {
+    setConfirm({
+      title: "エントリを削除",
+      message: "「" + storageKey + "」をlocalStorageから削除します。",
+      danger: true,
+      onConfirm: function() {
+        dashDel(storageKey);
+        setConfirm(null);
+        refresh();
+      }
+    });
+  }
+
+  function handleClearAll() {
+    setConfirm({
+      title: "全storageデータを削除",
+      message: "notetools_shared_ プレフィックスを持つ全データ（" + allKeys.length + "件）を削除します。APIキーは別途保持されます。",
+      danger: true,
+      onConfirm: function() {
+        allKeys.forEach(function(k) { dashDel(k); });
+        setConfirm(null);
+        refresh();
+      }
+    });
+  }
+
+  function getPreview(key) {
+    var raw = localStorage.getItem(STORAGE_PREFIX + key);
+    if (!raw) return "null";
+    if (raw.length > 80) return raw.slice(0, 80) + "...";
+    return raw;
+  }
+
+  function getSize(key) {
+    var raw = localStorage.getItem(STORAGE_PREFIX + key) || "";
+    return (new Blob([raw]).size / 1024).toFixed(1) + " KB";
+  }
+
+  return (
+    <div>
+      {confirm && <ConfirmDialog title={confirm.title} message={confirm.message} danger={confirm.danger} onConfirm={confirm.onConfirm} onCancel={function() { setConfirm(null); }} />}
+      {/* APIキー（読み取り専用） */}
+      <div className="section-card" style={{ marginBottom: 24 }}>
+        <div className="section-card-header">
+          <h3>APIキー（multiAiKeys_v1）</h3>
+          <span className="badge blue">読み取り専用表示</span>
+        </div>
+        <div className="section-card-body">
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            {AI_CONFIGS.map(function(ai) {
+              var has = !!apiKeys[ai.id];
+              return (
+                <div key={ai.id} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: "12px 16px", minWidth: 160 }}>
+                  <div style={{ fontSize: 18, marginBottom: 6 }}>{ai.icon}</div>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: "#fff", marginBottom: 4 }}>{ai.label}</div>
+                  <span className={"badge " + (has ? "green" : "red")}>{has ? "✓ 設定済み" : "未設定"}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ツールデータ */}
+      <div className="section-card">
+        <div className="section-card-header">
+          <h3>Storageデータ一覧 ({allKeys.length}件)</h3>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button className="action-btn secondary" onClick={refresh}>🔄 更新</button>
+            {allKeys.length > 0 && <button className="action-btn danger" onClick={handleClearAll}>🗑 全削除</button>}
+          </div>
+        </div>
+        <div className="section-card-body" style={{ padding: 0 }}>
+          {allKeys.length === 0 ? (
+            <div style={{ textAlign: "center", padding: 40, color: "rgba(255,255,255,0.3)" }}>
+              <div style={{ fontSize: 36, marginBottom: 12 }}>📦</div>
+              <div>Storageデータがありません</div>
+            </div>
+          ) : (
+            <table className="admin-table">
+              <thead><tr style={{ padding: "0 24px" }}><th style={{ padding: "12px 24px" }}>キー</th><th style={{ padding: "12px 24px" }}>サイズ</th><th style={{ padding: "12px 24px" }}>プレビュー</th><th style={{ padding: "12px 24px" }}>操作</th></tr></thead>
+              <tbody>
+                {allKeys.map(function(k) {
+                  return (
+                    <tr key={k}>
+                      <td style={{ padding: "12px 24px" }} className="mono" style={{ fontFamily: "monospace", fontSize: 12, color: "#e07b39", padding: "12px 24px" }}>{k}</td>
+                      <td style={{ padding: "12px 24px", color: "rgba(255,255,255,0.4)", fontSize: 12 }}>{getSize(k)}</td>
+                      <td style={{ padding: "12px 24px", maxWidth: 300, overflow: "hidden" }}>
+                        <div style={{ fontFamily: "monospace", fontSize: 11, color: "rgba(255,255,255,0.35)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{getPreview(k)}</div>
+                      </td>
+                      <td style={{ padding: "12px 24px" }}>
+                        <button className="action-btn danger" onClick={function() { handleDeleteKey(k); }}>削除</button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---- SETTINGS ----
+function SettingsPage(props) {
+  var onLogout = props.onLogout;
+  var cs = useState(null); var confirm = cs[0]; var setConfirm = cs[1];
+
+  function handleLogout() {
+    setConfirm({
+      title: "ログアウト",
+      message: "管理者セッションを終了します。",
+      danger: false,
+      onConfirm: function() { clearSession(); onLogout(); }
+    });
+  }
+
+  function handleResetAll() {
+    setConfirm({
+      title: "全データを初期化",
+      message: "APIキーを含む全てのlocalStorageデータを削除します。この操作は取り消せません。",
+      danger: true,
+      onConfirm: function() {
+        localStorage.clear();
+        clearSession();
+        onLogout();
+      }
+    });
+  }
+
+  return (
+    <div>
+      {confirm && <ConfirmDialog title={confirm.title} message={confirm.message} danger={confirm.danger} onConfirm={confirm.onConfirm} onCancel={function() { setConfirm(null); }} />}
+      {/* 認証設定 */}
+      <div className="section-card" style={{ marginBottom: 24 }}>
+        <div className="section-card-header"><h3>認証設定</h3></div>
+        <div className="section-card-body">
+          <table className="admin-table">
+            <thead><tr><th>設定</th><th>値</th><th>説明</th></tr></thead>
+            <tbody>
+              <tr>
+                <td style={{ color: "#fff" }}>管理者パスワード</td>
+                <td className="mono" style={{ fontFamily: "monospace", fontSize: 12, color: "#e07b39" }}>admin1234</td>
+                <td style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>ソースコード内で変更可能（ADMIN_PASSWORD定数）</td>
+              </tr>
+              <tr>
+                <td style={{ color: "#fff" }}>セッション有効期間</td>
+                <td className="mono" style={{ fontFamily: "monospace", fontSize: 12, color: "#e07b39" }}>8時間</td>
+                <td style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>ログイン後8時間でセッションが失効</td>
+              </tr>
+              <tr>
+                <td style={{ color: "#fff" }}>StorageキーPrefix</td>
+                <td className="mono" style={{ fontFamily: "monospace", fontSize: 12, color: "#e07b39" }}>notetools_shared_</td>
+                <td style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>全ツールで共通使用</td>
+              </tr>
+              <tr>
+                <td style={{ color: "#fff" }}>APIキーStorage名</td>
+                <td className="mono" style={{ fontFamily: "monospace", fontSize: 12, color: "#e07b39" }}>multiAiKeys_v1</td>
+                <td style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>全4AIのキーをJSONで保存</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Babel互換ルール */}
+      <div className="section-card" style={{ marginBottom: 24 }}>
+        <div className="section-card-header"><h3>Babel互換ルール（開発メモ）</h3></div>
+        <div className="section-card-body">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {[
+              { type: "danger", icon: "❌", rule: "?? 演算子禁止", fix: "|| または三項演算子を使用" },
+              { type: "danger", icon: "❌", rule: "JSX内IIFE禁止", fix: "別コンポーネントに分離" },
+              { type: "danger", icon: "❌", rule: "map()内setStateclosure禁止", fix: "独立コンポーネント化" },
+              { type: "danger", icon: "❌", rule: "予約語キー非クォート禁止", fix: "[\"delete\"]: クォート必須" },
+              { type: "danger", icon: "❌", rule: "dynamic import禁止", fix: "static importのみ" },
+              { type: "danger", icon: "❌", rule: "catch{} bindingless禁止", fix: "catch(e){} に統一" },
+            ].map(function(r, i) {
+              return (
+                <div key={i} style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 10, padding: "12px 16px" }}>
+                  <div style={{ fontWeight: 700, fontSize: 13, color: "#f87171", marginBottom: 4 }}>{r.icon} {r.rule}</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>→ {r.fix}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* 危険ゾーン */}
+      <div className="section-card" style={{ border: "1px solid rgba(239,68,68,0.2)" }}>
+        <div className="section-card-header">
+          <h3 style={{ color: "#f87171" }}>⚠️ 危険ゾーン</h3>
+        </div>
+        <div className="section-card-body">
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <div style={{ flex: 1, minWidth: 260 }}>
+              <div style={{ fontWeight: 700, color: "#fff", marginBottom: 6 }}>ログアウト</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 12 }}>管理者セッションを終了します</div>
+              <button className="action-btn secondary" onClick={handleLogout}>🚪 ログアウト</button>
+            </div>
+            <div style={{ flex: 1, minWidth: 260 }}>
+              <div style={{ fontWeight: 700, color: "#f87171", marginBottom: 6 }}>全データ初期化</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 12 }}>APIキーを含む全localStorageデータを削除します</div>
+              <button className="action-btn danger" onClick={handleResetAll}>🗑 全データを削除してリセット</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// MAIN ADMIN APP
+// ============================================================
+function AdminApp() {
+  var auth = useState(checkSession()); var isAuthed = auth[0]; var setIsAuthed = auth[1];
+  var pg = useState("overview"); var page = pg[0]; var setPage = pg[1];
+
+  if (!isAuthed) {
+    return <LoginPage onLogin={function() { setIsAuthed(true); }} />;
+  }
+
+  var NAV = [
+    { section: "概要" },
+    { id: "overview",  label: "概要",        icon: "📊" },
+    { section: "管理" },
+    { id: "usage",     label: "利用履歴",     icon: "📈" },
+    { id: "apikeys",   label: "APIキー管理",  icon: "🔑" },
+    { id: "storage",   label: "Storage管理",  icon: "💾" },
+    { id: "files",     label: "ファイル・バグ",icon: "📁" },
+    { section: "システム" },
+    { id: "settings",  label: "設定",         icon: "⚙️" },
+  ];
+
+  var pageTitles = {
+    overview: { title: "概要", sub: "ツール利用状況とシステム状態" },
+    usage:    { title: "利用履歴", sub: "ツール利用ログの確認・管理" },
+    apikeys:  { title: "APIキー管理", sub: "各AI APIキーの登録・更新・削除" },
+    storage:  { title: "Storage管理", sub: "localStorageデータの確認・削除" },
+    files:    { title: "ファイル・バグ診断", sub: "ソースファイルとバグ修正レポート" },
+    settings: { title: "設定", sub: "認証・開発設定・データリセット" },
+  };
+  var current = pageTitles[page] || { title: page, sub: "" };
+
+  return (
+    <div className="admin-layout">
+      {/* SIDEBAR */}
+      <nav className="sidebar">
+        <div className="sidebar-brand">
+          <div className="sidebar-brand-badge">👑 Admin</div>
+          <h2>note AI Tools</h2>
+          <p>管理者パネル</p>
+        </div>
+        <div className="sidebar-nav">
+          {NAV.map(function(item, idx) {
+            if (item.section) {
+              return <div key={idx} className="nav-section-label">{item.section}</div>;
+            }
+            var capturedId = item.id;
+            return (
+              <button key={item.id} className={"nav-item" + (page === item.id ? " active" : "")} onClick={function() { setPage(capturedId); }}>
+                <span className="nav-icon">{item.icon}</span>
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+        <div className="sidebar-footer">
+          <button className="logout-btn" onClick={function() { clearSession(); setIsAuthed(false); }}>🚪 ログアウト</button>
+        </div>
+      </nav>
+
+      {/* MAIN */}
+      <div className="admin-main">
+        <div className="admin-topbar">
+          <div>
+            <h1>{current.title}</h1>
+            <p>{current.sub}</p>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>
+              {new Date().toLocaleDateString("ja-JP", { month: "long", day: "numeric", weekday: "short" })}
+            </span>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e" }} title="認証済み"></div>
+          </div>
+        </div>
+        <div className="admin-content">
+          {page === "overview" && <OverviewPage />}
+          {page === "usage"    && <UsagePage />}
+          {page === "apikeys"  && <ApiKeysPage />}
+          {page === "storage"  && <StoragePage />}
+          {page === "files"    && <FilesPage />}
+          {page === "settings" && <SettingsPage onLogout={function() { setIsAuthed(false); }} />}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<AdminApp />);
+</script>
+</body>
+</html>
