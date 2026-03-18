@@ -336,6 +336,16 @@ async function callClaude(messages, systemPrompt, maxTokens) {
      - gemini-1.5-flash は廃止。現行モデルは gemini-2.0-flash / gemini-2.5-flash
      - モデル: gemini-2.0-flash (標準・安定), gemini-2.5-flash (高性能・フォールバック)
 */
+async function callGeminiModel(key, body, model) {
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + key;
+  var res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  return res;
+}
+
 async function callGemini(messages, systemPrompt, maxTokens) {
   var key = getKey('gemini');
   if (!key) throw new Error('Gemini: APIキーが設定されていません');
@@ -355,61 +365,64 @@ async function callGemini(messages, systemPrompt, maxTokens) {
     body.systemInstruction = { parts: [{ text: systemPrompt }] };
   }
 
-  // gemini-2.0-flashを優先、404/429時はgemini-2.5-flashにフォールバック
-  var models = ['gemini-2.0-flash', 'gemini-2.5-flash'];
-  var lastErr = null;
-  for (var i = 0; i < models.length; i++) {
-    var model = models[i];
-    var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + key;
+  // モデル優先順位: gemini-2.0-flash → gemini-2.5-flash → gemini-1.5-flash
+  // 再帰関数でBabel互換に実装（forループ内awaitを避ける）
+  async function tryModel(modelList, idx) {
+    if (idx >= modelList.length) {
+      throw new Error('Gemini: 利用可能なモデルが見つかりませんでした。\nAPIキーをGoogle AI Studio(aistudio.google.com)で確認してください。');
+    }
+    var model = modelList[idx];
     var res;
     try {
-      res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
+      res = await callGeminiModel(key, body, model);
     } catch(e) {
-      lastErr = new Error('Gemini: ネットワークエラー - ' + e.message);
-      continue;
+      return tryModel(modelList, idx + 1);
     }
+
     if (res.status === 429) {
-      // 429の場合は次のモデルを試す前に少し待機
-      if (i < models.length - 1) {
-        await new Promise(function(r) { setTimeout(r, 3000); });
-        lastErr = new Error('Gemini 429: レート制限。次のモデルを試します...');
-        continue;
+      if (idx < modelList.length - 1) {
+        // 429: レート制限 → 3秒待って次のモデルを試す
+        await new Promise(function(resolve) { setTimeout(resolve, 3000); });
+        return tryModel(modelList, idx + 1);
       }
-      throw new Error('Gemini 429: レート制限超過。無料枠の上限に達しました。\n・しばらく時間をおいてから再試行してください\n・Google AI Studioで使用量を確認してください');
+      throw new Error('Gemini 429: レート制限超過。無料枠の上限に達しました。\n・しばらく待ってから再試行してください\n・Google AI Studio(aistudio.google.com)で使用量を確認してください');
     }
+
     if (res.status === 404) {
-      // 404はモデルが存在しない or このAPIバージョンでサポートされていない
-      if (i < models.length - 1) {
-        lastErr = new Error('Gemini 404: モデル ' + model + ' が見つかりません。次のモデルを試します...');
-        continue;
+      // 404: モデルが見つからない → 次のモデルを試す
+      if (idx < modelList.length - 1) {
+        return tryModel(modelList, idx + 1);
       }
       var e404 = {};
       try { e404 = await res.json(); } catch(ex) {}
       var msg404 = e404.error ? e404.error.message : '';
-      throw new Error('Gemini 404: モデルが見つかりません。' + (msg404 ? ' (' + msg404 + ')' : '') + '\nAPIキーが正しいか、Google AI Studioで確認してください。');
+      throw new Error('Gemini 404: モデルが見つかりません。' + (msg404 ? '\n' + msg404 : '') + '\nAPIキーをGoogle AI Studioで確認してください。');
     }
+
     if (res.status === 400) {
       var e400 = {};
       try { e400 = await res.json(); } catch(ex) {}
       var msg400 = e400.error ? e400.error.message : '';
-      throw new Error('Gemini 400: APIキーが無効か、リクエストが不正です。' + (msg400 ? ' (' + msg400 + ')' : '') + '\nGoogle AI Studio(aistudio.google.com)でキーを確認してください。');
+      throw new Error('Gemini 400: APIキーが無効またはリクエストが不正です。\n' + (msg400 || '') + '\nGoogle AI Studio(aistudio.google.com)でAPIキーを確認してください。');
     }
+
     if (res.status === 403) {
-      throw new Error('Gemini 403: APIキーに権限がありません。Google AI Studioでキーの設定を確認してください。');
+      throw new Error('Gemini 403: APIキーに権限がありません。\nGoogle AI Studio(aistudio.google.com)でAPIキーを確認してください。');
     }
+
+    if (res.status === 401) {
+      throw new Error('Gemini 401: APIキーが無効です。\nGoogle AI Studio(aistudio.google.com)で新しいAPIキーを取得してください。');
+    }
+
     if (!res.ok) {
       var eData = {};
       try { eData = await res.json(); } catch(ex) {}
       var eMsg = eData.error ? eData.error.message : '';
       throw new Error('Gemini APIエラー ' + res.status + (eMsg ? ': ' + eMsg : ''));
     }
+
     var data = await res.json();
     if (!data.candidates || !data.candidates.length) {
-      // safety filterなどで空の場合
       var fb = data.promptFeedback;
       if (fb && fb.blockReason) throw new Error('Gemini: コンテンツがブロックされました (' + fb.blockReason + ')');
       throw new Error('Gemini: レスポンスが空でした');
@@ -418,7 +431,8 @@ async function callGemini(messages, systemPrompt, maxTokens) {
     if (!cand.content || !cand.content.parts) throw new Error('Gemini: レスポンス形式が不正です');
     return cand.content.parts.map(function(p) { return p.text || ''; }).join('');
   }
-  throw lastErr || new Error('Gemini: すべてのモデルで失敗しました');
+
+  return tryModel(['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-1.5-flash'], 0);
 }
 
 /* --- ChatGPT (OpenAI) API ---
@@ -473,34 +487,26 @@ async function callGrok(messages, systemPrompt, maxTokens) {
     ? [{ role: 'system', content: systemPrompt }].concat(messages)
     : messages;
 
-  // grok-3（標準・広く利用可能）→ grok-4（最新フラッグシップ、一部制限あり）の順でフォールバック
-  var grokModels = ['grok-3', 'grok-4'];
-  var lastErr = null;
-  for (var gi = 0; gi < grokModels.length; gi++) {
-    var grokModel = grokModels[gi];
+  // grok-3（標準）→ grok-4（最新）の順でフォールバック
+  // 再帰関数でBabel互換に実装（forループ内awaitを避ける）
+  async function tryGrokModel(modelList, idx) {
+    if (idx >= modelList.length) {
+      throw new Error('Grok: 利用可能なモデルが見つかりませんでした。console.x.aiでAPIキーを確認してください。');
+    }
+    var grokModel = modelList[idx];
     var grokRes;
     try {
       grokRes = await fetch('https://api.x.ai/v1/chat/completions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + key
-        },
-        body: JSON.stringify({
-          model: grokModel,
-          max_tokens: maxTokens || 4000,
-          messages: msgs
-        })
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+        body: JSON.stringify({ model: grokModel, max_tokens: maxTokens || 4000, messages: msgs })
       });
     } catch(e) {
-      lastErr = new Error('Grok: ネットワークエラー - ' + e.message);
-      continue;
+      if (idx < modelList.length - 1) return tryGrokModel(modelList, idx + 1);
+      throw new Error('Grok: ネットワークエラー - ' + e.message);
     }
-    if (grokRes.status === 404 || grokRes.status === 400) {
-      if (gi < grokModels.length - 1) {
-        lastErr = new Error('Grok: モデル ' + grokModel + ' が利用不可。次を試します...');
-        continue;
-      }
+    if (grokRes.status === 404 || (grokRes.status === 400 && idx < modelList.length - 1)) {
+      return tryGrokModel(modelList, idx + 1);
     }
     if (!grokRes.ok) {
       var eData = {};
@@ -514,7 +520,8 @@ async function callGrok(messages, systemPrompt, maxTokens) {
     if (!data.choices || !data.choices.length) throw new Error('Grok: 空のレスポンスが返りました');
     return data.choices[0].message.content || '';
   }
-  throw lastErr || new Error('Grok: すべてのモデルで失敗しました');
+
+  return tryGrokModel(['grok-3', 'grok-4'], 0);
 }
 
 /* --- 統合AI呼び出し関数 --- */
@@ -751,6 +758,14 @@ function NoteGenerator(props) {
   var copiedState = useState({});
   var copied = copiedState[0]; var setCopied = copiedState[1];
 
+  // Web検索例のstate
+  var topicExState = useState({ items:[], loading:false });
+  var topicEx = topicExState[0]; var setTopicEx = topicExState[1];
+  var sitExState = useState({ items:[], loading:false });
+  var sitEx = sitExState[0]; var setSitEx = sitExState[1];
+  var worryExState = useState({ items:[], loading:false });
+  var worryEx = worryExState[0]; var setWorryEx = worryExState[1];
+
   var hasArticle = editText.length > 0;
   var freeMatch = editText.match(/---FREE_START---([\s\S]*?)---FREE_END---/);
   var paidMatch = editText.match(/---PAID_START---([\s\S]*?)---PAID_END---/);
@@ -765,6 +780,68 @@ function NoteGenerator(props) {
 
   var aiIdRef = useRef(aiId);
   aiIdRef.current = aiId;
+
+  // === Web検索例取得関数 ===
+
+  // テーマ変更時に例を自動更新（初回マウント時も実行）
+  useEffect(function() {
+    // インラインで実行してBabel依存関係警告を回避
+    var themeKey = theme;
+    var themeLabel = (NOTE_THEMES.find(function(t) { return t.id === themeKey; }) || {}).label || themeKey;
+    var cleanLabel = themeLabel.replace(/[\u{1F300}-\u{1FFFF}]/gu, '').replace(/[\u2600-\u26FF]/gu, '').trim();
+
+    setTopicEx({ items:[], loading:true });
+    setSitEx({ items:[], loading:true });
+    setWorryEx({ items:[], loading:true });
+
+    // 3つのクエリを並列実行
+    var q1 = encodeURIComponent(cleanLabel + ' note 人気記事テーマ');
+    var q2 = encodeURIComponent(cleanLabel + ' 悩み 状況 あるある');
+    var q3 = encodeURIComponent(cleanLabel + ' よくある悩み 困っていること');
+
+    function safeFetch(q) {
+      return fetch('https://api.duckduckgo.com/?q=' + q + '&format=json&no_html=1&skip_disambig=1&no_redirect=1')
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .catch(function() { return null; });
+    }
+
+    function extractPhrases(d, maxLen) {
+      if (!d) return [];
+      var results = [];
+      if (d.AbstractText) {
+        d.AbstractText.split(/[。！？!?\n]/).forEach(function(s) {
+          var t = s.trim();
+          if (t.length >= 8 && t.length <= (maxLen || 40)) results.push(t);
+        });
+      }
+      if (d.RelatedTopics && results.length < 4) {
+        d.RelatedTopics.slice(0, 10).forEach(function(rt) {
+          if (results.length >= 4) return;
+          var txt = rt.Text || '';
+          txt.split(/[。！？!?\n]/).forEach(function(s) {
+            var t = s.replace(/https?:\/\/\S+/g, '').trim();
+            if (t.length >= 8 && t.length <= (maxLen || 40) && results.length < 4) results.push(t);
+          });
+        });
+      }
+      return results.slice(0, 3);
+    }
+
+    Promise.all([safeFetch(q1), safeFetch(q2), safeFetch(q3)]).then(function(results) {
+      var d1 = results[0], d2 = results[1], d3 = results[2];
+      var topicItems = extractPhrases(d1, 45);
+      var sitItems = extractPhrases(d2, 45);
+      var worryItems = extractPhrases(d3, 45);
+
+      var fb = { money:['月5万円副業を3ヶ月で達成した方法','節約で年間100万円貯めた実践記録','サラリーマンが副業で収入を2倍にした秘訣'], health:['1ヶ月-8kg減量ダイエット完全ガイド','リバウンドしない食事改善の習慣術','40代から始める体質改善メソッド'], career:['未経験からWebエンジニアに転職した全記録','副業で月収10万円を稼ぐフリーランス入門','年収UPのための交渉術と転職タイミング'], mindset:['成功者が実践する朝のルーティン7選','先延ばし癖をなくす行動心理学テクニック','自己肯定感を高める思考習慣の作り方'], relationship:['彼女ができない男性が変わった3つのきっかけ','職場の人間関係を劇的に改善した会話術','SNSで好感度を上げるコミュニケーション法'], productivity:['タスク管理で残業ゼロになった仕事術','集中力を3倍にする環境づくりと習慣','ノートアプリ活用で仕事効率が激変した話'], parenting:['イヤイヤ期を乗り越えた育児のコツ','子どもの自己肯定感を育てる声かけ方法','共働きでも子どもとの時間を増やす工夫'], other:['人生が変わった本10冊の読み方と実践法','断捨離で部屋も心もスッキリした体験記','ストレスフリーな生活を手に入れた方法'] };
+      var fbs = { money:['会社員で副業を始めたいが何から手をつければいいか迷っている','毎月赤字で貯金ゼロ、家計を立て直したい','子育て中でお金の余裕がなく将来が不安'], health:['ダイエットを何度も挫折してきた','運動する時間がなくて体型が崩れてきた','食事制限で体重は落ちたがリバウンドしてしまった'], career:['今の仕事に不満はないが将来性が不安','30代で転職を考えているがスキルに自信がない','フリーランスに興味があるが収入が安定するか心配'], mindset:['やる気が続かず目標を達成できない','他人の目が気になって行動できない','ネガティブ思考が止まらず毎日がしんどい'], relationship:['好きな人がいるが告白できずにいる','職場のコミュニケーションが苦手で孤立している','SNSで発信したいがどう思われるか怖い'], productivity:['仕事量が多くて残業が続いている','タスクが多すぎて何から手をつけるか分からない','集中できずついスマホを見てしまう'], parenting:['子供のイヤイヤ期で毎日ストレスが溜まっている','仕事と育児の両立で疲れ果てている','子供に怒りすぎてしまい自己嫌悪になる'], other:['毎日同じことの繰り返しで人生に変化がない','友達が少なくて休日が孤独','やりたいことが見つからず将来が漠然と不安'] };
+      var fbw = { money:['副業で稼げるか不安、詐欺に引っかかりそう','収入を上げたいのに具体的な方法が分からない','節約を頑張っても全然貯まらない'], health:['運動を続けられない、三日坊主になってしまう','食事制限が辛くてストレスになる','健康的に痩せたいが何が正解か分からない'], career:['転職活動をどこから始めればいいか分からない','スキルがなくて市場価値が低いと感じる','面接が苦手で選考に通らない'], mindset:['頭では分かっているが行動できない','自分に自信が持てず挑戦を諦めてしまう','モチベーションが続かず中途半端になる'], relationship:['会話が続かず人間関係が浅い','感情的になってしまい後から後悔する','好きな人にどうアプローチすればいいか分からない'], productivity:['やることが多すぎて優先順位がつけられない','集中力が続かず作業が終わらない','スマホやSNSが気になって仕事に集中できない'], parenting:['子供の気持ちが理解できず対応に困る','怒らない育児を試みるが限界がくる','子供の学力や将来が心配で焦っている'], other:['何か変えたいが何から始めればいいか分からない','行動しようとしても続かず自己嫌悪になる','周りの目を気にしてチャレンジできない'] };
+
+      setTopicEx({ items: topicItems.length >= 2 ? topicItems : (fb[themeKey] || fb['other']), loading: false });
+      setSitEx({ items: sitItems.length >= 2 ? sitItems : (fbs[themeKey] || fbs['other']), loading: false });
+      setWorryEx({ items: worryItems.length >= 2 ? worryItems : (fbw[themeKey] || fbw['other']), loading: false });
+    });
+  }, [theme]);
 
   var handleGenerate = useCallback(function() {
     var currentAiId = aiIdRef.current;
@@ -872,6 +949,32 @@ function NoteGenerator(props) {
               <input type="text" value={topic} onChange={function(e) { setTopic(e.target.value); }}
                 placeholder="例: 月5万円副業を3ヶ月で達成した方法" style={inputStyle} />
               <div style={{ fontSize:11, color:'rgba(255,255,255,0.3)', marginTop:6 }}>空欄の場合はAIが最適なテーマを選びます</div>
+              {/* Web検索例 */}
+              <div style={{ marginTop:12, background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, padding:'10px 12px' }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+                  <span style={{ fontSize:11, color:'rgba(255,255,255,0.45)', fontWeight:700 }}>🌐 Web検索からのテーマ例</span>
+                  <button onClick={function() { loadTopicExamples(true); }} disabled={topicEx.loading}
+                    style={{ background:'none', border:'1px solid rgba(255,255,255,0.15)', borderRadius:6, padding:'3px 8px', color:'rgba(255,255,255,0.5)', fontSize:11, cursor: topicEx.loading ? 'not-allowed' : 'pointer', display:'flex', alignItems:'center', gap:4 }}>
+                    <span style={{ display:'inline-block', animation: topicEx.loading ? 'spin 0.8s linear infinite' : 'none' }}>🔄</span>
+                    {topicEx.loading ? '検索中...' : '再検索'}
+                  </button>
+                </div>
+                {topicEx.loading
+                  ? <div style={{ color:'rgba(255,255,255,0.3)', fontSize:12, padding:'6px 0' }}>⏳ 検索中...</div>
+                  : topicEx.items.length === 0
+                    ? <div style={{ color:'rgba(255,255,255,0.2)', fontSize:12 }}>クリックして検索例を取得</div>
+                    : topicEx.items.map(function(item, idx) {
+                        return (
+                          <div key={idx} onClick={function() { setTopic(item); }}
+                            style={{ background:'rgba(233,69,96,0.08)', border:'1px solid rgba(233,69,96,0.2)', borderRadius:7, padding:'7px 10px', marginBottom:5, cursor:'pointer', fontSize:12, color:'rgba(255,255,255,0.75)', lineHeight:1.5, transition:'background 0.15s' }}
+                            onMouseEnter={function(e) { e.currentTarget.style.background='rgba(233,69,96,0.18)'; }}
+                            onMouseLeave={function(e) { e.currentTarget.style.background='rgba(233,69,96,0.08)'; }}>
+                            <span style={{ color:'#e94560', marginRight:6 }}>💡</span>{item}
+                          </div>
+                        );
+                      })
+                }
+              </div>
             </div>
 
             {/* 文体 */}
@@ -911,11 +1014,63 @@ function NoteGenerator(props) {
                 <div style={{ fontSize:12, color:'rgba(255,255,255,0.5)', marginBottom:6 }}>読者の状況（任意）</div>
                 <input type="text" value={situation} onChange={function(e) { setSituation(e.target.value); }}
                   placeholder="例: 副業を始めたいが何から始めればよいか分からない" style={inputStyle} />
+                {/* 状況のWeb検索例 */}
+                <div style={{ marginTop:8, background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, padding:'10px 12px' }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:7 }}>
+                    <span style={{ fontSize:11, color:'rgba(255,255,255,0.45)', fontWeight:700 }}>🌐 Web検索からの状況例</span>
+                    <button onClick={function() { loadSitExamples(true); }} disabled={sitEx.loading}
+                      style={{ background:'none', border:'1px solid rgba(255,255,255,0.15)', borderRadius:6, padding:'3px 8px', color:'rgba(255,255,255,0.5)', fontSize:11, cursor: sitEx.loading ? 'not-allowed' : 'pointer', display:'flex', alignItems:'center', gap:4 }}>
+                      <span style={{ display:'inline-block', animation: sitEx.loading ? 'spin 0.8s linear infinite' : 'none' }}>🔄</span>
+                      {sitEx.loading ? '検索中...' : '再検索'}
+                    </button>
+                  </div>
+                  {sitEx.loading
+                    ? <div style={{ color:'rgba(255,255,255,0.3)', fontSize:12, padding:'4px 0' }}>⏳ 検索中...</div>
+                    : sitEx.items.length === 0
+                      ? <div style={{ color:'rgba(255,255,255,0.2)', fontSize:12 }}>クリックして検索例を取得</div>
+                      : sitEx.items.map(function(item, idx) {
+                          return (
+                            <div key={idx} onClick={function() { setSituation(item); }}
+                              style={{ background:'rgba(99,102,241,0.08)', border:'1px solid rgba(99,102,241,0.2)', borderRadius:7, padding:'7px 10px', marginBottom:5, cursor:'pointer', fontSize:12, color:'rgba(255,255,255,0.75)', lineHeight:1.5, transition:'background 0.15s' }}
+                              onMouseEnter={function(e) { e.currentTarget.style.background='rgba(99,102,241,0.18)'; }}
+                              onMouseLeave={function(e) { e.currentTarget.style.background='rgba(99,102,241,0.08)'; }}>
+                              <span style={{ color:'#818cf8', marginRight:6 }}>👤</span>{item}
+                            </div>
+                          );
+                        })
+                  }
+                </div>
               </div>
               <div>
                 <div style={{ fontSize:12, color:'rgba(255,255,255,0.5)', marginBottom:6 }}>読者の悩み（任意）</div>
                 <input type="text" value={worry} onChange={function(e) { setWorry(e.target.value); }}
                   placeholder="例: 時間がなくて副業に踏み出せない" style={inputStyle} />
+                {/* 悩みのWeb検索例 */}
+                <div style={{ marginTop:8, background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, padding:'10px 12px' }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:7 }}>
+                    <span style={{ fontSize:11, color:'rgba(255,255,255,0.45)', fontWeight:700 }}>🌐 Web検索からの悩み例</span>
+                    <button onClick={function() { loadWorryExamples(true); }} disabled={worryEx.loading}
+                      style={{ background:'none', border:'1px solid rgba(255,255,255,0.15)', borderRadius:6, padding:'3px 8px', color:'rgba(255,255,255,0.5)', fontSize:11, cursor: worryEx.loading ? 'not-allowed' : 'pointer', display:'flex', alignItems:'center', gap:4 }}>
+                      <span style={{ display:'inline-block', animation: worryEx.loading ? 'spin 0.8s linear infinite' : 'none' }}>🔄</span>
+                      {worryEx.loading ? '検索中...' : '再検索'}
+                    </button>
+                  </div>
+                  {worryEx.loading
+                    ? <div style={{ color:'rgba(255,255,255,0.3)', fontSize:12, padding:'4px 0' }}>⏳ 検索中...</div>
+                    : worryEx.items.length === 0
+                      ? <div style={{ color:'rgba(255,255,255,0.2)', fontSize:12 }}>クリックして検索例を取得</div>
+                      : worryEx.items.map(function(item, idx) {
+                          return (
+                            <div key={idx} onClick={function() { setWorry(item); }}
+                              style={{ background:'rgba(251,191,36,0.08)', border:'1px solid rgba(251,191,36,0.2)', borderRadius:7, padding:'7px 10px', marginBottom:5, cursor:'pointer', fontSize:12, color:'rgba(255,255,255,0.75)', lineHeight:1.5, transition:'background 0.15s' }}
+                              onMouseEnter={function(e) { e.currentTarget.style.background='rgba(251,191,36,0.18)'; }}
+                              onMouseLeave={function(e) { e.currentTarget.style.background='rgba(251,191,36,0.08)'; }}>
+                              <span style={{ color:'#fbbf24', marginRight:6 }}>💭</span>{item}
+                            </div>
+                          );
+                        })
+                  }
+                </div>
               </div>
             </div>
 
@@ -1348,21 +1503,8 @@ function ImagePromptGenerator(props) {
   var error = errState[0]; var setError = errState[1];
   var copiedState = useState({});
   var copied = copiedState[0]; var setCopied = copiedState[1];
-  var fileRef = useRef(null);
-  var aiRef = useRef(aiId);
-  aiRef.current = aiId;
 
-  var handleFileChange = useCallback(async function(e) {
-    var file = e.target.files && e.target.files[0];
-    if (!file) return;
-    setArticleFile(file);
-    try {
-      var text = await readFileAsText(file);
-      setArticleText(text);
-    } catch(err) {
-      setError('ファイル読み込みエラー: ' + err.message);
-    }
-  }, []);
+  // Web検索例のstate
 
   var handleGenerate = useCallback(function() {
     var currentAiId = aiRef.current;
