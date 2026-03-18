@@ -1604,17 +1604,6 @@ function ImagePromptGenerator(props) {
   var copiedState = useState({});
   var copied = copiedState[0]; var setCopied = copiedState[1];
 
-  // 生成タイマー・プログレスのstate
-  var genStartState = useState(0);
-  var genStart = genStartState[0]; var setGenStart = genStartState[1];
-  var genElapsedState = useState(0);
-  var genElapsed = genElapsedState[0]; var setGenElapsed = genElapsedState[1];
-  var genProgressState = useState(0);
-  var genProgress = genProgressState[0]; var setGenProgress = genProgressState[1];
-  var genTimerRefState = useRef(null);
-
-  // Web検索例のstate
-
   var handleGenerate = useCallback(function() {
     var currentAiId = aiRef.current;
     if (!articleText.trim()) { setError('記事テキストをアップロードするか貼り付けてください'); return; }
