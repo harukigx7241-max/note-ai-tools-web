@@ -694,7 +694,15 @@ function buildNotePrompt(opts) {
   var ageLabel = (NOTE_AGES.find(function(a) { return a.id === age; }) || {}).label || age;
   var ageCtx = { '10s':'10代・学生・バイト・部活', '20s':'20代・社会人・転職・恋愛', '30s':'30代・育児・住宅・キャリア', '40s':'40代・老後・子育て・健康', '50s':'50代以上・定年・健康・老後', 'all':'全年代共通' }[age] || '';
 
-  return 'あなたは人気noteクリエイターです。以下の条件でnoteの有料記事を作成してください。\n\n'    + '## ターゲット読者\n'    + '- 年齢: ' + ageLabel + '\n'    + '- 状況: ' + (situation || '特に指定なし') + '\n'    + '- 悩み: ' + (worry || '特に指定なし') + '\n'    + '- ライフスタイル: ' + ageCtx + '\n\n'    + '## 記事設定\n'    + '- ジャンル: ' + themeLabel + '\n'    + '- テーマ: ' + (topic || 'ジャンルで最も読まれるテーマ') + '\n'    + '- 文体: ' + toneLabel + '\n'    + '- 販売価格: ¥' + price.toLocaleString() + '\n\n'    + '## 【最重要】文字数厳守ルール\n'    + '無料部分: ちょうど' + freeWC + '文字（±80文字以内に必ず収めること）\n'    + '有料部分: ちょうど' + paidWC + '文字（±100文字以内に必ず収めること）\n'    + '※ 文字数は日本語1文字=1文字、英数字1文字=1文字で計算してください\n'    + '※ 指定文字数に達しない場合は内容を追加し、超える場合は削除してください\n\n'    + '## 構成ルール\n'    + '1. タイトルは「# 」で始める 2. 冒頭に50〜100文字の要約 3. 「---FREE_START---」から無料部分開始 4. 「---FREE_END---」で無料終了 5. 「---PAID_START---」から有料部分開始 6. 「---PAID_END---」で有料終了\n\n'    + '## 無料パート（必ず' + freeWC + '文字±80文字以内）\n'    + '読者の悩みに共感し、記事を読む価値を伝える。続きへの期待感を高める。\n\n'    + '## 購入壁\n'    + '続きを読むためには購入が必要と明示。価格を改めて示す。\n\n'    + '## 有料パート（必ず' + paidWC + '文字±100文字以内）\n'    + '具体的な解決策・ノウハウ・実践ステップを詳しく解説。Q&A・よくある誤解・チェックリストを含む。\n\n'    + '---FREE_START---\n\n（ここから無料パートを書く）\n\n---FREE_END---\n---PAID_START---\n\n（ここから有料パートを書く）\n\n---PAID_END---';
+  // 文字数の許容範囲：設定値の±10%（最低50文字）
+  var freeWCTol = Math.max(50, Math.round(freeWC * 0.1));
+  var paidWCTol = Math.max(50, Math.round(paidWC * 0.1));
+  var freeWCMin = freeWC - freeWCTol;
+  var freeWCMax = freeWC + freeWCTol;
+  var paidWCMin = paidWC - paidWCTol;
+  var paidWCMax = paidWC + paidWCTol;
+
+  return 'あなたは人気noteクリエイターです。以下の条件でnoteの有料記事を作成してください。\n\n'    + '## ターゲット読者\n'    + '- 年齢: ' + ageLabel + '\n'    + '- 状況: ' + (situation || '特に指定なし') + '\n'    + '- 悩み: ' + (worry || '特に指定なし') + '\n'    + '- ライフスタイル: ' + ageCtx + '\n\n'    + '## 記事設定\n'    + '- ジャンル: ' + themeLabel + '\n'    + '- テーマ: ' + (topic || 'ジャンルで最も読まれるテーマ') + '\n'    + '- 文体: ' + toneLabel + '\n'    + '- 販売価格: ¥' + price.toLocaleString() + '\n\n'    + '## 【最重要】文字数厳守ルール\n'    + '- 無料部分: ' + freeWC + '文字（許容範囲: ' + freeWCMin + '〜' + freeWCMax + '文字）\n'    + '- 有料部分: ' + paidWC + '文字（許容範囲: ' + paidWCMin + '〜' + paidWCMax + '文字）\n'    + '- 文字数は日本語1文字=1文字、英数字1文字=1文字でカウントしてください\n'    + '- 文字数が不足の場合は内容を追加し、超過の場合は削除して調整してください\n\n'    + '## 構成ルール\n'    + '1. タイトルは「# 」で始める 2. 冒頭に50〜100文字の要約 3. 「---FREE_START---」から無料部分開始 4. 「---FREE_END---」で無料終了 5. 「---PAID_START---」から有料部分開始 6. 「---PAID_END---」で有料終了\n\n'    + '## 無料パート（' + freeWCMin + '〜' + freeWCMax + '文字厳守）\n'    + '読者の悩みに共感し、記事を読む価値を伝える。続きへの期待感を高める。\n\n'    + '## 購入壁\n'    + '続きを読むためには購入が必要と明示。価格を改めて示す。\n\n'    + '## 有料パート（' + paidWCMin + '〜' + paidWCMax + '文字厳守）\n'    + '具体的な解決策・ノウハウ・実践ステップを詳しく解説。Q&A・よくある誤解・チェックリストを含む。\n\n'    + '---FREE_START---\n\n（ここから無料パートを書く）\n\n---FREE_END---\n---PAID_START---\n\n（ここから有料パートを書く）\n\n---PAID_END---';
 }
 
 function NoteGenerator(props) {
@@ -1180,7 +1188,7 @@ function NoteGenerator(props) {
                   <span style={{ color:'rgba(255,255,255,0.35)', fontSize:12 }}>合計文字数</span>
                   <span style={{ color:'#fff', fontWeight:800, fontSize:15 }}>{(freeWC + paidWC).toLocaleString()}文字</span>
                 </div>
-                <div style={{ fontSize:10, color:'rgba(255,255,255,0.25)', lineHeight:1.5 }}>※ AIの特性上、実際の生成文字数は指定値から±100文字程度ズレる場合があります。ご了承ください。</div>
+                <div style={{ fontSize:10, color:'rgba(255,255,255,0.25)', lineHeight:1.5 }}>※ AIの特性上、実際の生成文字数は設定値から±10%程度ズレる場合があります。ご了承ください。</div>
               </div>
               </div>
             </div>
