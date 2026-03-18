@@ -146,11 +146,11 @@
   .tool-card-name { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
   .tool-card-desc { font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.5; }
 
-  /* SHARED APP STYLES */
-  .app-wrap { min-height: 100vh; background: #fafaf8; }
+  /* SHARED APP STYLES — DARK THEME */
+  .app-wrap { min-height: 100vh; background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0a1628 100%); }
   .app-header {
-    background: #fff;
-    border-bottom: 1px solid #eee;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
     padding: 14px 24px;
     display: flex;
     justify-content: space-between;
@@ -158,32 +158,34 @@
     position: sticky;
     top: 0;
     z-index: 100;
+    backdrop-filter: blur(10px);
   }
   .app-header-left { display: flex; align-items: center; gap: 12px; }
   .back-btn {
-    background: rgba(0,0,0,0.05);
-    border: 1px solid #e0e0e0;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
     border-radius: 8px;
     padding: 6px 12px;
     font-size: 13px;
     cursor: pointer;
-    color: #555;
+    color: rgba(255,255,255,0.7);
     transition: background 0.15s;
   }
-  .back-btn:hover { background: rgba(0,0,0,0.09); }
-  .app-title { font-size: 20px; font-weight: 800; margin: 0; }
-  .app-sub { font-size: 12px; color: #888; margin: 3px 0 0; }
+  .back-btn:hover { background: rgba(255,255,255,0.14); }
+  .app-title { font-size: 20px; font-weight: 800; margin: 0; color: #fff; }
+  .app-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin: 3px 0 0; }
   .key-btn {
     padding: 8px 16px;
-    background: #f5f5f5;
-    border: 1px solid #ddd;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
     border-radius: 8px;
     cursor: pointer;
     font-size: 13px;
     font-weight: 600;
+    color: rgba(255,255,255,0.7);
     transition: background 0.15s;
   }
-  .key-btn:hover { background: #ebebeb; }
+  .key-btn:hover { background: rgba(255,255,255,0.13); }
   .app-body { max-width: 860px; margin: 0 auto; padding: 24px 16px; }
 
   /* NOTE GENERATOR SPECIFIC */
@@ -258,7 +260,7 @@ const { useState, useEffect, useCallback, useRef } = React;
 // SHARED: AI CONFIGS & API KEY UTILS
 // ============================================================
 var AI_CONFIGS = [
-  { id: "claude",  label: "Claude",  icon: "🟠", color: "#e07b39", badge: "AUTO" },
+  { id: "claude",  label: "Claude",  icon: "🟠", color: "#e07b39", badge: "API" },
   { id: "gemini",  label: "Gemini",  icon: "🔵", color: "#4285f4", badge: "API"  },
   { id: "chatgpt", label: "ChatGPT", icon: "🟢", color: "#10a37f", badge: "API"  },
   { id: "grok",    label: "Grok",    icon: "⚫", color: "#9ca3af", badge: "API"  },
@@ -286,7 +288,7 @@ async function callAI(opts) {
       headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
       body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: maxTokens, system: systemPrompt, messages: messages })
     });
-    if (!r1.ok) throw new Error("Claude API error: " + r1.status);
+    if (!r1.ok) { var e1 = await r1.json().catch(function() { return {}; }); throw new Error("Claude APIエラー " + r1.status + (r1.status === 401 ? "：APIキーが無効です。console.anthropic.comで確認してください" : r1.status === 429 ? "：レート制限超過。しばらく待ってから再試行してください" : "")); }
     var d1 = await r1.json(); return d1.content.map(function(b) { return b.text || ""; }).join("");
   }
   if (aiId === "gemini") {
@@ -296,7 +298,7 @@ async function callAI(opts) {
     var r2 = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + key, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(gBody)
     });
-    if (!r2.ok) throw new Error("Gemini API error: " + r2.status);
+    if (!r2.ok) { throw new Error("Gemini APIエラー " + r2.status + (r2.status === 400 ? "：APIキーが無効です" : "")); }
     var d2 = await r2.json();
     return (d2.candidates && d2.candidates[0] && d2.candidates[0].content && d2.candidates[0].content.parts)
       ? d2.candidates[0].content.parts.map(function(p) { return p.text || ""; }).join("") : "";
@@ -307,7 +309,7 @@ async function callAI(opts) {
       method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
       body: JSON.stringify({ model: "gpt-4o", max_tokens: maxTokens, messages: cMsgs })
     });
-    if (!r3.ok) throw new Error("ChatGPT API error: " + r3.status);
+    if (!r3.ok) { throw new Error("ChatGPT APIエラー " + r3.status + (r3.status === 401 ? "：APIキーが無効です" : "")); }
     var d3 = await r3.json();
     return (d3.choices && d3.choices[0] && d3.choices[0].message) ? d3.choices[0].message.content : "";
   }
@@ -317,7 +319,7 @@ async function callAI(opts) {
       method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
       body: JSON.stringify({ model: "grok-3", max_tokens: maxTokens, messages: xMsgs })
     });
-    if (!r4.ok) throw new Error("Grok API error: " + r4.status);
+    if (!r4.ok) { throw new Error("Grok APIエラー " + r4.status + (r4.status === 401 ? "：APIキーが無効です" : "")); }
     var d4 = await r4.json();
     return (d4.choices && d4.choices[0] && d4.choices[0].message) ? d4.choices[0].message.content : "";
   }
@@ -327,13 +329,17 @@ async function callAI(opts) {
 async function callClaudeSearch(opts) {
   var messages = opts.messages; var systemPrompt = opts.systemPrompt || ""; var maxTokens = opts.maxTokens || 2000;
   var key = getApiKey("claude");
-  if (!key) throw new Error("ClaudeのAPIキーが設定されていません");
+  if (!key) throw new Error("🔑 ClaudeのAPIキーが未設定です。右上の「APIキー設定」から登録してください");
   var r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
     body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: maxTokens, system: systemPrompt, messages: messages, tools: [{ type: "web_search_20250305", name: "web_search" }] })
   });
-  if (!r.ok) throw new Error("Claude Search error: " + r.status);
+  if (!r.ok) {
+    if (r.status === 401) throw new Error("🔑 Claude APIキーが無効です（401）。console.anthropic.comでキーを確認してください");
+    if (r.status === 429) throw new Error("⏳ Claude APIのレート制限に達しました（429）。しばらく待ってから再試行してください");
+    throw new Error("Claude Web検索エラー: " + r.status);
+  }
   var d = await r.json(); return d.content.map(function(b) { return b.text || ""; }).join("");
 }
 
@@ -362,6 +368,13 @@ function ApiKeyModal(props) {
           <div style={{ color: textCol, fontWeight: 800, fontSize: 18 }}>🔑 APIキー設定</div>
           <button onClick={onClose} style={{ background: "rgba(0,0,0,0.06)", border: "none", borderRadius: 8, width: 36, height: 36, fontSize: 20, cursor: "pointer", color: textCol }}>×</button>
         </div>
+        <div style={{ background: isDark ? "rgba(255,180,0,0.08)" : "#fffbeb", border: "1px solid rgba(255,180,0,0.3)", borderRadius: 10, padding: "10px 14px", marginBottom: 20, fontSize: 12, color: isDark ? "#fcd34d" : "#92400e" }}>
+          <div style={{ fontWeight: 800, marginBottom: 6 }}>📋 APIキー取得先</div>
+          <div>🟠 Claude: <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer" style={{ color: isDark ? "#fbbf24" : "#b45309" }}>console.anthropic.com</a></div>
+          <div>🔵 Gemini: <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style={{ color: isDark ? "#fbbf24" : "#b45309" }}>aistudio.google.com</a></div>
+          <div>🟢 ChatGPT: <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" style={{ color: isDark ? "#fbbf24" : "#b45309" }}>platform.openai.com</a></div>
+          <div>⚫ Grok: <a href="https://console.x.ai/" target="_blank" rel="noopener noreferrer" style={{ color: isDark ? "#fbbf24" : "#b45309" }}>console.x.ai</a></div>
+        </div>
         {AI_CONFIGS.map(function(ai) {
           var aid = ai.id;
           return (
@@ -384,7 +397,7 @@ function ApiKeyModal(props) {
             </div>
           );
         })}
-        <p style={{ fontSize: 12, color: "#888", marginTop: 16 }}>※ APIキーはブラウザのlocalStorageに保存されます</p>
+        <p style={{ fontSize: 12, color: "#888", marginTop: 16 }}>※ APIキーはブラウザのlocalStorageに保存されます（サーバー送信なし）</p>
       </div>
     </div>
   );
@@ -497,22 +510,137 @@ async function searchLatestInfo(aiId, query) {
   });
 }
 
-async function fetchTargetSuggestions(aiId, themeLabel, topic, ageLabel) {
-  var prompt = "以下の条件でnote記事を書くためのターゲット読者分析をしてください。\n\n" +
-    "ジャンル：" + themeLabel + "\nテーマ：" + (topic || themeLabel) + "\n年齢層：" + ageLabel + "\n\n" +
-    "このテーマに興味を持つ読者が実際に抱えている「具体的な状況」を5つと「具体的な悩み」を5つ、それぞれ20字以内で列挙してください。\n\n" +
-    "JSONのみ出力（前置き不要）：\n" +
-    "{\"situations\":[\"状況1\",\"状況2\",\"状況3\",\"状況4\",\"状況5\"],\"worries\":[\"悩み1\",\"悩み2\",\"悩み3\",\"悩み4\",\"悩み5\"]}";
-  var result;
-  if (aiId === "claude") {
-    result = await callClaudeSearch({ messages: [{ role: "user", content: prompt }], systemPrompt: "JSONのみ出力。前置き・説明・バッククォート不要。", maxTokens: 800 });
-  } else {
-    result = await callAI({ aiId: aiId, messages: [{ role: "user", content: prompt }], systemPrompt: "JSONのみ出力。前置き・説明・バッククォート不要。", maxTokens: 800 });
+// ============================================================
+// WEB SEARCH UTILS（APIキー不要・AI不使用）
+// ============================================================
+
+// DuckDuckGo Instant Answer APIからRelatedTopicsを取得
+async function ddgSearch(query) {
+  var q = encodeURIComponent(query);
+  try {
+    var r = await fetch("https://api.duckduckgo.com/?q=" + q + "&format=json&no_html=1&skip_disambig=1&no_redirect=1");
+    if (!r.ok) return null;
+    return await r.json();
+  } catch(e) { return null; }
+}
+
+// テキストから短いフレーズを抽出（20字以内・句読点で区切る）
+function extractPhrases(text, maxLen) {
+  if (!text) return [];
+  var ml = maxLen || 22;
+  var phrases = [];
+  // 句読点・記号で分割
+  var parts = text.split(/[。、！？「」『』【】…・\n]/);
+  parts.forEach(function(p) {
+    var t = p.trim().replace(/^\s*[-・•＊*]\s*/, "");
+    if (t.length >= 6 && t.length <= ml) phrases.push(t);
+  });
+  return phrases;
+}
+
+// ジャンル×キーワードでWeb検索してテーマ候補を生成（AI不使用）
+async function fetchTopicSuggestionsFromWeb(themeLabel, extraKeyword) {
+  var q1 = (extraKeyword || themeLabel) + " おすすめ テーマ note";
+  var q2 = (extraKeyword || themeLabel) + " 人気 記事 2024";
+  var results = [];
+
+  var [d1, d2] = await Promise.all([ddgSearch(q1), ddgSearch(q2)]);
+
+  [d1, d2].forEach(function(d) {
+    if (!d) return;
+    if (d.AbstractText) extractPhrases(d.AbstractText, 30).forEach(function(p) { results.push(p); });
+    if (d.RelatedTopics) {
+      d.RelatedTopics.slice(0, 10).forEach(function(t) {
+        if (t.Text) extractPhrases(t.Text, 30).forEach(function(p) { results.push(p); });
+        if (t.Topics) t.Topics.slice(0, 5).forEach(function(sub) {
+          if (sub.Text) extractPhrases(sub.Text, 30).forEach(function(p) { results.push(p); });
+        });
+      });
+    }
+  });
+
+  // 重複除去・シャッフルして最大8件
+  var seen = {};
+  var unique = results.filter(function(p) {
+    var k = p.slice(0, 10);
+    if (seen[k]) return false;
+    seen[k] = true; return true;
+  });
+  // Fisher-Yates shuffle
+  for (var i = unique.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = unique[i]; unique[i] = unique[j]; unique[j] = tmp;
   }
-  var s = result.indexOf("{"); var e = result.lastIndexOf("}");
-  if (s === -1) throw new Error("JSON解析失敗");
-  var parsed = JSON.parse(result.slice(s, e + 1));
-  return { situations: parsed.situations || [], worries: parsed.worries || [] };
+  return unique.slice(0, 8);
+}
+
+// ターゲット読者の状況・悩みをWebから取得（AI不使用）
+async function fetchTargetSuggestions(themeLabel, topic, ageLabel) {
+  var base = (topic || themeLabel) + " " + ageLabel;
+  var [dSit, dWry] = await Promise.all([
+    ddgSearch(base + " 状況 実態"),
+    ddgSearch(base + " 悩み 困っている")
+  ]);
+
+  var situations = [];
+  var worries = [];
+
+  // 状況の抽出
+  [dSit, dWry].forEach(function(d) {
+    if (!d) return;
+    var allTexts = [];
+    if (d.AbstractText) allTexts.push(d.AbstractText);
+    if (d.RelatedTopics) d.RelatedTopics.slice(0, 12).forEach(function(t) {
+      if (t.Text) allTexts.push(t.Text);
+      if (t.Topics) t.Topics.forEach(function(sub) { if (sub.Text) allTexts.push(sub.Text); });
+    });
+    allTexts.forEach(function(txt) {
+      extractPhrases(txt, 22).forEach(function(p) {
+        // 悩み系キーワードを含む → worries
+        if (/悩|困|不安|できない|わからない|失敗|苦手|辛|難|問題|課題/.test(p)) {
+          if (worries.length < 12) worries.push(p);
+        } else {
+          // 状況系
+          if (situations.length < 12) situations.push(p);
+        }
+      });
+    });
+  });
+
+  // 重複除去
+  var seenS = {}; var seenW = {};
+  situations = situations.filter(function(p) { var k = p.slice(0,8); if(seenS[k]) return false; seenS[k]=true; return true; });
+  worries    = worries.filter(function(p)    { var k = p.slice(0,8); if(seenW[k]) return false; seenW[k]=true; return true; });
+
+  // フォールバック：取得不足の場合はジャンル別の定型文で補完
+  var sitFallback = {
+    "お金": ["副業を始めたいが何から手をつけるか不明","本業の給与が上がらず将来に不安","貯金はあるが増やし方がわからない"],
+    "健康": ["忙しくて運動する時間がない","ダイエットに何度も失敗している","体力が落ちてきたと感じる"],
+    "キャリア": ["今の職場に将来性を感じない","転職したいが何の職種が合うか不明","スキルアップの方法がわからない"],
+    "マインド": ["ネガティブ思考が止められない","自己肯定感が低い","やる気が続かない"],
+    "人間関係": ["職場の人間関係でストレスを感じる","コミュニケーションが苦手","友人関係の維持が難しい"],
+    "生産性": ["タスクが溜まって何から手をつけるか不明","集中力が続かない","時間管理が苦手"],
+    "育児": ["子どもの夜泣きで睡眠不足","イヤイヤ期の対応に疲弊","仕事と育児の両立が難しい"],
+  };
+  var wryFallback = {
+    "お金": ["節約しても全然貯まらない","投資を始めたいがリスクが怖い","副業収入が安定しない"],
+    "健康": ["食事制限が続かない","運動しても体重が減らない","体の疲れが取れない"],
+    "キャリア": ["面接で上手く自分をアピールできない","スキルに自信が持てない","転職後の失敗が怖い"],
+    "マインド": ["感情のコントロールが難しい","他人の目が気になって行動できない","目標達成への継続が難しい"],
+    "人間関係": ["言いたいことが言えない","人の顔色を気にしすぎる","深い関係を築くのが苦手"],
+    "生産性": ["先延ばし癖が直らない","マルチタスクで全てが中途半端","完璧主義でなかなか着手できない"],
+    "育児": ["子どもの言葉の発達が気になる","叱り方がわからない","子どもとの時間が確保できない"],
+  };
+
+  // テーマラベルに対応するキーを探す
+  var matchKey = Object.keys(sitFallback).find(function(k) { return themeLabel.indexOf(k) !== -1; });
+  if (situations.length < 3 && matchKey) situations = situations.concat(sitFallback[matchKey] || []);
+  if (worries.length < 3 && matchKey)    worries    = worries.concat(wryFallback[matchKey] || []);
+
+  return {
+    situations: situations.slice(0, 6),
+    worries: worries.slice(0, 6)
+  };
 }
 
 function exportArticle(text, format, topic) {
@@ -637,6 +765,9 @@ function NoteGenerator(props) {
   var ss2 = useState([]); var sugSit = ss2[0]; var setSugSit = ss2[1];
   var sw = useState([]); var sugWry = sw[0]; var setSugWry = sw[1];
   var se = useState(""); var sugErr = se[0]; var setSugErr = se[1];
+  var tsl = useState(false); var topicLoading = tsl[0]; var setTopicLoading = tsl[1];
+  var tsc = useState([]); var topicCandidates = tsc[0]; var setTopicCandidates = tsc[1];
+  var tse = useState(""); var topicErr = tse[0]; var setTopicErr = tse[1];
   var ld = useState(false); var loading = ld[0]; var setLoading = ld[1];
   var lm = useState(""); var loadMsg = lm[0]; var setLoadMsg = lm[1];
   var er = useState(""); var error = er[0]; var setError = er[1];
@@ -658,18 +789,30 @@ function NoteGenerator(props) {
   var hasArticle = editedText.length > 0;
 
   var fetchSugRef = useRef(null);
-  fetchSugRef.current = async function(currentAiId, curTheme, curTopic, curAge) {
-    if (!getApiKey(currentAiId)) { setSugSit([]); setSugWry([]); return; }
+  fetchSugRef.current = async function(curTheme, curTopic, curAge) {
     setSugLoading(true); setSugErr(""); setSugSit([]); setSugWry([]);
     try {
-      var result = await fetchTargetSuggestions(currentAiId, getThemeLabel(curTheme), curTopic, getAgeLabel(curAge));
+      var result = await fetchTargetSuggestions(getThemeLabel(curTheme), curTopic, getAgeLabel(curAge));
       setSugSit(result.situations || []); setSugWry(result.worries || []);
-    } catch(e) { setSugErr("提案取得失敗: " + e.message); }
+    } catch(e) { setSugErr("Web取得失敗: " + e.message); }
     setSugLoading(false);
   };
 
+  var fetchTopicRef = useRef(null);
+  fetchTopicRef.current = async function(curTheme, curTopic) {
+    setTopicLoading(true); setTopicErr(""); setTopicCandidates([]);
+    try {
+      var candidates = await fetchTopicSuggestionsFromWeb(getThemeLabel(curTheme), curTopic);
+      setTopicCandidates(candidates);
+    } catch(e) { setTopicErr("Web取得失敗: " + e.message); }
+    setTopicLoading(false);
+  };
+
   useEffect(function() {
-    var timer = setTimeout(function() { fetchSugRef.current(aiRef.current, theme, topic, targetAge); }, 800);
+    var timer = setTimeout(function() {
+      fetchTopicRef.current(theme, topic);
+      fetchSugRef.current(theme, topic, targetAge);
+    }, 800);
     return function() { clearTimeout(timer); };
   }, [theme, topic, targetAge]);
 
@@ -722,6 +865,12 @@ function NoteGenerator(props) {
         </div>
         <button onClick={function() { setShowApi(true); }} style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 10, padding: "8px 16px", color: "rgba(255,255,255,0.7)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>🔑 APIキー設定</button>
       </div>
+      {configuredAI.length === 0 && (
+        <div style={{ background: "rgba(255,180,0,0.1)", border: "1px solid rgba(255,180,0,0.35)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ fontSize: 13, color: "#fcd34d" }}>⚠️ APIキーが未設定です。使用するAIのAPIキーを登録してください。</div>
+          <button onClick={function() { setShowApi(true); }} style={{ background: "#e07b39", border: "none", borderRadius: 8, padding: "6px 14px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>今すぐ設定</button>
+        </div>
+      )}
 
       <div className="dark-tabs">
         <TabButton label="⚙️ 設定"      isActive={tab === "settings"} isDisabled={false}       onClick={function() { setTab("settings"); }} />
@@ -740,7 +889,7 @@ function NoteGenerator(props) {
                 {AI_CONFIGS.map(function(ai) {
                   var aid = ai.id; var isActive = aiId === aid; var hasKey = !!getApiKey(aid);
                   return (
-                    <button key={aid} onClick={function() { setAiId(aid); aiRef.current = aid; setTimeout(function() { fetchSugRef.current(aid, theme, topic, targetAge); }, 100); }}
+                    <button key={aid} onClick={function() { setAiId(aid); aiRef.current = aid; }}
                       style={{ flex: "1 1 110px", background: isActive ? ai.color + "22" : "rgba(255,255,255,0.04)", border: isActive ? "2px solid " + ai.color : "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "10px 8px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                       <div style={{ fontSize: 22 }}>{ai.icon}</div>
                       <div style={{ color: isActive ? "#fff" : "rgba(255,255,255,0.55)", fontWeight: isActive ? 800 : 400, fontSize: 13 }}>{ai.label}</div>
@@ -762,7 +911,7 @@ function NoteGenerator(props) {
                 {THEMES_GEN.map(function(t) {
                   var tid = t.id; var isActive = theme === tid;
                   return (
-                    <button key={tid} onClick={function() { setTheme(tid); setTopic(""); setTargetSit(""); setTargetWry(""); }}
+                    <button key={tid} onClick={function() { setTheme(tid); setTopic(""); setTargetSit(""); setTargetWry(""); setTopicCandidates([]); setSugSit([]); setSugWry([]); setTimeout(function() { fetchTopicRef.current(tid, ""); fetchSugRef.current(tid, "", targetAge); }, 100); }}
                       style={{ background: isActive ? "rgba(233,69,96,0.2)" : "rgba(255,255,255,0.05)", border: isActive ? "2px solid #e94560" : "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "8px 14px", fontSize: 13, cursor: "pointer", color: isActive ? "#fff" : "rgba(255,255,255,0.5)", fontWeight: isActive ? 700 : 400 }}>
                       {t.label}
                     </button>
@@ -774,21 +923,47 @@ function NoteGenerator(props) {
             <div style={card}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                 <div style={lbl}>✏️ テーマ・キーワード</div>
-                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>空白でAIが自動選定</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  {topicLoading && <span style={{ color: "#38bdf8", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}><span style={{ display: "inline-block", width: 10, height: 10, border: "2px solid #38bdf8", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />🌐 取得中...</span>}
+                  <button onClick={function() { fetchTopicRef.current(theme, topic); }}
+                    disabled={topicLoading}
+                    style={{ background: "rgba(56,189,248,0.12)", border: "1px solid rgba(56,189,248,0.3)", borderRadius: 6, padding: "4px 10px", color: "#38bdf8", fontSize: 11, cursor: topicLoading ? "not-allowed" : "pointer", fontWeight: 700 }}>
+                    🔄 再取得
+                  </button>
+                </div>
               </div>
               <input type="text" value={topic} onChange={function(e) { setTopic(e.target.value); }} placeholder="例：月5万円を3ヶ月で達成した副業術"
                 style={{ width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "12px 16px", color: "#fff", fontSize: 14, outline: "none", boxSizing: "border-box", marginBottom: 10 }} />
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                {(TOPIC_EXAMPLES[theme] || []).map(function(ex) {
-                  var capturedEx = ex;
-                  return (
-                    <button key={capturedEx} onClick={function() { setTopic(capturedEx); }}
-                      style={{ background: topic === capturedEx ? "rgba(233,69,96,0.2)" : "rgba(255,255,255,0.04)", border: topic === capturedEx ? "1px solid #e94560" : "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: "4px 12px", color: topic === capturedEx ? "#e94560" : "rgba(255,255,255,0.4)", fontSize: 11, cursor: "pointer" }}>
-                      {capturedEx}
-                    </button>
-                  );
-                })}
-              </div>
+              {topicCandidates.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 11, color: "#38bdf8", fontWeight: 700, marginBottom: 6 }}>🌐 Web候補</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {topicCandidates.map(function(ex) {
+                      var capturedEx = ex;
+                      return (
+                        <button key={capturedEx} onClick={function() { setTopic(capturedEx); }}
+                          style={{ background: topic === capturedEx ? "rgba(56,189,248,0.2)" : "rgba(255,255,255,0.04)", border: topic === capturedEx ? "1px solid #38bdf8" : "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: "4px 12px", color: topic === capturedEx ? "#38bdf8" : "rgba(255,255,255,0.4)", fontSize: 11, cursor: "pointer" }}>
+                          {capturedEx}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              {topicErr && <div style={{ color: "#f87171", fontSize: 11, marginTop: 6 }}>{topicErr}</div>}
+              {!topicLoading && topicCandidates.length === 0 && !topicErr && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 4 }}>
+                  {(TOPIC_EXAMPLES[theme] || []).map(function(ex) {
+                    var capturedEx = ex;
+                    return (
+                      <button key={capturedEx} onClick={function() { setTopic(capturedEx); }}
+                        style={{ background: topic === capturedEx ? "rgba(233,69,96,0.2)" : "rgba(255,255,255,0.04)", border: topic === capturedEx ? "1px solid #e94560" : "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: "4px 12px", color: topic === capturedEx ? "#e94560" : "rgba(255,255,255,0.4)", fontSize: 11, cursor: "pointer" }}>
+                        {capturedEx}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
             {/* 文体 */}
             <div style={card}>
@@ -810,9 +985,9 @@ function NoteGenerator(props) {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                 <div style={lbl}>🎯 ターゲット読者</div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  {sugLoading && <span style={{ color: currentAiCfg.color, fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}><span style={{ display: "inline-block", width: 10, height: 10, border: "2px solid " + currentAiCfg.color, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />{currentAiCfg.icon} 分析中...</span>}
-                  <button onClick={function() { fetchSugRef.current(aiRef.current, theme, topic, targetAge); }} disabled={sugLoading || !getApiKey(aiId)}
-                    style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 6, padding: "4px 10px", color: "rgba(255,255,255,0.5)", fontSize: 11, cursor: sugLoading ? "not-allowed" : "pointer" }}>
+                  {sugLoading && <span style={{ color: "#38bdf8", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}><span style={{ display: "inline-block", width: 10, height: 10, border: "2px solid #38bdf8", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />🌐 Web調査中...</span>}
+                  <button onClick={function() { fetchSugRef.current(theme, topic, targetAge); }} disabled={sugLoading}
+                    style={{ background: "rgba(56,189,248,0.12)", border: "1px solid rgba(56,189,248,0.3)", borderRadius: 6, padding: "4px 10px", color: "#38bdf8", fontSize: 11, cursor: sugLoading ? "not-allowed" : "pointer", fontWeight: 700 }}>
                     🔄 再取得
                   </button>
                 </div>
@@ -824,7 +999,7 @@ function NoteGenerator(props) {
                     {AGE_OPTIONS.map(function(a) {
                       var aid2 = a.id; var isActive = targetAge === aid2;
                       return (
-                        <button key={aid2} onClick={function() { setTargetAge(aid2); setTargetSit(""); setTargetWry(""); }}
+                        <button key={aid2} onClick={function() { setTargetAge(aid2); setTargetSit(""); setTargetWry(""); setTimeout(function() { fetchSugRef.current(theme, topic, aid2); }, 100); }}
                           style={{ background: isActive ? "rgba(233,69,96,0.2)" : "rgba(255,255,255,0.05)", border: isActive ? "2px solid #e94560" : "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: "5px 14px", fontSize: 12, cursor: "pointer", color: isActive ? "#fff" : "rgba(255,255,255,0.5)", fontWeight: isActive ? 700 : 400 }}>
                           {a.label}
                         </button>
@@ -835,7 +1010,7 @@ function NoteGenerator(props) {
                 <div style={{ marginBottom: 16 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                     <div style={subLbl}>② 具体的な状況</div>
-                    {sugSit.length > 0 && !sugLoading && <span style={{ background: currentAiCfg.color + "22", color: currentAiCfg.color, fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4 }}>{currentAiCfg.icon} AI提案</span>}
+                    {sugSit.length > 0 && !sugLoading && <span style={{ background: "rgba(56,189,248,0.15)", color: "#38bdf8", fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4 }}>🌐 Web調査</span>}
                   </div>
                   <TagPicker items={sugSit} value={targetSit} onChange={setTargetSit} color="#fbbf24" loading={sugLoading} />
                   {sugErr && <div style={{ color: "#f87171", fontSize: 11, marginTop: 4 }}>{sugErr}</div>}
@@ -843,7 +1018,7 @@ function NoteGenerator(props) {
                 <div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                     <div style={subLbl}>③ 具体的な悩み</div>
-                    {sugWry.length > 0 && !sugLoading && <span style={{ background: currentAiCfg.color + "22", color: currentAiCfg.color, fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4 }}>{currentAiCfg.icon} AI提案</span>}
+                    {sugWry.length > 0 && !sugLoading && <span style={{ background: "rgba(56,189,248,0.15)", color: "#38bdf8", fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4 }}>🌐 Web調査</span>}
                   </div>
                   <TagPicker items={sugWry} value={targetWry} onChange={setTargetWry} color="#fbbf24" loading={sugLoading} />
                 </div>
@@ -1100,9 +1275,14 @@ function BonusGenerator(props) {
     downloadAsXlsx(rows, "bonus_list");
   }, [selected, suggestions, results]);
 
+  var card = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "22px 26px", marginBottom: 14 };
+  var lbl = { color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", display: "block", marginBottom: 10 };
+  var inputStyle = { width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: 14, color: "#fff", outline: "none" };
+
   return (
     <div className="app-wrap">
-      {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} />}
+      <style>{"@keyframes spin { to { transform: rotate(360deg); } }"}</style>
+      {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} isDark={true} />}
       <div className="app-header">
         <div className="app-header-left">
           <button className="back-btn" onClick={onBack}>← 戻る</button>
@@ -1114,87 +1294,95 @@ function BonusGenerator(props) {
         <button className="key-btn" onClick={function() { setShowApi(true); }}>🔑 APIキー設定</button>
       </div>
       <div className="app-body">
+        {!getApiKey(aiId) && (
+          <div style={{ background: "rgba(255,180,0,0.1)", border: "1px solid rgba(255,180,0,0.35)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ fontSize: 13, color: "#fcd34d" }}>⚠️ 選択中のAIのAPIキーが未設定です。右上の「APIキー設定」から登録してください。</div>
+            <button onClick={function() { setShowApi(true); }} style={{ background: "#e07b39", border: "none", borderRadius: 8, padding: "6px 14px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>今すぐ設定</button>
+          </div>
+        )}
         {/* 設定 */}
-        <div style={{ background: "#fff", borderRadius: 12, padding: 20, border: "1px solid #eee", marginBottom: 20 }}>
-          <label style={{ display: "block", fontWeight: 700, marginBottom: 12 }}>使用するAI</label>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
+        <div style={card}>
+          <div style={lbl}>🤖 使用するAI</div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
             {AI_CONFIGS.map(function(ai) {
+              var isActive = aiId === ai.id; var hasKey = !!getApiKey(ai.id);
               return (
                 <button key={ai.id} onClick={function() { setAiId(ai.id); }}
-                  style={{ padding: "8px 18px", borderRadius: 10, border: aiId === ai.id ? "2px solid " + ai.color : "1px solid #ddd", background: aiId === ai.id ? ai.color + "22" : "#f9f9f9", cursor: "pointer", fontWeight: aiId === ai.id ? 700 : 400, fontSize: 14 }}>
-                  {ai.icon} {ai.label}
+                  style={{ flex: "1 1 110px", background: isActive ? ai.color + "22" : "rgba(255,255,255,0.04)", border: isActive ? "2px solid " + ai.color : "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "10px 8px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                  <div style={{ fontSize: 22 }}>{ai.icon}</div>
+                  <div style={{ color: isActive ? "#fff" : "rgba(255,255,255,0.55)", fontWeight: isActive ? 800 : 400, fontSize: 13 }}>{ai.label}</div>
+                  <div style={{ background: hasKey ? "rgba(74,222,128,0.2)" : "rgba(255,255,255,0.1)", color: hasKey ? "#4ade80" : "rgba(255,255,255,0.35)", fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 4 }}>{hasKey ? "✓ 設定済み" : ai.badge}</div>
                 </button>
               );
             })}
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
             <div>
-              <label style={{ display: "block", fontWeight: 700, marginBottom: 8 }}>🎯 ジャンル</label>
-              <select value={theme} onChange={function(e) { setTheme(e.target.value); }} style={{ width: "100%", padding: "10px 12px", border: "1px solid #ddd", borderRadius: 8, fontSize: 14 }}>
-                {BONUS_THEMES.map(function(t) { return <option key={t}>{t}</option>; })}
+              <div style={lbl}>🎯 ジャンル</div>
+              <select value={theme} onChange={function(e) { setTheme(e.target.value); }} style={inputStyle}>
+                {BONUS_THEMES.map(function(t) { return <option key={t} style={{ background: "#1a1a2e" }}>{t}</option>; })}
               </select>
             </div>
             <div>
-              <label style={{ display: "block", fontWeight: 700, marginBottom: 8 }}>👤 ターゲット年齢</label>
-              <select value={targetAge} onChange={function(e) { setTargetAge(e.target.value); }} style={{ width: "100%", padding: "10px 12px", border: "1px solid #ddd", borderRadius: 8, fontSize: 14 }}>
-                {BONUS_AGE_OPTIONS.map(function(a) { return <option key={a}>{a}</option>; })}
+              <div style={lbl}>👤 ターゲット年齢</div>
+              <select value={targetAge} onChange={function(e) { setTargetAge(e.target.value); }} style={inputStyle}>
+                {BONUS_AGE_OPTIONS.map(function(a) { return <option key={a} style={{ background: "#1a1a2e" }}>{a}</option>; })}
               </select>
             </div>
           </div>
         </div>
         {/* 記事入力 */}
-        <div style={{ background: "#fff", borderRadius: 12, padding: 20, border: "1px solid #eee", marginBottom: 20 }}>
-          <label style={{ display: "block", fontWeight: 700, marginBottom: 12 }}>📄 note記事をアップロード or 貼り付け</label>
+        <div style={card}>
+          <div style={lbl}>📄 note記事をアップロード or 貼り付け</div>
           <div onClick={function() { fileRef.current && fileRef.current.click(); }}
-            style={{ border: "2px dashed #ddd", borderRadius: 10, padding: 24, textAlign: "center", cursor: "pointer", marginBottom: 12, background: "#fafafa" }}>
+            style={{ border: "2px dashed rgba(255,255,255,0.15)", borderRadius: 10, padding: 24, textAlign: "center", cursor: "pointer", marginBottom: 12, background: "rgba(255,255,255,0.02)" }}>
             <div style={{ fontSize: 32, marginBottom: 8 }}>📂</div>
-            <div style={{ fontWeight: 600, marginBottom: 4 }}>{articleFile ? articleFile.name : "クリックしてファイルを選択"}</div>
-            {/* バグ修正: 元のコードで }>.txt となっていた構文エラーを修正 */}
-            <div style={{ fontSize: 12, color: "#888" }}>.txt / .md / .docx 対応</div>
+            <div style={{ fontWeight: 600, marginBottom: 4, color: "#fff" }}>{articleFile ? articleFile.name : "クリックしてファイルを選択"}</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>.txt / .md / .docx 対応</div>
             <input ref={fileRef} type="file" accept=".txt,.md,.docx" onChange={handleFileChange} style={{ display: "none" }} />
           </div>
           <textarea value={articleText} onChange={function(e) { setArticleText(e.target.value); }}
             placeholder="または記事テキストをここに貼り付けてください..."
-            style={{ width: "100%", minHeight: 150, padding: 12, border: "1px solid #ddd", borderRadius: 8, fontSize: 14, lineHeight: 1.7, boxSizing: "border-box", resize: "vertical" }} />
+            style={{ width: "100%", minHeight: 150, padding: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 14, lineHeight: 1.7, boxSizing: "border-box", resize: "vertical", color: "#e2e8f0", outline: "none" }} />
         </div>
-        {error && <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 8, padding: 16, color: "#dc2626", marginBottom: 16 }}>{error}</div>}
+        {error && <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, padding: 16, color: "#f87171", marginBottom: 16 }}>{error}</div>}
         <button onClick={handleAnalyze} disabled={loading}
-          style={{ width: "100%", padding: 16, background: loading ? "#ccc" : "#e07b39", color: "#fff", border: "none", borderRadius: 12, fontSize: 16, fontWeight: 800, cursor: loading ? "not-allowed" : "pointer", marginBottom: 24 }}>
+          style={{ width: "100%", padding: 16, background: loading ? "rgba(224,123,57,0.25)" : "linear-gradient(135deg,#e07b39,#c2600a)", color: "#fff", border: "none", borderRadius: 14, fontSize: 16, fontWeight: 800, cursor: loading ? "not-allowed" : "pointer", marginBottom: 24, boxShadow: loading ? "none" : "0 8px 30px rgba(224,123,57,0.4)" }}>
           {loading ? "⏳ 分析中..." : "🔍 記事を分析して特典を提案する"}
         </button>
         {/* 特典提案 */}
         {suggestions.length > 0 && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>🎁 特典候補（{selected.length}件選択中）</h2>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#fff" }}>🎁 特典候補（{selected.length}件選択中）</h2>
               {selected.length > 0 && (
                 <button onClick={handleExportXlsx}
-                  style={{ padding: "8px 16px", background: "#22c55e", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: 14 }}>
+                  style={{ padding: "8px 16px", background: "rgba(34,197,94,0.2)", border: "1px solid rgba(34,197,94,0.4)", color: "#4ade80", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: 14 }}>
                   📊 選択済みをXLSX書き出し
                 </button>
               )}
             </div>
-            <div style={{ display: "grid", gap: 16 }}>
+            <div style={{ display: "grid", gap: 14 }}>
               {suggestions.map(function(s) {
                 var isSelected = selected.indexOf(s.id) !== -1;
                 var content = results[s.id];
                 var isGenerating = genLoading[s.id];
                 var capturedId = s.id; var capturedTitle = s.title; var capturedType = s.type;
                 return (
-                  <div key={s.id} style={{ background: "#fff", borderRadius: 12, border: isSelected ? "2px solid #e07b39" : "1px solid #eee", padding: 20 }}>
+                  <div key={s.id} style={{ background: isSelected ? "rgba(224,123,57,0.08)" : "rgba(255,255,255,0.04)", borderRadius: 14, border: isSelected ? "2px solid rgba(224,123,57,0.5)" : "1px solid rgba(255,255,255,0.09)", padding: 20 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
                       <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
                         <input type="checkbox" checked={isSelected}
                           onChange={function() { setSelected(function(sel) { return isSelected ? sel.filter(function(x) { return x !== capturedId; }) : sel.concat([capturedId]); }); }}
-                          style={{ width: 18, height: 18, marginTop: 2, cursor: "pointer" }} />
+                          style={{ width: 18, height: 18, marginTop: 2, cursor: "pointer", accentColor: "#e07b39" }} />
                         <div>
-                          <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{s.title}</div>
-                          <div style={{ fontSize: 13, color: "#888" }}>{s.description}</div>
-                          {s.reason && <div style={{ fontSize: 12, color: "#aaa", marginTop: 4 }}>💡 {s.reason}</div>}
+                          <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4, color: "#fff" }}>{s.title}</div>
+                          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>{s.description}</div>
+                          {s.reason && <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>💡 {s.reason}</div>}
                         </div>
                       </div>
                       <button onClick={function() { handleGenerate(capturedId, capturedTitle, capturedType); }} disabled={isGenerating}
-                        style={{ padding: "8px 16px", background: isGenerating ? "#ccc" : "#6366f1", color: "#fff", border: "none", borderRadius: 8, cursor: isGenerating ? "not-allowed" : "pointer", fontWeight: 600, fontSize: 13, whiteSpace: "nowrap" }}>
+                        style={{ padding: "8px 16px", background: isGenerating ? "rgba(255,255,255,0.1)" : "rgba(99,102,241,0.3)", border: "1px solid rgba(99,102,241,0.5)", color: isGenerating ? "rgba(255,255,255,0.4)" : "#a5b4fc", borderRadius: 8, cursor: isGenerating ? "not-allowed" : "pointer", fontWeight: 600, fontSize: 13, whiteSpace: "nowrap" }}>
                         {isGenerating ? "⏳ 生成中..." : content ? "🔄 再生成" : "✨ 生成"}
                       </button>
                     </div>
@@ -1202,11 +1390,11 @@ function BonusGenerator(props) {
                       <div>
                         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
                           <button onClick={function() { navigator.clipboard.writeText(content); }}
-                            style={{ padding: "6px 14px", background: "#f5f5f5", border: "1px solid #ddd", borderRadius: 8, cursor: "pointer", fontSize: 13 }}>
+                            style={{ padding: "6px 14px", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,0.6)" }}>
                             📋 コピー
                           </button>
                         </div>
-                        <pre style={{ background: "#f9f9f9", borderRadius: 8, padding: 16, fontSize: 13, lineHeight: 1.8, whiteSpace: "pre-wrap", fontFamily: "inherit", margin: 0, maxHeight: 300, overflowY: "auto" }}>
+                        <pre style={{ background: "rgba(255,255,255,0.03)", borderRadius: 8, padding: 16, fontSize: 13, lineHeight: 1.8, whiteSpace: "pre-wrap", fontFamily: "inherit", margin: 0, maxHeight: 300, overflowY: "auto", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.07)" }}>
                           {content}
                         </pre>
                       </div>
@@ -1285,9 +1473,14 @@ function ImagePromptGenerator(props) {
     setTimeout(function() { setCopied(function(s) { var n = Object.assign({}, s); n[id] = false; return n; }); }, 2000);
   }
 
+  var card = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "22px 26px", marginBottom: 14 };
+  var lbl = { color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", display: "block", marginBottom: 10 };
+  var selStyle = { width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: 14, color: "#fff", outline: "none" };
+
   return (
     <div className="app-wrap">
-      {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} />}
+      <style>{"@keyframes spin { to { transform: rotate(360deg); } }"}</style>
+      {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} isDark={true} />}
       <div className="app-header">
         <div className="app-header-left">
           <button className="back-btn" onClick={onBack}>← 戻る</button>
@@ -1299,95 +1492,104 @@ function ImagePromptGenerator(props) {
         <button className="key-btn" onClick={function() { setShowApi(true); }}>🔑 APIキー設定</button>
       </div>
       <div className="app-body">
-        <div style={{ background: "#fff", borderRadius: 12, padding: 20, border: "1px solid #eee", marginBottom: 20 }}>
-          <label style={{ display: "block", fontWeight: 700, marginBottom: 12 }}>使用するAI</label>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        {!getApiKey(aiId) && (
+          <div style={{ background: "rgba(255,180,0,0.1)", border: "1px solid rgba(255,180,0,0.35)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ fontSize: 13, color: "#fcd34d" }}>⚠️ 選択中のAIのAPIキーが未設定です。右上の「APIキー設定」から登録してください。</div>
+            <button onClick={function() { setShowApi(true); }} style={{ background: "#e07b39", border: "none", borderRadius: 8, padding: "6px 14px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>今すぐ設定</button>
+          </div>
+        )}
+        {/* AI選択 + 記事入力 */}
+        <div style={card}>
+          <div style={lbl}>🤖 使用するAI</div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
             {AI_CONFIGS.map(function(ai) {
+              var isActive = aiId === ai.id; var hasKey = !!getApiKey(ai.id);
               return (
                 <button key={ai.id} onClick={function() { setAiId(ai.id); }}
-                  style={{ padding: "8px 18px", borderRadius: 10, border: aiId === ai.id ? "2px solid " + ai.color : "1px solid #ddd", background: aiId === ai.id ? ai.color + "22" : "#f9f9f9", cursor: "pointer", fontWeight: aiId === ai.id ? 700 : 400, fontSize: 14 }}>
-                  {ai.icon} {ai.label}
+                  style={{ flex: "1 1 110px", background: isActive ? ai.color + "22" : "rgba(255,255,255,0.04)", border: isActive ? "2px solid " + ai.color : "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "10px 8px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                  <div style={{ fontSize: 22 }}>{ai.icon}</div>
+                  <div style={{ color: isActive ? "#fff" : "rgba(255,255,255,0.55)", fontWeight: isActive ? 800 : 400, fontSize: 13 }}>{ai.label}</div>
+                  <div style={{ background: hasKey ? "rgba(74,222,128,0.2)" : "rgba(255,255,255,0.1)", color: hasKey ? "#4ade80" : "rgba(255,255,255,0.35)", fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 4 }}>{hasKey ? "✓ 設定済み" : ai.badge}</div>
                 </button>
               );
             })}
           </div>
-        </div>
-        <div style={{ background: "#fff", borderRadius: 12, padding: 20, border: "1px solid #eee", marginBottom: 20 }}>
-          <label style={{ display: "block", fontWeight: 700, marginBottom: 12 }}>📄 記事をアップロード or 貼り付け</label>
+          <div style={lbl}>📄 note記事をアップロード or 貼り付け</div>
           <div onClick={function() { fileRef.current && fileRef.current.click(); }}
-            style={{ border: "2px dashed #ddd", borderRadius: 10, padding: 20, textAlign: "center", cursor: "pointer", marginBottom: 12, background: "#fafafa" }}>
+            style={{ border: "2px dashed rgba(255,255,255,0.15)", borderRadius: 10, padding: 20, textAlign: "center", cursor: "pointer", marginBottom: 12, background: "rgba(255,255,255,0.02)" }}>
             <div style={{ fontSize: 28, marginBottom: 6 }}>📂</div>
-            <div style={{ fontWeight: 600, marginBottom: 4 }}>{articleFile ? articleFile.name : "クリックしてファイルを選択"}</div>
-            <div style={{ fontSize: 12, color: "#888" }}>.txt / .md / .docx 対応</div>
+            <div style={{ fontWeight: 600, marginBottom: 4, color: "#fff" }}>{articleFile ? articleFile.name : "クリックしてファイルを選択"}</div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>.txt / .md / .docx 対応</div>
             <input ref={fileRef} type="file" accept=".txt,.md,.docx" onChange={handleFileChange} style={{ display: "none" }} />
           </div>
           <textarea value={articleText} onChange={function(e) { setArticleText(e.target.value); }}
             placeholder="または記事テキストをここに貼り付けてください..."
-            style={{ width: "100%", minHeight: 120, padding: 12, border: "1px solid #ddd", borderRadius: 8, fontSize: 14, lineHeight: 1.7, boxSizing: "border-box", resize: "vertical" }} />
+            style={{ width: "100%", minHeight: 120, padding: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 14, lineHeight: 1.7, boxSizing: "border-box", resize: "vertical", color: "#e2e8f0", outline: "none" }} />
         </div>
-        <div style={{ background: "#fff", borderRadius: 12, padding: 20, border: "1px solid #eee", marginBottom: 20 }}>
+        {/* スタイル・ツール設定 */}
+        <div style={card}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
             <div>
-              <label style={{ display: "block", fontWeight: 700, marginBottom: 8 }}>🎨 画像スタイル</label>
-              <select value={imageStyle} onChange={function(e) { setImageStyle(e.target.value); }} style={{ width: "100%", padding: "10px 12px", border: "1px solid #ddd", borderRadius: 8, fontSize: 14 }}>
-                {IMAGE_STYLES.map(function(s) { return <option key={s}>{s}</option>; })}
+              <div style={lbl}>🎨 画像スタイル</div>
+              <select value={imageStyle} onChange={function(e) { setImageStyle(e.target.value); }} style={selStyle}>
+                {IMAGE_STYLES.map(function(s) { return <option key={s} style={{ background: "#1a1a2e" }}>{s}</option>; })}
               </select>
             </div>
             <div>
-              <label style={{ display: "block", fontWeight: 700, marginBottom: 8 }}>🛠 使用ツール</label>
-              <select value={imageTool} onChange={function(e) { setImageTool(e.target.value); }} style={{ width: "100%", padding: "10px 12px", border: "1px solid #ddd", borderRadius: 8, fontSize: 14 }}>
-                {AI_IMAGE_TOOLS.map(function(t) { return <option key={t}>{t}</option>; })}
+              <div style={lbl}>🛠 使用ツール</div>
+              <select value={imageTool} onChange={function(e) { setImageTool(e.target.value); }} style={selStyle}>
+                {AI_IMAGE_TOOLS.map(function(t) { return <option key={t} style={{ background: "#1a1a2e" }}>{t}</option>; })}
               </select>
             </div>
           </div>
-          <label style={{ display: "block", fontWeight: 700, marginBottom: 10 }}>📐 必要な画像種類（複数選択可）</label>
+          <div style={lbl}>📐 必要な画像種類（複数選択可）</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {IMAGE_USES.map(function(u) {
               var isSel = selectedUses.indexOf(u.id) !== -1;
               var capturedId = u.id;
               return (
                 <button key={u.id} onClick={function() { setSelectedUses(function(sel) { return isSel ? sel.filter(function(x) { return x !== capturedId; }) : sel.concat([capturedId]); }); }}
-                  style={{ padding: "8px 14px", borderRadius: 8, border: isSel ? "2px solid #6366f1" : "1px solid #ddd", background: isSel ? "#eef2ff" : "#f9f9f9", cursor: "pointer", fontSize: 13, fontWeight: isSel ? 700 : 400 }}>
-                  {u.label} <span style={{ color: "#aaa", fontSize: 11 }}>{u.size}</span>
+                  style={{ padding: "8px 14px", borderRadius: 8, border: isSel ? "2px solid #a5b4fc" : "1px solid rgba(255,255,255,0.1)", background: isSel ? "rgba(99,102,241,0.2)" : "rgba(255,255,255,0.04)", cursor: "pointer", fontSize: 13, fontWeight: isSel ? 700 : 400, color: isSel ? "#a5b4fc" : "rgba(255,255,255,0.5)" }}>
+                  {u.label} <span style={{ fontSize: 11, opacity: 0.6 }}>{u.size}</span>
                 </button>
               );
             })}
           </div>
         </div>
-        {error && <div style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 8, padding: 16, color: "#dc2626", marginBottom: 16 }}>{error}</div>}
+        {error && <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, padding: 16, color: "#f87171", marginBottom: 16 }}>{error}</div>}
         <button onClick={handleGenerate} disabled={loading}
-          style={{ width: "100%", padding: 16, background: loading ? "#ccc" : "#6366f1", color: "#fff", border: "none", borderRadius: 12, fontSize: 16, fontWeight: 800, cursor: loading ? "not-allowed" : "pointer", marginBottom: 24 }}>
+          style={{ width: "100%", background: loading ? "rgba(99,102,241,0.25)" : "linear-gradient(135deg,#6366f1,#4338ca)", border: "none", borderRadius: 14, padding: 18, color: "#fff", fontSize: 16, fontWeight: 900, cursor: loading ? "not-allowed" : "pointer", boxShadow: loading ? "none" : "0 8px 30px rgba(99,102,241,0.4)", marginBottom: 24 }}>
           {loading ? "⏳ 生成中..." : "✨ 画像プロンプトを生成する"}
         </button>
         {prompts.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <h2 style={{ margin: "0 0 8px", fontSize: 18, fontWeight: 700 }}>🖼 生成されたプロンプト</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <h2 style={{ margin: "0 0 8px", fontSize: 18, fontWeight: 700, color: "#fff" }}>🖼 生成されたプロンプト</h2>
             {prompts.map(function(p, idx) {
               var copyId = "prompt_" + idx;
               var capturedPromptEn = p.promptEn;
               return (
-                <div key={idx} style={{ background: "#fff", borderRadius: 12, padding: 20, border: "1px solid #eee" }}>
+                <div key={idx} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 14, padding: 20, border: "1px solid rgba(255,255,255,0.09)" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                    <strong style={{ fontSize: 16 }}>{p.useLabel || p.use}</strong>
+                    <strong style={{ fontSize: 16, color: "#fff" }}>{p.useLabel || p.use}</strong>
                     <button onClick={function() { handleCopy(capturedPromptEn, copyId); }}
-                      style={{ padding: "6px 14px", background: copied[copyId] ? "#22c55e" : "#6366f1", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600 }}>
+                      style={{ padding: "6px 14px", background: copied[copyId] ? "rgba(74,222,128,0.2)" : "rgba(99,102,241,0.25)", border: copied[copyId] ? "1px solid #4ade80" : "1px solid rgba(99,102,241,0.5)", color: copied[copyId] ? "#4ade80" : "#a5b4fc", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600 }}>
                       {copied[copyId] ? "✅ コピー済み" : "📋 英語コピー"}
                     </button>
                   </div>
-                  <div style={{ marginBottom: 12 }}>
-                    <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>🇺🇸 英語プロンプト</div>
-                    <div style={{ background: "#f0f0ff", borderRadius: 8, padding: 12, fontSize: 13, lineHeight: 1.7, fontFamily: "monospace" }}>{p.promptEn}</div>
+                  <div style={{ marginBottom: 10 }}>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>🇺🇸 英語プロンプト</div>
+                    <div style={{ background: "rgba(99,102,241,0.08)", borderRadius: 8, padding: 12, fontSize: 13, lineHeight: 1.7, fontFamily: "monospace", color: "#c7d2fe", border: "1px solid rgba(99,102,241,0.2)" }}>{p.promptEn}</div>
                   </div>
                   {p.promptJa && (
-                    <div style={{ marginBottom: 12 }}>
-                      <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>🇯🇵 日本語説明</div>
-                      <div style={{ background: "#f9f9f9", borderRadius: 8, padding: 12, fontSize: 13, lineHeight: 1.7 }}>{p.promptJa}</div>
+                    <div style={{ marginBottom: 10 }}>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>🇯🇵 日本語説明</div>
+                      <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 8, padding: 12, fontSize: 13, lineHeight: 1.7, color: "rgba(255,255,255,0.6)" }}>{p.promptJa}</div>
                     </div>
                   )}
                   {p.negativePrompt && (
                     <div>
-                      <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>🚫 ネガティブプロンプト</div>
-                      <div style={{ background: "#fff5f5", borderRadius: 8, padding: 12, fontSize: 13, lineHeight: 1.7, fontFamily: "monospace" }}>{p.negativePrompt}</div>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>🚫 ネガティブプロンプト</div>
+                      <div style={{ background: "rgba(239,68,68,0.06)", borderRadius: 8, padding: 12, fontSize: 13, lineHeight: 1.7, fontFamily: "monospace", color: "#fca5a5", border: "1px solid rgba(239,68,68,0.15)" }}>{p.negativePrompt}</div>
                     </div>
                   )}
                 </div>
@@ -1447,7 +1649,7 @@ var dashStorage = (function() {
 function DashTabBtn(props) {
   return (
     <button onClick={props.onClick}
-      style={{ padding: "14px 20px", border: "none", borderBottom: props.isActive ? "3px solid #e07b39" : "3px solid transparent", background: "none", cursor: "pointer", color: props.isActive ? "#e07b39" : "#555", fontWeight: props.isActive ? 700 : 400, fontSize: 14, whiteSpace: "nowrap" }}>
+      style={{ padding: "14px 20px", border: "none", borderBottom: props.isActive ? "3px solid #e07b39" : "3px solid transparent", background: "none", cursor: "pointer", color: props.isActive ? "#e07b39" : "rgba(255,255,255,0.5)", fontWeight: props.isActive ? 700 : 400, fontSize: 14, whiteSpace: "nowrap" }}>
       {props.label}
     </button>
   );
@@ -1508,9 +1710,13 @@ function Dashboard(props) {
   var apiKeys = loadApiKeys();
   var configuredKeys = AI_CONFIGS.filter(function(ai) { return !!apiKeys[ai.id]; });
 
+  var card = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "22px 26px", marginBottom: 14 };
+  var lbl = { color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", display: "block", marginBottom: 10 };
+
   return (
     <div className="app-wrap">
-      {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} />}
+      <style>{"@keyframes spin { to { transform: rotate(360deg); } }"}</style>
+      {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} isDark={true} />}
       <div className="app-header">
         <div className="app-header-left">
           <button className="back-btn" onClick={onBack}>← 戻る</button>
@@ -1521,8 +1727,8 @@ function Dashboard(props) {
         </div>
         <button className="key-btn" onClick={function() { setShowApi(true); }}>🔑 APIキー設定</button>
       </div>
-      {/* タブ - 独立コンポーネントで修正 */}
-      <div style={{ background: "#fff", borderBottom: "1px solid #eee", display: "flex", padding: "0 24px", overflowX: "auto", position: "sticky", top: 65, zIndex: 99 }}>
+      {/* タブ */}
+      <div style={{ background: "rgba(255,255,255,0.02)", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", padding: "0 24px", overflowX: "auto", position: "sticky", top: 65, zIndex: 99, backdropFilter: "blur(10px)" }}>
         <DashTabBtn label="🏠 ホーム"    isActive={tab === "home"}  onClick={function() { setTab("home"); }} />
         <DashTabBtn label="🛠 ツール一覧" isActive={tab === "tools"} onClick={function() { setTab("tools"); }} />
         <DashTabBtn label="📄 記事管理"  isActive={tab === "notes"} onClick={function() { setTab("notes"); }} />
@@ -1532,21 +1738,23 @@ function Dashboard(props) {
         {tab === "home" && (
           <div>
             {configuredKeys.length === 0 && (
-              <div style={{ background: "#fffbeb", border: "1px solid #fbbf24", borderRadius: 10, padding: 16, marginBottom: 20 }}>
-                <strong>⚠️ APIキーが設定されていません</strong>
-                <p style={{ margin: "8px 0 0", fontSize: 14 }}>右上の「🔑 APIキー設定」からAPIキーを登録してください。</p>
+              <div style={{ background: "rgba(255,180,0,0.1)", border: "1px solid rgba(255,180,0,0.35)", borderRadius: 10, padding: 16, marginBottom: 20 }}>
+                <strong style={{ color: "#fcd34d" }}>⚠️ APIキーが設定されていません</strong>
+                <p style={{ margin: "8px 0 0", fontSize: 14, color: "rgba(255,255,255,0.6)" }}>右上の「🔑 APIキー設定」からAPIキーを登録してください。</p>
               </div>
             )}
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>🛠 ツール</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 32 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: "#fff" }}>🛠 ツール</h2>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14, marginBottom: 32 }}>
               {DASH_TOOLS.map(function(tool) {
                 var capturedId = tool.id;
                 return (
-                  <div key={tool.id} style={{ background: "#fff", borderRadius: 12, padding: 20, border: "1px solid #eee", cursor: "pointer", transition: "box-shadow 0.2s" }}
-                    onClick={function() { recordUsage(capturedId); setTab("tools"); }}>
+                  <div key={tool.id} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 16, padding: 20, border: "1px solid rgba(255,255,255,0.09)", cursor: "pointer", transition: "all 0.2s" }}
+                    onClick={function() { recordUsage(capturedId); setTab("tools"); }}
+                    onMouseEnter={function(e) { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.borderColor = "rgba(224,123,57,0.4)"; }}
+                    onMouseLeave={function(e) { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.09)"; }}>
                     <div style={{ fontSize: 28, marginBottom: 8 }}>{tool.label.split(" ")[0]}</div>
-                    <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{tool.label.split(" ").slice(1).join(" ")}</div>
-                    <div style={{ fontSize: 13, color: "#888", marginBottom: 12 }}>{tool.desc}</div>
+                    <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4, color: "#fff" }}>{tool.label.split(" ").slice(1).join(" ")}</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 12 }}>{tool.desc}</div>
                     <div style={{ fontSize: 12, color: tool.color, fontWeight: 600 }}>使用回数: {toolCounts[tool.id]}回</div>
                   </div>
                 );
@@ -1554,15 +1762,15 @@ function Dashboard(props) {
             </div>
             {usage.length > 0 && (
               <div>
-                <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>📈 最近の利用履歴</h2>
-                <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #eee", overflow: "hidden" }}>
+                <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: "#fff" }}>📈 最近の利用履歴</h2>
+                <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 14, border: "1px solid rgba(255,255,255,0.09)", overflow: "hidden" }}>
                   {usage.slice(0, 10).map(function(u, idx) {
                     var tool = DASH_TOOLS.find(function(t) { return t.id === u.toolId; });
                     var d = new Date(u.timestamp);
                     return (
-                      <div key={idx} style={{ padding: "12px 16px", borderBottom: idx < 9 ? "1px solid #f0f0f0" : "none", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontSize: 14 }}>{tool ? tool.label : u.toolId}</span>
-                        <span style={{ fontSize: 12, color: "#aaa" }}>{d.toLocaleDateString("ja-JP")} {d.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}</span>
+                      <div key={idx} style={{ padding: "12px 16px", borderBottom: idx < 9 ? "1px solid rgba(255,255,255,0.06)" : "none", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: 14, color: "rgba(255,255,255,0.7)" }}>{tool ? tool.label : u.toolId}</span>
+                        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)" }}>{d.toLocaleDateString("ja-JP")} {d.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}</span>
                       </div>
                     );
                   })}
@@ -1573,16 +1781,16 @@ function Dashboard(props) {
         )}
         {tab === "tools" && (
           <div>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>🛠 ツール一覧</h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: "#fff" }}>🛠 ツール一覧</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {DASH_TOOLS.map(function(tool) {
                 return (
-                  <div key={tool.id} style={{ background: "#fff", borderRadius: 12, padding: 24, border: "1px solid #eee" }}>
+                  <div key={tool.id} style={card}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                       <div>
-                        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 6 }}>{tool.label}</div>
-                        <div style={{ fontSize: 14, color: "#888", marginBottom: 12 }}>{tool.desc}</div>
-                        <div style={{ fontSize: 12, background: "#f5f5f5", display: "inline-block", padding: "4px 10px", borderRadius: 6, fontFamily: "monospace" }}>{tool.id}.jsx</div>
+                        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 6, color: "#fff" }}>{tool.label}</div>
+                        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", marginBottom: 12 }}>{tool.desc}</div>
+                        <div style={{ fontSize: 12, background: "rgba(255,255,255,0.08)", display: "inline-block", padding: "4px 10px", borderRadius: 6, fontFamily: "monospace", color: "rgba(255,255,255,0.5)" }}>{tool.id}.jsx</div>
                       </div>
                       <div style={{ fontSize: 24, color: tool.color }}>{tool.label.split(" ")[0]}</div>
                     </div>
@@ -1594,28 +1802,28 @@ function Dashboard(props) {
         )}
         {tab === "notes" && (
           <div>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>📄 保存された記事</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: "#fff" }}>📄 保存された記事</h2>
             {dataLoading ? (
-              <div style={{ textAlign: "center", padding: 40, color: "#888" }}>⏳ 読み込み中...</div>
+              <div style={{ textAlign: "center", padding: 40, color: "rgba(255,255,255,0.4)" }}>⏳ 読み込み中...</div>
             ) : notes.length === 0 ? (
-              <div style={{ background: "#fff", borderRadius: 12, padding: 40, border: "1px solid #eee", textAlign: "center", color: "#888" }}>
+              <div style={Object.assign({}, card, { textAlign: "center", padding: 40 })}>
                 <div style={{ fontSize: 40, marginBottom: 16 }}>📄</div>
-                <div style={{ fontWeight: 600, marginBottom: 8 }}>保存された記事はありません</div>
-                <div style={{ fontSize: 14 }}>note記事ジェネレーターで生成した記事がここに表示されます</div>
+                <div style={{ fontWeight: 600, marginBottom: 8, color: "rgba(255,255,255,0.6)" }}>保存された記事はありません</div>
+                <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>note記事ジェネレーターで生成した記事がここに表示されます</div>
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {notes.map(function(note) {
                   var capturedNoteId = note.id;
                   return (
-                    <div key={note.id} style={{ background: "#fff", borderRadius: 12, padding: 20, border: "1px solid #eee" }}>
+                    <div key={note.id} style={card}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                         <div>
-                          <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{note.title || "（タイトルなし）"}</div>
-                          <div style={{ fontSize: 12, color: "#aaa" }}>{note.createdAt ? new Date(note.createdAt).toLocaleDateString("ja-JP") : ""} ／ {note.theme || ""}</div>
+                          <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4, color: "#fff" }}>{note.title || "（タイトルなし）"}</div>
+                          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>{note.createdAt ? new Date(note.createdAt).toLocaleDateString("ja-JP") : ""} ／ {note.theme || ""}</div>
                         </div>
                         <button onClick={function() { deleteNote(capturedNoteId); }}
-                          style={{ padding: "6px 12px", background: "#fef2f2", color: "#dc2626", border: "1px solid #fca5a5", borderRadius: 8, cursor: "pointer", fontSize: 13 }}>
+                          style={{ padding: "6px 12px", background: "rgba(239,68,68,0.15)", color: "#f87171", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, cursor: "pointer", fontSize: 13 }}>
                           🗑 削除
                         </button>
                       </div>
@@ -1629,14 +1837,14 @@ function Dashboard(props) {
         {tab === "memo" && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>📝 メモ</h2>
-              <button onClick={saveMemo} style={{ padding: "8px 20px", background: memoSaved ? "#22c55e" : "#e07b39", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: 14 }}>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#fff" }}>📝 メモ</h2>
+              <button onClick={saveMemo} style={{ padding: "8px 20px", background: memoSaved ? "rgba(34,197,94,0.25)" : "rgba(224,123,57,0.3)", border: memoSaved ? "1px solid #4ade80" : "1px solid rgba(224,123,57,0.5)", color: memoSaved ? "#4ade80" : "#fbbf24", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: 14 }}>
                 {memoSaved ? "✅ 保存済み" : "💾 保存"}
               </button>
             </div>
             <textarea value={memo} onChange={function(e) { setMemo(e.target.value); }}
               placeholder="自由にメモを書いてください..."
-              style={{ width: "100%", minHeight: 400, padding: 16, border: "1px solid #ddd", borderRadius: 12, fontSize: 14, lineHeight: 1.8, boxSizing: "border-box", resize: "vertical" }} />
+              style={{ width: "100%", minHeight: 400, padding: 16, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, fontSize: 14, lineHeight: 1.8, boxSizing: "border-box", resize: "vertical", color: "#e2e8f0", outline: "none" }} />
           </div>
         )}
       </div>
