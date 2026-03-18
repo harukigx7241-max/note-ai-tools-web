@@ -10,292 +10,231 @@
 <script src="https://cdn.jsdelivr.net/npm/mammoth/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { font-size: 16px; }
-  body {
-    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", sans-serif;
-    background: #fafaf8;
-    color: #1a1a1a;
-    line-height: 1.6;
-  }
-  #root { min-height: 100vh; }
+/* =========================================
+   RESET & BASE
+   ========================================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  background: #0d0d1a;
+  color: #fff;
+  line-height: 1.6;
+}
+input, textarea, select, button { font-family: inherit; }
+input[type="range"] { cursor: pointer; }
+textarea { resize: vertical; }
+select { cursor: pointer; }
+a { color: inherit; }
 
-  /* LANDING */
-  .landing {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0a1628 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .landing::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 700px 500px at 30% 40%, rgba(224,123,57,0.1) 0%, transparent 70%),
-      radial-gradient(ellipse 500px 500px at 80% 20%, rgba(99,102,241,0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .landing-grid {
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-    background-size: 50px 50px;
-  }
-  .landing-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    border: 1px solid rgba(224,123,57,0.4);
-    border-radius: 100px;
-    padding: 5px 14px;
-    font-size: 11px;
-    color: #e07b39;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 28px;
-    position: relative;
-    z-index: 1;
-  }
-  .landing-badge::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #e07b39;
-    animation: blink 2s ease-in-out infinite;
-  }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .landing-title {
-    font-size: clamp(48px, 9vw, 96px);
-    font-weight: 900;
-    color: #fff;
-    letter-spacing: -0.03em;
-    line-height: 1.05;
-    margin-bottom: 20px;
-    position: relative;
-    z-index: 1;
-  }
-  .landing-title span { color: #e07b39; }
-  .landing-sub {
-    font-size: 17px;
-    color: rgba(255,255,255,0.5);
-    max-width: 500px;
-    margin: 0 auto 40px;
-    font-weight: 300;
-    position: relative;
-    z-index: 1;
-    line-height: 1.7;
-  }
-  .ai-badges {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 40px;
-    position: relative;
-    z-index: 1;
-  }
-  .ai-badge {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 7px 14px;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #fff;
-    background: rgba(255,255,255,0.04);
-  }
-  .ai-dot { width: 8px; height: 8px; border-radius: 50%; }
-  .tool-cards-landing {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
-    max-width: 900px;
-    width: 100%;
-    margin-bottom: 40px;
-    position: relative;
-    z-index: 1;
-  }
-  .tool-card-landing {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 14px;
-    padding: 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: left;
-  }
-  .tool-card-landing:hover {
-    background: rgba(255,255,255,0.08);
-    border-color: rgba(224,123,57,0.4);
-    transform: translateY(-2px);
-  }
-  .tool-card-icon { font-size: 28px; margin-bottom: 10px; }
-  .tool-card-name { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-  .tool-card-desc { font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.5; }
+/* =========================================
+   LANDING PAGE
+   ========================================= */
+.landing {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0a1628 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.landing::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 700px 500px at 30% 40%, rgba(224,123,57,0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 500px at 80% 20%, rgba(99,102,241,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.landing-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+.landing-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid rgba(224,123,57,0.4);
+  border-radius: 100px; padding: 5px 14px;
+  font-size: 11px; color: #e07b39;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 28px; position: relative; z-index: 1;
+}
+.landing-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%; background: #e07b39;
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+@keyframes spin { to { transform: rotate(360deg); } }
+.landing-title {
+  font-size: clamp(48px, 9vw, 96px);
+  font-weight: 900; color: #fff;
+  letter-spacing: -0.03em; line-height: 1.05;
+  margin-bottom: 20px;
+  position: relative; z-index: 1;
+}
+.landing-title span { color: #e07b39; }
+.landing-sub {
+  font-size: 17px; color: rgba(255,255,255,0.5);
+  max-width: 500px; margin: 0 auto 40px;
+  font-weight: 300; position: relative; z-index: 1;
+  line-height: 1.7;
+}
+.ai-badges {
+  display: flex; gap: 10px;
+  justify-content: center; flex-wrap: wrap;
+  margin-bottom: 40px;
+  position: relative; z-index: 1;
+}
+.ai-badge {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; font-size: 13px;
+  font-weight: 500; color: #fff;
+  background: rgba(255,255,255,0.04);
+}
+.ai-dot { width: 8px; height: 8px; border-radius: 50%; }
+.tool-cards-landing {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px; max-width: 900px; width: 100%;
+  margin-bottom: 40px;
+  position: relative; z-index: 1;
+}
+.tool-card-landing {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px; padding: 20px;
+  cursor: pointer; transition: all 0.2s;
+  text-align: left;
+}
+.tool-card-landing:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(224,123,57,0.4);
+  transform: translateY(-2px);
+}
+.tool-card-icon { font-size: 28px; margin-bottom: 10px; }
+.tool-card-name { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.tool-card-desc { font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.5; }
 
-  /* SHARED APP STYLES — DARK THEME */
-  .app-wrap { min-height: 100vh; background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0a1628 100%); }
-  .app-header {
-    background: rgba(255,255,255,0.03);
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-    padding: 14px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(10px);
-  }
-  .app-header-left { display: flex; align-items: center; gap: 12px; }
-  .back-btn {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-size: 13px;
-    cursor: pointer;
-    color: rgba(255,255,255,0.7);
-    transition: background 0.15s;
-  }
-  .back-btn:hover { background: rgba(255,255,255,0.14); }
-  .app-title { font-size: 20px; font-weight: 800; margin: 0; color: #fff; }
-  .app-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin: 3px 0 0; }
-  .key-btn {
-    padding: 8px 16px;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.7);
-    transition: background 0.15s;
-  }
-  .key-btn:hover { background: rgba(255,255,255,0.13); }
-  .app-body { max-width: 860px; margin: 0 auto; padding: 24px 16px; }
+/* =========================================
+   SHARED APP LAYOUT
+   ========================================= */
+.app-wrap {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0a1628 100%);
+}
+.app-header {
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding: 14px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(10px);
+}
+.app-header-left { display: flex; align-items: center; gap: 12px; }
+.back-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px; padding: 6px 12px;
+  font-size: 13px; cursor: pointer;
+  color: rgba(255,255,255,0.7);
+  transition: background 0.15s;
+}
+.back-btn:hover { background: rgba(255,255,255,0.14); }
+.app-title { font-size: 20px; font-weight: 800; margin: 0; color: #fff; }
+.app-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin: 3px 0 0; }
+.key-btn {
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px; cursor: pointer;
+  font-size: 13px; font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  transition: background 0.15s;
+}
+.key-btn:hover { background: rgba(255,255,255,0.13); }
+.app-body { max-width: 860px; margin: 0 auto; padding: 24px 16px; }
+.dark-tabs {
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; padding: 0 20px;
+  overflow-x: auto;
+  position: sticky; top: 65px; z-index: 99;
+  backdrop-filter: blur(10px);
+}
 
-  /* NOTE GENERATOR SPECIFIC */
-  .dark-app { background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0a1628 100%); min-height: 100vh; }
-  .dark-header {
-    background: rgba(255,255,255,0.03);
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-    padding: 14px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(10px);
-  }
-  .dark-tabs {
-    background: rgba(255,255,255,0.02);
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    display: flex;
-    padding: 0 20px;
-    overflow-x: auto;
-    position: sticky;
-    top: 65px;
-    z-index: 99;
-    backdrop-filter: blur(10px);
-  }
+/* =========================================
+   MODAL
+   ========================================= */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 9999;
+  display: flex; align-items: center;
+  justify-content: center; padding: 16px;
+}
+.modal-box {
+  background: #1a1a2e;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px; padding: 32px;
+  width: 500px; max-width: 100%;
+  max-height: 90vh; overflow-y: auto;
+}
 
-  /* MODAL */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-  }
-  .modal-box {
-    background: #fff;
-    border-radius: 16px;
-    padding: 32px;
-    width: 500px;
-    max-width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-  .modal-box-dark {
-    background: #1a1a2e;
-    border: 1px solid rgba(255,255,255,0.12);
-  }
+/* =========================================
+   CARD / LABEL COMMON
+   ========================================= */
+.card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 18px; padding: 22px 26px;
+  margin-bottom: 14px;
+}
+.lbl {
+  color: rgba(255,255,255,0.6);
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 0.1em;
+  display: block; margin-bottom: 10px;
+}
 
-  input[type="range"] { cursor: pointer; }
-  textarea { font-family: inherit; }
-  select { font-family: inherit; cursor: pointer; }
-
-  /* =====================================================
-     RESPONSIVE — PC / TABLET / MOBILE
-     ===================================================== */
-
-  /* タブレット (768px以下) */
-  @media (max-width: 768px) {
-    .app-body { max-width: 100%; padding: 16px 14px; }
-    .app-header { padding: 12px 16px; }
-    .dark-header { padding: 12px 16px; }
-    .dark-tabs { padding: 0 12px; top: 58px; }
-    .tool-cards-landing { grid-template-columns: 1fr 1fr; gap: 10px; }
-  }
-
-  /* スマホ (480px以下) */
-  @media (max-width: 480px) {
-    /* ランディング */
-    .landing { padding: 32px 16px; }
-    .landing-title { font-size: clamp(36px, 12vw, 56px); letter-spacing: -0.02em; }
-    .landing-sub { font-size: 14px; margin-bottom: 28px; }
-    .landing-badge { font-size: 10px; padding: 4px 12px; margin-bottom: 20px; }
-    .ai-badges { gap: 6px; margin-bottom: 28px; }
-    .ai-badge { font-size: 11px; padding: 5px 10px; gap: 5px; }
-    .tool-cards-landing { grid-template-columns: 1fr 1fr; gap: 8px; max-width: 100%; margin-bottom: 28px; }
-    .tool-card-landing { padding: 14px 12px; border-radius: 12px; }
-    .tool-card-icon { font-size: 22px; margin-bottom: 6px; }
-    .tool-card-name { font-size: 12px; }
-    .tool-card-desc { font-size: 10px; }
-
-    /* 共通ヘッダー */
-    .app-header { padding: 10px 12px; }
-    .app-header-left { gap: 8px; }
-    .app-title { font-size: 15px; }
-    .app-sub { font-size: 10px; }
-    .back-btn { padding: 5px 9px; font-size: 12px; }
-    .key-btn { padding: 6px 10px; font-size: 11px; font-weight: 600; }
-    .app-body { padding: 12px 10px; }
-
-    /* ダークヘッダー */
-    .dark-header { padding: 10px 12px; }
-    .dark-tabs { padding: 0 8px; top: 54px; }
-    .modal-box { padding: 20px 16px; border-radius: 12px; }
-  }
-
-  /* 超小型スマホ (360px以下) */
-  @media (max-width: 360px) {
-    .landing-title { font-size: 34px; }
-    .tool-cards-landing { grid-template-columns: 1fr 1fr; gap: 6px; }
-    .tool-card-landing { padding: 10px 8px; }
-    .tool-card-name { font-size: 11px; }
-    .tool-card-desc { display: none; }
-    .app-title { font-size: 13px; }
-    .key-btn { padding: 5px 8px; font-size: 10px; }
-  }
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  .app-body { padding: 16px 14px; }
+  .app-header { padding: 12px 16px; }
+  .dark-tabs { padding: 0 12px; top: 58px; }
+  .tool-cards-landing { grid-template-columns: 1fr 1fr; gap: 10px; }
+}
+@media (max-width: 480px) {
+  .landing { padding: 32px 16px; }
+  .landing-title { font-size: clamp(36px, 12vw, 56px); }
+  .landing-sub { font-size: 14px; margin-bottom: 28px; }
+  .tool-cards-landing { gap: 8px; margin-bottom: 28px; }
+  .tool-card-landing { padding: 14px 12px; border-radius: 12px; }
+  .tool-card-icon { font-size: 22px; }
+  .tool-card-name { font-size: 12px; }
+  .app-header { padding: 10px 12px; }
+  .app-title { font-size: 15px; }
+  .app-sub { font-size: 10px; }
+  .back-btn { padding: 5px 9px; font-size: 12px; }
+  .key-btn { padding: 6px 10px; font-size: 11px; }
+  .app-body { padding: 12px 10px; }
+  .dark-tabs { padding: 0 8px; top: 54px; }
+  .modal-box { padding: 20px 16px; }
+  .card { padding: 16px 14px; border-radius: 14px; }
+}
+@media (max-width: 360px) {
+  .landing-title { font-size: 34px; }
+  .tool-card-desc { display: none; }
+  .app-title { font-size: 13px; }
+}
 </style>
 </head>
 <body>
@@ -304,1058 +243,929 @@
 <script type="text/babel">
 const { useState, useEffect, useCallback, useRef } = React;
 
-// ======================================================
-// SHARED: レスポンシブ検出フック
-// ======================================================
+/* =============================================
+   RESPONSIVE HOOK
+   ============================================= */
 function useIsMobile() {
-  var ms = useState(window.innerWidth <= 480);
-  var isMobile = ms[0]; var setIsMobile = ms[1];
+  var state = useState(window.innerWidth <= 480);
+  var isMobile = state[0];
+  var setIsMobile = state[1];
   useEffect(function() {
-    function onResize() { setIsMobile(window.innerWidth <= 480); }
-    window.addEventListener("resize", onResize);
-    return function() { window.removeEventListener("resize", onResize); };
+    function handleResize() { setIsMobile(window.innerWidth <= 480); }
+    window.addEventListener('resize', handleResize);
+    return function() { window.removeEventListener('resize', handleResize); };
   }, []);
   return isMobile;
 }
 
-// ============================================================
-// SHARED: AI CONFIGS & API KEY UTILS
-// ============================================================
-var AI_CONFIGS = [
-  { id: "claude",  label: "Claude",  icon: "🟠", color: "#e07b39", badge: "API" },
-  { id: "gemini",  label: "Gemini",  icon: "🔵", color: "#4285f4", badge: "API"  },
-  { id: "chatgpt", label: "ChatGPT", icon: "🟢", color: "#10a37f", badge: "API"  },
-  { id: "grok",    label: "Grok",    icon: "⚫", color: "#9ca3af", badge: "API"  },
+/* =============================================
+   AI CONFIGS & KEY STORAGE
+   ============================================= */
+var AI_LIST = [
+  { id: 'claude',  label: 'Claude',  icon: '🟠', color: '#e07b39', badge: 'API' },
+  { id: 'gemini',  label: 'Gemini',  icon: '🔵', color: '#4285f4', badge: 'API' },
+  { id: 'chatgpt', label: 'ChatGPT', icon: '🟢', color: '#10a37f', badge: 'API' },
+  { id: 'grok',    label: 'Grok',    icon: '⚫', color: '#9ca3af', badge: 'API' },
 ];
-var MULTI_AI_KEY = "multiAiKeys_v1";
+var KEY_STORAGE = 'noteAiKeys_v2';
 
-function loadApiKeys() {
-  try { return JSON.parse(localStorage.getItem(MULTI_AI_KEY) || "{}"); }
+function loadKeys() {
+  try { return JSON.parse(localStorage.getItem(KEY_STORAGE) || '{}'); }
   catch(e) { return {}; }
 }
-function saveApiKey(aiId, key) {
-  var k = loadApiKeys(); k[aiId] = key;
-  localStorage.setItem(MULTI_AI_KEY, JSON.stringify(k));
+function saveKey(id, val) {
+  var k = loadKeys(); k[id] = val;
+  localStorage.setItem(KEY_STORAGE, JSON.stringify(k));
 }
-function getApiKey(aiId) { return loadApiKeys()[aiId] || ""; }
+function getKey(id) { return loadKeys()[id] || ''; }
 
-async function callAI(opts) {
-  var aiId = opts.aiId; var messages = opts.messages;
-  var systemPrompt = opts.systemPrompt || ""; var maxTokens = opts.maxTokens || 4000;
-  var key = getApiKey(aiId);
-  if (!key) throw new Error(aiId + "のAPIキーが設定されていません");
-  if (aiId === "claude") {
-    var r1 = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
-      body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: maxTokens, system: systemPrompt, messages: messages })
-    });
-    if (!r1.ok) { var e1 = await r1.json().catch(function() { return {}; }); throw new Error("Claude APIエラー " + r1.status + (r1.status === 401 ? "：APIキーが無効です。console.anthropic.comで確認してください" : r1.status === 429 ? "：レート制限超過。しばらく待ってから再試行してください" : "")); }
-    var d1 = await r1.json(); return d1.content.map(function(b) { return b.text || ""; }).join("");
+/* =============================================
+   API CALL FUNCTIONS (正確な仕様に基づく実装)
+   ============================================= */
+
+/* --- Claude API ---
+   エンドポイント: POST https://api.anthropic.com/v1/messages
+   必須ヘッダー:
+     x-api-key: {APIキー}
+     anthropic-version: 2023-06-01
+     content-type: application/json
+     anthropic-dangerous-direct-browser-access: true  ← ブラウザから直接呼ぶ場合必須
+   ボディ: { model, max_tokens, system?, messages: [{role, content}] }
+   レスポンス: { content: [{type:"text", text:"..."}], ... }
+*/
+async function callClaude(messages, systemPrompt, maxTokens) {
+  var key = getKey('claude');
+  if (!key) throw new Error('Claude: APIキーが設定されていません');
+  var body = {
+    model: 'claude-sonnet-4-6',
+    max_tokens: maxTokens || 4000,
+    messages: messages
+  };
+  if (systemPrompt) body.system = systemPrompt;
+  var res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    var errData = {};
+    try { errData = await res.json(); } catch(e) {}
+    var msg = errData.error ? errData.error.message : '';
+    if (res.status === 401) throw new Error('Claude 401: APIキーが無効です。console.anthropic.comで確認してください。' + (msg ? ' (' + msg + ')' : ''));
+    if (res.status === 429) throw new Error('Claude 429: レート制限超過。しばらく待ってから再試行してください。');
+    if (res.status === 400) throw new Error('Claude 400: リクエストが不正です。' + (msg ? msg : ''));
+    if (res.status === 500) throw new Error('Claude 500: Anthropicサーバーエラー。しばらく待ってください。');
+    throw new Error('Claude APIエラー ' + res.status + (msg ? ': ' + msg : ''));
   }
-  if (aiId === "gemini") {
-    var gContents = messages.map(function(m) { return { role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] }; });
-    var gBody = { contents: gContents, generationConfig: { maxOutputTokens: maxTokens } };
-    if (systemPrompt) gBody.systemInstruction = { parts: [{ text: systemPrompt }] };
-    var geminiModels = ["gemini-2.0-flash", "gemini-1.5-flash"];
-    var r2, d2Resp;
-    for (var gi = 0; gi < geminiModels.length; gi++) {
-      r2 = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + geminiModels[gi] + ":generateContent?key=" + key, {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(gBody)
+  var data = await res.json();
+  if (!data.content || !data.content.length) throw new Error('Claude: 空のレスポンスが返りました');
+  return data.content.map(function(b) { return b.text || ''; }).join('');
+}
+
+/* --- Gemini API ---
+   エンドポイント: POST https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={APIキー}
+   ヘッダー: Content-Type: application/json
+   ボディ: { contents: [{role, parts:[{text}]}], generationConfig?: {maxOutputTokens}, systemInstruction?: {parts:[{text}]} }
+   注意:
+     - role は "user" または "model" (assistantではない)
+     - 429は無料枠レート制限 (gemini-1.5-flashが安定)
+     - モデル: gemini-1.5-flash (安定・高速), gemini-2.0-flash (新しいが429多め)
+*/
+async function callGemini(messages, systemPrompt, maxTokens) {
+  var key = getKey('gemini');
+  if (!key) throw new Error('Gemini: APIキーが設定されていません');
+
+  // roleをGemini形式に変換 (user/assistant → user/model)
+  var contents = messages.map(function(m) {
+    return {
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    };
+  });
+  var body = {
+    contents: contents,
+    generationConfig: { maxOutputTokens: maxTokens || 4000 }
+  };
+  if (systemPrompt) {
+    body.systemInstruction = { parts: [{ text: systemPrompt }] };
+  }
+
+  // gemini-1.5-flashを優先（429が少ない）、失敗時はgemini-2.0-flashにフォールバック
+  var models = ['gemini-1.5-flash', 'gemini-2.0-flash'];
+  var lastErr = null;
+  for (var i = 0; i < models.length; i++) {
+    var model = models[i];
+    var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + key;
+    var res;
+    try {
+      res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
       });
-      if (r2.status === 429 && gi < geminiModels.length - 1) {
-        await new Promise(function(res) { setTimeout(res, 2000); });
+    } catch(e) {
+      lastErr = new Error('Gemini: ネットワークエラー - ' + e.message);
+      continue;
+    }
+    if (res.status === 429) {
+      // 429の場合は次のモデルを試す前に少し待機
+      if (i < models.length - 1) {
+        await new Promise(function(r) { setTimeout(r, 3000); });
+        lastErr = new Error('Gemini 429: レート制限。次のモデルを試します...');
         continue;
       }
-      break;
+      throw new Error('Gemini 429: レート制限超過。無料枠の上限に達しました。\n・しばらく時間をおいてから再試行してください\n・Google AI Studioで使用量を確認してください');
     }
-    if (!r2.ok) { throw new Error("Gemini APIエラー " + r2.status + (r2.status === 400 ? "：APIキーが無効です" : r2.status === 429 ? "：レート制限超過。無料枠の上限に達しました。しばらく待つか、Google AI StudioでAPIキーを確認してください" : r2.status === 403 ? "：APIキーに権限がありません。Google AI StudioでAPIキーを確認してください" : "")); }
-    var d2 = await r2.json();
-    return (d2.candidates && d2.candidates[0] && d2.candidates[0].content && d2.candidates[0].content.parts)
-      ? d2.candidates[0].content.parts.map(function(p) { return p.text || ""; }).join("") : "";
+    if (res.status === 400) {
+      var e400 = {};
+      try { e400 = await res.json(); } catch(ex) {}
+      var msg400 = e400.error ? e400.error.message : '';
+      throw new Error('Gemini 400: APIキーが無効か、リクエストが不正です。' + (msg400 ? ' (' + msg400 + ')' : '') + '\nGoogle AI Studio(aistudio.google.com)でキーを確認してください。');
+    }
+    if (res.status === 403) {
+      throw new Error('Gemini 403: APIキーに権限がありません。Google AI Studioでキーの設定を確認してください。');
+    }
+    if (!res.ok) {
+      var eData = {};
+      try { eData = await res.json(); } catch(ex) {}
+      var eMsg = eData.error ? eData.error.message : '';
+      throw new Error('Gemini APIエラー ' + res.status + (eMsg ? ': ' + eMsg : ''));
+    }
+    var data = await res.json();
+    if (!data.candidates || !data.candidates.length) {
+      // safety filterなどで空の場合
+      var fb = data.promptFeedback;
+      if (fb && fb.blockReason) throw new Error('Gemini: コンテンツがブロックされました (' + fb.blockReason + ')');
+      throw new Error('Gemini: レスポンスが空でした');
+    }
+    var cand = data.candidates[0];
+    if (!cand.content || !cand.content.parts) throw new Error('Gemini: レスポンス形式が不正です');
+    return cand.content.parts.map(function(p) { return p.text || ''; }).join('');
   }
-  if (aiId === "chatgpt") {
-    var cMsgs = systemPrompt ? [{ role: "system", content: systemPrompt }].concat(messages) : messages;
-    var r3 = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
-      body: JSON.stringify({ model: "gpt-4o", max_tokens: maxTokens, messages: cMsgs })
-    });
-    if (!r3.ok) { throw new Error("ChatGPT APIエラー " + r3.status + (r3.status === 401 ? "：APIキーが無効です" : "")); }
-    var d3 = await r3.json();
-    return (d3.choices && d3.choices[0] && d3.choices[0].message) ? d3.choices[0].message.content : "";
-  }
-  if (aiId === "grok") {
-    var xMsgs = systemPrompt ? [{ role: "system", content: systemPrompt }].concat(messages) : messages;
-    var r4 = await fetch("https://api.x.ai/v1/chat/completions", {
-      method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
-      body: JSON.stringify({ model: "grok-3", max_tokens: maxTokens, messages: xMsgs })
-    });
-    if (!r4.ok) { throw new Error("Grok APIエラー " + r4.status + (r4.status === 401 ? "：APIキーが無効です" : "")); }
-    var d4 = await r4.json();
-    return (d4.choices && d4.choices[0] && d4.choices[0].message) ? d4.choices[0].message.content : "";
-  }
-  throw new Error("未対応のAI");
+  throw lastErr || new Error('Gemini: すべてのモデルで失敗しました');
 }
 
-async function callClaudeSearch(opts) {
-  var messages = opts.messages; var systemPrompt = opts.systemPrompt || ""; var maxTokens = opts.maxTokens || 2000;
-  var key = getApiKey("claude");
-  if (!key) throw new Error("🔑 ClaudeのAPIキーが未設定です。右上の「APIキー設定」から登録してください");
-  var r = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
-    body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: maxTokens, system: systemPrompt, messages: messages, tools: [{ type: "web_search_20250305", name: "web_search" }] })
+/* --- ChatGPT (OpenAI) API ---
+   エンドポイント: POST https://api.openai.com/v1/chat/completions
+   必須ヘッダー:
+     Authorization: Bearer {APIキー}
+     Content-Type: application/json
+   ボディ: { model, messages: [{role, content}], max_tokens? }
+   注意: systemプロンプトはmessagesの最初に role:"system" として追加
+*/
+async function callChatGPT(messages, systemPrompt, maxTokens) {
+  var key = getKey('chatgpt');
+  if (!key) throw new Error('ChatGPT: APIキーが設定されていません');
+  var msgs = systemPrompt
+    ? [{ role: 'system', content: systemPrompt }].concat(messages)
+    : messages;
+  var res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + key
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o',
+      max_tokens: maxTokens || 4000,
+      messages: msgs
+    })
   });
-  if (!r.ok) {
-    if (r.status === 401) throw new Error("🔑 Claude APIキーが無効です（401）。console.anthropic.comでキーを確認してください");
-    if (r.status === 429) throw new Error("⏳ Claude APIのレート制限に達しました（429）。しばらく待ってから再試行してください");
-    throw new Error("Claude Web検索エラー: " + r.status);
+  if (!res.ok) {
+    var eData = {};
+    try { eData = await res.json(); } catch(e) {}
+    var eMsg = eData.error ? eData.error.message : '';
+    if (res.status === 401) throw new Error('ChatGPT 401: APIキーが無効です。platform.openai.comで確認してください。');
+    if (res.status === 429) throw new Error('ChatGPT 429: レート制限またはクレジット不足。platform.openai.comで使用量を確認してください。');
+    if (res.status === 400) throw new Error('ChatGPT 400: リクエストが不正です。' + (eMsg ? eMsg : ''));
+    throw new Error('ChatGPT APIエラー ' + res.status + (eMsg ? ': ' + eMsg : ''));
   }
-  var d = await r.json(); return d.content.map(function(b) { return b.text || ""; }).join("");
+  var data = await res.json();
+  if (!data.choices || !data.choices.length) throw new Error('ChatGPT: 空のレスポンスが返りました');
+  return data.choices[0].message.content || '';
 }
 
-// ============================================================
-// SHARED: API KEY MODAL
-// ============================================================
-function ApiKeyModal(props) {
-  var onClose = props.onClose; var isDark = props.isDark || false;
-  var ks = useState(loadApiKeys()); var keys = ks[0]; var setKeys = ks[1];
-  var ss = useState({}); var show = ss[0]; var setShow = ss[1];
-  var vs = useState({}); var saved = vs[0]; var setSaved = vs[1];
-  function doSave(id) {
-    saveApiKey(id, keys[id] || "");
-    setSaved(function(s) { var n = Object.assign({}, s); n[id] = true; return n; });
-    setTimeout(function() { setSaved(function(s) { var n = Object.assign({}, s); n[id] = false; return n; }); }, 2000);
+/* --- Grok (xAI) API ---
+   エンドポイント: POST https://api.x.ai/v1/chat/completions
+   OpenAI互換形式。ヘッダー・ボディはChatGPTと同じ構造
+   モデル: grok-3 (現在の推奨)
+*/
+async function callGrok(messages, systemPrompt, maxTokens) {
+  var key = getKey('grok');
+  if (!key) throw new Error('Grok: APIキーが設定されていません');
+  var msgs = systemPrompt
+    ? [{ role: 'system', content: systemPrompt }].concat(messages)
+    : messages;
+  var res = await fetch('https://api.x.ai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + key
+    },
+    body: JSON.stringify({
+      model: 'grok-3',
+      max_tokens: maxTokens || 4000,
+      messages: msgs
+    })
+  });
+  if (!res.ok) {
+    var eData = {};
+    try { eData = await res.json(); } catch(e) {}
+    var eMsg = eData.error ? eData.error.message : '';
+    if (res.status === 401) throw new Error('Grok 401: APIキーが無効です。console.x.aiで確認してください。');
+    if (res.status === 429) throw new Error('Grok 429: レート制限超過。しばらく待ってから再試行してください。');
+    throw new Error('Grok APIエラー ' + res.status + (eMsg ? ': ' + eMsg : ''));
   }
-  var bg = isDark ? { background: "#1a1a2e", border: "1px solid rgba(255,255,255,0.12)" } : { background: "#fff" };
-  var textCol = isDark ? "#fff" : "#1a1a1a";
-  var inputStyle = isDark
-    ? { flex: 1, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, padding: "10px 14px", color: "#fff", fontSize: 13, outline: "none" }
-    : { flex: 1, padding: "8px 12px", border: "1px solid #ddd", borderRadius: 8, fontSize: 14, outline: "none" };
+  var data = await res.json();
+  if (!data.choices || !data.choices.length) throw new Error('Grok: 空のレスポンスが返りました');
+  return data.choices[0].message.content || '';
+}
+
+/* --- 統合AI呼び出し関数 --- */
+async function callAI(aiId, messages, systemPrompt, maxTokens) {
+  if (aiId === 'claude')  return await callClaude(messages, systemPrompt, maxTokens);
+  if (aiId === 'gemini')  return await callGemini(messages, systemPrompt, maxTokens);
+  if (aiId === 'chatgpt') return await callChatGPT(messages, systemPrompt, maxTokens);
+  if (aiId === 'grok')    return await callGrok(messages, systemPrompt, maxTokens);
+  throw new Error('不明なAI: ' + aiId);
+}
+
+/* =============================================
+   API KEY MODAL
+   ============================================= */
+function ApiKeyModal(props) {
+  var onClose = props.onClose;
+  var keys = useState(loadKeys());
+  var localKeys = keys[0]; var setLocalKeys = keys[1];
+  var shows = useState({});
+  var show = shows[0]; var setShow = shows[1];
+  var saved = useState({});
+  var savedState = saved[0]; var setSaved = saved[1];
+
+  function doSave(id) {
+    saveKey(id, localKeys[id] || '');
+    setSaved(function(s) { var n = Object.assign({}, s); n[id] = true; return n; });
+    setTimeout(function() {
+      setSaved(function(s) { var n = Object.assign({}, s); n[id] = false; return n; });
+    }, 2000);
+  }
+
   return (
-    <div className="modal-overlay">
-      <div className="modal-box" style={Object.assign({}, bg)}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-          <div style={{ color: textCol, fontWeight: 800, fontSize: 18 }}>🔑 APIキー設定</div>
-          <button onClick={onClose} style={{ background: "rgba(0,0,0,0.06)", border: "none", borderRadius: 8, width: 36, height: 36, fontSize: 20, cursor: "pointer", color: textCol }}>×</button>
+    <div className="modal-overlay" onClick={function(e) { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal-box">
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:24 }}>
+          <div style={{ color:'#fff', fontWeight:800, fontSize:18 }}>🔑 APIキー設定</div>
+          <button onClick={onClose} style={{ background:'rgba(255,255,255,0.1)', border:'none', borderRadius:8, width:36, height:36, fontSize:20, cursor:'pointer', color:'#fff' }}>×</button>
         </div>
-        <div style={{ background: isDark ? "rgba(255,180,0,0.08)" : "#fffbeb", border: "1px solid rgba(255,180,0,0.3)", borderRadius: 10, padding: "10px 14px", marginBottom: 20, fontSize: 12, color: isDark ? "#fcd34d" : "#92400e" }}>
-          <div style={{ fontWeight: 800, marginBottom: 6 }}>📋 APIキー取得先</div>
-          <div>🟠 Claude: <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer" style={{ color: isDark ? "#fbbf24" : "#b45309" }}>console.anthropic.com</a></div>
-          <div>🔵 Gemini: <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style={{ color: isDark ? "#fbbf24" : "#b45309" }}>aistudio.google.com</a></div>
-          <div>🟢 ChatGPT: <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" style={{ color: isDark ? "#fbbf24" : "#b45309" }}>platform.openai.com</a></div>
-          <div>⚫ Grok: <a href="https://console.x.ai/" target="_blank" rel="noopener noreferrer" style={{ color: isDark ? "#fbbf24" : "#b45309" }}>console.x.ai</a></div>
+
+        <div style={{ background:'rgba(255,180,0,0.08)', border:'1px solid rgba(255,180,0,0.3)', borderRadius:10, padding:'12px 14px', marginBottom:20, fontSize:12, color:'#fcd34d' }}>
+          <div style={{ fontWeight:800, marginBottom:6 }}>📋 APIキー取得先</div>
+          <div>🟠 Claude: <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer" style={{ color:'#fbbf24' }}>console.anthropic.com</a></div>
+          <div>🔵 Gemini: <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style={{ color:'#fbbf24' }}>aistudio.google.com</a></div>
+          <div>🟢 ChatGPT: <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" style={{ color:'#fbbf24' }}>platform.openai.com</a></div>
+          <div>⚫ Grok: <a href="https://console.x.ai/" target="_blank" rel="noopener noreferrer" style={{ color:'#fbbf24' }}>console.x.ai</a></div>
         </div>
-        {AI_CONFIGS.map(function(ai) {
+
+        {AI_LIST.map(function(ai) {
           var aid = ai.id;
           return (
-            <div key={aid} style={{ marginBottom: 16 }}>
-              <div style={{ color: isDark ? "rgba(255,255,255,0.65)" : "#444", fontSize: 12, fontWeight: 700, marginBottom: 8 }}>{ai.icon} {ai.label}</div>
-              <div style={{ display: "flex", gap: 8 }}>
-                <input type={show[aid] ? "text" : "password"} value={keys[aid] || ""}
-                  onChange={function(e) { var v = e.target.value; setKeys(function(k) { var n = Object.assign({}, k); n[aid] = v; return n; }); }}
-                  placeholder={ai.label + " APIキーを入力"}
-                  style={inputStyle} />
+            <div key={aid} style={{ marginBottom:16 }}>
+              <div style={{ color:'rgba(255,255,255,0.65)', fontSize:12, fontWeight:700, marginBottom:8 }}>
+                {ai.icon} {ai.label}
+              </div>
+              <div style={{ display:'flex', gap:8 }}>
+                <input
+                  type={show[aid] ? 'text' : 'password'}
+                  value={localKeys[aid] || ''}
+                  onChange={function(e) {
+                    var v = e.target.value;
+                    setLocalKeys(function(k) { var n = Object.assign({}, k); n[aid] = v; return n; });
+                  }}
+                  placeholder={ai.label + ' APIキーを入力'}
+                  style={{ flex:1, background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:8, padding:'10px 14px', color:'#fff', fontSize:13, outline:'none' }}
+                />
                 <button onClick={function() { setShow(function(s) { var n = Object.assign({}, s); n[aid] = !s[aid]; return n; }); }}
-                  style={{ padding: "0 12px", background: isDark ? "rgba(255,255,255,0.07)" : "#f5f5f5", border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid #ddd", borderRadius: 8, cursor: "pointer", fontSize: 16 }}>
-                  {show[aid] ? "🙈" : "👁"}
+                  style={{ padding:'0 12px', background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:8, cursor:'pointer', fontSize:16, color:'#fff' }}>
+                  {show[aid] ? '🙈' : '👁'}
                 </button>
                 <button onClick={function() { doSave(aid); }}
-                  style={{ padding: "0 16px", background: saved[aid] ? "rgba(74,222,128,0.2)" : isDark ? "rgba(255,255,255,0.1)" : "#333", border: saved[aid] ? "1px solid #4ade80" : isDark ? "1px solid rgba(255,255,255,0.15)" : "none", borderRadius: 8, color: saved[aid] ? "#4ade80" : "#fff", cursor: "pointer", fontWeight: 700, fontSize: 13 }}>
-                  {saved[aid] ? "✅" : "保存"}
+                  style={{ padding:'0 16px', background: savedState[aid] ? 'rgba(74,222,128,0.2)' : 'rgba(255,255,255,0.1)', border: savedState[aid] ? '1px solid #4ade80' : '1px solid rgba(255,255,255,0.15)', borderRadius:8, color: savedState[aid] ? '#4ade80' : '#fff', cursor:'pointer', fontWeight:700, fontSize:13, whiteSpace:'nowrap' }}>
+                  {savedState[aid] ? '✓ 保存済' : '保存'}
                 </button>
               </div>
             </div>
           );
         })}
-        <p style={{ fontSize: 12, color: "#888", marginTop: 16 }}>※ APIキーはブラウザのlocalStorageに保存されます（サーバー送信なし）</p>
+        <p style={{ fontSize:11, color:'#666', marginTop:16 }}>
+          ※ APIキーはブラウザのlocalStorageに保存されます（サーバーには送信されません）
+        </p>
       </div>
     </div>
   );
 }
 
-// ============================================================
-// TOOL 1: NOTE GENERATOR
-// ============================================================
-var THEMES_GEN = [
-  { id: "money",        label: "💰 お金・副業" },
-  { id: "health",       label: "💪 健康・ダイエット" },
-  { id: "career",       label: "🚀 キャリア・転職" },
-  { id: "mindset",      label: "🧠 マインドセット" },
-  { id: "relationship", label: "❤️ 人間関係・恋愛" },
-  { id: "productivity", label: "⚡ 生産性・習慣" },
-  { id: "parenting",    label: "👶 育児・子育て" },
-  { id: "other",        label: "📝 その他" },
-];
-var TONES = [
-  { id: "story",    label: "📖 体験談ストーリー型" },
-  { id: "how_to",   label: "📋 ハウツー解説型" },
-  { id: "secret",   label: "🔐 暴露・秘密公開型" },
-  { id: "contrast", label: "⚡ 比較・対比型" },
-  { id: "warm",     label: "💛 共感・寄り添い型" },
-];
-var AGE_OPTIONS = [
-  { id: "10s", label: "10代" }, { id: "20s", label: "20代" },
-  { id: "30s", label: "30代" }, { id: "40s", label: "40代" },
-  { id: "50s", label: "50代以上" }, { id: "all", label: "年齢不問" },
-];
-var TOPIC_EXAMPLES = {
-  money: ["月5万円を3ヶ月で達成した副業術","サラリーマンが年収+100万にした方法","初心者が失敗しないせどりの始め方","SNSだけで月10万稼いだコンテンツ販売"],
-  health: ["1日1時間で-8kg達成したダイエット法","リバウンドなしで痩せ続ける食事術","40代から始めて体脂肪率15%を実現した筋トレ"],
-  career: ["未経験から年収100万UPした転職戦略","面接通過率90%を叩き出した自己PR術","30代でフリーランス転向して収入2倍の実録"],
-  mindset: ["自己肯定感が低かった私が人生を変えた思考法","1年で別人になれた毎日5分のマインドセット術"],
-  relationship: ["人間関係が劇的に変わった会話の習慣","恋愛で失敗し続けた私が結婚できた理由"],
-  productivity: ["1日3時間で仕事を終わらせるタスク管理術","先延ばし癖を完全に直した5つの習慣"],
-  parenting: ["夜泣きをゼロにした3ヶ月の取り組み全記録","イヤイヤ期を乗り越えた40の声がけ法"],
-  other: ["私が3年間で学んだ人生で大切なこと","失敗から学んだ後悔しない選択の仕方"],
-};
-
-function getAgeCtx(id) {
-  var map = { "10s":"進路・受験・バイト・将来不安","20s":"就職・恋愛・一人暮らし・キャリア","30s":"子育て・住宅ローン・昇進・時間不足","40s":"更年期・介護・教育費・老後準備","50s":"定年・老後資金・健康・人生の意味","all":"幅広い読者層" };
-  return map[id] || "";
-}
-function getThemeLabel(id) {
-  var t = THEMES_GEN.find(function(x) { return x.id === id; });
-  return t ? t.label.replace(/[💰💪🚀🧠❤️⚡👶📝]/gu, "").trim() : id;
-}
-function getToneLabel(id) {
-  var t = TONES.find(function(x) { return x.id === id; });
-  return t ? t.label.replace(/[📖📋🔐⚡💛]/gu, "").trim() : id;
-}
-function getAgeLabel(id) {
-  var a = AGE_OPTIONS.find(function(x) { return x.id === id; });
-  return a ? a.label : id;
-}
-
-function buildPrompt(opts) {
-  var topic = opts.topic; var themeId = opts.theme; var toneId = opts.tone; var price = opts.price;
-  var freeWC = opts.freeWC; var paidWC = opts.paidWC; var searchSummary = opts.searchSummary;
-  var targetAge = opts.targetAge; var sit = opts.targetSituation; var worry = opts.targetWorry;
-  var tLabel = getThemeLabel(themeId); var toneLabel = getToneLabel(toneId); var ageLabel = getAgeLabel(targetAge);
-  var s1 = Math.round(freeWC * 0.30), s2 = Math.round(freeWC * 0.40), s3 = Math.round(freeWC * 0.30);
-  var s4 = Math.round(paidWC * 0.50), s5 = Math.round(paidWC * 0.20), s6 = Math.round(paidWC * 0.18), s7 = Math.round(paidWC * 0.12);
-  var ref = searchSummary ? "\n## 参考情報（必ず自分の言葉で書き直すこと）\n" + searchSummary + "\n" : "";
-  return "あなたは有料noteのプロライターです。以下の設定で記事を最初から最後まで完全に書いてください。\n\n" +
-    "## ターゲット読者\n- 年齢：" + ageLabel + "\n- 状況：" + (sit || "特に指定なし") + "\n- 悩み：" + (worry || "特に指定なし") + "\n- ライフステージ：" + getAgeCtx(targetAge) + "\n" + ref +
-    "\n## 基本設定\n- ジャンル：" + tLabel + "\n- テーマ：" + (topic || "ジャンルで最も売れるテーマを自由に考案") + "\n- 文体：" + toneLabel + "\n- 価格：¥" + price.toLocaleString() + "\n- 無料エリア：約" + freeWC + "字\n- 有料エリア：約" + paidWC + "字\n\n" +
-    "## 文章ルール\n1. です・ます調で統一 2. 1文50字以内 3. 2〜3文ごとに改行 4. 専門用語不使用 5. 各段落に具体例\n\n" +
-    "## 出力ルール（厳守）\n- 前置き・説明・補足は一切不要\n- 記事本文だけを最初から最後まで出力\n- コードブロック禁止\n- 最初の文字は # （タイトル行）\n\n" +
-    "---FREE_START---\n\n## （セクション1）\n（約" + s1 + "字）体験談から始める。問いかけ。悩みを3つ列挙。希望を示す。\n\n" +
-    "## （セクション2）\n（約" + s2 + "字）根本原因を深掘り。失敗談①。危機感を与える。\n\n" +
-    "## （セクション3）\n（約" + s3 + "字）得られる3つのことを提示。問いかけ。有料エリアへの橋渡し。\n\n" +
-    "---FREE_END---\n---PAID_START---\n\n## （セクション4：解決策ステップ）\n（約" + s4 + "字）\n▶ ステップ1〜5：各ステップを具体的に。失敗談②を含む。\n\n" +
-    "## （セクション5：実践例）\n（約" + s5 + "字）固有名詞・数字を使ったリアルな実践例。ビフォーアフター。\n\n" +
-    "## よくある質問\n（約" + s6 + "字）Q1〜Q4と回答。\n\n" +
-    "## 今すぐできること\n（約" + s7 + "字）【初級】【中級】【上級】別のアクションプラン。励ましのメッセージで締める。\n\n---PAID_END---";
-}
-
-async function generateArticle(aiId, prompt, onRetry) {
-  var sys = "有料noteのプロライター。前置き不要。記事本文のみ出力。コードブロック禁止。最初の文字は # 。です・ます調。1文50字以内。冒頭に体験談。失敗談1〜2箇所。読者への問いかけ。励ましのメッセージ。";
-  for (var attempt = 1; attempt <= 3; attempt++) {
-    if (attempt > 1) {
-      if (onRetry) onRetry(attempt - 1);
-      await new Promise(function(resolve) { setTimeout(resolve, attempt * 1200); });
-    }
-    try {
-      var result = await callAI({ aiId: aiId, messages: [{ role: "user", content: prompt }], systemPrompt: sys, maxTokens: 8000 });
-      var text = result.replace(/```[\w]*\n?/gm, "").replace(/```$/gm, "").trim();
-      if (!text || text.length < 200) throw new Error("生成内容が短すぎます");
-      return text;
-    } catch(err) { if (attempt === 3) throw err; }
-  }
-}
-
-async function searchLatestInfo(aiId, query) {
-  if (aiId === "claude") {
-    return await callClaudeSearch({
-      messages: [{ role: "user", content: "「" + query + "」について最新情報・実体験・悩み・解決策を箇条書きで10点まとめてください。改変必須・丸写し禁止。" }],
-      systemPrompt: "Web検索で収集した情報を必ず自分の言葉で要約・改変する。原文コピー厳禁。",
-      maxTokens: 1500,
-    });
-  }
-  return await callAI({
-    aiId: aiId,
-    messages: [{ role: "user", content: "「" + query + "」について2024〜2025年の最新トレンド・実体験・悩み・解決策を箇条書きで10点まとめてください。具体的な数字や事例を含めてください。" }],
-    systemPrompt: "最新のトレンドや実践的な情報を提供する専門家として回答してください。",
-    maxTokens: 1500,
-  });
-}
-
-// ============================================================
-// WEB SEARCH UTILS（APIキー不要・AI不使用）
-// ============================================================
-
-// DuckDuckGo Instant Answer APIからRelatedTopicsを取得
-async function ddgSearch(query) {
-  var q = encodeURIComponent(query);
-  try {
-    var r = await fetch("https://api.duckduckgo.com/?q=" + q + "&format=json&no_html=1&skip_disambig=1&no_redirect=1");
-    if (!r.ok) return null;
-    return await r.json();
-  } catch(e) { return null; }
-}
-
-// テキストから短いフレーズを抽出（20字以内・句読点で区切る）
-function extractPhrases(text, maxLen) {
-  if (!text) return [];
-  var ml = maxLen || 22;
-  var phrases = [];
-  // 句読点・記号で分割
-  var parts = text.split(/[。、！？「」『』【】…・\n]/);
-  parts.forEach(function(p) {
-    var t = p.trim().replace(/^\s*[-・•＊*]\s*/, "");
-    if (t.length >= 6 && t.length <= ml) phrases.push(t);
-  });
-  return phrases;
-}
-
-// ジャンル×キーワードでWeb検索してテーマ候補を生成（AI不使用）
-async function fetchTopicSuggestionsFromWeb(themeLabel, extraKeyword) {
-  var q1 = (extraKeyword || themeLabel) + " おすすめ テーマ note";
-  var q2 = (extraKeyword || themeLabel) + " 人気 記事 2024";
-  var results = [];
-
-  var [d1, d2] = await Promise.all([ddgSearch(q1), ddgSearch(q2)]);
-
-  [d1, d2].forEach(function(d) {
-    if (!d) return;
-    if (d.AbstractText) extractPhrases(d.AbstractText, 30).forEach(function(p) { results.push(p); });
-    if (d.RelatedTopics) {
-      d.RelatedTopics.slice(0, 10).forEach(function(t) {
-        if (t.Text) extractPhrases(t.Text, 30).forEach(function(p) { results.push(p); });
-        if (t.Topics) t.Topics.slice(0, 5).forEach(function(sub) {
-          if (sub.Text) extractPhrases(sub.Text, 30).forEach(function(p) { results.push(p); });
-        });
-      });
-    }
-  });
-
-  // 重複除去・シャッフルして最大8件
-  var seen = {};
-  var unique = results.filter(function(p) {
-    var k = p.slice(0, 10);
-    if (seen[k]) return false;
-    seen[k] = true; return true;
-  });
-  // Fisher-Yates shuffle
-  for (var i = unique.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var tmp = unique[i]; unique[i] = unique[j]; unique[j] = tmp;
-  }
-  return unique.slice(0, 8);
-}
-
-// ターゲット読者の状況・悩みをWebから取得（AI不使用）
-async function fetchTargetSuggestions(themeLabel, topic, ageLabel) {
-  var base = (topic || themeLabel) + " " + ageLabel;
-  var [dSit, dWry] = await Promise.all([
-    ddgSearch(base + " 状況 実態"),
-    ddgSearch(base + " 悩み 困っている")
-  ]);
-
-  var situations = [];
-  var worries = [];
-
-  // 状況の抽出
-  [dSit, dWry].forEach(function(d) {
-    if (!d) return;
-    var allTexts = [];
-    if (d.AbstractText) allTexts.push(d.AbstractText);
-    if (d.RelatedTopics) d.RelatedTopics.slice(0, 12).forEach(function(t) {
-      if (t.Text) allTexts.push(t.Text);
-      if (t.Topics) t.Topics.forEach(function(sub) { if (sub.Text) allTexts.push(sub.Text); });
-    });
-    allTexts.forEach(function(txt) {
-      extractPhrases(txt, 22).forEach(function(p) {
-        // 悩み系キーワードを含む → worries
-        if (/悩|困|不安|できない|わからない|失敗|苦手|辛|難|問題|課題/.test(p)) {
-          if (worries.length < 12) worries.push(p);
-        } else {
-          // 状況系
-          if (situations.length < 12) situations.push(p);
-        }
-      });
-    });
-  });
-
-  // 重複除去
-  var seenS = {}; var seenW = {};
-  situations = situations.filter(function(p) { var k = p.slice(0,8); if(seenS[k]) return false; seenS[k]=true; return true; });
-  worries    = worries.filter(function(p)    { var k = p.slice(0,8); if(seenW[k]) return false; seenW[k]=true; return true; });
-
-  // フォールバック：取得不足の場合はジャンル別の定型文で補完
-  var sitFallback = {
-    "お金": ["副業を始めたいが何から手をつけるか不明","本業の給与が上がらず将来に不安","貯金はあるが増やし方がわからない"],
-    "健康": ["忙しくて運動する時間がない","ダイエットに何度も失敗している","体力が落ちてきたと感じる"],
-    "キャリア": ["今の職場に将来性を感じない","転職したいが何の職種が合うか不明","スキルアップの方法がわからない"],
-    "マインド": ["ネガティブ思考が止められない","自己肯定感が低い","やる気が続かない"],
-    "人間関係": ["職場の人間関係でストレスを感じる","コミュニケーションが苦手","友人関係の維持が難しい"],
-    "生産性": ["タスクが溜まって何から手をつけるか不明","集中力が続かない","時間管理が苦手"],
-    "育児": ["子どもの夜泣きで睡眠不足","イヤイヤ期の対応に疲弊","仕事と育児の両立が難しい"],
-  };
-  var wryFallback = {
-    "お金": ["節約しても全然貯まらない","投資を始めたいがリスクが怖い","副業収入が安定しない"],
-    "健康": ["食事制限が続かない","運動しても体重が減らない","体の疲れが取れない"],
-    "キャリア": ["面接で上手く自分をアピールできない","スキルに自信が持てない","転職後の失敗が怖い"],
-    "マインド": ["感情のコントロールが難しい","他人の目が気になって行動できない","目標達成への継続が難しい"],
-    "人間関係": ["言いたいことが言えない","人の顔色を気にしすぎる","深い関係を築くのが苦手"],
-    "生産性": ["先延ばし癖が直らない","マルチタスクで全てが中途半端","完璧主義でなかなか着手できない"],
-    "育児": ["子どもの言葉の発達が気になる","叱り方がわからない","子どもとの時間が確保できない"],
-  };
-
-  // テーマラベルに対応するキーを探す
-  var matchKey = Object.keys(sitFallback).find(function(k) { return themeLabel.indexOf(k) !== -1; });
-  if (situations.length < 3 && matchKey) situations = situations.concat(sitFallback[matchKey] || []);
-  if (worries.length < 3 && matchKey)    worries    = worries.concat(wryFallback[matchKey] || []);
-
-  return {
-    situations: situations.slice(0, 6),
-    worries: worries.slice(0, 6)
-  };
-}
-
-function exportArticle(text, format, topic) {
-  var filename = "note_" + (topic || "article").slice(0, 20) + "_" + Date.now();
-  if (format === "txt") { var b1 = new Blob([text], { type: "text/plain;charset=utf-8" }); var a1 = document.createElement("a"); a1.href = URL.createObjectURL(b1); a1.download = filename + ".txt"; a1.click(); }
-  else if (format === "md") { var b2 = new Blob([text], { type: "text/markdown;charset=utf-8" }); var a2 = document.createElement("a"); a2.href = URL.createObjectURL(b2); a2.download = filename + ".md"; a2.click(); }
-  else if (format === "doc") { var html = "<html><head><meta charset=\"utf-8\"></head><body>" + text.replace(/\n/g, "<br>") + "</body></html>"; var b3 = new Blob([html], { type: "application/msword" }); var a3 = document.createElement("a"); a3.href = URL.createObjectURL(b3); a3.download = filename + ".doc"; a3.click(); }
-}
-
-// TabButton: 独立コンポーネント（stale closure 完全回避）
-function TabButton(props) {
+/* =============================================
+   AI SELECTOR COMPONENT
+   ============================================= */
+function AiSelector(props) {
+  var value = props.value;
+  var onChange = props.onChange;
   return (
-    <button onClick={props.onClick} style={{
-      padding: "13px 18px", border: "none",
-      borderBottom: props.isActive ? "3px solid #e94560" : "3px solid transparent",
-      background: "none",
-      cursor: props.isDisabled ? "not-allowed" : "pointer",
-      color: props.isDisabled ? "rgba(255,255,255,0.2)" : props.isActive ? "#e94560" : "rgba(255,255,255,0.55)",
-      fontWeight: props.isActive ? 800 : 400, fontSize: 13, whiteSpace: "nowrap",
-      opacity: props.isDisabled ? 0.4 : 1,
-    }}>{props.label}</button>
-  );
-}
-
-function TagPicker(props) {
-  var items = props.items; var value = props.value; var onChange = props.onChange;
-  var color = props.color || "#fbbf24"; var loading = props.loading;
-  return (
-    <div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8, minHeight: 34 }}>
-        {loading ? (
-          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, padding: "6px 0", display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid " + color, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-            AI が分析中...
-          </div>
-        ) : items.map(function(item) {
-          var isActive = value === item;
-          var capturedItem = item;
-          return (
-            <button key={capturedItem} onClick={function() { onChange(isActive ? "" : capturedItem); }}
-              style={{ background: isActive ? color + "22" : "rgba(255,255,255,0.05)", border: isActive ? "2px solid " + color : "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: "5px 13px", fontSize: 12, cursor: "pointer", color: isActive ? "#fff" : "rgba(255,255,255,0.5)", fontWeight: isActive ? 700 : 400 }}>
-              {capturedItem}
-            </button>
-          );
-        })}
-      </div>
-      <input type="text" value={(value && items.indexOf(value) === -1) ? value : ""} onChange={function(e) { onChange(e.target.value); }}
-        placeholder={loading ? "AI が提案を生成中..." : "自由に入力することもできます"}
-        style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "9px 14px", color: "#fff", fontSize: 13, outline: "none", boxSizing: "border-box" }} />
+    <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+      {AI_LIST.map(function(ai) {
+        var isActive = value === ai.id;
+        var hasKey = !!getKey(ai.id);
+        return (
+          <button key={ai.id} onClick={function() { onChange(ai.id); }}
+            style={{
+              flex:'1 1 110px',
+              background: isActive ? ai.color + '22' : 'rgba(255,255,255,0.04)',
+              border: isActive ? '2px solid ' + ai.color : '1px solid rgba(255,255,255,0.1)',
+              borderRadius:12, padding:'10px 8px',
+              cursor:'pointer', display:'flex', flexDirection:'column',
+              alignItems:'center', gap:4
+            }}>
+            <div style={{ fontSize:22 }}>{ai.icon}</div>
+            <div style={{ color: isActive ? '#fff' : 'rgba(255,255,255,0.55)', fontWeight: isActive ? 800 : 400, fontSize:13 }}>{ai.label}</div>
+            <div style={{ background: hasKey ? 'rgba(74,222,128,0.2)' : 'rgba(255,255,255,0.1)', color: hasKey ? '#4ade80' : 'rgba(255,255,255,0.35)', fontSize:9, fontWeight:700, padding:'2px 7px', borderRadius:4 }}>
+              {hasKey ? '✓ 設定済み' : ai.badge}
+            </div>
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-function ArticlePreview(props) {
-  var text = props.text; var price = props.price;
-  var ps = useState(false); var showPaid = ps[0]; var setShowPaid = ps[1];
-  var fm = text.match(/---FREE_START---([\s\S]*?)---FREE_END---/);
-  var pm = text.match(/---PAID_START---([\s\S]*?)---PAID_END---/);
-  var freeText = fm ? fm[1].trim() : text;
-  var paidText = pm ? pm[1].trim() : "";
-  var title = "（タイトル）";
-  var ls = text.split("\n");
-  for (var i = 0; i < ls.length; i++) { if (ls[i].indexOf("# ") === 0) { title = ls[i].replace(/^#\s*/, ""); break; } }
-  function renderBlock(t) {
-    return t.split("\n\n").map(function(para, idx) {
-      var p = para.trim(); if (!p) return null;
-      if (p.indexOf("## ") === 0) return <h2 key={idx} style={{ fontSize: 17, fontWeight: 800, color: "#1a1a1a", margin: "24px 0 10px", paddingLeft: 12, borderLeft: "4px solid #e94560" }}>{p.replace(/^##\s*/, "")}</h2>;
-      if (p.indexOf("▶") === 0) { var bl = p.split("\n"); return <div key={idx} style={{ background: "#f0f4ff", borderRadius: 10, padding: "14px 16px", margin: "12px 0", borderLeft: "4px solid #6366f1" }}><div style={{ fontWeight: 800, color: "#4338ca", marginBottom: 6, fontSize: 14 }}>{bl[0]}</div><div style={{ fontSize: 14, lineHeight: 1.85, color: "#374151" }}>{bl.slice(1).join("\n")}</div></div>; }
-      if (/^Q\d+\./.test(p)) return <div key={idx} style={{ background: "#f8fafc", borderRadius: 8, padding: "12px 14px", margin: "8px 0", border: "1px solid #e2e8f0", fontSize: 14, lineHeight: 1.8 }}>{p}</div>;
-      if (/【(初級|中級|上級)/.test(p)) return <div key={idx} style={{ background: "#f0fdf4", borderRadius: 8, padding: "12px 14px", margin: "8px 0", borderLeft: "3px solid #22c55e", fontSize: 14, lineHeight: 1.85 }}>{p}</div>;
-      return <p key={idx} style={{ fontSize: 15, lineHeight: 1.95, margin: "0 0 12px", color: "#333" }}>{p}</p>;
-    });
-  }
+/* =============================================
+   TAB BUTTON
+   ============================================= */
+function TabBtn(props) {
   return (
-    <div style={{ background: "#fff", borderRadius: 16, overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.12)" }}>
-      <div style={{ background: "#f0fdf4", borderBottom: "2px solid #86efac", padding: "8px 20px" }}>
-        <span style={{ color: "#16a34a", fontSize: 12, fontWeight: 700 }}>🔓 無料エリア</span>
-      </div>
-      <div style={{ padding: "32px 36px 24px" }}>
-        <h1 style={{ fontSize: 24, fontWeight: 900, lineHeight: 1.4, color: "#1a1a1a", marginBottom: 24 }}>{title}</h1>
-        {renderBlock(freeText)}
-      </div>
-      <div style={{ background: "linear-gradient(135deg,#1a1a2e,#0f3460)", margin: "0 24px 24px", borderRadius: 14, padding: "28px 24px", textAlign: "center", color: "#fff" }}>
-        <div style={{ fontSize: 32, marginBottom: 10 }}>🔐</div>
-        <h3 style={{ fontSize: 17, fontWeight: 900, margin: "0 0 8px" }}>ここから先は有料コンテンツです</h3>
-        <p style={{ fontSize: 13, opacity: 0.65, margin: "0 0 18px", lineHeight: 1.7 }}>具体的な手順・実践例・Q&A・アクションプランをすべて公開</p>
-        <button onClick={function() { setShowPaid(function(v) { return !v; }); }}
-          style={{ background: "linear-gradient(135deg,#e94560,#c2185b)", color: "#fff", border: "none", borderRadius: 10, padding: "12px 32px", fontSize: 15, fontWeight: 900, cursor: "pointer" }}>
-          {showPaid ? "▲ 閉じる" : "¥" + price.toLocaleString() + " で続きを読む →"}
-        </button>
-        <p style={{ fontSize: 11, opacity: 0.35, marginTop: 8 }}>※ デモ用プレビュー表示</p>
-      </div>
-      {showPaid && paidText && (
-        <div>
-          <div style={{ background: "#1a0a0a", padding: "8px 20px" }}>
-            <span style={{ color: "#f87171", fontSize: 12, fontWeight: 700 }}>🔑 有料エリア</span>
-          </div>
-          <div style={{ padding: "28px 36px 36px", background: "#fffbfb" }}>{renderBlock(paidText)}</div>
-        </div>
-      )}
-    </div>
+    <button onClick={props.onClick}
+      style={{
+        padding:'13px 18px', border:'none',
+        borderBottom: props.active ? '3px solid #e94560' : '3px solid transparent',
+        background:'none', cursor: props.disabled ? 'not-allowed' : 'pointer',
+        color: props.disabled ? 'rgba(255,255,255,0.2)' : props.active ? '#e94560' : 'rgba(255,255,255,0.55)',
+        fontWeight: props.active ? 800 : 400, fontSize:13, whiteSpace:'nowrap',
+        opacity: props.disabled ? 0.4 : 1
+      }}>
+      {props.label}
+    </button>
   );
+}
+
+/* =============================================
+   TOOL 1: NOTE記事生成ツール
+   ============================================= */
+var NOTE_THEMES = [
+  { id:'money',        label:'💰 お金・節約' },
+  { id:'health',       label:'💪 健康・ダイエット' },
+  { id:'career',       label:'🚀 キャリア・副業' },
+  { id:'mindset',      label:'🧠 マインドセット' },
+  { id:'relationship', label:'❤️ 人間関係・恋愛' },
+  { id:'productivity', label:'⚡ 生産性・習慣' },
+  { id:'parenting',    label:'👶 育児・子育て' },
+  { id:'other',        label:'📝 その他' },
+];
+var NOTE_TONES = [
+  { id:'story',    label:'📖 体験談ストーリー系' },
+  { id:'howto',    label:'📋 ハウツー解説系' },
+  { id:'secret',   label:'🔥 秘密・裏知識系' },
+  { id:'contrast', label:'⚡ 比較・対比系' },
+  { id:'warm',     label:'💓 共感・温かい系' },
+];
+var NOTE_AGES = [
+  { id:'10s', label:'10代' }, { id:'20s', label:'20代' },
+  { id:'30s', label:'30代' }, { id:'40s', label:'40代' },
+  { id:'50s', label:'50代以上' }, { id:'all', label:'全年齢' },
+];
+
+function buildNotePrompt(opts) {
+  var theme = opts.theme; var topic = opts.topic; var tone = opts.tone;
+  var price = opts.price; var freeWC = opts.freeWC; var paidWC = opts.paidWC;
+  var age = opts.age; var situation = opts.situation; var worry = opts.worry;
+  var themeLabel = (NOTE_THEMES.find(function(t) { return t.id === theme; }) || {}).label || theme;
+  var toneLabel = (NOTE_TONES.find(function(t) { return t.id === tone; }) || {}).label || tone;
+  var ageLabel = (NOTE_AGES.find(function(a) { return a.id === age; }) || {}).label || age;
+  var ageCtx = { '10s':'10代・学生・バイト・部活', '20s':'20代・社会人・転職・恋愛', '30s':'30代・育児・住宅・キャリア', '40s':'40代・老後・子育て・健康', '50s':'50代以上・定年・健康・老後', 'all':'全年代共通' }[age] || '';
+
+  return 'あなたは人気noteクリエイターです。以下の条件でnoteの有料記事を作成してください。\n\n'
+    + '## ターゲット読者\n'
+    + '- 年齢: ' + ageLabel + '\n'
+    + '- 状況: ' + (situation || '特に指定なし') + '\n'
+    + '- 悩み: ' + (worry || '特に指定なし') + '\n'
+    + '- ライフスタイル: ' + ageCtx + '\n\n'
+    + '## 記事設定\n'
+    + '- ジャンル: ' + themeLabel + '\n'
+    + '- テーマ: ' + (topic || 'ジャンルで最も読まれるテーマ') + '\n'
+    + '- 文体: ' + toneLabel + '\n'
+    + '- 販売価格: ¥' + price.toLocaleString() + '\n'
+    + '- 無料部分の文字数: ' + freeWC + '文字\n'
+    + '- 有料部分の文字数: ' + paidWC + '文字\n\n'
+    + '## 構成ルール\n'
+    + '1. タイトルは「# 」で始める 2. 1記事50〜100文字の要約 3. 「---FREE_START---」から無料部分開始 4. 「---FREE_END---」で無料終了 5. 「---PAID_START---」から有料部分開始 6. 「---PAID_END---」で有料終了\n\n'
+    + '## 無料パート（' + freeWC + '文字目安）\n'
+    + '読者の悩みに共感し、記事を読む価値を伝える。続きへの期待感を高める。\n\n'
+    + '## 購入壁\n'
+    + '続きを読むためには購入が必要と明示。価格を改めて示す。\n\n'
+    + '## 有料パート（' + paidWC + '文字目安）\n'
+    + '具体的な解決策・ノウハウ・実践ステップを詳しく解説。Q&A・よくある誤解・チェックリストを含む。\n\n'
+    + '---FREE_START---\n\n（ここから無料パートを書く）\n\n---FREE_END---\n---PAID_START---\n\n（ここから有料パートを書く）\n\n---PAID_END---';
 }
 
 function NoteGenerator(props) {
   var onBack = props.onBack;
-  var ts = useState("settings"); var tab = ts[0]; var setTab = ts[1];
-  var as = useState(false); var showApi = as[0]; var setShowApi = as[1];
-  var ais = useState("claude"); var aiId = ais[0]; var setAiId = ais[1];
-  var aiRef = useRef("claude");
   var isMobile = useIsMobile();
-  var ths = useState("money"); var theme = ths[0]; var setTheme = ths[1];
-  var tps = useState(""); var topic = tps[0]; var setTopic = tps[1];
-  var tns = useState("story"); var tone = tns[0]; var setTone = tns[1];
-  var prs = useState(980); var price = prs[0]; var setPrice = prs[1];
-  var fws = useState(800); var freeWC = fws[0]; var setFreeWC = fws[1];
-  var pws = useState(2000); var paidWC = pws[0]; var setPaidWC = pws[1];
-  var age = useState("30s"); var targetAge = age[0]; var setTargetAge = age[1];
-  var sit = useState(""); var targetSit = sit[0]; var setTargetSit = sit[1];
-  var wry = useState(""); var targetWry = wry[0]; var setTargetWry = wry[1];
-  var uss = useState(false); var useSearch = uss[0]; var setUseSearch = uss[1];
-  var sl = useState(false); var sugLoading = sl[0]; var setSugLoading = sl[1];
-  var ss2 = useState([]); var sugSit = ss2[0]; var setSugSit = ss2[1];
-  var sw = useState([]); var sugWry = sw[0]; var setSugWry = sw[1];
-  var se = useState(""); var sugErr = se[0]; var setSugErr = se[1];
-  var tsl = useState(false); var topicLoading = tsl[0]; var setTopicLoading = tsl[1];
-  var tsc = useState([]); var topicCandidates = tsc[0]; var setTopicCandidates = tsc[1];
-  var tse = useState(""); var topicErr = tse[0]; var setTopicErr = tse[1];
-  var ld = useState(false); var loading = ld[0]; var setLoading = ld[1];
-  var lm = useState(""); var loadMsg = lm[0]; var setLoadMsg = lm[1];
-  var er = useState(""); var error = er[0]; var setError = er[1];
-  var gt = useState(""); var generatedText = gt[0]; var setGeneratedText = gt[1];
-  var et = useState(""); var editedText = et[0]; var setEditedText = et[1];
-  var cp = useState({}); var copied = cp[0]; var setCopied = cp[1];
+  var showApi = useState(false);
+  var setShowApi = showApi[1]; showApi = showApi[0];
+  var aiState = useState('claude');
+  var aiId = aiState[0]; var setAiId = aiState[1];
+  var themeState = useState('money');
+  var theme = themeState[0]; var setTheme = themeState[1];
+  var topicState = useState('');
+  var topic = topicState[0]; var setTopic = topicState[1];
+  var toneState = useState('story');
+  var tone = toneState[0]; var setTone = toneState[1];
+  var priceState = useState(980);
+  var price = priceState[0]; var setPrice = priceState[1];
+  var freeWCState = useState(800);
+  var freeWC = freeWCState[0]; var setFreeWC = freeWCState[1];
+  var paidWCState = useState(2000);
+  var paidWC = paidWCState[0]; var setPaidWC = paidWCState[1];
+  var ageState = useState('30s');
+  var age = ageState[0]; var setAge = ageState[1];
+  var sitState = useState('');
+  var situation = sitState[0]; var setSituation = sitState[1];
+  var worryState = useState('');
+  var worry = worryState[0]; var setWorry = worryState[1];
+  var tabState = useState('settings');
+  var tab = tabState[0]; var setTab = tabState[1];
+  var loadingState = useState(false);
+  var loading = loadingState[0]; var setLoading = loadingState[1];
+  var loadMsgState = useState('');
+  var loadMsg = loadMsgState[0]; var setLoadMsg = loadMsgState[1];
+  var errorState = useState('');
+  var error = errorState[0]; var setError = errorState[1];
+  var genTextState = useState('');
+  var genText = genTextState[0]; var setGenText = genTextState[1];
+  var editTextState = useState('');
+  var editText = editTextState[0]; var setEditText = editTextState[1];
+  var copiedState = useState({});
+  var copied = copiedState[0]; var setCopied = copiedState[1];
 
-  var fm = editedText.match(/---FREE_START---([\s\S]*?)---FREE_END---/);
-  var freeText = fm ? fm[1].trim() : "";
-  var pm2 = editedText.match(/---PAID_START---([\s\S]*?)---PAID_END---/);
-  var paidText = pm2 ? pm2[1].trim() : "";
-  var dispTitle = topic || "（タイトル未設定）";
-  var tls = editedText.split("\n");
-  for (var ti = 0; ti < tls.length; ti++) { if (tls[ti].indexOf("# ") === 0) { dispTitle = tls[ti].replace(/^#\s*/, ""); break; } }
-  var freeCount = freeText.replace(/\s/g, "").length;
-  var paidCount = paidText.replace(/\s/g, "").length;
-  var currentAiCfg = AI_CONFIGS.find(function(a) { return a.id === aiId; }) || AI_CONFIGS[0];
-  var configuredAI = AI_CONFIGS.filter(function(a) { return !!getApiKey(a.id); });
-  var hasArticle = editedText.length > 0;
+  var hasArticle = editText.length > 0;
+  var freeMatch = editText.match(/---FREE_START---([\s\S]*?)---FREE_END---/);
+  var paidMatch = editText.match(/---PAID_START---([\s\S]*?)---PAID_END---/);
+  var freeText = freeMatch ? freeMatch[1].trim() : '';
+  var paidText = paidMatch ? paidMatch[1].trim() : '';
+  var dispTitle = topic || 'note記事';
+  var titleMatch = editText.match(/^# (.+)/m);
+  if (titleMatch) dispTitle = titleMatch[1];
 
-  var fetchSugRef = useRef(null);
-  fetchSugRef.current = async function(curTheme, curTopic, curAge) {
-    setSugLoading(true); setSugErr(""); setSugSit([]); setSugWry([]);
-    try {
-      var result = await fetchTargetSuggestions(getThemeLabel(curTheme), curTopic, getAgeLabel(curAge));
-      setSugSit(result.situations || []); setSugWry(result.worries || []);
-    } catch(e) { setSugErr("Web取得失敗: " + e.message); }
-    setSugLoading(false);
-  };
+  var configuredAI = AI_LIST.filter(function(a) { return !!getKey(a.id); });
+  var currentAI = AI_LIST.find(function(a) { return a.id === aiId; }) || AI_LIST[0];
 
-  var fetchTopicRef = useRef(null);
-  fetchTopicRef.current = async function(curTheme, curTopic) {
-    setTopicLoading(true); setTopicErr(""); setTopicCandidates([]);
-    try {
-      var candidates = await fetchTopicSuggestionsFromWeb(getThemeLabel(curTheme), curTopic);
-      setTopicCandidates(candidates);
-    } catch(e) { setTopicErr("Web取得失敗: " + e.message); }
-    setTopicLoading(false);
-  };
+  var aiIdRef = useRef(aiId);
+  aiIdRef.current = aiId;
 
-  useEffect(function() {
-    var timer = setTimeout(function() {
-      fetchTopicRef.current(theme, topic);
-      fetchSugRef.current(theme, topic, targetAge);
-    }, 800);
-    return function() { clearTimeout(timer); };
-  }, [theme, topic, targetAge]);
-
-  var generate = useCallback(function() {
-    var currentAiId = aiRef.current;
-    setError(""); setLoading(true); setLoadMsg("⏳ 準備中...");
-    (async function() {
-      try {
-        var summary = "";
-        if (useSearch) {
-          setLoadMsg("🔍 最新情報を検索中...");
-          try { summary = await searchLatestInfo(currentAiId, ((topic || getThemeLabel(theme)) + " " + (targetSit || "") + " " + (targetWry || "")).trim()); }
-          catch(e2) { summary = ""; }
-        }
-        setLoadMsg("✍️ 記事を生成中...");
-        var prompt = buildPrompt({ topic: topic, theme: theme, tone: tone, price: price, freeWC: freeWC, paidWC: paidWC, searchSummary: summary, targetAge: targetAge, targetSituation: targetSit, targetWorry: targetWry });
-        var result = await generateArticle(currentAiId, prompt, function(n) { setLoadMsg("🔄 再試行中... (" + n + "/2回目)"); });
-        setGeneratedText(result); setEditedText(result); setTab("edit");
-      } catch(e) { setError(e.message); }
-      setLoading(false); setLoadMsg("");
-    })();
-  }, [topic, theme, tone, price, freeWC, paidWC, targetAge, targetSit, targetWry, useSearch]);
+  var handleGenerate = useCallback(function() {
+    var currentAiId = aiIdRef.current;
+    setError(''); setLoading(true);
+    setLoadMsg('⏳ ' + currentAI.label + 'で記事を生成中...');
+    var prompt = buildNotePrompt({ theme, topic, tone, price, freeWC, paidWC, age, situation, worry });
+    var sys = 'あなたは人気noteクリエイターです。指定された構成で必ず記事を書いてください。マークダウン形式で、コードブロックなしで出力してください。';
+    callAI(currentAiId, [{ role:'user', content: prompt }], sys, 8000)
+      .then(function(result) {
+        var text = result.replace(/```[\w]*\n?/gm, '').replace(/```$/gm, '').trim();
+        if (text.length < 200) throw new Error('生成されたテキストが短すぎます');
+        setGenText(text); setEditText(text); setTab('edit');
+        setLoading(false); setLoadMsg('');
+      })
+      .catch(function(err) {
+        setError(err.message); setLoading(false); setLoadMsg('');
+      });
+  }, [theme, topic, tone, price, freeWC, paidWC, age, situation, worry]);
 
   function doCopy(text, key) {
-    navigator.clipboard.writeText(text);
+    navigator.clipboard.writeText(text).catch(function() {});
     setCopied(function(s) { var n = Object.assign({}, s); n[key] = true; return n; });
     setTimeout(function() { setCopied(function(s) { var n = Object.assign({}, s); n[key] = false; return n; }); }, 2000);
   }
 
-  var card = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: isMobile ? 14 : 18, padding: isMobile ? "16px 14px" : "22px 26px", marginBottom: 14 };
-  var lbl = { color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", display: "block", marginBottom: 10 };
-  var subLbl = { color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", marginBottom: 8, display: "block" };
+  function exportTxt() {
+    var b = new Blob([editText], { type:'text/plain;charset=utf-8' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(b);
+    a.download = 'note_' + Date.now() + '.txt'; a.click();
+  }
+
+  var cardStyle = { background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.09)', borderRadius: isMobile ? 14 : 18, padding: isMobile ? '16px 14px' : '22px 26px', marginBottom:14 };
+  var lblStyle = { color:'rgba(255,255,255,0.6)', fontSize:12, fontWeight:700, letterSpacing:'0.1em', display:'block', marginBottom:10 };
+  var inputStyle = { width:'100%', background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:8, padding:'10px 14px', color:'#fff', fontSize:13, outline:'none', boxSizing:'border-box' };
 
   return (
-    <div className="dark-app">
-      <style>{"@keyframes spin { to { transform: rotate(360deg); } }"}</style>
-      {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} isDark={true} />}
-      <div className="dark-header">
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <button onClick={onBack} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, padding: "6px 12px", color: "rgba(255,255,255,0.7)", fontSize: 13, cursor: "pointer" }}>← 戻る</button>
+    <div style={{ minHeight:'100vh', background:'linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0a1628 100%)' }}>
+      <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}</style>
+      {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} />}
+
+      {/* ヘッダー */}
+      <div style={{ background:'rgba(255,255,255,0.03)', borderBottom:'1px solid rgba(255,255,255,0.07)', padding: isMobile ? '10px 12px' : '14px 20px', display:'flex', justifyContent:'space-between', alignItems:'center', position:'sticky', top:0, zIndex:100, backdropFilter:'blur(10px)' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+          <button onClick={onBack} style={{ background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:8, padding:'6px 12px', color:'rgba(255,255,255,0.7)', fontSize:13, cursor:'pointer' }}>← 戻る</button>
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ background: "linear-gradient(135deg,#e94560,#c2185b)", borderRadius: 6, padding: "3px 8px", fontSize: 9, fontWeight: 800, color: "#fff", letterSpacing: "0.15em" }}>AI POWERED</div>
-              <h1 style={{ margin: 0, fontSize: 18, fontWeight: 900, color: "#fff" }}>有料note 全自動生成ツール</h1>
+            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+              <div style={{ background:'linear-gradient(135deg,#e94560,#c2185b)', borderRadius:6, padding:'3px 8px', fontSize:9, fontWeight:800, color:'#fff', letterSpacing:'0.1em' }}>AI POWERED</div>
+              <h1 style={{ margin:0, fontSize: isMobile ? 15 : 18, fontWeight:900, color:'#fff' }}>📝 note有料記事生成</h1>
             </div>
-            <p style={{ margin: "2px 0 0", fontSize: 11, color: "rgba(255,255,255,0.35)" }}>
-              {configuredAI.length > 0 ? "✅ " + configuredAI.map(function(a) { return a.icon + " " + a.label; }).join("  ") : "⚠️ APIキー未設定"}
+            <p style={{ margin:'2px 0 0', fontSize:11, color:'rgba(255,255,255,0.35)' }}>
+              {configuredAI.length > 0 ? '✓ ' + configuredAI.map(function(a) { return a.label; }).join(' ') : '⚠️ APIキー未設定'}
             </p>
           </div>
         </div>
-        <button onClick={function() { setShowApi(true); }} style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 10, padding: "8px 16px", color: "rgba(255,255,255,0.7)", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>🔑 APIキー設定</button>
-      </div>
-      {configuredAI.length === 0 && (
-        <div style={{ background: "rgba(255,180,0,0.1)", border: "1px solid rgba(255,180,0,0.35)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ fontSize: 13, color: "#fcd34d" }}>⚠️ APIキーが未設定です。使用するAIのAPIキーを登録してください。</div>
-          <button onClick={function() { setShowApi(true); }} style={{ background: "#e07b39", border: "none", borderRadius: 8, padding: "6px 14px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>今すぐ設定</button>
-        </div>
-      )}
-
-      <div className="dark-tabs">
-        <TabButton label="⚙️ 設定"      isActive={tab === "settings"} isDisabled={false}       onClick={function() { setTab("settings"); }} />
-        <TabButton label="✏️ 編集"      isActive={tab === "edit"}     isDisabled={!hasArticle} onClick={function() { if (hasArticle) setTab("edit"); }} />
-        <TabButton label="👁 プレビュー" isActive={tab === "preview"}  isDisabled={!hasArticle} onClick={function() { if (hasArticle) setTab("preview"); }} />
-        <TabButton label="📮 投稿"      isActive={tab === "post"}     isDisabled={!hasArticle} onClick={function() { if (hasArticle) setTab("post"); }} />
+        <button onClick={function() { setShowApi(true); }} style={{ padding: isMobile ? '6px 10px' : '8px 16px', background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:10, color:'rgba(255,255,255,0.7)', fontSize: isMobile ? 11 : 13, fontWeight:700, cursor:'pointer' }}>🔑 APIキー設定</button>
       </div>
 
-      <div style={{ maxWidth: 780, margin: "0 auto", padding: isMobile ? "12px 10px" : "20px 16px" }}>
-        {tab === "settings" && (
+      {/* タブ */}
+      <div style={{ background:'rgba(255,255,255,0.02)', borderBottom:'1px solid rgba(255,255,255,0.06)', display:'flex', padding: isMobile ? '0 8px' : '0 20px', overflowX:'auto', position:'sticky', top: isMobile ? 54 : 65, zIndex:99, backdropFilter:'blur(10px)' }}>
+        <TabBtn label="⚙️ 設定" active={tab==='settings'} disabled={false} onClick={function() { setTab('settings'); }} />
+        <TabBtn label="✏️ 編集" active={tab==='edit'} disabled={!hasArticle} onClick={function() { if(hasArticle) setTab('edit'); }} />
+        <TabBtn label="👁 プレビュー" active={tab==='preview'} disabled={!hasArticle} onClick={function() { if(hasArticle) setTab('preview'); }} />
+        <TabBtn label="📤 投稿" active={tab==='post'} disabled={!hasArticle} onClick={function() { if(hasArticle) setTab('post'); }} />
+      </div>
+
+      {/* コンテンツ */}
+      <div style={{ maxWidth:780, margin:'0 auto', padding: isMobile ? '12px 10px' : '20px 16px' }}>
+
+        {/* === 設定タブ === */}
+        {tab === 'settings' && (
           <div>
-            {/* AI選択 */}
-            <div style={card}>
-              <div style={lbl}>🤖 使用するAI</div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {AI_CONFIGS.map(function(ai) {
-                  var aid = ai.id; var isActive = aiId === aid; var hasKey = !!getApiKey(aid);
-                  return (
-                    <button key={aid} onClick={function() { setAiId(aid); aiRef.current = aid; }}
-                      style={{ flex: "1 1 110px", background: isActive ? ai.color + "22" : "rgba(255,255,255,0.04)", border: isActive ? "2px solid " + ai.color : "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "10px 8px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                      <div style={{ fontSize: 22 }}>{ai.icon}</div>
-                      <div style={{ color: isActive ? "#fff" : "rgba(255,255,255,0.55)", fontWeight: isActive ? 800 : 400, fontSize: 13 }}>{ai.label}</div>
-                      <div style={{ background: hasKey ? "rgba(74,222,128,0.2)" : "rgba(255,255,255,0.1)", color: hasKey ? "#4ade80" : "rgba(255,255,255,0.35)", fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 4 }}>{hasKey ? "✓ 設定済み" : ai.badge}</div>
-                    </button>
-                  );
-                })}
+            {/* API未設定警告 */}
+            {!getKey(aiId) && (
+              <div style={{ background:'rgba(255,180,0,0.1)', border:'1px solid rgba(255,180,0,0.35)', borderRadius:10, padding:'12px 16px', marginBottom:16, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                <div style={{ fontSize:13, color:'#fcd34d' }}>⚠️ {currentAI.label}のAPIキーが未設定です</div>
+                <button onClick={function() { setShowApi(true); }} style={{ background:'#e07b39', border:'none', borderRadius:8, padding:'6px 14px', color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer' }}>設定する</button>
               </div>
-              {!getApiKey(aiId) && (
-                <div style={{ marginTop: 10, background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 8, padding: "8px 12px", color: "#fbbf24", fontSize: 12 }}>
-                  ⚠️ {currentAiCfg.label} のAPIキーが未設定です。
-                </div>
-              )}
+            )}
+
+            {/* AI選択 */}
+            <div style={cardStyle}>
+              <span style={lblStyle}>🤖 使用するAI</span>
+              <AiSelector value={aiId} onChange={function(id) { setAiId(id); aiIdRef.current = id; }} />
             </div>
+
             {/* ジャンル */}
-            <div style={card}>
-              <div style={lbl}>📂 ジャンル</div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {THEMES_GEN.map(function(t) {
-                  var tid = t.id; var isActive = theme === tid;
+            <div style={cardStyle}>
+              <span style={lblStyle}>📂 ジャンル</span>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+                {NOTE_THEMES.map(function(t) {
+                  var isA = theme === t.id;
                   return (
-                    <button key={tid} onClick={function() { setTheme(tid); setTopic(""); setTargetSit(""); setTargetWry(""); setTopicCandidates([]); setSugSit([]); setSugWry([]); setTimeout(function() { fetchTopicRef.current(tid, ""); fetchSugRef.current(tid, "", targetAge); }, 100); }}
-                      style={{ background: isActive ? "rgba(233,69,96,0.2)" : "rgba(255,255,255,0.05)", border: isActive ? "2px solid #e94560" : "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "8px 14px", fontSize: 13, cursor: "pointer", color: isActive ? "#fff" : "rgba(255,255,255,0.5)", fontWeight: isActive ? 700 : 400 }}>
+                    <button key={t.id} onClick={function() { setTheme(t.id); }}
+                      style={{ background: isA ? 'rgba(233,69,96,0.2)' : 'rgba(255,255,255,0.05)', border: isA ? '2px solid #e94560' : '1px solid rgba(255,255,255,0.1)', borderRadius:10, padding:'8px 14px', fontSize:13, cursor:'pointer', color: isA ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: isA ? 700 : 400 }}>
                       {t.label}
                     </button>
                   );
                 })}
               </div>
             </div>
-            {/* テーマ */}
-            <div style={card}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                <div style={lbl}>✏️ テーマ・キーワード</div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  {topicLoading && <span style={{ color: "#38bdf8", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}><span style={{ display: "inline-block", width: 10, height: 10, border: "2px solid #38bdf8", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />🌐 取得中...</span>}
-                  <button onClick={function() { fetchTopicRef.current(theme, topic); }}
-                    disabled={topicLoading}
-                    style={{ background: "rgba(56,189,248,0.12)", border: "1px solid rgba(56,189,248,0.3)", borderRadius: 6, padding: "4px 10px", color: "#38bdf8", fontSize: 11, cursor: topicLoading ? "not-allowed" : "pointer", fontWeight: 700 }}>
-                    🔄 再取得
-                  </button>
-                </div>
+
+            {/* テーマ入力 */}
+            <div style={cardStyle}>
+              <span style={lblStyle}>✏️ テーマ（自由入力）</span>
+              <input type="text" value={topic} onChange={function(e) { setTopic(e.target.value); }}
+                placeholder="例: 月5万円副業を3ヶ月で達成した方法" style={inputStyle} />
+              <div style={{ fontSize:11, color:'rgba(255,255,255,0.3)', marginTop:6 }}>空欄の場合はAIが最適なテーマを選びます</div>
+            </div>
+
+            {/* 文体 */}
+            <div style={cardStyle}>
+              <span style={lblStyle}>🎨 文体スタイル</span>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+                {NOTE_TONES.map(function(t) {
+                  var isA = tone === t.id;
+                  return (
+                    <button key={t.id} onClick={function() { setTone(t.id); }}
+                      style={{ background: isA ? 'rgba(233,69,96,0.2)' : 'rgba(255,255,255,0.05)', border: isA ? '2px solid #e94560' : '1px solid rgba(255,255,255,0.1)', borderRadius:10, padding:'8px 14px', fontSize:13, cursor:'pointer', color: isA ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: isA ? 700 : 400 }}>
+                      {t.label}
+                    </button>
+                  );
+                })}
               </div>
-              <input type="text" value={topic} onChange={function(e) { setTopic(e.target.value); }} placeholder="例：月5万円を3ヶ月で達成した副業術"
-                style={{ width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "12px 16px", color: "#fff", fontSize: 14, outline: "none", boxSizing: "border-box", marginBottom: 10 }} />
-              {topicCandidates.length > 0 && (
-                <div>
-                  <div style={{ fontSize: 11, color: "#38bdf8", fontWeight: 700, marginBottom: 6 }}>🌐 Web候補</div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                    {topicCandidates.map(function(ex) {
-                      var capturedEx = ex;
-                      return (
-                        <button key={capturedEx} onClick={function() { setTopic(capturedEx); }}
-                          style={{ background: topic === capturedEx ? "rgba(56,189,248,0.2)" : "rgba(255,255,255,0.04)", border: topic === capturedEx ? "1px solid #38bdf8" : "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: "4px 12px", color: topic === capturedEx ? "#38bdf8" : "rgba(255,255,255,0.4)", fontSize: 11, cursor: "pointer" }}>
-                          {capturedEx}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-              {topicErr && <div style={{ color: "#f87171", fontSize: 11, marginTop: 6 }}>{topicErr}</div>}
-              {!topicLoading && topicCandidates.length === 0 && !topicErr && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 4 }}>
-                  {(TOPIC_EXAMPLES[theme] || []).map(function(ex) {
-                    var capturedEx = ex;
+            </div>
+
+            {/* ターゲット読者 */}
+            <div style={cardStyle}>
+              <span style={lblStyle}>👥 ターゲット読者</span>
+              <div style={{ marginBottom:16 }}>
+                <div style={{ fontSize:12, color:'rgba(255,255,255,0.5)', marginBottom:8 }}>年齢層</div>
+                <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+                  {NOTE_AGES.map(function(a) {
+                    var isA = age === a.id;
                     return (
-                      <button key={capturedEx} onClick={function() { setTopic(capturedEx); }}
-                        style={{ background: topic === capturedEx ? "rgba(233,69,96,0.2)" : "rgba(255,255,255,0.04)", border: topic === capturedEx ? "1px solid #e94560" : "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: "4px 12px", color: topic === capturedEx ? "#e94560" : "rgba(255,255,255,0.4)", fontSize: 11, cursor: "pointer" }}>
-                        {capturedEx}
+                      <button key={a.id} onClick={function() { setAge(a.id); }}
+                        style={{ background: isA ? 'rgba(233,69,96,0.2)' : 'rgba(255,255,255,0.05)', border: isA ? '2px solid #e94560' : '1px solid rgba(255,255,255,0.1)', borderRadius:20, padding:'5px 14px', fontSize:12, cursor:'pointer', color: isA ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: isA ? 700 : 400 }}>
+                        {a.label}
                       </button>
                     );
                   })}
                 </div>
-              )}
-            </div>
-            {/* 文体 */}
-            <div style={card}>
-              <div style={lbl}>🎭 文体・スタイル</div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {TONES.map(function(t) {
-                  var tid = t.id; var isActive = tone === tid;
-                  return (
-                    <button key={tid} onClick={function() { setTone(tid); }}
-                      style={{ background: isActive ? "rgba(233,69,96,0.2)" : "rgba(255,255,255,0.05)", border: isActive ? "2px solid #e94560" : "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "8px 14px", fontSize: 13, cursor: "pointer", color: isActive ? "#fff" : "rgba(255,255,255,0.5)", fontWeight: isActive ? 700 : 400 }}>
-                      {t.label}
-                    </button>
-                  );
-                })}
+              </div>
+              <div style={{ marginBottom:12 }}>
+                <div style={{ fontSize:12, color:'rgba(255,255,255,0.5)', marginBottom:6 }}>読者の状況（任意）</div>
+                <input type="text" value={situation} onChange={function(e) { setSituation(e.target.value); }}
+                  placeholder="例: 副業を始めたいが何から始めればよいか分からない" style={inputStyle} />
+              </div>
+              <div>
+                <div style={{ fontSize:12, color:'rgba(255,255,255,0.5)', marginBottom:6 }}>読者の悩み（任意）</div>
+                <input type="text" value={worry} onChange={function(e) { setWorry(e.target.value); }}
+                  placeholder="例: 時間がなくて副業に踏み出せない" style={inputStyle} />
               </div>
             </div>
-            {/* ターゲット */}
-            <div style={card}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <div style={lbl}>🎯 ターゲット読者</div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  {sugLoading && <span style={{ color: "#38bdf8", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}><span style={{ display: "inline-block", width: 10, height: 10, border: "2px solid #38bdf8", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />🌐 Web調査中...</span>}
-                  <button onClick={function() { fetchSugRef.current(theme, topic, targetAge); }} disabled={sugLoading}
-                    style={{ background: "rgba(56,189,248,0.12)", border: "1px solid rgba(56,189,248,0.3)", borderRadius: 6, padding: "4px 10px", color: "#38bdf8", fontSize: 11, cursor: sugLoading ? "not-allowed" : "pointer", fontWeight: 700 }}>
-                    🔄 再取得
-                  </button>
-                </div>
-              </div>
-              <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "16px 18px" }}>
-                <div style={{ marginBottom: 16 }}>
-                  <div style={subLbl}>① 年齢層</div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                    {AGE_OPTIONS.map(function(a) {
-                      var aid2 = a.id; var isActive = targetAge === aid2;
-                      return (
-                        <button key={aid2} onClick={function() { setTargetAge(aid2); setTargetSit(""); setTargetWry(""); setTimeout(function() { fetchSugRef.current(theme, topic, aid2); }, 100); }}
-                          style={{ background: isActive ? "rgba(233,69,96,0.2)" : "rgba(255,255,255,0.05)", border: isActive ? "2px solid #e94560" : "1px solid rgba(255,255,255,0.1)", borderRadius: 20, padding: "5px 14px", fontSize: 12, cursor: "pointer", color: isActive ? "#fff" : "rgba(255,255,255,0.5)", fontWeight: isActive ? 700 : 400 }}>
-                          {a.label}
-                        </button>
-                      );
-                    })}
+
+            {/* 価格・文字数設定 */}
+            <div style={cardStyle}>
+              <span style={lblStyle}>📊 価格・文字数設定</span>
+              <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+                <div>
+                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:5 }}>
+                    <span style={{ color:'#4ade80', fontSize:12, fontWeight:700 }}>🆓 無料部分</span>
+                    <span style={{ background:'rgba(74,222,128,0.15)', border:'1px solid rgba(74,222,128,0.3)', color:'#4ade80', borderRadius:6, padding:'2px 10px', fontSize:13, fontWeight:700 }}>{freeWC.toLocaleString()}文字</span>
                   </div>
-                </div>
-                <div style={{ marginBottom: 16 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                    <div style={subLbl}>② 具体的な状況</div>
-                    {sugSit.length > 0 && !sugLoading && <span style={{ background: "rgba(56,189,248,0.15)", color: "#38bdf8", fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4 }}>🌐 Web調査</span>}
-                  </div>
-                  <TagPicker items={sugSit} value={targetSit} onChange={setTargetSit} color="#fbbf24" loading={sugLoading} />
-                  {sugErr && <div style={{ color: "#f87171", fontSize: 11, marginTop: 4 }}>{sugErr}</div>}
+                  <input type="range" min="300" max="3000" step="100" value={freeWC}
+                    onChange={function(e) { setFreeWC(Number(e.target.value)); }}
+                    style={{ width:'100%', accentColor:'#4ade80' }} />
+                  <div style={{ display:'flex', justifyContent:'space-between', color:'rgba(255,255,255,0.25)', fontSize:10 }}><span>300文字</span><span>3,000文字</span></div>
                 </div>
                 <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                    <div style={subLbl}>③ 具体的な悩み</div>
-                    {sugWry.length > 0 && !sugLoading && <span style={{ background: "rgba(56,189,248,0.15)", color: "#38bdf8", fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4 }}>🌐 Web調査</span>}
+                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:5 }}>
+                    <span style={{ color:'#f87171', fontSize:12, fontWeight:700 }}>🔒 有料部分</span>
+                    <span style={{ background:'rgba(248,113,113,0.15)', border:'1px solid rgba(248,113,113,0.3)', color:'#f87171', borderRadius:6, padding:'2px 10px', fontSize:13, fontWeight:700 }}>{paidWC.toLocaleString()}文字</span>
                   </div>
-                  <TagPicker items={sugWry} value={targetWry} onChange={setTargetWry} color="#fbbf24" loading={sugLoading} />
+                  <input type="range" min="500" max="8000" step="100" value={paidWC}
+                    onChange={function(e) { setPaidWC(Number(e.target.value)); }}
+                    style={{ width:'100%', accentColor:'#f87171' }} />
+                  <div style={{ display:'flex', justifyContent:'space-between', color:'rgba(255,255,255,0.25)', fontSize:10 }}><span>500文字</span><span>8,000文字</span></div>
+                </div>
+                <div>
+                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:5 }}>
+                    <span style={{ color:'#fbbf24', fontSize:12, fontWeight:700 }}>💰 販売価格</span>
+                    <span style={{ background:'rgba(251,191,36,0.15)', border:'1px solid rgba(251,191,36,0.3)', color:'#fbbf24', borderRadius:6, padding:'2px 10px', fontSize:13, fontWeight:700 }}>¥{price.toLocaleString()}</span>
+                  </div>
+                  <input type="range" min="300" max="9800" step="100" value={price}
+                    onChange={function(e) { setPrice(Number(e.target.value)); }}
+                    style={{ width:'100%', accentColor:'#fbbf24' }} />
+                  <div style={{ display:'flex', justifyContent:'space-between', color:'rgba(255,255,255,0.25)', fontSize:10 }}><span>¥300</span><span>¥9,800</span></div>
+                </div>
+                <div style={{ borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:12, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                  <span style={{ color:'rgba(255,255,255,0.35)', fontSize:12 }}>合計文字数</span>
+                  <span style={{ color:'#fff', fontWeight:800, fontSize:15 }}>{(freeWC + paidWC).toLocaleString()}文字</span>
                 </div>
               </div>
             </div>
-            {/* 文字数・価格 */}
-            <div style={card}>
-              <div style={lbl}>📏 文字数・価格設定</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                    <span style={{ color: "#4ade80", fontSize: 12, fontWeight: 700 }}>🔓 無料エリア</span>
-                    <span style={{ background: "rgba(74,222,128,0.15)", border: "1px solid rgba(74,222,128,0.3)", color: "#4ade80", borderRadius: 6, padding: "2px 10px", fontSize: 13, fontWeight: 700 }}>{freeWC.toLocaleString()}字</span>
-                  </div>
-                  <input type="range" min="300" max="3000" step="100" value={freeWC} onChange={function(e) { setFreeWC(Number(e.target.value)); }} style={{ width: "100%", accentColor: "#4ade80" }} />
-                  <div style={{ display: "flex", justifyContent: "space-between", color: "rgba(255,255,255,0.25)", fontSize: 10 }}><span>300字</span><span>3,000字</span></div>
-                </div>
-                <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                    <span style={{ color: "#f87171", fontSize: 12, fontWeight: 700 }}>🔑 有料エリア</span>
-                    <span style={{ background: "rgba(248,113,113,0.15)", border: "1px solid rgba(248,113,113,0.3)", color: "#f87171", borderRadius: 6, padding: "2px 10px", fontSize: 13, fontWeight: 700 }}>{paidWC.toLocaleString()}字</span>
-                  </div>
-                  <input type="range" min="500" max="8000" step="100" value={paidWC} onChange={function(e) { setPaidWC(Number(e.target.value)); }} style={{ width: "100%", accentColor: "#f87171" }} />
-                  <div style={{ display: "flex", justifyContent: "space-between", color: "rgba(255,255,255,0.25)", fontSize: 10 }}><span>500字</span><span>8,000字</span></div>
-                </div>
-                <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                    <span style={{ color: "#fbbf24", fontSize: 12, fontWeight: 700 }}>💴 販売価格</span>
-                    <span style={{ background: "rgba(251,191,36,0.15)", border: "1px solid rgba(251,191,36,0.3)", color: "#fbbf24", borderRadius: 6, padding: "2px 10px", fontSize: 13, fontWeight: 700 }}>¥{price.toLocaleString()}</span>
-                  </div>
-                  <input type="range" min="300" max="9800" step="100" value={price} onChange={function(e) { setPrice(Number(e.target.value)); }} style={{ width: "100%", accentColor: "#fbbf24" }} />
-                  <div style={{ display: "flex", justifyContent: "space-between", color: "rgba(255,255,255,0.25)", fontSize: 10 }}><span>¥300</span><span>¥9,800</span></div>
-                </div>
-                <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>合計文字数</span>
-                  <span style={{ color: "#fff", fontWeight: 800, fontSize: 15 }}>{(freeWC + paidWC).toLocaleString()}字 <span style={{ color: "rgba(255,255,255,0.3)", fontWeight: 400, fontSize: 11 }}>約{Math.round((freeWC + paidWC) / 500)}分で読了</span></span>
-                </div>
+
+            {/* エラー表示 */}
+            {error && (
+              <div style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:10, padding:'14px 18px', color:'#f87171', fontSize:13, marginBottom:14, whiteSpace:'pre-line' }}>
+                ❌ {error}
               </div>
-            </div>
-            {/* Web検索 */}
-            <div style={card}>
-              <div onClick={function() { setUseSearch(function(v) { return !v; }); }} style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
-                <div style={{ width: 44, height: 24, background: useSearch ? "#e94560" : "rgba(255,255,255,0.15)", borderRadius: 12, position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
-                  <div style={{ position: "absolute", top: 3, left: useSearch ? 23 : 3, width: 18, height: 18, background: "#fff", borderRadius: "50%", transition: "left 0.2s", boxShadow: "0 1px 4px rgba(0,0,0,0.3)" }} />
-                </div>
-                <div>
-                  <div style={{ color: "#fff", fontWeight: 700, fontSize: 14 }}>🔍 最新情報を検索して記事に組み込む</div>
-                  <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, marginTop: 2 }}>
-                    {aiId === "claude" ? "🟠 Claude: Web検索ツールで最新情報を取得" : currentAiCfg.icon + " " + currentAiCfg.label + ": 学習済み最新情報を活用"}
-                  </div>
-                </div>
-              </div>
-            </div>
-            {error && <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, padding: "14px 18px", color: "#f87171", fontSize: 13, marginBottom: 14 }}>⚠️ {error}</div>}
-            <button onClick={generate} disabled={loading}
-              style={{ width: "100%", background: loading ? "rgba(233,69,96,0.25)" : "linear-gradient(135deg,#e94560,#c2185b)", border: "none", borderRadius: 14, padding: 18, color: "#fff", fontSize: 16, fontWeight: 900, cursor: loading ? "not-allowed" : "pointer", boxShadow: loading ? "none" : "0 8px 30px rgba(233,69,96,0.45)", letterSpacing: "0.06em" }}>
-              {loading ? (loadMsg || "⏳ 生成中...") : currentAiCfg.icon + " " + currentAiCfg.label + " で記事を自動生成する"}
+            )}
+
+            {/* 生成ボタン */}
+            <button onClick={handleGenerate} disabled={loading}
+              style={{ width:'100%', background: loading ? 'rgba(233,69,96,0.25)' : 'linear-gradient(135deg,#e94560,#c2185b)', border:'none', borderRadius:14, padding:18, color:'#fff', fontSize:16, fontWeight:900, cursor: loading ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 8px 30px rgba(233,69,96,0.45)', letterSpacing:'0.06em' }}>
+              {loading
+                ? (loadMsg || '⏳ 生成中...')
+                : currentAI.icon + ' ' + currentAI.label + ' で記事を生成する'}
             </button>
           </div>
         )}
 
-        {tab === "edit" && (
-          hasArticle ? (
-            <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-                <div style={{ display: "flex", gap: 12, fontSize: 13 }}>
-                  <span style={{ color: "#4ade80", fontWeight: 700 }}>無料 {freeCount}字</span>
-                  <span style={{ color: "rgba(255,255,255,0.2)" }}>／</span>
-                  <span style={{ color: "#f87171", fontWeight: 700 }}>有料 {paidCount}字</span>
-                  <span style={{ color: "rgba(255,255,255,0.2)" }}>／</span>
-                  <span style={{ color: "rgba(255,255,255,0.4)" }}>合計 {(freeCount + paidCount).toLocaleString()}字</span>
-                </div>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  <button onClick={function() { setEditedText(generatedText); }} style={{ padding: "7px 14px", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, color: "rgba(255,255,255,0.6)", fontSize: 12, cursor: "pointer" }}>↩ 元に戻す</button>
-                  <button onClick={function() { exportArticle(editedText, "txt", topic); }} style={{ padding: "7px 14px", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, color: "rgba(255,255,255,0.6)", fontSize: 12, cursor: "pointer" }}>📄 TXT</button>
-                  <button onClick={function() { exportArticle(editedText, "md", topic); }} style={{ padding: "7px 14px", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, color: "rgba(255,255,255,0.6)", fontSize: 12, cursor: "pointer" }}>📝 MD</button>
-                  <button onClick={function() { exportArticle(editedText, "doc", topic); }} style={{ padding: "7px 14px", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, color: "rgba(255,255,255,0.6)", fontSize: 12, cursor: "pointer" }}>📃 DOC</button>
-                </div>
+        {/* === 編集タブ === */}
+        {tab === 'edit' && hasArticle && (
+          <div>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14, flexWrap:'wrap', gap:8 }}>
+              <div style={{ display:'flex', gap:12, fontSize:13 }}>
+                <span style={{ color:'#4ade80', fontWeight:700 }}>無料 {freeText.replace(/\s/g,'').length}文字</span>
+                <span style={{ color:'rgba(255,255,255,0.2)' }}>|</span>
+                <span style={{ color:'#f87171', fontWeight:700 }}>有料 {paidText.replace(/\s/g,'').length}文字</span>
               </div>
-              <textarea value={editedText} onChange={function(e) { setEditedText(e.target.value); }}
-                style={{ width: "100%", minHeight: 600, padding: 16, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, color: "#e2e8f0", fontSize: 14, lineHeight: 1.85, fontFamily: "inherit", boxSizing: "border-box", resize: "vertical", outline: "none" }} />
+              <div style={{ display:'flex', gap:6 }}>
+                <button onClick={function() { setEditText(genText); }} style={{ padding:'7px 14px', background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:8, color:'rgba(255,255,255,0.6)', fontSize:12, cursor:'pointer' }}>↩ 元に戻す</button>
+                <button onClick={exportTxt} style={{ padding:'7px 14px', background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:8, color:'rgba(255,255,255,0.6)', fontSize:12, cursor:'pointer' }}>📥 TXT</button>
+              </div>
             </div>
-          ) : (
-            <div style={{ textAlign: "center", padding: "80px 20px", color: "rgba(255,255,255,0.3)" }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>✏️</div>
-              <div style={{ fontSize: 15, marginBottom: 8 }}>まだ記事が生成されていません</div>
-              <div style={{ fontSize: 13 }}>⚙️ 設定タブで記事を生成してください</div>
-            </div>
-          )
+            <textarea value={editText} onChange={function(e) { setEditText(e.target.value); }}
+              style={{ width:'100%', minHeight:600, padding:16, background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:12, color:'#e2e8f0', fontSize:14, lineHeight:1.85, boxSizing:'border-box', resize:'vertical', outline:'none' }} />
+          </div>
         )}
 
-        {tab === "preview" && (
-          hasArticle ? (
-            <div>
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginBottom: 12 }}>
-                <button onClick={function() { doCopy(editedText, "full"); }}
-                  style={{ padding: "7px 14px", background: copied["full"] ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.07)", border: copied["full"] ? "1px solid #4ade80" : "1px solid rgba(255,255,255,0.15)", borderRadius: 8, color: copied["full"] ? "#4ade80" : "rgba(255,255,255,0.6)", fontSize: 12, cursor: "pointer" }}>
-                  {copied["full"] ? "✅ コピー完了" : "📋 全文コピー"}
-                </button>
+        {/* === プレビュータブ === */}
+        {tab === 'preview' && hasArticle && (
+          <div>
+            <div style={{ display:'flex', justifyContent:'flex-end', gap:8, marginBottom:12 }}>
+              <button onClick={function() { doCopy(editText, 'full'); }}
+                style={{ padding:'7px 14px', background: copied['full'] ? 'rgba(74,222,128,0.15)' : 'rgba(255,255,255,0.07)', border: copied['full'] ? '1px solid #4ade80' : '1px solid rgba(255,255,255,0.15)', borderRadius:8, color: copied['full'] ? '#4ade80' : 'rgba(255,255,255,0.6)', fontSize:12, cursor:'pointer' }}>
+                {copied['full'] ? '✓ コピー済み' : '📋 全文コピー'}
+              </button>
+            </div>
+            <div style={{ background:'#fff', borderRadius:16, overflow:'hidden', boxShadow:'0 20px 60px rgba(0,0,0,0.2)' }}>
+              <div style={{ background:'#f0fdf4', borderBottom:'2px solid #86efac', padding:'8px 20px' }}>
+                <span style={{ color:'#16a34a', fontSize:12, fontWeight:700 }}>📓 無料部分プレビュー</span>
               </div>
-              <ArticlePreview text={editedText} price={price} />
+              <div style={{ padding:'28px 32px' }}>
+                <h1 style={{ fontSize:22, fontWeight:900, lineHeight:1.4, color:'#1a1a1a', marginBottom:20 }}>{dispTitle}</h1>
+                <div style={{ fontSize:15, lineHeight:1.95, color:'#333', whiteSpace:'pre-wrap' }}>{freeText}</div>
+              </div>
+              <div style={{ background:'linear-gradient(135deg,#1a1a2e,#0f3460)', margin:'0 24px 24px', borderRadius:14, padding:'28px 24px', textAlign:'center', color:'#fff' }}>
+                <div style={{ fontSize:32, marginBottom:10 }}>🔐</div>
+                <h3 style={{ fontSize:17, fontWeight:900, margin:'0 0 8px' }}>ここから先は有料コンテンツです</h3>
+                <p style={{ fontSize:13, opacity:0.65, margin:'0 0 18px', lineHeight:1.7 }}>具体的な方法・Q&A・アクションプランを詳しく解説</p>
+                <div style={{ background:'linear-gradient(135deg,#e94560,#c2185b)', display:'inline-block', borderRadius:10, padding:'12px 32px', fontSize:15, fontWeight:900, cursor:'pointer' }}>¥{price.toLocaleString()} で続きを読む →</div>
+                <p style={{ fontSize:11, opacity:0.35, marginTop:8 }}>※ デジタルコンテンツ購入</p>
+              </div>
             </div>
-          ) : (
-            <div style={{ textAlign: "center", padding: "80px 20px", color: "rgba(255,255,255,0.3)" }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>👁</div>
-              <div style={{ fontSize: 15, marginBottom: 8 }}>まだ記事が生成されていません</div>
-            </div>
-          )
+          </div>
         )}
 
-        {tab === "post" && (
-          hasArticle ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, marginBottom: 4 }}>各セクションをコピーしてnoteの投稿画面に貼り付けてください。</div>
-              {[
-                { key: "title", label: "📌 タイトル",  text: dispTitle,  accent: "#fbbf24" },
-                { key: "free",  label: "🆓 無料エリア", text: freeText,   accent: "#4ade80" },
-                { key: "paid",  label: "🔒 有料エリア", text: paidText,   accent: "#f87171" },
-              ].map(function(item) {
-                var ik = item.key;
-                return (
-                  <div key={ik} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 14, overflow: "hidden" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-                      <div>
-                        <span style={{ color: "#fff", fontWeight: 700, fontSize: 14 }}>{item.label}</span>
-                        <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginLeft: 10 }}>{item.text.replace(/\s/g, "").length}字</span>
-                      </div>
-                      <button onClick={function() { doCopy(item.text, ik); }}
-                        style={{ padding: "7px 16px", background: copied[ik] ? "rgba(74,222,128,0.15)" : item.accent + "22", border: copied[ik] ? "1px solid #4ade80" : "1px solid " + item.accent + "44", borderRadius: 8, color: copied[ik] ? "#4ade80" : item.accent, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                        {copied[ik] ? "✅ コピー済み" : "📋 コピー"}
-                      </button>
+        {/* === 投稿タブ === */}
+        {tab === 'post' && hasArticle && (
+          <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+            <div style={{ color:'rgba(255,255,255,0.5)', fontSize:13, marginBottom:4 }}>各パートをコピーしてnoteの投稿画面に貼り付けてください。</div>
+            {[
+              { key:'title', label:'🏷️ タイトル',  text: dispTitle,  accent:'#fbbf24' },
+              { key:'free',  label:'🆓 無料パート', text: freeText,   accent:'#4ade80' },
+              { key:'paid',  label:'🔒 有料パート', text: paidText,   accent:'#f87171' },
+            ].map(function(item) {
+              var ik = item.key;
+              return (
+                <div key={ik} style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.09)', borderRadius:14, overflow:'hidden' }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'14px 20px', borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
+                    <div>
+                      <span style={{ color:'#fff', fontWeight:700, fontSize:14 }}>{item.label}</span>
+                      <span style={{ color:'rgba(255,255,255,0.3)', fontSize:11, marginLeft:10 }}>{item.text.replace(/\s/g,'').length}文字</span>
                     </div>
-                    <div style={{ padding: "14px 20px", maxHeight: 120, overflowY: "auto" }}>
-                      <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, lineHeight: 1.75, whiteSpace: "pre-wrap" }}>{item.text.slice(0, 400)}{item.text.length > 400 ? "..." : ""}</div>
-                    </div>
+                    <button onClick={function() { doCopy(item.text, ik); }}
+                      style={{ padding:'7px 16px', background: copied[ik] ? 'rgba(74,222,128,0.15)' : item.accent + '22', border: copied[ik] ? '1px solid #4ade80' : '1px solid ' + item.accent + '44', borderRadius:8, color: copied[ik] ? '#4ade80' : item.accent, fontSize:13, fontWeight:700, cursor:'pointer' }}>
+                      {copied[ik] ? '✓ コピー済み' : '📋 コピー'}
+                    </button>
                   </div>
-                );
-              })}
-              <a href="https://note.com/notes/new" target="_blank" rel="noopener noreferrer"
-                style={{ display: "block", textAlign: "center", background: "linear-gradient(135deg,#41c9b4,#0ea5e9)", color: "#fff", padding: 16, borderRadius: 14, fontWeight: 800, fontSize: 15, textDecoration: "none", boxShadow: "0 6px 24px rgba(65,201,180,0.35)" }}>
-                📮 noteの投稿画面を開く
-              </a>
-            </div>
-          ) : (
-            <div style={{ textAlign: "center", padding: "80px 20px", color: "rgba(255,255,255,0.3)" }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>📮</div>
-              <div style={{ fontSize: 15, marginBottom: 8 }}>まだ記事が生成されていません</div>
-            </div>
-          )
+                  <div style={{ padding:'14px 20px', maxHeight:120, overflowY:'auto' }}>
+                    <div style={{ color:'rgba(255,255,255,0.5)', fontSize:13, lineHeight:1.75, whiteSpace:'pre-wrap' }}>{item.text.slice(0, 400)}{item.text.length > 400 ? '...' : ''}</div>
+                  </div>
+                </div>
+              );
+            })}
+            <a href="https://note.com/notes/new" target="_blank" rel="noopener noreferrer"
+              style={{ display:'block', textAlign:'center', background:'linear-gradient(135deg,#41c9b4,#0ea5e9)', color:'#fff', padding:16, borderRadius:14, fontWeight:800, fontSize:15, textDecoration:'none', boxShadow:'0 6px 24px rgba(65,201,180,0.35)' }}>
+              📤 noteの投稿画面を開く
+            </a>
+          </div>
+        )}
+
+        {/* 記事未生成の場合 */}
+        {(tab === 'edit' || tab === 'preview' || tab === 'post') && !hasArticle && (
+          <div style={{ textAlign:'center', padding:'80px 20px', color:'rgba(255,255,255,0.3)' }}>
+            <div style={{ fontSize:48, marginBottom:16 }}>✏️</div>
+            <div style={{ fontSize:15, marginBottom:8 }}>まだ記事が生成されていません</div>
+            <div style={{ fontSize:13 }}>⚙️ 設定タブで条件を設定して生成してください</div>
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-// ============================================================
-// TOOL 2: BONUS GENERATOR
-// ============================================================
-var BONUS_THEMES = ["恋愛・婚活","ダイエット・美容","副業・お金","育児・子育て","健康・メンタル","ビジネス・キャリア","人間関係","趣味・ライフスタイル","その他"];
-var BONUS_AGE_OPTIONS = ["10代","20代前半","20代後半","30代前半","30代後半","40代","50代以上","年齢問わず"];
+/* =============================================
+   TOOL 2: 購入者特典ジェネレーター
+   ============================================= */
+var BONUS_THEMES = ['副業・お金','ダイエット・健康','節約・お金','育児・子育て','マインドセット','ビジネス・キャリア','人間関係','ライフスタイル','その他'];
+var BONUS_AGES = ['10代','20代前半','20代後半','30代前半','30代後半','40代','50代以上','全年齢'];
 
 async function readFileAsText(file) {
-  if (!file) return "";
+  if (!file) return '';
   var name = file.name.toLowerCase();
-  if (name.endsWith(".docx") && typeof mammoth !== "undefined") {
-    var arrayBuffer = await file.arrayBuffer();
-    var result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+  if (name.endsWith('.docx') && typeof mammoth !== 'undefined') {
+    var buf = await file.arrayBuffer();
+    var result = await mammoth.extractRawText({ arrayBuffer: buf });
     return result.value;
   }
   return new Promise(function(resolve, reject) {
     var reader = new FileReader();
     reader.onload = function(e) { resolve(e.target.result); };
     reader.onerror = reject;
-    reader.readAsText(file, "utf-8");
+    reader.readAsText(file, 'utf-8');
   });
-}
-
-function downloadAsXlsx(rows, filename) {
-  if (typeof XLSX === "undefined") { alert("XLSXライブラリが読み込めませんでした。"); return; }
-  var ws = XLSX.utils.aoa_to_sheet(rows);
-  var wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "特典");
-  XLSX.writeFile(wb, (filename || "bonus") + ".xlsx");
 }
 
 function BonusGenerator(props) {
   var onBack = props.onBack;
-  var as = useState(false); var showApi = as[0]; var setShowApi = as[1];
-  var ais = useState("claude"); var aiId = ais[0]; var setAiId = ais[1];
-  var ts = useState("副業・お金"); var theme = ts[0]; var setTheme = ts[1];
-  var ages = useState("30代前半"); var targetAge = ages[0]; var setTargetAge = ages[1];
-  var fs = useState(null); var articleFile = fs[0]; var setArticleFile = fs[1];
-  var ats = useState(""); var articleText = ats[0]; var setArticleText = ats[1];
-  var sug = useState([]); var suggestions = sug[0]; var setSuggestions = sug[1];
-  var sel = useState([]); var selected = sel[0]; var setSelected = sel[1];
-  var res = useState({}); var results = res[0]; var setResults = res[1];
-  var ld = useState(false); var loading = ld[0]; var setLoading = ld[1];
-  var gl = useState({}); var genLoading = gl[0]; var setGenLoading = gl[1];
-  var er = useState(""); var error = er[0]; var setError = er[1];
-  var fileRef = useRef(null);
   var isMobile = useIsMobile();
+  var showApi = useState(false);
+  var setShowApi = showApi[1]; showApi = showApi[0];
+  var aiState = useState('claude');
+  var aiId = aiState[0]; var setAiId = aiState[1];
+  var themeState = useState('副業・お金');
+  var theme = themeState[0]; var setTheme = themeState[1];
+  var ageState = useState('30代前半');
+  var targetAge = ageState[0]; var setTargetAge = ageState[1];
+  var fileState = useState(null);
+  var articleFile = fileState[0]; var setArticleFile = fileState[1];
+  var textState = useState('');
+  var articleText = textState[0]; var setArticleText = textState[1];
+  var sugState = useState([]);
+  var suggestions = sugState[0]; var setSuggestions = sugState[1];
+  var selState = useState([]);
+  var selected = selState[0]; var setSelected = selState[1];
+  var resState = useState({});
+  var results = resState[0]; var setResults = resState[1];
+  var loadState = useState(false);
+  var loading = loadState[0]; var setLoading = loadState[1];
+  var genLoadState = useState({});
+  var genLoading = genLoadState[0]; var setGenLoading = genLoadState[1];
+  var errState = useState('');
+  var error = errState[0]; var setError = errState[1];
+  var fileRef = useRef(null);
+  var aiRef = useRef(aiId);
+  aiRef.current = aiId;
 
   var handleFileChange = useCallback(async function(e) {
     var file = e.target.files && e.target.files[0];
     if (!file) return;
     setArticleFile(file);
-    try { var text = await readFileAsText(file); setArticleText(text); }
-    catch(err) { setError("ファイル読み込みエラー: " + err.message); }
+    try {
+      var text = await readFileAsText(file);
+      setArticleText(text);
+    } catch(err) {
+      setError('ファイル読み込みエラー: ' + err.message);
+    }
   }, []);
 
-  var handleAnalyze = useCallback(async function() {
-    if (!articleText.trim()) { setError("記事テキストを入力またはファイルをアップロードしてください"); return; }
-    setError(""); setLoading(true); setSuggestions([]); setSelected([]); setResults({});
-    try {
-      var prompt = "以下のnote記事を分析し、購入者特典として最適なコンテンツを8つ提案してください。\n\n" +
-        "【ジャンル】" + theme + "\n【ターゲット】" + targetAge + "\n\n" +
-        "【記事内容（抜粋）】\n" + articleText.slice(0, 3000) + "\n\n" +
-        "JSON配列で回答してください。各要素は {id, type, title, description, reason} を含めてください。" +
-        "typeは checklist/template/worksheet/glossary/casestudy/qanda/resource/stepguide のいずれか。" +
-        "余分なテキストなしでJSONのみ返してください。";
-      var result = await callAI({ aiId: aiId, messages: [{ role: "user", content: prompt }], maxTokens: 2000 });
-      var clean = result.replace(/```json/g, "").replace(/```/g, "").trim();
-      var parsed = JSON.parse(clean);
-      setSuggestions(parsed);
-    } catch(err) { setError("分析エラー: " + err.message); }
-    setLoading(false);
-  }, [articleText, theme, targetAge, aiId]);
+  var handleAnalyze = useCallback(function() {
+    var currentAiId = aiRef.current;
+    if (!articleText.trim()) { setError('記事テキストをアップロードするか貼り付けてください'); return; }
+    setError(''); setLoading(true); setSuggestions([]); setSelected([]); setResults({});
+    var prompt = '以下のnote記事を分析して、購入者向けの特典コンテンツを8つ提案してください。\n\n'
+      + '【ジャンル】' + theme + '\n【ターゲット年齢】' + targetAge + '\n\n'
+      + '【記事内容（抜粋）】\n' + articleText.slice(0, 3000) + '\n\n'
+      + 'JSONのみで出力（前置きなし）。形式: [{id, type, title, description, reason}]\n'
+      + 'typeは checklist/template/worksheet/glossary/casestudy/qanda/resource/stepguide のいずれか';
+    callAI(currentAiId, [{ role:'user', content: prompt }], null, 2000)
+      .then(function(result) {
+        var clean = result.replace(/```json/g, '').replace(/```/g, '').trim();
+        var parsed = JSON.parse(clean);
+        setSuggestions(parsed); setLoading(false);
+      })
+      .catch(function(err) {
+        setError('分析エラー: ' + err.message); setLoading(false);
+      });
+  }, [articleText, theme, targetAge]);
 
-  var handleGenerate = useCallback(async function(bonusId, bonusTitle, bonusType) {
+  function handleGenerate(bonusId, bonusTitle, bonusType) {
+    var currentAiId = aiRef.current;
     setGenLoading(function(s) { var n = Object.assign({}, s); n[bonusId] = true; return n; });
-    setError("");
-    try {
-      var searchSummary = "";
-      if (aiId === "claude") {
-        try { searchSummary = await callClaudeSearch({ messages: [{ role: "user", content: "「" + bonusTitle + "」に関する最新情報・実例・データを調査してください。" }], maxTokens: 1000 }); }
-        catch(e2) { searchSummary = ""; }
-      }
-      var prompt2 = "以下の特典コンテンツを実用的に作成してください。\n\n" +
-        "【特典タイトル】" + bonusTitle + "\n【特典タイプ】" + bonusType + "\n【ジャンル】" + theme + "\n【ターゲット】" + targetAge + "\n" +
-        (searchSummary ? "【参考情報】\n" + searchSummary + "\n\n" : "") +
-        "【記事内容（抜粋）】\n" + articleText.slice(0, 2000) + "\n\n実際に購入者が使えるクオリティで、具体的な内容を含めて作成してください。";
-      var result2 = await callAI({ aiId: aiId, messages: [{ role: "user", content: prompt2 }], maxTokens: 3000 });
-      setResults(function(r) { var n = Object.assign({}, r); n[bonusId] = result2; return n; });
-    } catch(err) { setError("生成エラー: " + err.message); }
-    setGenLoading(function(s) { var n = Object.assign({}, s); n[bonusId] = false; return n; });
-  }, [articleText, theme, targetAge, aiId]);
+    setError('');
+    var prompt = '以下の特典コンテンツを実際に作成してください。\n\n'
+      + '【特典タイトル】' + bonusTitle + '\n【タイプ】' + bonusType + '\n【ジャンル】' + theme + '\n【ターゲット】' + targetAge + '\n\n'
+      + '【参考記事（抜粋）】\n' + articleText.slice(0, 2000) + '\n\n'
+      + '読者がすぐに使えるクオリティで、具体的な内容を作成してください。';
+    callAI(currentAiId, [{ role:'user', content: prompt }], null, 3000)
+      .then(function(result) {
+        setResults(function(r) { var n = Object.assign({}, r); n[bonusId] = result; return n; });
+        setGenLoading(function(s) { var n = Object.assign({}, s); n[bonusId] = false; return n; });
+      })
+      .catch(function(err) {
+        setError('生成エラー: ' + err.message);
+        setGenLoading(function(s) { var n = Object.assign({}, s); n[bonusId] = false; return n; });
+      });
+  }
 
-  var handleExportXlsx = useCallback(function() {
-    var rows = [["特典タイトル", "タイプ", "内容"]];
+  function downloadXlsx() {
+    if (typeof XLSX === 'undefined') { alert('XLSXライブラリが読み込まれていません'); return; }
+    var rows = [['特典タイトル', 'タイプ', '内容']];
     selected.forEach(function(id) {
       var s = suggestions.find(function(x) { return x.id === id; });
-      var content = results[id] || "（未生成）";
-      rows.push([s ? s.title : id, s ? s.type : "", content]);
+      rows.push([s ? s.title : id, s ? s.type : '', results[id] || '（未生成）']);
     });
-    downloadAsXlsx(rows, "bonus_list");
-  }, [selected, suggestions, results]);
+    var ws = XLSX.utils.aoa_to_sheet(rows);
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '特典一覧');
+    XLSX.writeFile(wb, 'bonus_list.xlsx');
+  }
 
-  var card = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: isMobile ? 14 : 18, padding: isMobile ? "16px 14px" : "22px 26px", marginBottom: 12 };
-  var lbl = { color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", display: "block", marginBottom: 8 };
-  var inputStyle = { width: "100%", padding: isMobile ? "9px 10px" : "10px 12px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: isMobile ? 13 : 14, color: "#fff", outline: "none" };
+  var cardStyle = { background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.09)', borderRadius: isMobile ? 14 : 18, padding: isMobile ? '16px 14px' : '22px 26px', marginBottom:14 };
+  var lblStyle = { color:'rgba(255,255,255,0.6)', fontSize:12, fontWeight:700, letterSpacing:'0.1em', display:'block', marginBottom:10 };
+  var inputStyle = { width:'100%', padding:'10px 12px', background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:8, fontSize:14, color:'#fff', outline:'none' };
 
   return (
     <div className="app-wrap">
-      <style>{"@keyframes spin { to { transform: rotate(360deg); } }"}</style>
-      {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} isDark={true} />}
+      <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}</style>
+      {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} />}
       <div className="app-header">
         <div className="app-header-left">
           <button className="back-btn" onClick={onBack}>← 戻る</button>
@@ -1367,115 +1177,101 @@ function BonusGenerator(props) {
         <button className="key-btn" onClick={function() { setShowApi(true); }}>🔑 APIキー設定</button>
       </div>
       <div className="app-body">
-        {!getApiKey(aiId) && (
-          <div style={{ background: "rgba(255,180,0,0.1)", border: "1px solid rgba(255,180,0,0.35)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ fontSize: 13, color: "#fcd34d" }}>⚠️ 選択中のAIのAPIキーが未設定です。右上の「APIキー設定」から登録してください。</div>
-            <button onClick={function() { setShowApi(true); }} style={{ background: "#e07b39", border: "none", borderRadius: 8, padding: "6px 14px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>今すぐ設定</button>
-          </div>
-        )}
-        {/* 設定 */}
-        <div style={card}>
-          <div style={lbl}>🤖 使用するAI</div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
-            {AI_CONFIGS.map(function(ai) {
-              var isActive = aiId === ai.id; var hasKey = !!getApiKey(ai.id);
-              return (
-                <button key={ai.id} onClick={function() { setAiId(ai.id); }}
-                  style={{ flex: "1 1 110px", background: isActive ? ai.color + "22" : "rgba(255,255,255,0.04)", border: isActive ? "2px solid " + ai.color : "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "10px 8px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                  <div style={{ fontSize: 22 }}>{ai.icon}</div>
-                  <div style={{ color: isActive ? "#fff" : "rgba(255,255,255,0.55)", fontWeight: isActive ? 800 : 400, fontSize: 13 }}>{ai.label}</div>
-                  <div style={{ background: hasKey ? "rgba(74,222,128,0.2)" : "rgba(255,255,255,0.1)", color: hasKey ? "#4ade80" : "rgba(255,255,255,0.35)", fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 4 }}>{hasKey ? "✓ 設定済み" : ai.badge}</div>
-                </button>
-              );
-            })}
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 10 : 16 }}>
+        {/* AI選択 + 設定 */}
+        <div style={cardStyle}>
+          <span style={lblStyle}>🤖 使用するAI</span>
+          <AiSelector value={aiId} onChange={function(id) { setAiId(id); aiRef.current = id; }} />
+          <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 10 : 16, marginTop:20 }}>
             <div>
-              <div style={lbl}>🎯 ジャンル</div>
+              <div style={lblStyle}>🎯 ジャンル</div>
               <select value={theme} onChange={function(e) { setTheme(e.target.value); }} style={inputStyle}>
-                {BONUS_THEMES.map(function(t) { return <option key={t} style={{ background: "#1a1a2e" }}>{t}</option>; })}
+                {BONUS_THEMES.map(function(t) { return <option key={t} style={{ background:'#1a1a2e' }}>{t}</option>; })}
               </select>
             </div>
             <div>
-              <div style={lbl}>👤 ターゲット年齢</div>
+              <div style={lblStyle}>👤 ターゲット年齢</div>
               <select value={targetAge} onChange={function(e) { setTargetAge(e.target.value); }} style={inputStyle}>
-                {BONUS_AGE_OPTIONS.map(function(a) { return <option key={a} style={{ background: "#1a1a2e" }}>{a}</option>; })}
+                {BONUS_AGES.map(function(a) { return <option key={a} style={{ background:'#1a1a2e' }}>{a}</option>; })}
               </select>
             </div>
           </div>
         </div>
+
         {/* 記事入力 */}
-        <div style={card}>
-          <div style={lbl}>📄 note記事をアップロード or 貼り付け</div>
+        <div style={cardStyle}>
+          <span style={lblStyle}>📄 note記事をアップロード or 貼り付け</span>
           <div onClick={function() { fileRef.current && fileRef.current.click(); }}
-            style={{ border: "2px dashed rgba(255,255,255,0.15)", borderRadius: 10, padding: 24, textAlign: "center", cursor: "pointer", marginBottom: 12, background: "rgba(255,255,255,0.02)" }}>
-            <div style={{ fontSize: 32, marginBottom: 8 }}>📂</div>
-            <div style={{ fontWeight: 600, marginBottom: 4, color: "#fff" }}>{articleFile ? articleFile.name : "クリックしてファイルを選択"}</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>.txt / .md / .docx 対応</div>
-            <input ref={fileRef} type="file" accept=".txt,.md,.docx" onChange={handleFileChange} style={{ display: "none" }} />
+            style={{ border:'2px dashed rgba(255,255,255,0.15)', borderRadius:10, padding:24, textAlign:'center', cursor:'pointer', marginBottom:12, background:'rgba(255,255,255,0.02)' }}>
+            <div style={{ fontSize:32, marginBottom:8 }}>📂</div>
+            <div style={{ fontWeight:600, marginBottom:4, color:'#fff' }}>{articleFile ? articleFile.name : 'クリックしてファイルを選択'}</div>
+            <div style={{ fontSize:12, color:'rgba(255,255,255,0.4)' }}>.txt / .md / .docx 対応</div>
+            <input ref={fileRef} type="file" accept=".txt,.md,.docx" onChange={handleFileChange} style={{ display:'none' }} />
           </div>
           <textarea value={articleText} onChange={function(e) { setArticleText(e.target.value); }}
             placeholder="または記事テキストをここに貼り付けてください..."
-            style={{ width: "100%", minHeight: 150, padding: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 14, lineHeight: 1.7, boxSizing: "border-box", resize: "vertical", color: "#e2e8f0", outline: "none" }} />
+            style={{ width:'100%', minHeight:150, padding:12, background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:8, fontSize:14, lineHeight:1.7, boxSizing:'border-box', resize:'vertical', color:'#e2e8f0', outline:'none' }} />
         </div>
-        {error && <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, padding: 16, color: "#f87171", marginBottom: 16 }}>{error}</div>}
+
+        {error && <div style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:8, padding:16, color:'#f87171', marginBottom:16, whiteSpace:'pre-line' }}>{error}</div>}
+
         <button onClick={handleAnalyze} disabled={loading}
-          style={{ width: "100%", padding: 16, background: loading ? "rgba(224,123,57,0.25)" : "linear-gradient(135deg,#e07b39,#c2600a)", color: "#fff", border: "none", borderRadius: 14, fontSize: 16, fontWeight: 800, cursor: loading ? "not-allowed" : "pointer", marginBottom: 24, boxShadow: loading ? "none" : "0 8px 30px rgba(224,123,57,0.4)" }}>
-          {loading ? "⏳ 分析中..." : "🔍 記事を分析して特典を提案する"}
+          style={{ width:'100%', padding:16, background: loading ? 'rgba(224,123,57,0.25)' : 'linear-gradient(135deg,#e07b39,#c2600a)', color:'#fff', border:'none', borderRadius:14, fontSize:16, fontWeight:800, cursor: loading ? 'not-allowed' : 'pointer', marginBottom:24, boxShadow: loading ? 'none' : '0 8px 30px rgba(224,123,57,0.4)' }}>
+          {loading ? (
+            <span style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+              <span style={{ display:'inline-block', width:16, height:16, border:'2px solid rgba(255,255,255,0.3)', borderTopColor:'#fff', borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
+              分析中...
+            </span>
+          ) : '🔍 記事を分析して特典を提案する'}
         </button>
-        {/* 特典提案 */}
+
+        {/* 提案リスト */}
         {suggestions.length > 0 && (
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#fff" }}>🎁 特典候補（{selected.length}件選択中）</h2>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
+              <h3 style={{ fontSize:15, fontWeight:800, color:'#fff' }}>💡 提案された特典 ({suggestions.length}件)</h3>
               {selected.length > 0 && (
-                <button onClick={handleExportXlsx}
-                  style={{ padding: "8px 16px", background: "rgba(34,197,94,0.2)", border: "1px solid rgba(34,197,94,0.4)", color: "#4ade80", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: 14 }}>
-                  📊 選択済みをXLSX書き出し
+                <button onClick={downloadXlsx} style={{ padding:'7px 14px', background:'rgba(74,222,128,0.15)', border:'1px solid rgba(74,222,128,0.4)', borderRadius:8, color:'#4ade80', fontSize:12, fontWeight:700, cursor:'pointer' }}>
+                  📊 Excel出力 ({selected.length}件)
                 </button>
               )}
             </div>
-            <div style={{ display: "grid", gap: 14 }}>
-              {suggestions.map(function(s) {
-                var isSelected = selected.indexOf(s.id) !== -1;
-                var content = results[s.id];
-                var isGenerating = genLoading[s.id];
-                var capturedId = s.id; var capturedTitle = s.title; var capturedType = s.type;
-                return (
-                  <div key={s.id} style={{ background: isSelected ? "rgba(224,123,57,0.08)" : "rgba(255,255,255,0.04)", borderRadius: 14, border: isSelected ? "2px solid rgba(224,123,57,0.5)" : "1px solid rgba(255,255,255,0.09)", padding: 20 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-                      <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-                        <input type="checkbox" checked={isSelected}
-                          onChange={function() { setSelected(function(sel) { return isSelected ? sel.filter(function(x) { return x !== capturedId; }) : sel.concat([capturedId]); }); }}
-                          style={{ width: 18, height: 18, marginTop: 2, cursor: "pointer", accentColor: "#e07b39" }} />
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4, color: "#fff" }}>{s.title}</div>
-                          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>{s.description}</div>
-                          {s.reason && <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>💡 {s.reason}</div>}
-                        </div>
+            {suggestions.map(function(s) {
+              var sid = s.id;
+              var isSelected = selected.indexOf(sid) !== -1;
+              var isGenerating = !!genLoading[sid];
+              var hasResult = !!results[sid];
+              return (
+                <div key={sid} style={{ background:'rgba(255,255,255,0.04)', border: isSelected ? '2px solid #e07b39' : '1px solid rgba(255,255,255,0.09)', borderRadius:14, marginBottom:10, overflow:'hidden' }}>
+                  <div style={{ display:'flex', alignItems:'flex-start', gap:12, padding:'16px 20px' }}>
+                    <input type="checkbox" checked={isSelected}
+                      onChange={function() {
+                        setSelected(function(sel) {
+                          var idx = sel.indexOf(sid);
+                          return idx === -1 ? sel.concat([sid]) : sel.filter(function(x) { return x !== sid; });
+                        });
+                      }}
+                      style={{ marginTop:3, accentColor:'#e07b39', cursor:'pointer' }} />
+                    <div style={{ flex:1 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:4 }}>
+                        <span style={{ background:'rgba(224,123,57,0.15)', color:'#e07b39', fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:4 }}>{s.type}</span>
+                        <span style={{ color:'#fff', fontWeight:700, fontSize:14 }}>{s.title}</span>
                       </div>
-                      <button onClick={function() { handleGenerate(capturedId, capturedTitle, capturedType); }} disabled={isGenerating}
-                        style={{ padding: "8px 16px", background: isGenerating ? "rgba(255,255,255,0.1)" : "rgba(99,102,241,0.3)", border: "1px solid rgba(99,102,241,0.5)", color: isGenerating ? "rgba(255,255,255,0.4)" : "#a5b4fc", borderRadius: 8, cursor: isGenerating ? "not-allowed" : "pointer", fontWeight: 600, fontSize: 13, whiteSpace: "nowrap" }}>
-                        {isGenerating ? "⏳ 生成中..." : content ? "🔄 再生成" : "✨ 生成"}
-                      </button>
+                      <div style={{ fontSize:12, color:'rgba(255,255,255,0.45)', marginBottom:6 }}>{s.description}</div>
+                      <div style={{ fontSize:11, color:'rgba(255,255,255,0.3)' }}>💡 {s.reason}</div>
                     </div>
-                    {content && (
-                      <div>
-                        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
-                          <button onClick={function() { navigator.clipboard.writeText(content); }}
-                            style={{ padding: "6px 14px", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,0.6)" }}>
-                            📋 コピー
-                          </button>
-                        </div>
-                        <pre style={{ background: "rgba(255,255,255,0.03)", borderRadius: 8, padding: 16, fontSize: 13, lineHeight: 1.8, whiteSpace: "pre-wrap", fontFamily: "inherit", margin: 0, maxHeight: 300, overflowY: "auto", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                          {content}
-                        </pre>
-                      </div>
-                    )}
+                    <button onClick={function() { handleGenerate(sid, s.title, s.type); }} disabled={isGenerating}
+                      style={{ padding:'8px 16px', background: hasResult ? 'rgba(74,222,128,0.15)' : 'rgba(224,123,57,0.15)', border: hasResult ? '1px solid rgba(74,222,128,0.4)' : '1px solid rgba(224,123,57,0.4)', borderRadius:8, color: hasResult ? '#4ade80' : '#e07b39', fontSize:12, fontWeight:700, cursor: isGenerating ? 'not-allowed' : 'pointer', whiteSpace:'nowrap' }}>
+                      {isGenerating ? '⏳ 生成中' : hasResult ? '✓ 生成済' : '✨ 生成'}
+                    </button>
                   </div>
-                );
-              })}
-            </div>
+                  {hasResult && (
+                    <div style={{ borderTop:'1px solid rgba(255,255,255,0.07)', padding:'14px 20px', background:'rgba(0,0,0,0.2)' }}>
+                      <pre style={{ margin:0, fontSize:13, color:'rgba(255,255,255,0.7)', whiteSpace:'pre-wrap', lineHeight:1.7, fontFamily:'inherit' }}>{results[sid]}</pre>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
@@ -1483,440 +1279,190 @@ function BonusGenerator(props) {
   );
 }
 
-// ============================================================
-// TOOL 3: IMAGE PROMPT GENERATOR
-// ============================================================
-var IMAGE_STYLES = ["イラスト・アニメ風","写真リアル調","フラットデザイン","水彩・手描き風","ミニマル・シンプル","ポップ・カラフル","モノクロ・シック","3Dレンダリング"];
-var IMAGE_USES = [
-  { id: "header", label: "ヘッダー画像", size: "1280x670" },
-  { id: "thumbnail", label: "サムネイル", size: "600x400" },
-  { id: "section", label: "セクション区切り", size: "800x200" },
-  { id: "icon", label: "アイコン・イラスト", size: "512x512" },
-  { id: "cta", label: "CTAバナー", size: "800x300" },
-  { id: "profile", label: "プロフィール画像", size: "400x400" },
+/* =============================================
+   TOOL 3: 画像プロンプト生成ツール
+   ============================================= */
+var IMG_STYLES = ['イラスト・アニメ風','リアル・写真風','シンプル・フラット','3D・CGレンダリング','水彩・手描き風','ミニマル・モダン'];
+var IMG_TOOLS = ['Midjourney','DALL-E 3','Stable Diffusion','Adobe Firefly','Ideogram'];
+var IMG_USES = [
+  { id:'header', label:'ヘッダー画像' },
+  { id:'thumbnail', label:'サムネイル' },
+  { id:'cover', label:'マガジン表紙' },
+  { id:'profile', label:'プロフィール画像' },
+  { id:'content', label:'本文挿絵' },
 ];
-var AI_IMAGE_TOOLS = ["Midjourney","DALL-E 3","Stable Diffusion","Adobe Firefly","Canva AI","その他"];
 
 function ImagePromptGenerator(props) {
   var onBack = props.onBack;
-  var as = useState(false); var showApi = as[0]; var setShowApi = as[1];
-  var ais = useState("claude"); var aiId = ais[0]; var setAiId = ais[1];
-  var fs = useState(null); var articleFile = fs[0]; var setArticleFile = fs[1];
-  var ats = useState(""); var articleText = ats[0]; var setArticleText = ats[1];
-  var iss = useState("イラスト・アニメ風"); var imageStyle = iss[0]; var setImageStyle = iss[1];
-  var its = useState("Midjourney"); var imageTool = its[0]; var setImageTool = its[1];
-  var sus = useState(["header","thumbnail"]); var selectedUses = sus[0]; var setSelectedUses = sus[1];
-  var ps = useState([]); var prompts = ps[0]; var setPrompts = ps[1];
-  var ld = useState(false); var loading = ld[0]; var setLoading = ld[1];
   var isMobile = useIsMobile();
-  var er = useState(""); var error = er[0]; var setError = er[1];
-  var cs = useState({}); var copied = cs[0]; var setCopied = cs[1];
+  var showApi = useState(false);
+  var setShowApi = showApi[1]; showApi = showApi[0];
+  var aiState = useState('claude');
+  var aiId = aiState[0]; var setAiId = aiState[1];
+  var fileState = useState(null);
+  var articleFile = fileState[0]; var setArticleFile = fileState[1];
+  var textState = useState('');
+  var articleText = textState[0]; var setArticleText = textState[1];
+  var styleState = useState('イラスト・アニメ風');
+  var imageStyle = styleState[0]; var setImageStyle = styleState[1];
+  var toolState = useState('Midjourney');
+  var imageTool = toolState[0]; var setImageTool = toolState[1];
+  var usesState = useState(['header', 'thumbnail']);
+  var selectedUses = usesState[0]; var setSelectedUses = usesState[1];
+  var promptsState = useState([]);
+  var prompts = promptsState[0]; var setPrompts = promptsState[1];
+  var loadState = useState(false);
+  var loading = loadState[0]; var setLoading = loadState[1];
+  var errState = useState('');
+  var error = errState[0]; var setError = errState[1];
+  var copiedState = useState({});
+  var copied = copiedState[0]; var setCopied = copiedState[1];
   var fileRef = useRef(null);
+  var aiRef = useRef(aiId);
+  aiRef.current = aiId;
 
   var handleFileChange = useCallback(async function(e) {
     var file = e.target.files && e.target.files[0];
     if (!file) return;
     setArticleFile(file);
-    try { var text = await readFileAsText(file); setArticleText(text); }
-    catch(err) { setError("ファイル読み込みエラー: " + err.message); }
+    try {
+      var text = await readFileAsText(file);
+      setArticleText(text);
+    } catch(err) {
+      setError('ファイル読み込みエラー: ' + err.message);
+    }
   }, []);
 
-  var handleGenerate = useCallback(async function() {
-    if (!articleText.trim()) { setError("記事テキストを入力またはファイルをアップロードしてください"); return; }
-    setError(""); setLoading(true); setPrompts([]);
-    try {
-      var usesDesc = selectedUses.map(function(id) {
-        var u = IMAGE_USES.find(function(x) { return x.id === id; });
-        return u ? u.label + "(" + u.size + ")" : id;
-      }).join(", ");
-      var prompt = "以下のnote記事に合う画像生成プロンプトを作成してください。\n\n" +
-        "【記事内容（抜粋）】\n" + articleText.slice(0, 2000) + "\n\n" +
-        "【画像スタイル】" + imageStyle + "\n【使用ツール】" + imageTool + "\n【必要な画像種類】" + usesDesc + "\n\n" +
-        "各画像種類ごとに、英語プロンプトと日本語説明を含むJSONを返してください。\n" +
-        "形式: [{use, useLabel, promptEn, promptJa, negativePrompt}]\n余分なテキストなしでJSONのみ返してください。";
-      var result = await callAI({ aiId: aiId, messages: [{ role: "user", content: prompt }], maxTokens: 3000 });
-      var clean = result.replace(/```json/g, "").replace(/```/g, "").trim();
-      setPrompts(JSON.parse(clean));
-    } catch(err) { setError("生成エラー: " + err.message); }
-    setLoading(false);
-  }, [articleText, imageStyle, imageTool, selectedUses, aiId]);
+  var handleGenerate = useCallback(function() {
+    var currentAiId = aiRef.current;
+    if (!articleText.trim()) { setError('記事テキストをアップロードするか貼り付けてください'); return; }
+    setError(''); setLoading(true); setPrompts([]);
+    var useLabels = selectedUses.map(function(uid) {
+      var u = IMG_USES.find(function(x) { return x.id === uid; });
+      return u ? u.label : uid;
+    }).join('、');
+    var prompt = '以下のnote記事に合う画像プロンプトを、' + useLabels + 'の各用途に対して生成してください。\n\n'
+      + '【画像スタイル】' + imageStyle + '\n【使用ツール】' + imageTool + '\n\n'
+      + '【記事内容（抜粋）】\n' + articleText.slice(0, 2000) + '\n\n'
+      + '各用途について:\n- 日本語説明（50文字程度）\n- ' + imageTool + '用の英語プロンプト（詳細なもの）\n\n'
+      + 'JSONのみで出力。形式: [{use, description, prompt_en}]';
+    callAI(currentAiId, [{ role:'user', content: prompt }], null, 2000)
+      .then(function(result) {
+        var clean = result.replace(/```json/g, '').replace(/```/g, '').trim();
+        var parsed = JSON.parse(clean);
+        setPrompts(parsed); setLoading(false);
+      })
+      .catch(function(err) {
+        setError('生成エラー: ' + err.message); setLoading(false);
+      });
+  }, [articleText, imageStyle, imageTool, selectedUses]);
 
-  function handleCopy(text, id) {
-    navigator.clipboard.writeText(text);
-    setCopied(function(s) { var n = Object.assign({}, s); n[id] = true; return n; });
-    setTimeout(function() { setCopied(function(s) { var n = Object.assign({}, s); n[id] = false; return n; }); }, 2000);
+  function doCopy(text, key) {
+    navigator.clipboard.writeText(text).catch(function() {});
+    setCopied(function(s) { var n = Object.assign({}, s); n[key] = true; return n; });
+    setTimeout(function() { setCopied(function(s) { var n = Object.assign({}, s); n[key] = false; return n; }); }, 2000);
   }
 
-  var card = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: isMobile ? 14 : 18, padding: isMobile ? "16px 14px" : "22px 26px", marginBottom: 12 };
-  var lbl = { color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", display: "block", marginBottom: 8 };
-  var selStyle = { width: "100%", padding: isMobile ? "9px 10px" : "10px 12px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: isMobile ? 13 : 14, color: "#fff", outline: "none" };
-      <style>{"@keyframes spin { to { transform: rotate(360deg); } }"}</style>
-      {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} isDark={true} />}
-      <div className="app-header">
-        <div className="app-header-left">
-          <button className="back-btn" onClick={onBack}>← 戻る</button>
-          <div>
-            <h1 className="app-title">🎨 画像プロンプトジェネレーター</h1>
-            <p className="app-sub">note記事の画像生成プロンプトを自動作成</p>
-          </div>
-        </div>
-        <button className="key-btn" onClick={function() { setShowApi(true); }}>🔑 APIキー設定</button>
-      </div>
-      <div className="app-body">
-        {!getApiKey(aiId) && (
-          <div style={{ background: "rgba(255,180,0,0.1)", border: "1px solid rgba(255,180,0,0.35)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ fontSize: 13, color: "#fcd34d" }}>⚠️ 選択中のAIのAPIキーが未設定です。右上の「APIキー設定」から登録してください。</div>
-            <button onClick={function() { setShowApi(true); }} style={{ background: "#e07b39", border: "none", borderRadius: 8, padding: "6px 14px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>今すぐ設定</button>
-          </div>
-        )}
-        {/* AI選択 + 記事入力 */}
-        <div style={card}>
-          <div style={lbl}>🤖 使用するAI</div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
-            {AI_CONFIGS.map(function(ai) {
-              var isActive = aiId === ai.id; var hasKey = !!getApiKey(ai.id);
-              return (
-                <button key={ai.id} onClick={function() { setAiId(ai.id); }}
-                  style={{ flex: "1 1 110px", background: isActive ? ai.color + "22" : "rgba(255,255,255,0.04)", border: isActive ? "2px solid " + ai.color : "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "10px 8px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                  <div style={{ fontSize: 22 }}>{ai.icon}</div>
-                  <div style={{ color: isActive ? "#fff" : "rgba(255,255,255,0.55)", fontWeight: isActive ? 800 : 400, fontSize: 13 }}>{ai.label}</div>
-                  <div style={{ background: hasKey ? "rgba(74,222,128,0.2)" : "rgba(255,255,255,0.1)", color: hasKey ? "#4ade80" : "rgba(255,255,255,0.35)", fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 4 }}>{hasKey ? "✓ 設定済み" : ai.badge}</div>
-                </button>
-              );
-            })}
-          </div>
-          <div style={lbl}>📄 note記事をアップロード or 貼り付け</div>
-          <div onClick={function() { fileRef.current && fileRef.current.click(); }}
-            style={{ border: "2px dashed rgba(255,255,255,0.15)", borderRadius: 10, padding: 20, textAlign: "center", cursor: "pointer", marginBottom: 12, background: "rgba(255,255,255,0.02)" }}>
-            <div style={{ fontSize: 28, marginBottom: 6 }}>📂</div>
-            <div style={{ fontWeight: 600, marginBottom: 4, color: "#fff" }}>{articleFile ? articleFile.name : "クリックしてファイルを選択"}</div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>.txt / .md / .docx 対応</div>
-            <input ref={fileRef} type="file" accept=".txt,.md,.docx" onChange={handleFileChange} style={{ display: "none" }} />
-          </div>
-          <textarea value={articleText} onChange={function(e) { setArticleText(e.target.value); }}
-            placeholder="または記事テキストをここに貼り付けてください..."
-            style={{ width: "100%", minHeight: 120, padding: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 14, lineHeight: 1.7, boxSizing: "border-box", resize: "vertical", color: "#e2e8f0", outline: "none" }} />
-        </div>
-        {/* スタイル・ツール設定 */}
-        <div style={card}>
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 10 : 16, marginBottom: 20 }}>
-            <div>
-              <div style={lbl}>🎨 画像スタイル</div>
-              <select value={imageStyle} onChange={function(e) { setImageStyle(e.target.value); }} style={selStyle}>
-                {IMAGE_STYLES.map(function(s) { return <option key={s} style={{ background: "#1a1a2e" }}>{s}</option>; })}
-              </select>
-            </div>
-            <div>
-              <div style={lbl}>🛠 使用ツール</div>
-              <select value={imageTool} onChange={function(e) { setImageTool(e.target.value); }} style={selStyle}>
-                {AI_IMAGE_TOOLS.map(function(t) { return <option key={t} style={{ background: "#1a1a2e" }}>{t}</option>; })}
-              </select>
-            </div>
-          </div>
-          <div style={lbl}>📐 必要な画像種類（複数選択可）</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {IMAGE_USES.map(function(u) {
-              var isSel = selectedUses.indexOf(u.id) !== -1;
-              var capturedId = u.id;
-              return (
-                <button key={u.id} onClick={function() { setSelectedUses(function(sel) { return isSel ? sel.filter(function(x) { return x !== capturedId; }) : sel.concat([capturedId]); }); }}
-                  style={{ padding: "8px 14px", borderRadius: 8, border: isSel ? "2px solid #a5b4fc" : "1px solid rgba(255,255,255,0.1)", background: isSel ? "rgba(99,102,241,0.2)" : "rgba(255,255,255,0.04)", cursor: "pointer", fontSize: 13, fontWeight: isSel ? 700 : 400, color: isSel ? "#a5b4fc" : "rgba(255,255,255,0.5)" }}>
-                  {u.label} <span style={{ fontSize: 11, opacity: 0.6 }}>{u.size}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        {error && <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, padding: 16, color: "#f87171", marginBottom: 16 }}>{error}</div>}
-        <button onClick={handleGenerate} disabled={loading}
-          style={{ width: "100%", background: loading ? "rgba(99,102,241,0.25)" : "linear-gradient(135deg,#6366f1,#4338ca)", border: "none", borderRadius: 14, padding: 18, color: "#fff", fontSize: 16, fontWeight: 900, cursor: loading ? "not-allowed" : "pointer", boxShadow: loading ? "none" : "0 8px 30px rgba(99,102,241,0.4)", marginBottom: 24 }}>
-          {loading ? "⏳ 生成中..." : "✨ 画像プロンプトを生成する"}
-        </button>
-        {prompts.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <h2 style={{ margin: "0 0 8px", fontSize: 18, fontWeight: 700, color: "#fff" }}>🖼 生成されたプロンプト</h2>
-            {prompts.map(function(p, idx) {
-              var copyId = "prompt_" + idx;
-              var capturedPromptEn = p.promptEn;
-              return (
-                <div key={idx} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 14, padding: 20, border: "1px solid rgba(255,255,255,0.09)" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                    <strong style={{ fontSize: 16, color: "#fff" }}>{p.useLabel || p.use}</strong>
-                    <button onClick={function() { handleCopy(capturedPromptEn, copyId); }}
-                      style={{ padding: "6px 14px", background: copied[copyId] ? "rgba(74,222,128,0.2)" : "rgba(99,102,241,0.25)", border: copied[copyId] ? "1px solid #4ade80" : "1px solid rgba(99,102,241,0.5)", color: copied[copyId] ? "#4ade80" : "#a5b4fc", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600 }}>
-                      {copied[copyId] ? "✅ コピー済み" : "📋 英語コピー"}
-                    </button>
-                  </div>
-                  <div style={{ marginBottom: 10 }}>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>🇺🇸 英語プロンプト</div>
-                    <div style={{ background: "rgba(99,102,241,0.08)", borderRadius: 8, padding: 12, fontSize: 13, lineHeight: 1.7, fontFamily: "monospace", color: "#c7d2fe", border: "1px solid rgba(99,102,241,0.2)" }}>{p.promptEn}</div>
-                  </div>
-                  {p.promptJa && (
-                    <div style={{ marginBottom: 10 }}>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>🇯🇵 日本語説明</div>
-                      <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 8, padding: 12, fontSize: 13, lineHeight: 1.7, color: "rgba(255,255,255,0.6)" }}>{p.promptJa}</div>
-                    </div>
-                  )}
-                  {p.negativePrompt && (
-                    <div>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>🚫 ネガティブプロンプト</div>
-                      <div style={{ background: "rgba(239,68,68,0.06)", borderRadius: 8, padding: 12, fontSize: 13, lineHeight: 1.7, fontFamily: "monospace", color: "#fca5a5", border: "1px solid rgba(239,68,68,0.15)" }}>{p.negativePrompt}</div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ============================================================
-// TOOL 4: DASHBOARD
-// ============================================================
-var DASH_TOOLS = [
-  { id: "note-generator", label: "📝 note記事生成", desc: "有料note記事を自動生成", color: "#e07b39" },
-  { id: "bonus-generator", label: "🎁 特典生成", desc: "購入者特典コンテンツを生成", color: "#6366f1" },
-  { id: "image-prompt", label: "🎨 画像プロンプト", desc: "note記事の画像プロンプトを生成", color: "#ec4899" },
-];
-
-var dashStorage = (function() {
-  var prefix = "notetools_shared_";
-  return {
-    get: async function(key) {
-      try {
-        var val = localStorage.getItem(prefix + key);
-        if (val === null) throw new Error("not found");
-        return { key: key, value: val };
-      } catch(e) { throw e; }
-    },
-    set: async function(key, value) {
-      try { localStorage.setItem(prefix + key, value); return { key: key, value: value }; }
-      catch(e) { throw e; }
-    },
-    "delete": async function(key) {
-      try { localStorage.removeItem(prefix + key); return { key: key, deleted: true }; }
-      catch(e) { throw e; }
-    },
-    list: async function(pfx) {
-      try {
-        var keys = [];
-        for (var i = 0; i < localStorage.length; i++) {
-          var k = localStorage.key(i);
-          if (k && k.indexOf(prefix) === 0) {
-            var stripped = k.slice(prefix.length);
-            if (!pfx || stripped.indexOf(pfx) === 0) keys.push(stripped);
-          }
-        }
-        return { keys: keys };
-      } catch(e) { throw e; }
-    },
-  };
-})();
-
-// DashTabBtn: 独立コンポーネント（stale closure修正）
-function DashTabBtn(props) {
-  return (
-    <button onClick={props.onClick}
-      style={{ padding: "14px 20px", border: "none", borderBottom: props.isActive ? "3px solid #e07b39" : "3px solid transparent", background: "none", cursor: "pointer", color: props.isActive ? "#e07b39" : "rgba(255,255,255,0.5)", fontWeight: props.isActive ? 700 : 400, fontSize: 14, whiteSpace: "nowrap" }}>
-      {props.label}
-    </button>
-  );
-}
-
-function Dashboard(props) {
-  var onBack = props.onBack;
-  var as = useState(false); var showApi = as[0]; var setShowApi = as[1];
-  var ts = useState("home"); var tab = ts[0]; var setTab = ts[1];
-  var isMobile = useIsMobile();
-  var us = useState([]); var usage = us[0]; var setUsage = us[1];
-  var ns = useState([]); var notes = ns[0]; var setNotes = ns[1];
-  var ls = useState(true); var dataLoading = ls[0]; var setDataLoading = ls[1];
-  var ms = useState(""); var memo = ms[0]; var setMemo = ms[1];
-  var mss = useState(false); var memoSaved = mss[0]; var setMemoSaved = mss[1];
-
-  useEffect(function() {
-    async function loadData() {
-      setDataLoading(true);
-      try { var r1 = await dashStorage.get("dashboard:usage"); if (r1 && r1.value) setUsage(JSON.parse(r1.value)); } catch(e) {}
-      try { var r2 = await dashStorage.get("dashboard:memo"); if (r2 && r2.value) setMemo(r2.value); } catch(e) {}
-      try {
-        var r3 = await dashStorage.list("notes:");
-        if (r3 && r3.keys && r3.keys.length > 0) {
-          var items = [];
-          for (var i = 0; i < r3.keys.length; i++) {
-            try { var item = await dashStorage.get(r3.keys[i]); if (item && item.value) items.push(JSON.parse(item.value)); } catch(e2) {}
-          }
-          setNotes(items);
-        }
-      } catch(e) {}
-      setDataLoading(false);
-    }
-    loadData();
-  }, []);
-
-  var recordUsage = useCallback(async function(toolId) {
-    var newEntry = { toolId: toolId, timestamp: new Date().toISOString() };
-    setUsage(function(prev) {
-      var next = [newEntry].concat(prev).slice(0, 50);
-      dashStorage.set("dashboard:usage", JSON.stringify(next)).catch(function() {});
-      return next;
-    });
-  }, []);
-
-  var saveMemo = useCallback(async function() {
-    try { await dashStorage.set("dashboard:memo", memo); setMemoSaved(true); setTimeout(function() { setMemoSaved(false); }, 2000); }
-    catch(e) {}
-  }, [memo]);
-
-  var deleteNote = useCallback(async function(noteId) {
-    try { await dashStorage["delete"]("notes:" + noteId); setNotes(function(prev) { return prev.filter(function(n) { return n.id !== noteId; }); }); }
-    catch(e) {}
-  }, []);
-
-  var toolCounts = {};
-  DASH_TOOLS.forEach(function(t) { toolCounts[t.id] = 0; });
-  usage.forEach(function(u) { if (toolCounts[u.toolId] !== undefined) toolCounts[u.toolId]++; });
-  var apiKeys = loadApiKeys();
-  var configuredKeys = AI_CONFIGS.filter(function(ai) { return !!apiKeys[ai.id]; });
-
-  var card = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: isMobile ? 14 : 18, padding: isMobile ? "16px 14px" : "22px 26px", marginBottom: 12 };
-  var lbl = { color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", display: "block", marginBottom: 8 };
+  var cardStyle = { background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.09)', borderRadius: isMobile ? 14 : 18, padding: isMobile ? '16px 14px' : '22px 26px', marginBottom:14 };
+  var lblStyle = { color:'rgba(255,255,255,0.6)', fontSize:12, fontWeight:700, letterSpacing:'0.1em', display:'block', marginBottom:10 };
 
   return (
     <div className="app-wrap">
-      <style>{"@keyframes spin { to { transform: rotate(360deg); } }"}</style>
-      {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} isDark={true} />}
+      <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}</style>
+      {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} />}
       <div className="app-header">
         <div className="app-header-left">
           <button className="back-btn" onClick={onBack}>← 戻る</button>
           <div>
-            <h1 className="app-title">📊 note ツールダッシュボード</h1>
-            <p className="app-sub">APIキー: {configuredKeys.length > 0 ? configuredKeys.map(function(a) { return a.icon; }).join(" ") + " 設定済み" : "未設定"}</p>
+            <h1 className="app-title">🖼️ 画像プロンプトジェネレーター</h1>
+            <p className="app-sub">note記事用AI画像プロンプトを自動生成</p>
           </div>
         </div>
         <button className="key-btn" onClick={function() { setShowApi(true); }}>🔑 APIキー設定</button>
       </div>
-      {/* タブ */}
-      <div style={{ background: "rgba(255,255,255,0.02)", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", padding: "0 24px", overflowX: "auto", position: "sticky", top: 65, zIndex: 99, backdropFilter: "blur(10px)" }}>
-        <DashTabBtn label="🏠 ホーム"    isActive={tab === "home"}  onClick={function() { setTab("home"); }} />
-        <DashTabBtn label="🛠 ツール一覧" isActive={tab === "tools"} onClick={function() { setTab("tools"); }} />
-        <DashTabBtn label="📄 記事管理"  isActive={tab === "notes"} onClick={function() { setTab("notes"); }} />
-        <DashTabBtn label="📝 メモ"      isActive={tab === "memo"}  onClick={function() { setTab("memo"); }} />
-      </div>
       <div className="app-body">
-        {tab === "home" && (
-          <div>
-            {configuredKeys.length === 0 && (
-              <div style={{ background: "rgba(255,180,0,0.1)", border: "1px solid rgba(255,180,0,0.35)", borderRadius: 10, padding: 16, marginBottom: 20 }}>
-                <strong style={{ color: "#fcd34d" }}>⚠️ APIキーが設定されていません</strong>
-                <p style={{ margin: "8px 0 0", fontSize: 14, color: "rgba(255,255,255,0.6)" }}>右上の「🔑 APIキー設定」からAPIキーを登録してください。</p>
-              </div>
-            )}
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: "#fff" }}>🛠 ツール</h2>
-            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(auto-fit, minmax(240px, 1fr))", gap: isMobile ? 10 : 14, marginBottom: 32 }}>
-              {DASH_TOOLS.map(function(tool) {
-                var capturedId = tool.id;
-                return (
-                  <div key={tool.id} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 16, padding: 20, border: "1px solid rgba(255,255,255,0.09)", cursor: "pointer", transition: "all 0.2s" }}
-                    onClick={function() { recordUsage(capturedId); setTab("tools"); }}
-                    onMouseEnter={function(e) { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.borderColor = "rgba(224,123,57,0.4)"; }}
-                    onMouseLeave={function(e) { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.09)"; }}>
-                    <div style={{ fontSize: 28, marginBottom: 8 }}>{tool.label.split(" ")[0]}</div>
-                    <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4, color: "#fff" }}>{tool.label.split(" ").slice(1).join(" ")}</div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 12 }}>{tool.desc}</div>
-                    <div style={{ fontSize: 12, color: tool.color, fontWeight: 600 }}>使用回数: {toolCounts[tool.id]}回</div>
-                  </div>
-                );
-              })}
+        <div style={cardStyle}>
+          <span style={lblStyle}>🤖 使用するAI</span>
+          <AiSelector value={aiId} onChange={function(id) { setAiId(id); aiRef.current = id; }} />
+          <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 10 : 16, marginTop:20 }}>
+            <div>
+              <div style={lblStyle}>🎨 画像スタイル</div>
+              <select value={imageStyle} onChange={function(e) { setImageStyle(e.target.value); }}
+                style={{ width:'100%', padding:'10px 12px', background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:8, fontSize:14, color:'#fff', outline:'none' }}>
+                {IMG_STYLES.map(function(s) { return <option key={s} style={{ background:'#1a1a2e' }}>{s}</option>; })}
+              </select>
             </div>
-            {usage.length > 0 && (
-              <div>
-                <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: "#fff" }}>📈 最近の利用履歴</h2>
-                <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 14, border: "1px solid rgba(255,255,255,0.09)", overflow: "hidden" }}>
-                  {usage.slice(0, 10).map(function(u, idx) {
-                    var tool = DASH_TOOLS.find(function(t) { return t.id === u.toolId; });
-                    var d = new Date(u.timestamp);
-                    return (
-                      <div key={idx} style={{ padding: "12px 16px", borderBottom: idx < 9 ? "1px solid rgba(255,255,255,0.06)" : "none", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontSize: 14, color: "rgba(255,255,255,0.7)" }}>{tool ? tool.label : u.toolId}</span>
-                        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)" }}>{d.toLocaleDateString("ja-JP")} {d.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}</span>
-                      </div>
-                    );
-                  })}
+            <div>
+              <div style={lblStyle}>🛠️ 画像生成ツール</div>
+              <select value={imageTool} onChange={function(e) { setImageTool(e.target.value); }}
+                style={{ width:'100%', padding:'10px 12px', background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:8, fontSize:14, color:'#fff', outline:'none' }}>
+                {IMG_TOOLS.map(function(t) { return <option key={t} style={{ background:'#1a1a2e' }}>{t}</option>; })}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div style={cardStyle}>
+          <span style={lblStyle}>🖼️ 生成する画像の用途</span>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+            {IMG_USES.map(function(u) {
+              var isSelected = selectedUses.indexOf(u.id) !== -1;
+              return (
+                <button key={u.id} onClick={function() {
+                  setSelectedUses(function(sel) {
+                    var idx = sel.indexOf(u.id);
+                    return idx === -1 ? sel.concat([u.id]) : sel.filter(function(x) { return x !== u.id; });
+                  });
+                }}
+                  style={{ background: isSelected ? 'rgba(99,102,241,0.2)' : 'rgba(255,255,255,0.05)', border: isSelected ? '2px solid #6366f1' : '1px solid rgba(255,255,255,0.1)', borderRadius:10, padding:'8px 14px', fontSize:13, cursor:'pointer', color: isSelected ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: isSelected ? 700 : 400 }}>
+                  {u.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={cardStyle}>
+          <span style={lblStyle}>📄 note記事をアップロード or 貼り付け</span>
+          <div onClick={function() { fileRef.current && fileRef.current.click(); }}
+            style={{ border:'2px dashed rgba(255,255,255,0.15)', borderRadius:10, padding:20, textAlign:'center', cursor:'pointer', marginBottom:12, background:'rgba(255,255,255,0.02)' }}>
+            <div style={{ fontWeight:600, color:'#fff', marginBottom:4 }}>{articleFile ? articleFile.name : 'クリックしてファイルを選択'}</div>
+            <div style={{ fontSize:12, color:'rgba(255,255,255,0.4)' }}>.txt / .md / .docx 対応</div>
+            <input ref={fileRef} type="file" accept=".txt,.md,.docx" onChange={handleFileChange} style={{ display:'none' }} />
+          </div>
+          <textarea value={articleText} onChange={function(e) { setArticleText(e.target.value); }}
+            placeholder="または記事テキストをここに貼り付けてください..."
+            style={{ width:'100%', minHeight:120, padding:12, background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:8, fontSize:14, lineHeight:1.7, boxSizing:'border-box', resize:'vertical', color:'#e2e8f0', outline:'none' }} />
+        </div>
+
+        {error && <div style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:8, padding:16, color:'#f87171', marginBottom:16, whiteSpace:'pre-line' }}>{error}</div>}
+
+        <button onClick={handleGenerate} disabled={loading}
+          style={{ width:'100%', padding:16, background: loading ? 'rgba(99,102,241,0.25)' : 'linear-gradient(135deg,#6366f1,#4f46e5)', color:'#fff', border:'none', borderRadius:14, fontSize:16, fontWeight:800, cursor: loading ? 'not-allowed' : 'pointer', marginBottom:24, boxShadow: loading ? 'none' : '0 8px 30px rgba(99,102,241,0.4)' }}>
+          {loading ? '⏳ プロンプト生成中...' : '🎨 画像プロンプトを生成する'}
+        </button>
+
+        {prompts.length > 0 && (
+          <div>
+            <h3 style={{ fontSize:15, fontWeight:800, color:'#fff', marginBottom:14 }}>✨ 生成されたプロンプト ({prompts.length}件)</h3>
+            {prompts.map(function(p, idx) {
+              var key = 'p_' + idx;
+              return (
+                <div key={idx} style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.09)', borderRadius:14, marginBottom:10, overflow:'hidden' }}>
+                  <div style={{ padding:'16px 20px', borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
+                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+                      <span style={{ background:'rgba(99,102,241,0.2)', color:'#818cf8', fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:6 }}>{p.use}</span>
+                      <button onClick={function() { doCopy(p.prompt_en, key); }}
+                        style={{ padding:'6px 14px', background: copied[key] ? 'rgba(74,222,128,0.15)' : 'rgba(99,102,241,0.15)', border: copied[key] ? '1px solid #4ade80' : '1px solid rgba(99,102,241,0.4)', borderRadius:8, color: copied[key] ? '#4ade80' : '#818cf8', fontSize:12, fontWeight:700, cursor:'pointer' }}>
+                        {copied[key] ? '✓ コピー済み' : '📋 プロンプトをコピー'}
+                      </button>
+                    </div>
+                    <div style={{ color:'rgba(255,255,255,0.6)', fontSize:13, marginBottom:10 }}>{p.description}</div>
+                    <div style={{ background:'rgba(0,0,0,0.3)', borderRadius:8, padding:'12px 14px', fontFamily:'monospace', fontSize:13, color:'#93c5fd', lineHeight:1.6 }}>{p.prompt_en}</div>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        )}
-        {tab === "tools" && (
-          <div>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: "#fff" }}>🛠 ツール一覧</h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {DASH_TOOLS.map(function(tool) {
-                return (
-                  <div key={tool.id} style={card}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                      <div>
-                        <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 6, color: "#fff" }}>{tool.label}</div>
-                        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", marginBottom: 12 }}>{tool.desc}</div>
-                        <div style={{ fontSize: 12, background: "rgba(255,255,255,0.08)", display: "inline-block", padding: "4px 10px", borderRadius: 6, fontFamily: "monospace", color: "rgba(255,255,255,0.5)" }}>{tool.id}.jsx</div>
-                      </div>
-                      <div style={{ fontSize: 24, color: tool.color }}>{tool.label.split(" ")[0]}</div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-        {tab === "notes" && (
-          <div>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: "#fff" }}>📄 保存された記事</h2>
-            {dataLoading ? (
-              <div style={{ textAlign: "center", padding: 40, color: "rgba(255,255,255,0.4)" }}>⏳ 読み込み中...</div>
-            ) : notes.length === 0 ? (
-              <div style={Object.assign({}, card, { textAlign: "center", padding: 40 })}>
-                <div style={{ fontSize: 40, marginBottom: 16 }}>📄</div>
-                <div style={{ fontWeight: 600, marginBottom: 8, color: "rgba(255,255,255,0.6)" }}>保存された記事はありません</div>
-                <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>note記事ジェネレーターで生成した記事がここに表示されます</div>
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {notes.map(function(note) {
-                  var capturedNoteId = note.id;
-                  return (
-                    <div key={note.id} style={card}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4, color: "#fff" }}>{note.title || "（タイトルなし）"}</div>
-                          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>{note.createdAt ? new Date(note.createdAt).toLocaleDateString("ja-JP") : ""} ／ {note.theme || ""}</div>
-                        </div>
-                        <button onClick={function() { deleteNote(capturedNoteId); }}
-                          style={{ padding: "6px 12px", background: "rgba(239,68,68,0.15)", color: "#f87171", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, cursor: "pointer", fontSize: 13 }}>
-                          🗑 削除
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-        {tab === "memo" && (
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#fff" }}>📝 メモ</h2>
-              <button onClick={saveMemo} style={{ padding: "8px 20px", background: memoSaved ? "rgba(34,197,94,0.25)" : "rgba(224,123,57,0.3)", border: memoSaved ? "1px solid #4ade80" : "1px solid rgba(224,123,57,0.5)", color: memoSaved ? "#4ade80" : "#fbbf24", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: 14 }}>
-                {memoSaved ? "✅ 保存済み" : "💾 保存"}
-              </button>
-            </div>
-            <textarea value={memo} onChange={function(e) { setMemo(e.target.value); }}
-              placeholder="自由にメモを書いてください..."
-              style={{ width: "100%", minHeight: isMobile ? 280 : 400, padding: 16, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, fontSize: 14, lineHeight: 1.8, boxSizing: "border-box", resize: "vertical", color: "#e2e8f0", outline: "none" }} />
+              );
+            })}
           </div>
         )}
       </div>
@@ -1924,57 +1470,142 @@ function Dashboard(props) {
   );
 }
 
-// ============================================================
-// LANDING PAGE & ROOT APP
-// ============================================================
-function App() {
-  var vs = useState("landing"); var view = vs[0]; var setView = vs[1];
+/* =============================================
+   DASHBOARD (使用履歴・メモ機能は削除し軽量化)
+   ============================================= */
+function Dashboard(props) {
+  var onBack = props.onBack;
+  var isMobile = useIsMobile();
+  var showApi = useState(false);
+  var setShowApi = showApi[1]; showApi = showApi[0];
+  var apiKeys = loadKeys();
+  var configuredKeys = AI_LIST.filter(function(ai) { return !!apiKeys[ai.id]; });
 
-  if (view === "generator") return <NoteGenerator onBack={function() { setView("landing"); }} />;
-  if (view === "bonus")     return <BonusGenerator onBack={function() { setView("landing"); }} />;
-  if (view === "image")     return <ImagePromptGenerator onBack={function() { setView("landing"); }} />;
-  if (view === "dashboard") return <Dashboard onBack={function() { setView("landing"); }} />;
+  var toolStats = [
+    { icon:'📝', name:'note記事生成', desc:'テーマ・ターゲット・文字数を設定して有料記事を自動生成', color:'#e94560' },
+    { icon:'🎁', name:'特典ジェネレーター', desc:'購入者向けの豪華特典コンテンツを記事から自動提案・生成', color:'#e07b39' },
+    { icon:'🖼️', name:'画像プロンプト生成', desc:'記事に合うAI画像用プロンプトを自動生成', color:'#6366f1' },
+  ];
+
+  return (
+    <div className="app-wrap">
+      {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} />}
+      <div className="app-header">
+        <div className="app-header-left">
+          <button className="back-btn" onClick={onBack}>← 戻る</button>
+          <div>
+            <h1 className="app-title">📊 ダッシュボード</h1>
+            <p className="app-sub">ツール一覧とAPIキー管理</p>
+          </div>
+        </div>
+        <button className="key-btn" onClick={function() { setShowApi(true); }}>🔑 APIキー設定</button>
+      </div>
+      <div className="app-body">
+        {/* APIキー状態 */}
+        <div style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.09)', borderRadius:18, padding:'22px 26px', marginBottom:24 }}>
+          <div style={{ color:'rgba(255,255,255,0.6)', fontSize:12, fontWeight:700, letterSpacing:'0.1em', marginBottom:14 }}>🔑 APIキー状態</div>
+          <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap:10 }}>
+            {AI_LIST.map(function(ai) {
+              var hasKey = !!apiKeys[ai.id];
+              return (
+                <div key={ai.id} style={{ background: hasKey ? 'rgba(74,222,128,0.08)' : 'rgba(255,255,255,0.03)', border: hasKey ? '1px solid rgba(74,222,128,0.25)' : '1px solid rgba(255,255,255,0.08)', borderRadius:12, padding:'12px', textAlign:'center' }}>
+                  <div style={{ fontSize:20, marginBottom:6 }}>{ai.icon}</div>
+                  <div style={{ fontSize:12, fontWeight:700, color: hasKey ? '#4ade80' : 'rgba(255,255,255,0.4)' }}>{ai.label}</div>
+                  <div style={{ fontSize:10, color: hasKey ? '#4ade80' : 'rgba(255,255,255,0.25)', marginTop:2 }}>{hasKey ? '✓ 設定済み' : '未設定'}</div>
+                </div>
+              );
+            })}
+          </div>
+          {configuredKeys.length === 0 && (
+            <div style={{ marginTop:14, textAlign:'center' }}>
+              <button onClick={function() { setShowApi(true); }} style={{ background:'#e07b39', border:'none', borderRadius:8, padding:'10px 24px', color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer' }}>
+                APIキーを設定する
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* ツール一覧 */}
+        <div style={{ color:'rgba(255,255,255,0.6)', fontSize:12, fontWeight:700, letterSpacing:'0.1em', marginBottom:12 }}>🛠️ ツール一覧</div>
+        <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(240px, 1fr))', gap:14, marginBottom:32 }}>
+          {toolStats.map(function(t) {
+            return (
+              <div key={t.name} style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.09)', borderRadius:16, padding:'20px', cursor:'pointer', transition:'all 0.2s' }}
+                onClick={onBack}>
+                <div style={{ fontSize:28, marginBottom:10 }}>{t.icon}</div>
+                <div style={{ fontSize:15, fontWeight:700, color:'#fff', marginBottom:6 }}>{t.name}</div>
+                <div style={{ fontSize:12, color:'rgba(255,255,255,0.45)', lineHeight:1.5 }}>{t.desc}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =============================================
+   LANDING / APP ROUTER
+   ============================================= */
+var TOOLS = [
+  { id:'note',   icon:'📝', name:'note記事生成',       desc:'テーマ・文字数を設定してAIが有料記事を自動生成',  badge:'人気No.1' },
+  { id:'bonus',  icon:'🎁', name:'購入者特典生成',      desc:'記事から特典コンテンツを自動提案・生成',          badge:'NEW' },
+  { id:'image',  icon:'🖼️', name:'画像プロンプト生成',  desc:'記事に合うAI画像プロンプトを自動生成',            badge:'' },
+  { id:'dash',   icon:'📊', name:'ダッシュボード',      desc:'ツール一覧とAPIキー管理',                         badge:'' },
+];
+
+function App() {
+  var screenState = useState('landing');
+  var screen = screenState[0]; var setScreen = screenState[1];
+
+  if (screen === 'note')   return <NoteGenerator onBack={function() { setScreen('landing'); }} />;
+  if (screen === 'bonus')  return <BonusGenerator onBack={function() { setScreen('landing'); }} />;
+  if (screen === 'image')  return <ImagePromptGenerator onBack={function() { setScreen('landing'); }} />;
+  if (screen === 'dash')   return <Dashboard onBack={function() { setScreen('landing'); }} />;
 
   return (
     <div className="landing">
-      <div className="landing-grid"></div>
-      <div className="landing-badge">note AI Tools</div>
-      <h1 className="landing-title">note<span>AI</span><br/>Tools</h1>
-      <p className="landing-sub">有料note記事の生成から特典・画像プロンプトまで、AI駆動の制作ツール群</p>
+      <div className="landing-grid" />
+      <div className="landing-badge">✦ note AI Tools</div>
+      <h1 className="landing-title">
+        note<span>AI</span><br />Tools
+      </h1>
+      <p className="landing-sub">
+        Claude・Gemini・ChatGPT・Grokを使った<br />
+        note特化AIツール集
+      </p>
       <div className="ai-badges">
-        <div className="ai-badge"><div className="ai-dot" style={{ background: "#e07b39" }}></div>Claude</div>
-        <div className="ai-badge"><div className="ai-dot" style={{ background: "#4285f4" }}></div>Gemini</div>
-        <div className="ai-badge"><div className="ai-dot" style={{ background: "#10a37f" }}></div>ChatGPT</div>
-        <div className="ai-badge"><div className="ai-dot" style={{ background: "#9ca3af" }}></div>Grok</div>
+        {AI_LIST.map(function(ai) {
+          return (
+            <div key={ai.id} className="ai-badge">
+              <div className="ai-dot" style={{ background: ai.color }} />
+              {ai.label}
+            </div>
+          );
+        })}
       </div>
       <div className="tool-cards-landing">
-        <div className="tool-card-landing" onClick={function() { setView("generator"); }}>
-          <div className="tool-card-icon">✏️</div>
-          <div className="tool-card-name">note記事生成</div>
-          <div className="tool-card-desc">有料記事を全自動生成。設定からプレビュー・投稿まで一気通貫</div>
-        </div>
-        <div className="tool-card-landing" onClick={function() { setView("bonus"); }}>
-          <div className="tool-card-icon">🎁</div>
-          <div className="tool-card-name">購入者特典生成</div>
-          <div className="tool-card-desc">記事をアップロードしてAIが特典8件を提案、XLSX書き出し対応</div>
-        </div>
-        <div className="tool-card-landing" onClick={function() { setView("image"); }}>
-          <div className="tool-card-icon">🎨</div>
-          <div className="tool-card-name">画像プロンプト生成</div>
-          <div className="tool-card-desc">記事に合った画像プロンプトを英日両言語で自動生成</div>
-        </div>
-        <div className="tool-card-landing" onClick={function() { setView("dashboard"); }}>
-          <div className="tool-card-icon">📊</div>
-          <div className="tool-card-name">ダッシュボード</div>
-          <div className="tool-card-desc">記事管理・メモ・利用履歴の統合管理画面</div>
-        </div>
+        {TOOLS.map(function(tool) {
+          return (
+            <div key={tool.id} className="tool-card-landing" onClick={function() { setScreen(tool.id); }}>
+              {tool.badge && (
+                <div style={{ display:'inline-block', background:'rgba(233,69,96,0.2)', border:'1px solid rgba(233,69,96,0.4)', borderRadius:100, padding:'2px 8px', fontSize:9, color:'#e94560', fontWeight:800, letterSpacing:'0.1em', marginBottom:8 }}>{tool.badge}</div>
+              )}
+              <div className="tool-card-icon">{tool.icon}</div>
+              <div className="tool-card-name">{tool.name}</div>
+              <div className="tool-card-desc">{tool.desc}</div>
+            </div>
+          );
+        })}
       </div>
+      <p style={{ position:'relative', zIndex:1, fontSize:12, color:'rgba(255,255,255,0.2)', marginTop:8 }}>
+        APIキーはブラウザに安全に保存。サーバーには送信されません。
+      </p>
     </div>
   );
 }
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App />);
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
 </body>
 </html>
