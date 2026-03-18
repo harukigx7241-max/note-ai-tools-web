@@ -243,10 +243,58 @@
   textarea { font-family: inherit; }
   select { font-family: inherit; cursor: pointer; }
 
-  @media (max-width: 600px) {
-    .tool-cards-landing { grid-template-columns: 1fr 1fr; }
-    .app-body { padding: 16px 12px; }
-    .landing-title { font-size: 52px; }
+  /* =====================================================
+     RESPONSIVE — PC / TABLET / MOBILE
+     ===================================================== */
+
+  /* タブレット (768px以下) */
+  @media (max-width: 768px) {
+    .app-body { max-width: 100%; padding: 16px 14px; }
+    .app-header { padding: 12px 16px; }
+    .dark-header { padding: 12px 16px; }
+    .dark-tabs { padding: 0 12px; top: 58px; }
+    .tool-cards-landing { grid-template-columns: 1fr 1fr; gap: 10px; }
+  }
+
+  /* スマホ (480px以下) */
+  @media (max-width: 480px) {
+    /* ランディング */
+    .landing { padding: 32px 16px; }
+    .landing-title { font-size: clamp(36px, 12vw, 56px); letter-spacing: -0.02em; }
+    .landing-sub { font-size: 14px; margin-bottom: 28px; }
+    .landing-badge { font-size: 10px; padding: 4px 12px; margin-bottom: 20px; }
+    .ai-badges { gap: 6px; margin-bottom: 28px; }
+    .ai-badge { font-size: 11px; padding: 5px 10px; gap: 5px; }
+    .tool-cards-landing { grid-template-columns: 1fr 1fr; gap: 8px; max-width: 100%; margin-bottom: 28px; }
+    .tool-card-landing { padding: 14px 12px; border-radius: 12px; }
+    .tool-card-icon { font-size: 22px; margin-bottom: 6px; }
+    .tool-card-name { font-size: 12px; }
+    .tool-card-desc { font-size: 10px; }
+
+    /* 共通ヘッダー */
+    .app-header { padding: 10px 12px; }
+    .app-header-left { gap: 8px; }
+    .app-title { font-size: 15px; }
+    .app-sub { font-size: 10px; }
+    .back-btn { padding: 5px 9px; font-size: 12px; }
+    .key-btn { padding: 6px 10px; font-size: 11px; font-weight: 600; }
+    .app-body { padding: 12px 10px; }
+
+    /* ダークヘッダー */
+    .dark-header { padding: 10px 12px; }
+    .dark-tabs { padding: 0 8px; top: 54px; }
+    .modal-box { padding: 20px 16px; border-radius: 12px; }
+  }
+
+  /* 超小型スマホ (360px以下) */
+  @media (max-width: 360px) {
+    .landing-title { font-size: 34px; }
+    .tool-cards-landing { grid-template-columns: 1fr 1fr; gap: 6px; }
+    .tool-card-landing { padding: 10px 8px; }
+    .tool-card-name { font-size: 11px; }
+    .tool-card-desc { display: none; }
+    .app-title { font-size: 13px; }
+    .key-btn { padding: 5px 8px; font-size: 10px; }
   }
 </style>
 </head>
@@ -255,6 +303,20 @@
 
 <script type="text/babel">
 const { useState, useEffect, useCallback, useRef } = React;
+
+// ======================================================
+// SHARED: レスポンシブ検出フック
+// ======================================================
+function useIsMobile() {
+  var ms = useState(window.innerWidth <= 480);
+  var isMobile = ms[0]; var setIsMobile = ms[1];
+  useEffect(function() {
+    function onResize() { setIsMobile(window.innerWidth <= 480); }
+    window.addEventListener("resize", onResize);
+    return function() { window.removeEventListener("resize", onResize); };
+  }, []);
+  return isMobile;
+}
 
 // ============================================================
 // SHARED: AI CONFIGS & API KEY UTILS
@@ -751,6 +813,7 @@ function NoteGenerator(props) {
   var as = useState(false); var showApi = as[0]; var setShowApi = as[1];
   var ais = useState("claude"); var aiId = ais[0]; var setAiId = ais[1];
   var aiRef = useRef("claude");
+  var isMobile = useIsMobile();
   var ths = useState("money"); var theme = ths[0]; var setTheme = ths[1];
   var tps = useState(""); var topic = tps[0]; var setTopic = tps[1];
   var tns = useState("story"); var tone = tns[0]; var setTone = tns[1];
@@ -842,7 +905,7 @@ function NoteGenerator(props) {
     setTimeout(function() { setCopied(function(s) { var n = Object.assign({}, s); n[key] = false; return n; }); }, 2000);
   }
 
-  var card = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "22px 26px", marginBottom: 14 };
+  var card = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: isMobile ? 14 : 18, padding: isMobile ? "16px 14px" : "22px 26px", marginBottom: 14 };
   var lbl = { color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", display: "block", marginBottom: 10 };
   var subLbl = { color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", marginBottom: 8, display: "block" };
 
@@ -879,7 +942,7 @@ function NoteGenerator(props) {
         <TabButton label="📮 投稿"      isActive={tab === "post"}     isDisabled={!hasArticle} onClick={function() { if (hasArticle) setTab("post"); }} />
       </div>
 
-      <div style={{ maxWidth: 780, margin: "0 auto", padding: "20px 16px" }}>
+      <div style={{ maxWidth: 780, margin: "0 auto", padding: isMobile ? "12px 10px" : "20px 16px" }}>
         {tab === "settings" && (
           <div>
             {/* AI選択 */}
@@ -1219,6 +1282,7 @@ function BonusGenerator(props) {
   var gl = useState({}); var genLoading = gl[0]; var setGenLoading = gl[1];
   var er = useState(""); var error = er[0]; var setError = er[1];
   var fileRef = useRef(null);
+  var isMobile = useIsMobile();
 
   var handleFileChange = useCallback(async function(e) {
     var file = e.target.files && e.target.files[0];
@@ -1275,9 +1339,9 @@ function BonusGenerator(props) {
     downloadAsXlsx(rows, "bonus_list");
   }, [selected, suggestions, results]);
 
-  var card = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "22px 26px", marginBottom: 14 };
-  var lbl = { color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", display: "block", marginBottom: 10 };
-  var inputStyle = { width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: 14, color: "#fff", outline: "none" };
+  var card = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: isMobile ? 14 : 18, padding: isMobile ? "16px 14px" : "22px 26px", marginBottom: 12 };
+  var lbl = { color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", display: "block", marginBottom: 8 };
+  var inputStyle = { width: "100%", padding: isMobile ? "9px 10px" : "10px 12px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: isMobile ? 13 : 14, color: "#fff", outline: "none" };
 
   return (
     <div className="app-wrap">
@@ -1316,7 +1380,7 @@ function BonusGenerator(props) {
               );
             })}
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 10 : 16 }}>
             <div>
               <div style={lbl}>🎯 ジャンル</div>
               <select value={theme} onChange={function(e) { setTheme(e.target.value); }} style={inputStyle}>
@@ -1435,6 +1499,7 @@ function ImagePromptGenerator(props) {
   var sus = useState(["header","thumbnail"]); var selectedUses = sus[0]; var setSelectedUses = sus[1];
   var ps = useState([]); var prompts = ps[0]; var setPrompts = ps[1];
   var ld = useState(false); var loading = ld[0]; var setLoading = ld[1];
+  var isMobile = useIsMobile();
   var er = useState(""); var error = er[0]; var setError = er[1];
   var cs = useState({}); var copied = cs[0]; var setCopied = cs[1];
   var fileRef = useRef(null);
@@ -1473,12 +1538,9 @@ function ImagePromptGenerator(props) {
     setTimeout(function() { setCopied(function(s) { var n = Object.assign({}, s); n[id] = false; return n; }); }, 2000);
   }
 
-  var card = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "22px 26px", marginBottom: 14 };
-  var lbl = { color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", display: "block", marginBottom: 10 };
-  var selStyle = { width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: 14, color: "#fff", outline: "none" };
-
-  return (
-    <div className="app-wrap">
+  var card = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: isMobile ? 14 : 18, padding: isMobile ? "16px 14px" : "22px 26px", marginBottom: 12 };
+  var lbl = { color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", display: "block", marginBottom: 8 };
+  var selStyle = { width: "100%", padding: isMobile ? "9px 10px" : "10px 12px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: isMobile ? 13 : 14, color: "#fff", outline: "none" };
       <style>{"@keyframes spin { to { transform: rotate(360deg); } }"}</style>
       {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} isDark={true} />}
       <div className="app-header">
@@ -1528,7 +1590,7 @@ function ImagePromptGenerator(props) {
         </div>
         {/* スタイル・ツール設定 */}
         <div style={card}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 10 : 16, marginBottom: 20 }}>
             <div>
               <div style={lbl}>🎨 画像スタイル</div>
               <select value={imageStyle} onChange={function(e) { setImageStyle(e.target.value); }} style={selStyle}>
@@ -1659,6 +1721,7 @@ function Dashboard(props) {
   var onBack = props.onBack;
   var as = useState(false); var showApi = as[0]; var setShowApi = as[1];
   var ts = useState("home"); var tab = ts[0]; var setTab = ts[1];
+  var isMobile = useIsMobile();
   var us = useState([]); var usage = us[0]; var setUsage = us[1];
   var ns = useState([]); var notes = ns[0]; var setNotes = ns[1];
   var ls = useState(true); var dataLoading = ls[0]; var setDataLoading = ls[1];
@@ -1710,8 +1773,8 @@ function Dashboard(props) {
   var apiKeys = loadApiKeys();
   var configuredKeys = AI_CONFIGS.filter(function(ai) { return !!apiKeys[ai.id]; });
 
-  var card = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 18, padding: "22px 26px", marginBottom: 14 };
-  var lbl = { color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", display: "block", marginBottom: 10 };
+  var card = { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: isMobile ? 14 : 18, padding: isMobile ? "16px 14px" : "22px 26px", marginBottom: 12 };
+  var lbl = { color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", display: "block", marginBottom: 8 };
 
   return (
     <div className="app-wrap">
@@ -1744,7 +1807,7 @@ function Dashboard(props) {
               </div>
             )}
             <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: "#fff" }}>🛠 ツール</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14, marginBottom: 32 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(auto-fit, minmax(240px, 1fr))", gap: isMobile ? 10 : 14, marginBottom: 32 }}>
               {DASH_TOOLS.map(function(tool) {
                 var capturedId = tool.id;
                 return (
@@ -1844,7 +1907,7 @@ function Dashboard(props) {
             </div>
             <textarea value={memo} onChange={function(e) { setMemo(e.target.value); }}
               placeholder="自由にメモを書いてください..."
-              style={{ width: "100%", minHeight: 400, padding: 16, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, fontSize: 14, lineHeight: 1.8, boxSizing: "border-box", resize: "vertical", color: "#e2e8f0", outline: "none" }} />
+              style={{ width: "100%", minHeight: isMobile ? 280 : 400, padding: 16, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, fontSize: 14, lineHeight: 1.8, boxSizing: "border-box", resize: "vertical", color: "#e2e8f0", outline: "none" }} />
           </div>
         )}
       </div>
