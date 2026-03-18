@@ -694,28 +694,7 @@ function buildNotePrompt(opts) {
   var ageLabel = (NOTE_AGES.find(function(a) { return a.id === age; }) || {}).label || age;
   var ageCtx = { '10s':'10代・学生・バイト・部活', '20s':'20代・社会人・転職・恋愛', '30s':'30代・育児・住宅・キャリア', '40s':'40代・老後・子育て・健康', '50s':'50代以上・定年・健康・老後', 'all':'全年代共通' }[age] || '';
 
-  return 'あなたは人気noteクリエイターです。以下の条件でnoteの有料記事を作成してください。\n\n'
-    + '## ターゲット読者\n'
-    + '- 年齢: ' + ageLabel + '\n'
-    + '- 状況: ' + (situation || '特に指定なし') + '\n'
-    + '- 悩み: ' + (worry || '特に指定なし') + '\n'
-    + '- ライフスタイル: ' + ageCtx + '\n\n'
-    + '## 記事設定\n'
-    + '- ジャンル: ' + themeLabel + '\n'
-    + '- テーマ: ' + (topic || 'ジャンルで最も読まれるテーマ') + '\n'
-    + '- 文体: ' + toneLabel + '\n'
-    + '- 販売価格: ¥' + price.toLocaleString() + '\n'
-    + '- 無料部分の文字数: ' + freeWC + '文字\n'
-    + '- 有料部分の文字数: ' + paidWC + '文字\n\n'
-    + '## 構成ルール\n'
-    + '1. タイトルは「# 」で始める 2. 1記事50〜100文字の要約 3. 「---FREE_START---」から無料部分開始 4. 「---FREE_END---」で無料終了 5. 「---PAID_START---」から有料部分開始 6. 「---PAID_END---」で有料終了\n\n'
-    + '## 無料パート（' + freeWC + '文字目安）\n'
-    + '読者の悩みに共感し、記事を読む価値を伝える。続きへの期待感を高める。\n\n'
-    + '## 購入壁\n'
-    + '続きを読むためには購入が必要と明示。価格を改めて示す。\n\n'
-    + '## 有料パート（' + paidWC + '文字目安）\n'
-    + '具体的な解決策・ノウハウ・実践ステップを詳しく解説。Q&A・よくある誤解・チェックリストを含む。\n\n'
-    + '---FREE_START---\n\n（ここから無料パートを書く）\n\n---FREE_END---\n---PAID_START---\n\n（ここから有料パートを書く）\n\n---PAID_END---';
+  return 'あなたは人気noteクリエイターです。以下の条件でnoteの有料記事を作成してください。\n\n'    + '## ターゲット読者\n'    + '- 年齢: ' + ageLabel + '\n'    + '- 状況: ' + (situation || '特に指定なし') + '\n'    + '- 悩み: ' + (worry || '特に指定なし') + '\n'    + '- ライフスタイル: ' + ageCtx + '\n\n'    + '## 記事設定\n'    + '- ジャンル: ' + themeLabel + '\n'    + '- テーマ: ' + (topic || 'ジャンルで最も読まれるテーマ') + '\n'    + '- 文体: ' + toneLabel + '\n'    + '- 販売価格: ¥' + price.toLocaleString() + '\n\n'    + '## 【最重要】文字数厳守ルール\n'    + '無料部分: ちょうど' + freeWC + '文字（±80文字以内に必ず収めること）\n'    + '有料部分: ちょうど' + paidWC + '文字（±100文字以内に必ず収めること）\n'    + '※ 文字数は日本語1文字=1文字、英数字1文字=1文字で計算してください\n'    + '※ 指定文字数に達しない場合は内容を追加し、超える場合は削除してください\n\n'    + '## 構成ルール\n'    + '1. タイトルは「# 」で始める 2. 冒頭に50〜100文字の要約 3. 「---FREE_START---」から無料部分開始 4. 「---FREE_END---」で無料終了 5. 「---PAID_START---」から有料部分開始 6. 「---PAID_END---」で有料終了\n\n'    + '## 無料パート（必ず' + freeWC + '文字±80文字以内）\n'    + '読者の悩みに共感し、記事を読む価値を伝える。続きへの期待感を高める。\n\n'    + '## 購入壁\n'    + '続きを読むためには購入が必要と明示。価格を改めて示す。\n\n'    + '## 有料パート（必ず' + paidWC + '文字±100文字以内）\n'    + '具体的な解決策・ノウハウ・実践ステップを詳しく解説。Q&A・よくある誤解・チェックリストを含む。\n\n'    + '---FREE_START---\n\n（ここから無料パートを書く）\n\n---FREE_END---\n---PAID_START---\n\n（ここから有料パートを書く）\n\n---PAID_END---';
 }
 
 function NoteGenerator(props) {
@@ -799,96 +778,107 @@ function NoteGenerator(props) {
     setWorry('');
   }, [age]);
 
-  useEffect(function() {
-    // インラインで実行してBabel依存関係警告を回避
-    var themeKey = theme;
+  // === 例取得関数（再検索ボタン・テーマ/年齢変更で共有） ===
+  // フォールバックデータ（組み込みの高品質な例）
+  var FB_TOPICS = { money:['月5万円副業を3ヶ月で達成した方法','節約で年間100万円貯めた実践記録','サラリーマンが副業で収入を2倍にした秘訣'], health:['1ヶ月-8kg減量ダイエット完全ガイド','リバウンドしない食事改善の習慣術','40代から始める体質改善メソッド'], career:['未経験からWebエンジニアに転職した全記録','副業で月収10万円を稼ぐフリーランス入門','年収UPのための交渉術と転職タイミング'], mindset:['成功者が実践する朝のルーティン7選','先延ばし癖をなくす行動心理学テクニック','自己肯定感を高める思考習慣の作り方'], relationship:['彼女ができない男性が変わった3つのきっかけ','職場の人間関係を劇的に改善した会話術','SNSで好感度を上げるコミュニケーション法'], productivity:['タスク管理で残業ゼロになった仕事術','集中力を3倍にする環境づくりと習慣','ノートアプリ活用で仕事効率が激変した話'], parenting:['イヤイヤ期を乗り越えた育児のコツ','子どもの自己肯定感を育てる声かけ方法','共働きでも子どもとの時間を増やす工夫'], other:['人生が変わった本10冊の読み方と実践法','断捨離で部屋も心もスッキリした体験記','ストレスフリーな生活を手に入れた方法'] };
+  var FB_SIT = { money:['会社員で副業を始めたいが何から手をつければいいか迷っている','毎月赤字で貯金ゼロ、家計を立て直したい','子育て中でお金の余裕がなく将来が不安'], health:['ダイエットを何度も挫折してきた','運動する時間がなくて体型が崩れてきた','食事制限で体重は落ちたがリバウンドしてしまった'], career:['今の仕事に不満はないが将来性が不安','30代で転職を考えているがスキルに自信がない','フリーランスに興味があるが収入が安定するか心配'], mindset:['やる気が続かず目標を達成できない','他人の目が気になって行動できない','ネガティブ思考が止まらず毎日がしんどい'], relationship:['好きな人がいるが告白できずにいる','職場のコミュニケーションが苦手で孤立している','SNSで発信したいがどう思われるか怖い'], productivity:['仕事量が多くて残業が続いている','タスクが多すぎて何から手をつけるか分からない','集中できずついスマホを見てしまう'], parenting:['子供のイヤイヤ期で毎日ストレスが溜まっている','仕事と育児の両立で疲れ果てている','子供に怒りすぎてしまい自己嫌悪になる'], other:['毎日同じことの繰り返しで人生に変化がない','友達が少なくて休日が孤独','やりたいことが見つからず将来が漠然と不安'] };
+  var FB_WORRY = { money:['副業で稼げるか不安、詐欺に引っかかりそう','収入を上げたいのに具体的な方法が分からない','節約を頑張っても全然貯まらない'], health:['運動を続けられない、三日坊主になってしまう','食事制限が辛くてストレスになる','健康的に痩せたいが何が正解か分からない'], career:['転職活動をどこから始めればいいか分からない','スキルがなくて市場価値が低いと感じる','面接が苦手で選考に通らない'], mindset:['頭では分かっているが行動できない','自分に自信が持てず挑戦を諦めてしまう','モチベーションが続かず中途半端になる'], relationship:['会話が続かず人間関係が浅い','感情的になってしまい後から後悔する','好きな人にどうアプローチすればいいか分からない'], productivity:['やることが多すぎて優先順位がつけられない','集中力が続かず作業が終わらない','スマホやSNSが気になって仕事に集中できない'], parenting:['子供の気持ちが理解できず対応に困る','怒らない育児を試みるが限界がくる','子供の学力や将来が心配で焦っている'], other:['何か変えたいが何から始めればいいか分からない','行動しようとしても続かず自己嫌悪になる','周りの目を気にしてチャレンジできない'] };
+
+  // 例取得のコア関数（再検索ボタン・自動更新で共通使用）
+  // themeKey, currentAge を引数で受け取り現在stateに依存しない
+  function fetchExamples(themeKey, currentAge) {
     var themeLabel = (NOTE_THEMES.find(function(t) { return t.id === themeKey; }) || {}).label || themeKey;
     var cleanLabel = themeLabel.replace(/[\u{1F300}-\u{1FFFF}]/gu, '').replace(/[\u2600-\u26FF]/gu, '').trim();
+    var ageLabel = { '10s':'10代', '20s':'20代', '30s':'30代', '40s':'40代', '50s':'50代以上', 'all':'全年齢' }[currentAge] || '全年齢';
 
     setTopicEx({ items:[], loading:true });
     setSitEx({ items:[], loading:true });
     setWorryEx({ items:[], loading:true });
 
-    // 3つのクエリを並列実行
-    var q1 = encodeURIComponent(cleanLabel + ' note 人気記事テーマ');
-    var q2 = encodeURIComponent(cleanLabel + ' 悩み 状況 あるある');
-    var q3 = encodeURIComponent(cleanLabel + ' よくある悩み 困っていること');
-
-    function safeFetch(q) {
-      return fetch('https://api.duckduckgo.com/?q=' + q + '&format=json&no_html=1&skip_disambig=1&no_redirect=1')
-        .then(function(r) { return r.ok ? r.json() : null; })
-        .catch(function() { return null; });
-    }
-
-    function extractPhrases(d, maxLen) {
-      if (!d) return [];
-      var results = [];
-      if (d.AbstractText) {
-        d.AbstractText.split(/[。！？!?\n]/).forEach(function(s) {
-          var t = s.trim();
-          if (t.length >= 8 && t.length <= (maxLen || 40)) results.push(t);
-        });
-      }
-      if (d.RelatedTopics && results.length < 4) {
-        d.RelatedTopics.slice(0, 10).forEach(function(rt) {
-          if (results.length >= 4) return;
-          var txt = rt.Text || '';
-          txt.split(/[。！？!?\n]/).forEach(function(s) {
-            var t = s.replace(/https?:\/\/\S+/g, '').trim();
-            if (t.length >= 8 && t.length <= (maxLen || 40) && results.length < 4) results.push(t);
-          });
-        });
-      }
-      return results.slice(0, 3);
-    }
-
-    // フォールバックデータ（組み込みの高品質な例）
-    var fb  = { money:['月5万円副業を3ヶ月で達成した方法','節約で年間100万円貯めた実践記録','サラリーマンが副業で収入を2倍にした秘訣'], health:['1ヶ月-8kg減量ダイエット完全ガイド','リバウンドしない食事改善の習慣術','40代から始める体質改善メソッド'], career:['未経験からWebエンジニアに転職した全記録','副業で月収10万円を稼ぐフリーランス入門','年収UPのための交渉術と転職タイミング'], mindset:['成功者が実践する朝のルーティン7選','先延ばし癖をなくす行動心理学テクニック','自己肯定感を高める思考習慣の作り方'], relationship:['彼女ができない男性が変わった3つのきっかけ','職場の人間関係を劇的に改善した会話術','SNSで好感度を上げるコミュニケーション法'], productivity:['タスク管理で残業ゼロになった仕事術','集中力を3倍にする環境づくりと習慣','ノートアプリ活用で仕事効率が激変した話'], parenting:['イヤイヤ期を乗り越えた育児のコツ','子どもの自己肯定感を育てる声かけ方法','共働きでも子どもとの時間を増やす工夫'], other:['人生が変わった本10冊の読み方と実践法','断捨離で部屋も心もスッキリした体験記','ストレスフリーな生活を手に入れた方法'] };
-    var fbs = { money:['会社員で副業を始めたいが何から手をつければいいか迷っている','毎月赤字で貯金ゼロ、家計を立て直したい','子育て中でお金の余裕がなく将来が不安'], health:['ダイエットを何度も挫折してきた','運動する時間がなくて体型が崩れてきた','食事制限で体重は落ちたがリバウンドしてしまった'], career:['今の仕事に不満はないが将来性が不安','30代で転職を考えているがスキルに自信がない','フリーランスに興味があるが収入が安定するか心配'], mindset:['やる気が続かず目標を達成できない','他人の目が気になって行動できない','ネガティブ思考が止まらず毎日がしんどい'], relationship:['好きな人がいるが告白できずにいる','職場のコミュニケーションが苦手で孤立している','SNSで発信したいがどう思われるか怖い'], productivity:['仕事量が多くて残業が続いている','タスクが多すぎて何から手をつけるか分からない','集中できずついスマホを見てしまう'], parenting:['子供のイヤイヤ期で毎日ストレスが溜まっている','仕事と育児の両立で疲れ果てている','子供に怒りすぎてしまい自己嫌悪になる'], other:['毎日同じことの繰り返しで人生に変化がない','友達が少なくて休日が孤独','やりたいことが見つからず将来が漠然と不安'] };
-    var fbw = { money:['副業で稼げるか不安、詐欺に引っかかりそう','収入を上げたいのに具体的な方法が分からない','節約を頑張っても全然貯まらない'], health:['運動を続けられない、三日坊主になってしまう','食事制限が辛くてストレスになる','健康的に痩せたいが何が正解か分からない'], career:['転職活動をどこから始めればいいか分からない','スキルがなくて市場価値が低いと感じる','面接が苦手で選考に通らない'], mindset:['頭では分かっているが行動できない','自分に自信が持てず挑戦を諦めてしまう','モチベーションが続かず中途半端になる'], relationship:['会話が続かず人間関係が浅い','感情的になってしまい後から後悔する','好きな人にどうアプローチすればいいか分からない'], productivity:['やることが多すぎて優先順位がつけられない','集中力が続かず作業が終わらない','スマホやSNSが気になって仕事に集中できない'], parenting:['子供の気持ちが理解できず対応に困る','怒らない育児を試みるが限界がくる','子供の学力や将来が心配で焦っている'], other:['何か変えたいが何から始めればいいか分からない','行動しようとしても続かず自己嫌悪になる','周りの目を気にしてチャレンジできない'] };
-
-    var ageLabel = { '10s':'10代', '20s':'20代', '30s':'30代', '40s':'40代', '50s':'50代以上', 'all':'全年齢' }[age] || '';
-
-    // AIキーがあればAIで高精度な例を生成、なければDDG→フォールバックの順
-    var aiKey = getKey('claude') || getKey('gemini') || getKey('chatgpt') || getKey('grok');
     var aiIdForEx = getKey('claude') ? 'claude' : getKey('gemini') ? 'gemini' : getKey('chatgpt') ? 'chatgpt' : getKey('grok') ? 'grok' : null;
 
-    if (aiIdForEx) {
-      // AI生成: 高精度な例を一括生成
-      var aiPrompt = 'note記事生成ツールのUI用に、以下の条件でリストを3件ずつ生成してください。\n\nジャンル: ' + cleanLabel + '\n対象年齢: ' + ageLabel + '\n\n出力形式はJSONのみ（前置きなし）:\n{"topics":["テーマ例1","テーマ例2","テーマ例3"],"situations":["読者の状況例1","状況例2","状況例3"],"worries":["読者の悩み例1","悩み例2","悩み例3"]}\n\n各項目:\n- topics: このジャンルのnote有料記事として売れそうな具体的なタイトル（20〜35文字）\n- situations: 対象年齢の読者がよく置かれている状況（15〜35文字）\n- worries: 対象年齢の読者がよく抱える悩み（15〜30文字）';
+    function applyFallback() {
+      setTopicEx({ items: FB_TOPICS[themeKey] || FB_TOPICS['other'], loading: false });
+      setSitEx({ items: FB_SIT[themeKey] || FB_SIT['other'], loading: false });
+      setWorryEx({ items: FB_WORRY[themeKey] || FB_WORRY['other'], loading: false });
+    }
 
-      callAI(aiIdForEx, [{ role:'user', content: aiPrompt }], null, 500)
+    if (aiIdForEx) {
+      // AIキーあり: AI（Gemini/Claude/ChatGPT/Grok）で高精度な例を生成
+      var aiPrompt = 'note記事生成ツールのUI用に、以下の条件でリストを3件ずつ生成してください。\n\nジャンル: ' + cleanLabel + '\n対象年齢: ' + ageLabel + '\n\n出力形式はJSONのみ（コードブロック不要、前置きなし）:\n{"topics":["テーマ例1","テーマ例2","テーマ例3"],"situations":["状況例1","状況例2","状況例3"],"worries":["悩み例1","悩み例2","悩み例3"]}\n\n各項目の条件:\n- topics: ' + cleanLabel + 'ジャンルのnote有料記事として売れそうな具体的タイトル（20〜35文字）\n- situations: ' + ageLabel + 'の読者がよく置かれている状況（15〜35文字）\n- worries: ' + ageLabel + 'の読者がよく抱える悩み（15〜30文字）\n\n必ずJSONのみ返してください。';
+
+      callAI(aiIdForEx, [{ role:'user', content: aiPrompt }], null, 600)
         .then(function(aiResult) {
           try {
             var clean = aiResult.replace(/```json/g,'').replace(/```/g,'').trim();
-            var parsed = JSON.parse(clean);
-            setTopicEx({ items: (parsed.topics || []).slice(0,3), loading: false });
-            setSitEx({ items: (parsed.situations || []).slice(0,3), loading: false });
-            setWorryEx({ items: (parsed.worries || []).slice(0,3), loading: false });
+            // JSON部分だけ抽出（前後に余分なテキストがある場合）
+            var jsonMatch = clean.match(/\{[\s\S]*\}/);
+            var parsed = JSON.parse(jsonMatch ? jsonMatch[0] : clean);
+            var topics = Array.isArray(parsed.topics) ? parsed.topics.slice(0,3) : [];
+            var situations = Array.isArray(parsed.situations) ? parsed.situations.slice(0,3) : [];
+            var worries = Array.isArray(parsed.worries) ? parsed.worries.slice(0,3) : [];
+            // AIが返したアイテムが少ない場合はフォールバックで補完
+            if (topics.length === 0) topics = FB_TOPICS[themeKey] || FB_TOPICS['other'];
+            if (situations.length === 0) situations = FB_SIT[themeKey] || FB_SIT['other'];
+            if (worries.length === 0) worries = FB_WORRY[themeKey] || FB_WORRY['other'];
+            setTopicEx({ items: topics, loading: false });
+            setSitEx({ items: situations, loading: false });
+            setWorryEx({ items: worries, loading: false });
           } catch(e) {
-            // JSON解析失敗時はフォールバック
-            setTopicEx({ items: fb[themeKey] || fb['other'], loading: false });
-            setSitEx({ items: fbs[themeKey] || fbs['other'], loading: false });
-            setWorryEx({ items: fbw[themeKey] || fbw['other'], loading: false });
+            applyFallback();
           }
         })
         .catch(function() {
-          setTopicEx({ items: fb[themeKey] || fb['other'], loading: false });
-          setSitEx({ items: fbs[themeKey] || fbs['other'], loading: false });
-          setWorryEx({ items: fbw[themeKey] || fbw['other'], loading: false });
+          applyFallback();
         });
     } else {
-      // APIキーなし: DuckDuckGo → フォールバック
-      Promise.all([safeFetch(q1), safeFetch(q2), safeFetch(q3)]).then(function(results) {
-        var d1 = results[0], d2 = results[1], d3 = results[2];
-        var topicItems = extractPhrases(d1, 45);
-        var sitItems = extractPhrases(d2, 45);
-        var worryItems = extractPhrases(d3, 45);
-        setTopicEx({ items: topicItems.length >= 2 ? topicItems : (fb[themeKey] || fb['other']), loading: false });
-        setSitEx({ items: sitItems.length >= 2 ? sitItems : (fbs[themeKey] || fbs['other']), loading: false });
-        setWorryEx({ items: worryItems.length >= 2 ? worryItems : (fbw[themeKey] || fbw['other']), loading: false });
+      // APIキーなし: DuckDuckGo検索 → フォールバック
+      var q1 = encodeURIComponent(cleanLabel + ' note 人気記事テーマ');
+      var q2 = encodeURIComponent(cleanLabel + ' ' + ageLabel + ' 悩み 状況');
+      var q3 = encodeURIComponent(cleanLabel + ' ' + ageLabel + ' よくある悩み');
+
+      function safeFetch(q) {
+        return fetch('https://api.duckduckgo.com/?q=' + q + '&format=json&no_html=1&skip_disambig=1&no_redirect=1')
+          .then(function(r) { return r.ok ? r.json() : null; })
+          .catch(function() { return null; });
+      }
+
+      function extractPhrases(d, maxLen) {
+        if (!d) return [];
+        var results = [];
+        if (d.AbstractText) {
+          d.AbstractText.split(/[。！？!?\n]/).forEach(function(s) {
+            var t = s.trim();
+            if (t.length >= 8 && t.length <= (maxLen || 40)) results.push(t);
+          });
+        }
+        if (d.RelatedTopics && results.length < 3) {
+          d.RelatedTopics.slice(0, 10).forEach(function(rt) {
+            if (results.length >= 3) return;
+            var txt = rt.Text || '';
+            txt.split(/[。！？!?\n]/).forEach(function(s) {
+              var t = s.replace(/https?:\/\/\S+/g, '').trim();
+              if (t.length >= 8 && t.length <= (maxLen || 40) && results.length < 3) results.push(t);
+            });
+          });
+        }
+        return results.slice(0, 3);
+      }
+
+      Promise.all([safeFetch(q1), safeFetch(q2), safeFetch(q3)]).then(function(res) {
+        var topicItems = extractPhrases(res[0], 45);
+        var sitItems = extractPhrases(res[1], 45);
+        var worryItems = extractPhrases(res[2], 45);
+        setTopicEx({ items: topicItems.length >= 2 ? topicItems : (FB_TOPICS[themeKey] || FB_TOPICS['other']), loading: false });
+        setSitEx({ items: sitItems.length >= 2 ? sitItems : (FB_SIT[themeKey] || FB_SIT['other']), loading: false });
+        setWorryEx({ items: worryItems.length >= 2 ? worryItems : (FB_WORRY[themeKey] || FB_WORRY['other']), loading: false });
       });
     }
+  }
+
+  // テーマ・年齢変更時に自動更新
+  useEffect(function() {
+    fetchExamples(theme, age);
   }, [theme, age]);
 
   var handleGenerate = useCallback(function() {
@@ -1021,7 +1011,7 @@ function NoteGenerator(props) {
               <div style={{ marginTop:12, background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, padding:'10px 12px' }}>
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
                   <span style={{ fontSize:11, color:'rgba(255,255,255,0.45)', fontWeight:700 }}>🌐 Web検索からのテーマ例</span>
-                  <button onClick={function() { loadTopicExamples(true); }} disabled={topicEx.loading}
+                  <button onClick={function() { fetchExamples(theme, age); }} disabled={topicEx.loading}
                     style={{ background:'none', border:'1px solid rgba(255,255,255,0.15)', borderRadius:6, padding:'3px 8px', color:'rgba(255,255,255,0.5)', fontSize:11, cursor: topicEx.loading ? 'not-allowed' : 'pointer', display:'flex', alignItems:'center', gap:4 }}>
                     <span style={{ display:'inline-block', animation: topicEx.loading ? 'spin 0.8s linear infinite' : 'none' }}>🔄</span>
                     {topicEx.loading ? '検索中...' : '再検索'}
@@ -1095,7 +1085,7 @@ function NoteGenerator(props) {
                 <div style={{ marginTop:8, background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, padding:'10px 12px' }}>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:7 }}>
                     <span style={{ fontSize:11, color:'rgba(255,255,255,0.45)', fontWeight:700 }}>🌐 Web検索からの状況例</span>
-                    <button onClick={function() { loadSitExamples(true); }} disabled={sitEx.loading}
+                    <button onClick={function() { fetchExamples(theme, age); }} disabled={sitEx.loading}
                       style={{ background:'none', border:'1px solid rgba(255,255,255,0.15)', borderRadius:6, padding:'3px 8px', color:'rgba(255,255,255,0.5)', fontSize:11, cursor: sitEx.loading ? 'not-allowed' : 'pointer', display:'flex', alignItems:'center', gap:4 }}>
                       <span style={{ display:'inline-block', animation: sitEx.loading ? 'spin 0.8s linear infinite' : 'none' }}>🔄</span>
                       {sitEx.loading ? '検索中...' : '再検索'}
@@ -1126,7 +1116,7 @@ function NoteGenerator(props) {
                 <div style={{ marginTop:8, background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, padding:'10px 12px' }}>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:7 }}>
                     <span style={{ fontSize:11, color:'rgba(255,255,255,0.45)', fontWeight:700 }}>🌐 Web検索からの悩み例</span>
-                    <button onClick={function() { loadWorryExamples(true); }} disabled={worryEx.loading}
+                    <button onClick={function() { fetchExamples(theme, age); }} disabled={worryEx.loading}
                       style={{ background:'none', border:'1px solid rgba(255,255,255,0.15)', borderRadius:6, padding:'3px 8px', color:'rgba(255,255,255,0.5)', fontSize:11, cursor: worryEx.loading ? 'not-allowed' : 'pointer', display:'flex', alignItems:'center', gap:4 }}>
                       <span style={{ display:'inline-block', animation: worryEx.loading ? 'spin 0.8s linear infinite' : 'none' }}>🔄</span>
                       {worryEx.loading ? '検索中...' : '再検索'}
@@ -1185,10 +1175,13 @@ function NoteGenerator(props) {
                     style={{ width:'100%', accentColor:'#fbbf24' }} />
                   <div style={{ display:'flex', justifyContent:'space-between', color:'rgba(255,255,255,0.25)', fontSize:10 }}><span>¥300</span><span>¥9,800</span></div>
                 </div>
-                <div style={{ borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:12, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                <div style={{ borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:12 }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6 }}>
                   <span style={{ color:'rgba(255,255,255,0.35)', fontSize:12 }}>合計文字数</span>
                   <span style={{ color:'#fff', fontWeight:800, fontSize:15 }}>{(freeWC + paidWC).toLocaleString()}文字</span>
                 </div>
+                <div style={{ fontSize:10, color:'rgba(255,255,255,0.25)', lineHeight:1.5 }}>※ AIの特性上、実際の生成文字数は指定値から±100文字程度ズレる場合があります。ご了承ください。</div>
+              </div>
               </div>
             </div>
 
