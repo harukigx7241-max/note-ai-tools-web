@@ -91,7 +91,7 @@ a{-webkit-tap-highlight-color:transparent}
 .pill:hover{background:rgba(255,255,255,.1)}
 .pill-on{background:rgba(233,69,96,.2) !important;border-color:rgba(233,69,96,.5) !important;color:#fff !important}
 .warn{background:rgba(255,180,0,.09);border:1px solid rgba(255,180,0,.3);border-radius:9px;padding:10px 12px;font-size:12px;color:#fcd34d;margin-bottom:9px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.err{background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.3);border-radius:9px;padding:10px 12px;font-size:13px;color:#f87171;margin-bottom:9px}
+.err{background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.3);border-radius:9px;padding:10px 12px;font-size:13px;color:#f87171;margin-bottom:9px;white-space:pre-wrap;line-height:1.5;}
 .genbtn{width:100%;border-radius:11px;border:none;cursor:pointer;position:relative;overflow:hidden}
 .genbtn:disabled{cursor:not-allowed}
 .gen-ov{position:absolute;inset:0;background:rgba(0,0,0,.3);border-radius:11px}
@@ -250,27 +250,47 @@ function apiClaude(msgs,sys,max){
     return d.content.filter(function(c){return c.type==='text';}).map(function(c){return c.text;}).join('');
   });
 }
+
+// Gemini API のエラーハンドリングと旧モデル（安定版）の追加
 function apiGemini(msgs,sys,max){
   var key=getKey('gemini');
   if(!key)return Promise.reject(new Error('Gemini APIキー未設定'));
-  var models=['gemini-2.5-pro','gemini-2.0-flash'];
+  
+  // 安定して動く可能性が高い旧モデルを追加
+  var models=['gemini-2.5-pro','gemini-2.0-flash','gemini-1.5-pro','gemini-1.5-flash'];
+  
   var contents=msgs.map(function(m){return{role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]};});
   var body={contents:contents,generationConfig:{maxOutputTokens:max}};
   if(sys)body.systemInstruction={parts:[{text:sys}]};
+  
+  var lastErr = '';
   function tryM(i){
-    if(i>=models.length)return Promise.reject(new Error('Gemini 全モデル失敗'));
+    if(i>=models.length)return Promise.reject(new Error('Gemini失敗: ' + (lastErr || 'APIキーや利用制限を確認してください')));
+    
     return fetch('https://generativelanguage.googleapis.com/v1beta/models/'+models[i]+':generateContent?key='+key,{
       method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)
     }).then(function(r){
-      if(!r.ok){if(r.status===404||r.status===429)return tryM(i+1);return r.json().catch(function(){return{};}).then(function(e){throw new Error((e.error&&e.error.message)||'Gemini APIエラー');});}
-      return r.json();
-    }).then(function(d){
-      var p=d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts;
-      return (p||[]).map(function(x){return x.text||'';}).join('');
+      if(!r.ok){
+        return r.json().catch(function(){return{};}).then(function(e){
+          lastErr = (e.error&&e.error.message)||('HTTP '+r.status);
+          
+          // APIキー間違いの場合は、他のモデルを試さずに即座にエラーを出す
+          if(r.status === 400 && lastErr.toLowerCase().indexOf('api key') !== -1) {
+             throw new Error('Gemini APIキーが無効です（コピーミスや余白が含まれていないか確認してください）');
+          }
+          // それ以外のエラー(404モデル未解禁など)は次のモデルを試す
+          return tryM(i+1);
+        });
+      }
+      return r.json().then(function(d){
+        var p=d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts;
+        return (p||[]).map(function(x){return x.text||'';}).join('');
+      });
     });
   }
   return tryM(0);
 }
+
 function apiChatGPT(msgs,sys,max){
   var key=getKey('chatgpt');
   if(!key)return Promise.reject(new Error('ChatGPT APIキー未設定'));
@@ -286,6 +306,7 @@ function apiChatGPT(msgs,sys,max){
     return (d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'';
   });
 }
+
 function apiGrok(msgs,sys,max){
   var key=getKey('grok');
   if(!key)return Promise.reject(new Error('Grok APIキー未設定'));
@@ -306,6 +327,7 @@ function apiGrok(msgs,sys,max){
   }
   return tryM(0);
 }
+
 function callAI(id,msgs,sys,max){
   if(id==='claude')return apiClaude(msgs,sys,max);
   if(id==='gemini')return apiGemini(msgs,sys,max);
