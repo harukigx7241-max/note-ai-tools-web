@@ -251,13 +251,12 @@ function apiClaude(msgs,sys,max){
   });
 }
 
-// Gemini API のエラーハンドリングと旧モデル（安定版）の追加
 function apiGemini(msgs,sys,max){
   var key=getKey('gemini');
   if(!key)return Promise.reject(new Error('Gemini APIキー未設定'));
   
-  // 安定して動く可能性が高い旧モデルを追加
-  var models=['gemini-2.5-pro','gemini-2.0-flash','gemini-1.5-pro','gemini-1.5-flash'];
+  // 💡 修正: 確実に動作する公式モデル名（-latest付きや、安定の旧モデル）を指定
+  var models=['gemini-1.5-flash-latest','gemini-1.5-pro-latest','gemini-pro'];
   
   var contents=msgs.map(function(m){return{role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]};});
   var body={contents:contents,generationConfig:{maxOutputTokens:max}};
@@ -274,11 +273,11 @@ function apiGemini(msgs,sys,max){
         return r.json().catch(function(){return{};}).then(function(e){
           lastErr = (e.error&&e.error.message)||('HTTP '+r.status);
           
-          // APIキー間違いの場合は、他のモデルを試さずに即座にエラーを出す
+          // APIキー間違いの場合は即座にエラーを出す
           if(r.status === 400 && lastErr.toLowerCase().indexOf('api key') !== -1) {
              throw new Error('Gemini APIキーが無効です（コピーミスや余白が含まれていないか確認してください）');
           }
-          // それ以外のエラー(404モデル未解禁など)は次のモデルを試す
+          // それ以外のエラー(モデルがない等)は次のモデルを試す
           return tryM(i+1);
         });
       }
@@ -306,7 +305,6 @@ function apiChatGPT(msgs,sys,max){
     return (d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'';
   });
 }
-
 function apiGrok(msgs,sys,max){
   var key=getKey('grok');
   if(!key)return Promise.reject(new Error('Grok APIキー未設定'));
@@ -327,7 +325,6 @@ function apiGrok(msgs,sys,max){
   }
   return tryM(0);
 }
-
 function callAI(id,msgs,sys,max){
   if(id==='claude')return apiClaude(msgs,sys,max);
   if(id==='gemini')return apiGemini(msgs,sys,max);
