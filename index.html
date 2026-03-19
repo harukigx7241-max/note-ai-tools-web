@@ -271,7 +271,6 @@ var TOOLS = [
 ];
 
 // ── API呼び出し群 ──
-// 【修正箇所】GrokのSyntax Errorを修正しました
 function apiClaude(msgs,sys,max){
   var key=getKey('claude'); if(!key)return Promise.reject(new Error('Claude APIキー未設定'));
   var body={model:'claude-3-7-sonnet-20250219',max_tokens:max,messages:msgs}; if(sys)body.system=sys;
@@ -763,6 +762,7 @@ function App(){
   var npS=useState({theme:'money',topic:'',age:'30s',sit:'',wry:''});
   var noteProps=npS[0]; var setNoteProps=npS[1];
   
+  // 自動保存データの読み込み
   var sDraft = useState(loadDraft()); var savedDraft = sDraft[0]; var setSavedDraft = sDraft[1];
 
   var s6=useState('genre');    var step=s6[0];      var setStep=s6[1];
@@ -786,13 +786,21 @@ function App(){
     setThemes(shuffled.slice(0, 10));
   }
 
-  function extractPersona(){
-    var al = (AGES.find(function(a){return a.id===selAge;})||{}).label || '';
+  // ★ 状況と悩みを別々に抽出できるように関数を分割し、引数で年齢を受け取るよう改善
+  function extractSituations(aid){
+    var targetAge = aid || selAge;
+    var al = (AGES.find(function(a){return a.id===targetAge;})||{}).label || '';
     var sits = shuffleArray(FB.sit[genre]||FB.sit.other).slice(0,5).map(function(s){return s.replace(/\{age\}/g, al);});
+    setSugSit(sits);
+    setSelSit(-1);
+  }
+
+  function extractWorries(aid){
+    var targetAge = aid || selAge;
+    var al = (AGES.find(function(a){return a.id===targetAge;})||{}).label || '';
     var wrys = shuffleArray(FB.wry[genre]||FB.wry.other).slice(0,5).map(function(w){return w.replace(/\{age\}/g, al);});
-    
-    setSugSit(sits); setSugWry(wrys);
-    setSelSit(-1); setSelWry(-1);
+    setSugWry(wrys);
+    setSelWry(-1);
   }
 
   if(screen==='note') return h(NoteGenerator,{
@@ -836,7 +844,9 @@ function App(){
         h('button',{className:'btn-primary',disabled:thIdx<0,onClick:function(){
           setNoteProps(function(p){return Object.assign({},p,{topic:themes[thIdx]});});
           setStep('target');
-          setTimeout(extractPersona, 10);
+          setSelAge('30s');
+          extractSituations('30s');
+          extractWorries('30s');
         }}, 'このテーマで決定 →')
       )
     ):null,
@@ -846,19 +856,22 @@ function App(){
       
       h('p',{style:{fontSize:12,color:'rgba(255,255,255,.4)',marginBottom:8,fontWeight:700}},'② ターゲット読者の年齢を選択'),
       h('div',{className:'chips',style:{marginBottom:18}},
-        AGES.map(function(a){ return h('button',{key:a.id,className:'chip'+(selAge===a.id?' chip-age-on':''), onClick:function(){ setSelAge(a.id); setTimeout(extractPersona,10); }},a.label); })
+        AGES.map(function(a){ return h('button',{key:a.id,className:'chip'+(selAge===a.id?' chip-age-on':''), onClick:function(){ setSelAge(a.id); extractSituations(a.id); extractWorries(a.id); }},a.label); })
       ),
 
       selAge?h('div',{style:{marginBottom: 18}},
-        h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginBottom:8}},
-          h('p',{className:'sw-lbl', style:{margin:0}},'③ '+ (AGES.find(function(a){return a.id===selAge;})||{}).label +'読者の具体的な「状況」と「悩み」'),
-          h('button',{className:'btn-rl',style:{padding:'4px 8px', fontSize:11}, onClick:extractPersona}, '🔄 別の候補を抽出')
+        h('p',{className:'sw-lbl', style:{marginBottom:12}},'③ '+ (AGES.find(function(a){return a.id===selAge;})||{}).label +'読者の具体的な「状況」と「悩み」'),
+        
+        h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginBottom:6}},
+          h('p',{style:{fontSize:11, color:'rgba(255,255,255,.4)', margin:0}},'▼ 状況を選択（必須）'),
+          h('button',{className:'btn-rl',style:{padding:'4px 8px', fontSize:11}, onClick:function(){extractSituations();}}, '🔄 別の状況を抽出')
         ),
+        h('div',{className:'sw-grid', style:{marginBottom:16}}, sugSit.map(function(s,i){ return h('div',{key:i,className:'sw-item'+(selSit===i?' sw-sit':''), onClick:function(){ setSelSit(i); }}, (selSit===i?'✓ ':'')+s); })),
         
-        h('p',{style:{fontSize:11, color:'rgba(255,255,255,.4)', marginBottom:6}},'▼ 状況を選択（必須）'),
-        h('div',{className:'sw-grid', style:{marginBottom:12}}, sugSit.map(function(s,i){ return h('div',{key:i,className:'sw-item'+(selSit===i?' sw-sit':''), onClick:function(){ setSelSit(i); }}, (selSit===i?'✓ ':'')+s); })),
-        
-        h('p',{style:{fontSize:11, color:'rgba(255,255,255,.4)', marginBottom:6}},'▼ 悩みを選択（必須）'),
+        h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginBottom:6}},
+          h('p',{style:{fontSize:11, color:'rgba(255,255,255,.4)', margin:0}},'▼ 悩みを選択（必須）'),
+          h('button',{className:'btn-rl',style:{padding:'4px 8px', fontSize:11}, onClick:function(){extractWorries();}}, '🔄 別の悩みを抽出')
+        ),
         h('div',{className:'sw-grid'}, sugWry.map(function(w,i){ return h('div',{key:i,className:'sw-item'+(selWry===i?' sw-wry':''), onClick:function(){ setSelWry(i); }}, (selWry===i?'✓ ':'')+w); }))
       ):null,
 
