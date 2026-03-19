@@ -12,8 +12,10 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;background:#0d0d1a;color:#fff;min-height:100vh;line-height:1.6}
+body{font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;background:#0d0d1a;color:#fff;min-height:100vh;line-height:1.6;overflow-x:hidden;-webkit-text-size-adjust:100%}
 button,input,textarea,select{font-family:inherit}
+button{-webkit-tap-highlight-color:transparent;tap-highlight-color:transparent}
+a{-webkit-tap-highlight-color:transparent}
 .landing{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 16px 60px;position:relative;overflow-x:hidden;background:linear-gradient(135deg,#0d0d1a,#1a0a2e 50%,#0a1628)}
 .landing-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
 .lz1{position:relative;z-index:1}
@@ -57,12 +59,12 @@ button,input,textarea,select{font-family:inherit}
 .btn-go{width:100%;padding:15px;border-radius:12px;background:linear-gradient(135deg,#e94560,#c2185b);border:none;color:#fff;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 5px 18px rgba(233,69,96,.4)}
 .loading-txt{text-align:center;padding:18px;color:rgba(255,255,255,.4);font-size:13px}
 .contact-box{width:100%;max-width:580px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;margin-bottom:24px}
-.ci{width:100%;padding:11px 13px;margin-bottom:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-size:14px;outline:none}
+.ci{width:100%;padding:11px 13px;margin-bottom:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-size:16px;outline:none}
 .ci:focus{border-color:rgba(233,69,96,.5)}
 .ci-ta{resize:vertical;min-height:100px}
 .btn-send{width:100%;padding:13px;border-radius:8px;background:linear-gradient(135deg,#e94560,#c2185b);border:none;color:#fff;font-size:14px;font-weight:800;cursor:pointer}
 .app-wrap{min-height:100vh;background:linear-gradient(135deg,#0d0d1a,#1a0a2e 50%,#0a1628)}
-.app-hd{background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.07);padding:12px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;backdrop-filter:blur(10px)}
+.app-hd{background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.07);padding:12px 18px;display:flex;justify-content:space-between;align-items:center;position:-webkit-sticky;position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .app-hd-l{display:flex;align-items:center;gap:10px}
 .back-btn{padding:7px 13px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:7px;color:rgba(255,255,255,.6);font-size:13px;cursor:pointer}
 .app-title{font-size:16px;font-weight:900;color:#fff;margin:0}
@@ -76,7 +78,7 @@ button,input,textarea,select{font-family:inherit}
 .tab-btn:disabled{opacity:.25;cursor:not-allowed}
 .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:16px 18px;margin-bottom:12px}
 .lbl{color:rgba(255,255,255,.55);font-size:11px;font-weight:700;letter-spacing:.1em;display:block;margin-bottom:10px}
-.inp{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-size:14px;outline:none;padding:11px 13px}
+.inp{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-size:16px;outline:none;padding:11px 13px}
 .inp:focus{border-color:rgba(233,69,96,.5)}
 .hint{font-size:11px;color:rgba(255,255,255,.28);margin-top:5px}
 .pills{display:flex;flex-wrap:wrap;gap:6px}
@@ -105,6 +107,7 @@ button,input,textarea,select{font-family:inherit}
 .copy-btn{padding:6px 13px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;transition:all .15s}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{display:inline-block;animation:spin .7s linear infinite}
+.edit-ta{width:100%;min-height:480px;padding:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:11px;color:#fff;font-size:16px;line-height:1.8;resize:vertical;outline:none}
 @media(max-width:540px){
   .landing-title{font-size:44px}
   .sw-grid{grid-template-columns:1fr}
@@ -113,6 +116,16 @@ button,input,textarea,select{font-family:inherit}
   .theme-grid{grid-template-columns:1fr}
   .app-title{font-size:14px}
   .tc-desc{display:none}
+  .app-body{padding:14px 10px}
+  .modal-box{padding:20px 16px}
+  .theme-box{padding:16px 12px}
+  .contact-box{padding:18px 14px}
+  .card{padding:14px 14px}
+  .gen-inner{padding:14px 16px}
+  .btn-row{gap:8px}
+  .btn-primary{padding:10px 18px;font-size:13px}
+  .dark-tabs{-webkit-overflow-scrolling:touch}
+  .edit-ta{min-height:300px;font-size:14px}
 }
 </style>
 </head>
@@ -761,7 +774,7 @@ style={{ background: loading ? ‘rgba(233,69,96,.15)’ : ‘linear-gradient(13
 </div>
 </div>
 <textarea value={editText} onChange={function(e){ setEditText(e.target.value); }}
-style={{ width:‘100%’, minHeight:520, padding:13, background:‘rgba(255,255,255,.04)’, border:‘1px solid rgba(255,255,255,.1)’, borderRadius:11, color:’#fff’, fontSize:14, lineHeight:1.8, resize:‘vertical’, outline:‘none’, fontFamily:‘monospace’ }}/>
+className=“edit-ta” style={{ fontFamily:‘monospace’ }}/>
 </div>
 )}
 {tab === ‘preview’ && hasArt && (
