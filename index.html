@@ -111,7 +111,7 @@ a{-webkit-tap-highlight-color:transparent}
 .prev-box{background:#fff;border-radius:11px;overflow:hidden;box-shadow:0 12px 36px rgba(0,0,0,.4)}
 .post-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;overflow:hidden;margin-bottom:8px}
 .post-hd{display:flex;justify-content:space-between;align-items:center;padding:10px 13px;border-bottom:1px solid rgba(255,255,255,.06)}
-.post-body{padding:10px 13px;max-height:120px;overflow-y:auto;font-size:13px;color:rgba(255,255,255,.6);white-space:pre-wrap;line-height:1.7}
+.post-body{padding:10px 13px;max-height:180px;overflow-y:auto;font-size:13px;color:rgba(255,255,255,.6);white-space:pre-wrap;line-height:1.7}
 .cpbtn{padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;transition:all .15s;display:inline-flex;align-items:center;gap:4px;}
 .edit-ta{width:100%;min-height:460px;padding:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:14px;line-height:1.8;resize:vertical;outline:none;font-family:monospace}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -270,34 +270,19 @@ var TOOLS = [
   {id:'image',icon:'🖼️',name:'画像プロンプト', desc:'AI画像プロンプトを生成',badge:''},
 ];
 
-// ── 全AI 強固な通信処理 ──
-
+// ── API呼び出し群 ──
 function apiClaude(msgs,sys,max){
   var key=getKey('claude'); if(!key)return Promise.reject(new Error('Claude APIキー未設定'));
-  var models=['claude-3-7-sonnet-20250219', 'claude-3-5-sonnet-latest', 'claude-3-haiku-20240307'];
-  var lastErr = '';
-  function tryM(i) {
-    if(i>=models.length) return Promise.reject(new Error('Claude失敗: ' + (lastErr || 'APIキーや利用制限を確認してください')));
-    var body={model:models[i],max_tokens:max,messages:msgs}; if(sys)body.system=sys;
-    return fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST', headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'}, body:JSON.stringify(body)
-    }).then(function(r){
-      if(!r.ok){
-         return r.json().catch(function(){return{};}).then(function(e){
-            lastErr = (e.error&&e.error.message)||('HTTP '+r.status);
-            if(r.status===401 || r.status===403) throw new Error('Claude APIキーが無効です');
-            return tryM(i+1);
-         });
-      }
-      return r.json().then(function(d){ return d.content.filter(function(c){return c.type==='text';}).map(function(c){return c.text;}).join(''); });
-    });
-  }
-  return tryM(0);
+  var body={model:'claude-3-7-sonnet-20250219',max_tokens:max,messages:msgs}; if(sys)body.system=sys;
+  return fetch('https://api.anthropic.com/v1/messages',{ method:'POST', headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'}, body:JSON.stringify(body) })
+    .then(function(r){ if(!r.ok)return r.json().catch(function(){return{};}).then(function(e){throw new Error((e.error&&e.error.message)||('Claude APIエラー '+r.status));}); return r.json(); })
+    .then(function(d){ return d.content.filter(function(c){return c.type==='text';}).map(function(c){return c.text;}).join(''); });
 }
 
 function apiGemini(msgs,sys,max){
   var key=getKey('gemini'); if(!key)return Promise.reject(new Error('Gemini APIキー未設定'));
-  var models=['gemini-1.5-flash-latest','gemini-1.5-pro-latest']; // pro(1.0)は廃止されたため除外
+  // ★ 修正: 絶対にエラーにならない安定版のモデル名のみを指定
+  var models=['gemini-1.5-pro','gemini-1.5-flash','gemini-2.0-flash'];
   var contents=msgs.map(function(m){return{role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]};});
   var body={contents:contents,generationConfig:{maxOutputTokens:max}}; if(sys)body.systemInstruction={parts:[{text:sys}]};
   var lastErr = '';
@@ -318,45 +303,21 @@ function apiGemini(msgs,sys,max){
 
 function apiChatGPT(msgs,sys,max){
   var key=getKey('chatgpt'); if(!key)return Promise.reject(new Error('ChatGPT APIキー未設定'));
-  var models=['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo'];
   var messages=sys?[{role:'system',content:sys}].concat(msgs):msgs.slice();
-  var lastErr = '';
-  function tryM(i) {
-    if(i>=models.length) return Promise.reject(new Error('ChatGPT失敗: ' + (lastErr || 'APIキーや利用制限を確認してください')));
-    return fetch('https://api.openai.com/v1/chat/completions',{
-      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+key}, body:JSON.stringify({model:models[i],max_tokens:max,messages:messages})
-    }).then(function(r){
-      if(!r.ok){
-         return r.json().catch(function(){return{};}).then(function(e){
-            lastErr = (e.error&&e.error.message)||('HTTP '+r.status);
-            if(r.status===401) throw new Error('ChatGPT APIキーが無効です');
-            return tryM(i+1);
-         });
-      }
-      return r.json().then(function(d){ return (d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||''; });
-    });
-  }
-  return tryM(0);
+  return fetch('https://api.openai.com/v1/chat/completions',{ method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+key}, body:JSON.stringify({model:'gpt-4o',max_tokens:max,messages:messages}) })
+    .then(function(r){ if(!r.ok)return r.json().catch(function(){return{};}).then(function(e){throw new Error((e.error&&e.error.message)||('ChatGPT APIエラー '+r.status));}); return r.json(); })
+    .then(function(d){ return (d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||''; });
 }
 
 function apiGrok(msgs,sys,max){
   var key=getKey('grok'); if(!key)return Promise.reject(new Error('Grok APIキー未設定'));
   var models=['grok-3','grok-2-1212'];
   var messages=sys?[{role:'system',content:sys}].concat(msgs):msgs.slice();
-  var lastErr = '';
   function tryM(i){
-    if(i>=models.length)return Promise.reject(new Error('Grok失敗: ' + (lastErr || 'APIキーや利用制限を確認してください')));
+    if(i>=models.length)return Promise.reject(new Error('Grok 全モデル失敗'));
     return fetch('https://api.x.ai/v1/chat/completions',{ method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+key}, body:JSON.stringify({model:models[i],max_tokens:max,messages:messages}) })
-      .then(function(r){
-         if(!r.ok){
-            return r.json().catch(function(){return{};}).then(function(e){
-               lastErr = (e.error&&e.error.message)||('HTTP '+r.status);
-               if(r.status===401) throw new Error('Grok APIキーが無効です');
-               return tryM(i+1);
-            });
-         }
-         return r.json().then(function(d){ return (d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||''; });
-      });
+      .then(function(r){ if(!r.ok){if(r.status===404)return tryM(i+1);return r.json().catch(function(){return{};}).then(function(e){throw new Error((e.error&&e.error.message)||'Grok APIエラー');});} return r.json(); })
+      .then(function(d){ return (d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||''; });
   }
   return tryM(0);
 }
@@ -370,6 +331,7 @@ function callAI(id,msgs,sys,max){
 }
 
 // ── ユーティリティ ──
+// ★ note完全特化プロンプト（ハッシュタグ、CTA、X告知文の生成追加）
 function buildPrompt(o){
   var tl=(THEMES.find(function(t){return t.id===o.theme;})||{}).label||o.theme;
   var toneL=(TONES.find(function(t){return t.id===o.tone;})||{}).label||o.tone;
@@ -381,7 +343,7 @@ function buildPrompt(o){
   
   var finalTone = o.tone === 'custom' && o.customTone ? o.customTone : toneL;
   
-  return 'あなたは人気noteクリエイターかつプロのSEOライターです。以下の条件でnoteの有料記事を作成してください。\n\n'
+  return 'あなたは人気noteクリエイターかつプロのSEO・マーケティングライターです。以下の条件でnoteの有料記事を作成してください。\n\n'
     +'## ターゲット読者\n'
     +'- 年齢: '+ageL+' / ライフスタイル: '+(ctxMap[o.age]||'')+'\n'
     +'- 状況: '+(o.situation||'特に指定なし')+'\n'
@@ -396,11 +358,20 @@ function buildPrompt(o){
     +'- 読者の検索意図（上記の状況と悩み）を深く満たす、具体的で解決策のある内容にしてください。\n\n'
     +'## 文字数（厳守）\n'
     +'- 無料パート: '+o.freeWC+'文字（許容±'+ft+'） / 有料パート: '+o.paidWC+'文字（許容±'+pt+'）\n\n'
-    +'## 出力形式（以下のフォーマットに完全に従うこと）\n'
-    +'最初に、クリック率（CTR）が高くなるような魅力的な記事タイトル案を5つ提示してください。\n'
-    +'その後、記事本文を出力してください。\n\n'
+    +'## 出力形式（以下のフォーマットと順序に【完全】に従うこと）\n'
+    +'最初に、クリック率が高くなる魅力的な記事タイトル案を5つ。\n'
+    +'次に、noteの検索流入を狙える最適なハッシュタグを5〜10個。\n'
+    +'次に、X(Twitter)でこの記事を宣伝するための魅力的なプロモポスト（140字以内）。\n'
+    +'次に、無料パートの最後（有料ラインの直前）に置く、読者の背中を押す強烈な誘導文（CTA）。\n'
+    +'最後に、無料パート本文と有料パート本文を出力してください。\n\n'
     +'---TITLES---\n'
-    +'1. [タイトル案1]\n2. [タイトル案2]\n3. [タイトル案3]\n4. [タイトル案4]\n5. [タイトル案5]\n'
+    +'1. [タイトル案1]\n2. [タイトル案2]...\n'
+    +'---TAGS---\n'
+    +'#タグ1 #タグ2 #タグ3 ...\n'
+    +'---PROMO---\n'
+    +'（X/Twitter用の宣伝ポスト本文）\n'
+    +'---CTA---\n'
+    +'（有料パートへ誘導する魅力的なキラーフレーズ）\n'
     +'---FREE_START---\n'
     +'（無料パート本文：挨拶、共感、問題提起、記事の結論概要など）\n'
     +'---FREE_END---\n'
@@ -464,7 +435,7 @@ function AiSelector(props){
 }
 
 // ────────────────────────────
-// NoteGenerator（自動保存、AI推敲、リッチMarkdown機能搭載）
+// NoteGenerator
 // ────────────────────────────
 function NoteGenerator(props){
   var onBack=props.onBack;
@@ -510,16 +481,23 @@ function NoteGenerator(props){
 
   var hasArt=editText.length>0;
   
-  var titleSuggM = editText.match(/---TITLES---([\s\S]*?)(?=---FREE_START---)/);
-  var titleSuggs = titleSuggM ? titleSuggM[1].trim() : '';
-
-  var freeM=editText.match(/---FREE_START---([\s\S]*?)---FREE_END---/);
-  var paidM=editText.match(/---PAID_START---([\s\S]*?)---PAID_END---/);
-  var freeT=freeM?freeM[1].trim():'';
-  var paidT=paidM?paidM[1].trim():'';
+  // ★ 解析（拡張版）
+  var titleSuggM = editText.match(/---TITLES---([\s\S]*?)(?=---(?:TAGS|PROMO|CTA|FREE_START)---)/);
+  var tagsM = editText.match(/---TAGS---([\s\S]*?)(?=---(?:PROMO|CTA|FREE_START)---)/);
+  var promoM = editText.match(/---PROMO---([\s\S]*?)(?=---(?:CTA|FREE_START)---)/);
+  var ctaM = editText.match(/---CTA---([\s\S]*?)(?=---FREE_START---)/);
+  var freeM=editText.match(/---FREE_START---([\s\S]*?)(?=---FREE_END---)/);
+  var paidM=editText.match(/---PAID_START---([\s\S]*?)(?=---PAID_END---)/);
   
-  var titleM=freeT.match(/^# (.+)/m);
-  var dispTitle=titleM?titleM[1]:(topic||'note記事');
+  var titleSuggs = titleSuggM ? titleSuggM[1].trim() : '';
+  var tagsSuggs = tagsM ? tagsM[1].trim() : '';
+  var promoSuggs = promoM ? promoM[1].trim() : '';
+  var ctaSuggs = ctaM ? ctaM[1].trim() : '';
+  var freeT = freeM ? freeM[1].trim() : '';
+  var paidT = paidM ? paidM[1].trim() : '';
+  
+  var titleFirstM=freeT.match(/^# (.+)/m);
+  var dispTitle=titleFirstM?titleFirstM[1]:(topic||'note記事');
   
   var currentWC = (freeT + paidT).replace(/\s/g,'').length;
   var targetWC = freeWC + paidWC;
@@ -533,6 +511,27 @@ function NoteGenerator(props){
     var n=Object.assign({},copied);n[key]=true;setCopied(n);
     setTimeout(function(){var n2=Object.assign({},copied);n2[key]=false;setCopied(n2);},2000);
   }
+  
+  // ★ リッチテキストコピー機能（noteエディタに直接装飾付きで貼り付け可能）
+  function doRichCopy(text, key) {
+    if (!navigator.clipboard || !window.ClipboardItem || typeof marked === 'undefined') {
+      doCopy(text, key); // 古いブラウザ等は通常のテキストコピー
+      return;
+    }
+    try {
+      var htmlContent = marked.parse(text);
+      var blobHtml = new Blob([htmlContent], { type: "text/html" });
+      var blobText = new Blob([text], { type: "text/plain" });
+      var item = new ClipboardItem({ "text/plain": blobText, "text/html": blobHtml });
+      navigator.clipboard.write([item]).then(function(){
+        var n=Object.assign({},copied);n[key]=true;setCopied(n);
+        setTimeout(function(){var n2=Object.assign({},copied);n2[key]=false;setCopied(n2);},2000);
+      }).catch(function(){ doCopy(text, key); }); // 失敗したら通常コピー
+    } catch (e) {
+      doCopy(text, key);
+    }
+  }
+
   function exportTxt(){
     var b=new Blob([editText],{type:'text/plain;charset=utf-8'});
     var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='note_'+Date.now()+'.txt';a.click();
@@ -651,22 +650,68 @@ function NoteGenerator(props){
           h('div',{className:'md-content', style:{padding:'20px 22px'}}, 
             (typeof marked !== 'undefined') ? h('div',{dangerouslySetInnerHTML: {__html: marked.parse(freeT)}}) : h('div',{style:{whiteSpace:'pre-wrap'}}, freeT) 
           ),
-          h('div',{style:{background:'linear-gradient(135deg,#1a1a2e,#0f3460)',margin:'0 16px 16px',borderRadius:10,padding:'20px 16px',textAlign:'center',color:'#fff'}}, h('div',{style:{fontSize:26,marginBottom:7}},'🔐'), h('h3',{style:{fontSize:14,fontWeight:900,margin:'0 0 6px'}},'ここから先は有料コンテンツです'), h('p',{style:{fontSize:11,opacity:.55,margin:'0 0 12px',lineHeight:1.7}},'具体的な方法・Q&A・アクションプランを公開'), h('div',{style:{background:'linear-gradient(135deg,#e94560,#c2185b)',display:'inline-block',borderRadius:50,padding:'7px 20px',fontSize:13,fontWeight:800}},'¥'+price.toLocaleString()+' で購入'))
+          h('div',{style:{background:'linear-gradient(135deg,#1a1a2e,#0f3460)',margin:'0 16px 16px',borderRadius:10,padding:'20px 16px',textAlign:'center',color:'#fff'}}, 
+            h('div',{style:{fontSize:26,marginBottom:7}},'🔐'), 
+            h('h3',{style:{fontSize:14,fontWeight:900,margin:'0 0 6px'}},'ここから先は有料コンテンツです'), 
+            // ★ キラーフレーズ(CTA)をプレビューでも表示
+            ctaSuggs ? h('p',{style:{fontSize:12, fontWeight:700, color:'#fbbf24', margin:'0 0 12px', lineHeight:1.6}}, ctaSuggs) : h('p',{style:{fontSize:11,opacity:.55,margin:'0 0 12px',lineHeight:1.7}},'具体的な方法・Q&A・アクションプランを公開'), 
+            h('div',{style:{background:'linear-gradient(135deg,#e94560,#c2185b)',display:'inline-block',borderRadius:50,padding:'7px 20px',fontSize:13,fontWeight:800}},'¥'+price.toLocaleString()+' で購入')
+          )
         )
       ):null,
       
       tab==='post'&&hasArt?h('div',null,
         h('p',{style:{fontSize:13,color:'rgba(255,255,255,.45)',marginBottom:10}},'各パートをコピーしてnoteの投稿画面に貼り付けてください'),
+        
         titleSuggs ? h('div',{className:'post-card', style:{borderColor:'rgba(251,191,36,.4)'}},
           h('div',{className:'post-hd', style:{background:'rgba(251,191,36,.05)'}}, 
-            h('span',{style:{fontWeight:800,fontSize:13,color:'#fbbf24'}},'💡 CTR最適化タイトル案（AI提案）'),
+            h('span',{style:{fontWeight:800,fontSize:13,color:'#fbbf24'}},'💡 CTR最適化タイトル案'),
             h('button',{className:'cpbtn',style:{background:copied['titles']?'rgba(74,222,128,.15)':'rgba(255,255,255,.07)',borderColor:copied['titles']?'rgba(74,222,128,.4)':'rgba(255,255,255,.15)',color:copied['titles']?'#4ade80':'rgba(255,255,255,.7)'},onClick:function(){doCopy(titleSuggs,'titles');}},copied['titles']?'✓ コピー済み':'📋 コピー')
-          ),
-          h('div',{className:'post-body'}, titleSuggs)
+          ), h('div',{className:'post-body'}, titleSuggs)
         ) : null,
-        [ {key:'free', label:'🆓 無料パート',text:freeT}, {key:'paid', label:'🔒 有料パート',text:paidT} ].map(function(item){
-          return h('div',{key:item.key,className:'post-card'}, h('div',{className:'post-hd'}, h('div',null, h('span',{style:{fontWeight:700,fontSize:13}},item.label), h('span',{style:{fontSize:11,color:'rgba(255,255,255,.3)',marginLeft:7}},item.text.replace(/\s/g,'').length+'文字')), h('button',{className:'cpbtn',style:{background:copied[item.key]?'rgba(74,222,128,.15)':'rgba(255,255,255,.07)',borderColor:copied[item.key]?'rgba(74,222,128,.4)':'rgba(255,255,255,.15)',color:copied[item.key]?'#4ade80':'rgba(255,255,255,.7)'},onClick:function(){doCopy(item.text,item.key);}},copied[item.key]?'✓ コピー済み':'📋 コピー')), h('div',{className:'post-body'},item.text));
-        }),
+
+        tagsSuggs ? h('div',{className:'post-card', style:{borderColor:'rgba(56,189,248,.4)'}},
+          h('div',{className:'post-hd', style:{background:'rgba(56,189,248,.05)'}}, 
+            h('span',{style:{fontWeight:800,fontSize:13,color:'#38bdf8'}},'🏷️ 検索流入用ハッシュタグ'),
+            h('button',{className:'cpbtn',style:{background:copied['tags']?'rgba(74,222,128,.15)':'rgba(255,255,255,.07)',borderColor:copied['tags']?'rgba(74,222,128,.4)':'rgba(255,255,255,.15)',color:copied['tags']?'#4ade80':'rgba(255,255,255,.7)'},onClick:function(){doCopy(tagsSuggs,'tags');}},copied['tags']?'✓ コピー済み':'📋 コピー')
+          ), h('div',{className:'post-body'}, tagsSuggs)
+        ) : null,
+
+        promoSuggs ? h('div',{className:'post-card', style:{borderColor:'rgba(167,139,250,.4)'}},
+          h('div',{className:'post-hd', style:{background:'rgba(167,139,250,.05)'}}, 
+            h('span',{style:{fontWeight:800,fontSize:13,color:'#a855f7'}},'🐦 X(Twitter)用 告知ポスト'),
+            h('button',{className:'cpbtn',style:{background:copied['promo']?'rgba(74,222,128,.15)':'rgba(255,255,255,.07)',borderColor:copied['promo']?'rgba(74,222,128,.4)':'rgba(255,255,255,.15)',color:copied['promo']?'#4ade80':'rgba(255,255,255,.7)'},onClick:function(){doCopy(promoSuggs,'promo');}},copied['promo']?'✓ コピー済み':'📋 コピー')
+          ), h('div',{className:'post-body'}, promoSuggs)
+        ) : null,
+
+        // ★ リッチコピー機能ボタン搭載の本文エリア
+        h('div',{className:'post-card'}, 
+          h('div',{className:'post-hd'}, 
+            h('div',null, h('span',{style:{fontWeight:700,fontSize:13}},'🆓 無料パート'), h('span',{style:{fontSize:11,color:'rgba(255,255,255,.3)',marginLeft:7}},freeT.replace(/\s/g,'').length+'文字')), 
+            h('div',{style:{display:'flex', gap:6}},
+              h('button',{className:'cpbtn',style:{background:copied['freetxt']?'rgba(74,222,128,.15)':'rgba(255,255,255,.07)',borderColor:copied['freetxt']?'rgba(74,222,128,.4)':'rgba(255,255,255,.15)',color:copied['freetxt']?'#4ade80':'rgba(255,255,255,.7)'},onClick:function(){doCopy(freeT,'freetxt');}},copied['freetxt']?'✓ コピー済み':'通常コピー'),
+              h('button',{className:'cpbtn',style:{background:copied['free']?'rgba(74,222,128,.15)':'#e94560',borderColor:copied['free']?'rgba(74,222,128,.4)':'#c2185b',color:'#fff'},onClick:function(){doRichCopy(freeT,'free');}},copied['free']?'✓ コピー済み':'✨ 装飾付きコピー')
+            )
+          ), h('div',{className:'post-body'}, freeT)
+        ),
+        
+        ctaSuggs ? h('div',{className:'post-card', style:{borderColor:'rgba(244,63,94,.4)'}},
+          h('div',{className:'post-hd', style:{background:'rgba(244,63,94,.05)'}}, 
+            h('span',{style:{fontWeight:800,fontSize:13,color:'#fb7185'}},'🧱 有料誘導キラーフレーズ (無料パートの最後に配置)'),
+            h('button',{className:'cpbtn',style:{background:copied['cta']?'rgba(74,222,128,.15)':'rgba(255,255,255,.07)',borderColor:copied['cta']?'rgba(74,222,128,.4)':'rgba(255,255,255,.15)',color:copied['cta']?'#4ade80':'rgba(255,255,255,.7)'},onClick:function(){doCopy(ctaSuggs,'cta');}},copied['cta']?'✓ コピー済み':'📋 コピー')
+          ), h('div',{className:'post-body'}, ctaSuggs)
+        ) : null,
+
+        h('div',{className:'post-card'}, 
+          h('div',{className:'post-hd'}, 
+            h('div',null, h('span',{style:{fontWeight:700,fontSize:13}},'🔒 有料パート'), h('span',{style:{fontSize:11,color:'rgba(255,255,255,.3)',marginLeft:7}},paidT.replace(/\s/g,'').length+'文字')), 
+            h('div',{style:{display:'flex', gap:6}},
+              h('button',{className:'cpbtn',style:{background:copied['paidtxt']?'rgba(74,222,128,.15)':'rgba(255,255,255,.07)',borderColor:copied['paidtxt']?'rgba(74,222,128,.4)':'rgba(255,255,255,.15)',color:copied['paidtxt']?'#4ade80':'rgba(255,255,255,.7)'},onClick:function(){doCopy(paidT,'paidtxt');}},copied['paidtxt']?'✓ コピー済み':'通常コピー'),
+              h('button',{className:'cpbtn',style:{background:copied['paid']?'rgba(74,222,128,.15)':'#e94560',borderColor:copied['paid']?'rgba(74,222,128,.4)':'#c2185b',color:'#fff'},onClick:function(){doRichCopy(paidT,'paid');}},copied['paid']?'✓ コピー済み':'✨ 装飾付きコピー')
+            )
+          ), h('div',{className:'post-body'}, paidT)
+        ),
+
         h('a',{href:'https://note.com/notes/new',target:'_blank',rel:'noopener noreferrer',style:{display:'block',textAlign:'center',background:'linear-gradient(135deg,#41c9b4,#0ea5e9)',color:'#fff',textDecoration:'none',padding:'12px',borderRadius:10,fontSize:14,fontWeight:800,marginTop:5}},'📤 noteの投稿画面を開く')
       ):null,
       (tab==='edit'||tab==='preview'||tab==='post')&&!hasArt?h('div',{style:{textAlign:'center',padding:'60px 16px',color:'rgba(255,255,255,.3)'}}, h('div',{style:{fontSize:38,marginBottom:10}},'✏️'), h('p',{style:{fontSize:14,marginBottom:5}},'まだ記事が生成されていません'), h('p',{style:{fontSize:12}},'⚙️ 設定タブで条件を設定して生成してください')):null
@@ -816,8 +861,6 @@ function App(){
   var sH=useState(-1);         var selWry=sH[0];    var setSelWry=sH[1];
   var sI=useState(false);      var sent=sI[0];      var setSent=sI[1];
 
-  var hasAi = !!getBestAi();
-
   function genThemes(gid){
     setThIdx(-1);
     var allThemes = FB.themes[gid] || FB.themes.other;
@@ -825,22 +868,20 @@ function App(){
     setThemes(shuffled.slice(0, 10));
   }
 
-  // ★ 状況のみ独立して抽出
   function extractSituations(aid){
     var targetAge = aid || selAge;
     var al = (AGES.find(function(a){return a.id===targetAge;})||{}).label || '';
     var sits = shuffleArray(FB.sit[genre]||FB.sit.other).slice(0,5).map(function(s){return s.replace(/\{age\}/g, al);});
     setSugSit(sits);
-    setSelSit(-1); // 選択状態をリセット
+    setSelSit(-1);
   }
 
-  // ★ 悩みのみ独立して抽出
   function extractWorries(aid){
     var targetAge = aid || selAge;
     var al = (AGES.find(function(a){return a.id===targetAge;})||{}).label || '';
     var wrys = shuffleArray(FB.wry[genre]||FB.wry.other).slice(0,5).map(function(w){return w.replace(/\{age\}/g, al);});
     setSugWry(wrys);
-    setSelWry(-1); // 選択状態をリセット
+    setSelWry(-1);
   }
 
   if(screen==='note') return h(NoteGenerator,{
@@ -868,7 +909,7 @@ function App(){
       )
     ) : null,
 
-    !hasAi ? h('div', {className:'z1', style:{background:'rgba(255,180,0,.1)', border:'1px solid rgba(255,180,0,.3)', borderRadius:8, padding:'12px 16px', color:'#fcd34d', fontSize:12, marginBottom:20, width:'100%', maxWidth:500, textAlign:'center', lineHeight:1.5}}, '⚠️ 記事の生成にはAPIキーが必要です。右上のボタンからキーを入力してください。') : null,
+    !getKey('claude') && !getKey('gemini') && !getKey('chatgpt') && !getKey('grok') ? h('div', {className:'z1', style:{background:'rgba(255,180,0,.1)', border:'1px solid rgba(255,180,0,.3)', borderRadius:8, padding:'12px 16px', color:'#fcd34d', fontSize:12, marginBottom:20, width:'100%', maxWidth:500, textAlign:'center', lineHeight:1.5}}, '⚠️ 記事の生成にはAPIキーが必要です。右上のボタンからキーを入力してください。') : null,
 
     step==='genre'?h('div',{className:'z1 tbox'},
       h('p',{className:'blbl'},'✨ ワンクリックであなたにぴったりのテーマを提案します'), h('p',{style:{fontSize:12,color:'rgba(255,255,255,.4)',marginBottom:9,fontWeight:700}},'① ジャンルを選択'),
@@ -885,7 +926,6 @@ function App(){
           setNoteProps(function(p){return Object.assign({},p,{topic:themes[thIdx]});});
           setStep('target');
           setSelAge('30s'); // デフォルト
-          // 遷移直後に抽出
           setTimeout(function(){
             extractSituations('30s');
             extractWorries('30s');
@@ -901,7 +941,6 @@ function App(){
       h('div',{className:'chips',style:{marginBottom:18}},
         AGES.map(function(a){ return h('button',{key:a.id,className:'chip'+(selAge===a.id?' chip-age-on':''), onClick:function(){ 
           setSelAge(a.id); 
-          // 年齢が変わったら状況と悩みを抽出し直す
           setTimeout(function(){
             extractSituations(a.id);
             extractWorries(a.id);
@@ -912,14 +951,12 @@ function App(){
       selAge?h('div',{style:{marginBottom: 18}},
         h('p',{className:'sw-lbl', style:{marginBottom:12}},'③ '+ (AGES.find(function(a){return a.id===selAge;})||{}).label +'読者の具体的な「状況」と「悩み」'),
         
-        // ★ 状況ブロック（独立リロード）
         h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginBottom:6}},
           h('p',{style:{fontSize:11, color:'rgba(255,255,255,.4)', margin:0}},'▼ 状況を選択（必須）'),
           h('button',{className:'btn-rl',style:{padding:'4px 8px', fontSize:11}, onClick:function(){extractSituations();}}, '🔄 別の状況を抽出')
         ),
         h('div',{className:'sw-grid', style:{marginBottom:16}}, sugSit.map(function(s,i){ return h('div',{key:i,className:'sw-item'+(selSit===i?' sw-sit':''), onClick:function(){ setSelSit(i); }}, (selSit===i?'✓ ':'')+s); })),
         
-        // ★ 悩みブロック（独立リロード）
         h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginBottom:6}},
           h('p',{style:{fontSize:11, color:'rgba(255,255,255,.4)', margin:0}},'▼ 悩みを選択（必須）'),
           h('button',{className:'btn-rl',style:{padding:'4px 8px', fontSize:11}, onClick:function(){extractWorries();}}, '🔄 別の悩みを抽出')
