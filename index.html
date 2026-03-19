@@ -7,7 +7,7 @@
 <title>note AI Tools</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.23.10/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <style>
@@ -194,7 +194,7 @@ method:‘POST’,
 headers:{‘Content-Type’:‘application/json’,‘x-api-key’:key,‘anthropic-version’:‘2023-06-01’,‘anthropic-dangerous-direct-browser-access’:‘true’},
 body:JSON.stringify(body)
 });
-if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||‘Claude APIエラー ‘+r.status);}
+if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error((e.error&&e.error.message)||‘Claude APIエラー ‘+r.status);}
 const d=await r.json();
 return d.content.filter(c=>c.type===‘text’).map(c=>c.text).join(’’);
 }
@@ -207,12 +207,12 @@ const body={contents,generationConfig:{maxOutputTokens:max}};
 if(sys) body.systemInstruction={parts:[{text:sys}]};
 async function tryModel(i){
 if(i>=models.length) throw new Error(‘Gemini 全モデル失敗’);
-const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${models[i]}:generateContent?key=${key}`,{
+const r=await fetch(‘https://generativelanguage.googleapis.com/v1beta/models/’+models[i]+’:generateContent?key=’+key,{
 method:‘POST’,headers:{‘Content-Type’:‘application/json’},body:JSON.stringify(body)
 });
-if(!r.ok){ if(r.status===404||r.status===429) return tryModel(i+1); const e=await r.json().catch(()=>({})); throw new Error(e.error?.message||‘Gemini APIエラー’); }
+if(!r.ok){ if(r.status===404||r.status===429) return tryModel(i+1); const e=await r.json().catch(()=>({})); throw new Error((e.error&&e.error.message)||‘Gemini APIエラー’); }
 const d=await r.json();
-return (d.candidates?.[0]?.content?.parts||[]).map(p=>p.text||’’).join(’’);
+return ((d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[]).map(p=>p.text||’’).join(’’);
 }
 return tryModel(0);
 }
@@ -225,9 +225,9 @@ method:‘POST’,
 headers:{‘Content-Type’:‘application/json’,‘Authorization’:’Bearer ’+key},
 body:JSON.stringify({model:‘gpt-4o’,max_tokens:max,messages})
 });
-if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||‘ChatGPT APIエラー ‘+r.status);}
+if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error((e.error&&e.error.message)||‘ChatGPT APIエラー ‘+r.status);}
 const d=await r.json();
-return d.choices?.[0]?.message?.content||’’;
+return (d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||’’;
 }
 
 async function callGrok(msgs,sys,max){
@@ -241,9 +241,9 @@ method:‘POST’,
 headers:{‘Content-Type’:‘application/json’,‘Authorization’:‘Bearer ‘+key},
 body:JSON.stringify({model:models[i],max_tokens:max,messages})
 });
-if(!r.ok){ if(r.status===404) return tryModel(i+1); const e=await r.json().catch(()=>({})); throw new Error(e.error?.message||‘Grok APIエラー’); }
+if(!r.ok){ if(r.status===404) return tryModel(i+1); const e=await r.json().catch(()=>({})); throw new Error((e.error&&e.error.message)||‘Grok APIエラー’); }
 const d=await r.json();
-return d.choices?.[0]?.message?.content||’’;
+return (d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||’’;
 }
 return tryModel(0);
 }
@@ -280,7 +280,7 @@ try{
 const q=JSON.parse(localStorage.getItem(ADM_QUE)||’[]’);
 if(!q.length){_flushing=false;return;}
 const path=cfg.path||‘data.json’;
-const url=`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`;
+const url=‘https://api.github.com/repos/’+cfg.owner+’/’+cfg.repo+’/contents/’+path;
 const hd={‘Authorization’:‘Bearer ‘+cfg.pat,‘Accept’:‘application/vnd.github+json’};
 const gr=await fetch(url,{headers:hd});
 let stats={totalAccess:0,totalGenerate:0,lastAccess:null,byTool:{},byAi:{},byTheme:{},dailyAccess:{},history:[]};
@@ -334,7 +334,7 @@ return (
 <span>{ai.icon}</span>{ai.label}
 {keys[ai.id]&&<span style={{background:‘rgba(74,222,128,.15)’,border:‘1px solid rgba(74,222,128,.3)’,borderRadius:4,padding:‘1px 6px’,fontSize:10,color:’#4ade80’}}>✓ 設定済み</span>}
 </label>
-<input className=“inp” type=“password” placeholder={`${ai.label} APIキー`}
+<input className=“inp” type=“password” placeholder={ai.label+” APIキー”}
 defaultValue={keys[ai.id]||’’}
 onBlur={e=>save(ai.id,e.target.value.trim())}/>
 </div>
@@ -406,39 +406,24 @@ const ageCtx={
 }[age]||’’;
 const kw=(SEO_KW[theme]||SEO_KW.other).slice(0,4).join(’・’);
 const ft=Math.max(50,Math.round(freeWC*.1)),pt=Math.max(50,Math.round(paidWC*.1));
-return `あなたは人気noteクリエイターかつSEOライターです。以下の条件でnoteの有料記事を作成してください。
-
-## ターゲット読者
-
-- 年齢: ${ageL} / ライフスタイル: ${ageCtx}
-- 状況: ${situation||‘特に指定なし’} / 悩み: ${worry||‘特に指定なし’}
-
-## 記事設定
-
-- ジャンル: ${tl} / テーマ: ${topic||‘ジャンルで最も読まれるテーマ’}
-- 文体: ${toneL} / 販売価格: ¥${price.toLocaleString()}
-
-## SEO
-
-- キーワード（必ず含める）: ${kw}
-- タイトルにキーワードを含め、冒頭200文字以内にも自然に入れる
-
-## 文字数（厳守）
-
-- 無料: ${freeWC}文字（許容±${ft}）/ 有料: ${paidWC}文字（許容±${pt}）
-
-## 構成
-
-タイトル「# 」で始める。冒頭50-100文字の要約。
-—FREE_START— で無料開始 → —FREE_END— で終了
-—PAID_START— で有料開始 → —PAID_END— で終了
-
-—FREE_START—
-（ここから無料パート）
-—FREE_END—
-—PAID_START—
-（ここから有料パート）
-—PAID_END—`;
+return ‘あなたは人気noteクリエイターかつSEOライターです。以下の条件でnoteの有料記事を作成してください。\n\n’
++ ‘## ターゲット読者\n’
++ ’- 年齢: ’ + ageL + ’ / ライフスタイル: ’ + ageCtx + ‘\n’
++ ’- 状況: ’ + (situation||‘特に指定なし’) + ’ / 悩み: ’ + (worry||‘特に指定なし’) + ‘\n\n’
++ ‘## 記事設定\n’
++ ’- ジャンル: ’ + tl + ’ / テーマ: ’ + (topic||‘ジャンルで最も読まれるテーマ’) + ‘\n’
++ ‘- 文体: ’ + toneL + ’ / 販売価格: ¥’ + price.toLocaleString() + ‘\n\n’
++ ‘## SEO\n’
++ ’- キーワード（必ず含める）: ’ + kw + ‘\n’
++ ‘- タイトルにキーワードを含め、冒頭200文字以内にも自然に入れる\n\n’
++ ‘## 文字数（厳守）\n’
++ ’- 無料: ’ + freeWC + ‘文字（許容±’ + ft + ’）/ 有料: ’ + paidWC + ‘文字（許容±’ + pt + ‘）\n\n’
++ ‘## 構成\n’
++ ‘タイトル「# 」で始める。冒頭50-100文字の要約。\n’
++ ‘—FREE_START— で無料開始 → —FREE_END— で終了\n’
++ ‘—PAID_START— で有料開始 → —PAID_END— で終了\n\n’
++ ‘—FREE_START—\n（ここから無料パート）\n—FREE_END—\n’
++ ‘—PAID_START—\n（ここから有料パート）\n—PAID_END—’;
 }
 
 /* ── NoteGenerator ── */
@@ -812,7 +797,7 @@ try{
 const clean=res.replace(/`json/g,'').replace(/`/g,’’).trim();
 const m=clean.match(/{[\s\S]*}/);
 const p=JSON.parse(m?m[0]:clean);
-if(p.suggestions?.length>0) setSuggestions(p.suggestions);
+if((p.suggestions&&p.suggestions.length)>0) setSuggestions(p.suggestions);
 else throw new Error(‘提案が取得できませんでした’);
 }catch{setError(‘解析エラー。もう一度お試しください。’);}
 setLoading(false);
@@ -837,7 +822,7 @@ const downloadXlsx=()=>{
 if(typeof XLSX===‘undefined’){alert(‘XLSXライブラリが読み込まれていません’);return;}
 const rows=selected.map(id=>{
 const s=suggestions.find(x=>x.id===id);
-return {タイトル:s?.title||’’,内容:results[id]||’’};
+return {タイトル:(s&&s.title)||’’,内容:results[id]||’’};
 });
 const ws=XLSX.utils.json_to_sheet(rows);
 const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,‘特典’);
@@ -988,17 +973,7 @@ const handleGenerate=useCallback(()=>{
 const id=aiRef.current;
 setError(’’);setLoading(true);setPrompts([]);
 const useLabels=uses.map(u=>(IMG_USES.find(x=>x.id===u)||{label:u}).label).join(’・’);
-const prompt=`以下の条件でAI画像生成ツール用の英語プロンプトを5種類作成してください。
-
-スタイル: ${style}
-ツール: ${tool}
-用途: ${useLabels}
-キーワード: ${keyword||‘note記事のカバー画像’}
-
-出力形式（JSONのみ）:
-{“prompts”:[“英語プロンプト1”,“英語プロンプト2”,“英語プロンプト3”,“英語プロンプト4”,“英語プロンプト5”]}
-
-各プロンプトは具体的で${tool}に最適化した英語で書いてください。`;
+const prompt=‘以下の条件でAI画像生成ツール用の英語プロンプトを5種類作成してください。\n\nスタイル: ‘+style+’\nツール: ‘+tool+’\n用途: ‘+useLabels+’\nキーワード: ‘+(keyword||‘note記事のカバー画像’)+’\n\n出力形式（JSONのみ）:\n{“prompts”:[“英語プロンプト1”,“英語プロンプト2”,“英語プロンプト3”,“英語プロンプト4”,“英語プロンプト5”]}\n\n各プロンプトは具体的で’+tool+‘に最適化した英語で書いてください。’;
 
 ```
 callAI(id,[{role:'user',content:prompt}],null,1000)
@@ -1007,7 +982,7 @@ callAI(id,[{role:'user',content:prompt}],null,1000)
       const clean=res.replace(/```json/g,'').replace(/```/g,'').trim();
       const m=clean.match(/\{[\s\S]*\}/);
       const p=JSON.parse(m?m[0]:clean);
-      if(p.prompts?.length>0){recordGenerate(id,'image','');setPrompts(p.prompts);}
+      if((p.prompts&&p.prompts.length)>0){recordGenerate(id,'image','');setPrompts(p.prompts);}
       else throw new Error('プロンプトが取得できませんでした');
     }catch{setError('解析エラー。もう一度お試しください。');}
     setLoading(false);
@@ -1177,7 +1152,7 @@ const clean=gl.replace(/[^\u3040-\u30FF\u4E00-\u9FFF\uFF00-\uFFEFa-zA-Z\s]/g,’
 setThLoading(true);setThemes([]);setThIdx(-1);
 if(!ai){setThemes(FB_THEMES[gid]||FB_THEMES.other);setThLoading(false);return;}
 const exclude=prev&&prev.length>0?’\n以下のテーマは除外:\n’+prev.slice(-20).join(’\n’):’’;
-const prompt=`note有料記事のテーマを10個生成してください。\nジャンル: ${clean}\n条件: 購入したくなる魅力的なタイトル（25〜40文字）、読者の悩みを解決する具体的な内容${exclude}\n出力形式（JSONのみ）:\n{"themes":["テーマ1","テーマ2","テーマ3","テーマ4","テーマ5","テーマ6","テーマ7","テーマ8","テーマ9","テーマ10"]}`;
+const prompt=‘note有料記事のテーマを10個生成してください。\nジャンル: ‘+clean+’\n条件: 購入したくなる魅力的なタイトル（25〜40文字）、読者の悩みを解決する具体的な内容’+exclude+’\n出力形式（JSONのみ）:\n{“themes”:[“テーマ1”,“テーマ2”,“テーマ3”,“テーマ4”,“テーマ5”,“テーマ6”,“テーマ7”,“テーマ8”,“テーマ9”,“テーマ10”]}’;
 callAI(ai,[{role:‘user’,content:prompt}],null,600)
 .then(res=>{
 try{
@@ -1198,7 +1173,7 @@ const al=(AGES.find(a=>a.id===aid)||{}).label||aid;
 const clean=gl.replace(/[^\u3040-\u30FF\u4E00-\u9FFF\uFF00-\uFFEFa-zA-Z\s]/g,’’).trim();
 setSwLoading(true);setSugSit([]);setSugWorry([]);setSelSit(-1);setSelWry(-1);
 if(!ai){setSugSit(FB_SIT[gid]||FB_SIT.other);setSugWorry(FB_WORRY[gid]||FB_WORRY.other);setSwLoading(false);return;}
-const prompt=`note記事のターゲット読者の「状況」と「悩み」を5件ずつ生成してください。\nジャンル: ${clean} / 年齢: ${al}\n出力形式（JSONのみ）:\n{"situations":["状況1","状況2","状況3","状況4","状況5"],"worries":["悩み1","悩み2","悩み3","悩み4","悩み5"]}`;
+const prompt=‘note記事のターゲット読者の「状況」と「悩み」を5件ずつ生成してください。\nジャンル: ‘+clean+’ / 年齢: ‘+al+’\n出力形式（JSONのみ）:\n{“situations”:[“状況1”,“状況2”,“状況3”,“状況4”,“状況5”],“worries”:[“悩み1”,“悩み2”,“悩み3”,“悩み4”,“悩み5”]}’;
 callAI(ai,[{role:‘user’,content:prompt}],null,600)
 .then(res=>{
 try{
