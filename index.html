@@ -5,358 +5,527 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>note AI Tools</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone@7.23.10/babel.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mammoth/mammoth.browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{font-size:16px}
-body{font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;background:#0d0d1a;color:#fff;min-height:100vh}
+body{font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;background:#0d0d1a;color:#fff;min-height:100vh;line-height:1.6}
 button,input,textarea,select{font-family:inherit}
-
-/* LANDING */
-.landing{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 16px 60px;position:relative;overflow-x:hidden;background:linear-gradient(135deg,#0d0d1a 0%,#1a0a2e 50%,#0a1628 100%)}
-.landing-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
-.landing-badge{position:relative;z-index:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:50px;padding:6px 18px;font-size:11px;font-weight:700;letter-spacing:.15em;color:rgba(255,255,255,.7);margin-bottom:28px}
-.landing-title{position:relative;z-index:1;font-size:clamp(52px,10vw,88px);font-weight:900;line-height:1;text-align:center;margin-bottom:20px}
+.landing{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 16px 60px;position:relative;overflow-x:hidden;background:linear-gradient(135deg,#0d0d1a,#1a0a2e 50%,#0a1628)}
+.landing-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.lz1{position:relative;z-index:1}
+.landing-badge{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:50px;padding:6px 18px;font-size:11px;font-weight:700;letter-spacing:.15em;color:rgba(255,255,255,.7);margin-bottom:28px}
+.landing-title{font-size:clamp(48px,10vw,84px);font-weight:900;line-height:1.05;text-align:center;margin-bottom:18px}
 .landing-title span{color:#e94560}
-.landing-sub{position:relative;z-index:1;font-size:15px;color:rgba(255,255,255,.5);text-align:center;line-height:1.8;margin-bottom:28px}
-.ai-badges{position:relative;z-index:1;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:40px}
+.landing-sub{font-size:15px;color:rgba(255,255,255,.5);text-align:center;line-height:1.8;margin-bottom:24px}
+.ai-badges{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:36px}
 .ai-badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:6px 14px;font-size:13px;font-weight:600}
-.ai-dot{width:8px;height:8px;border-radius:50%}
-
-/* TOOL CARDS */
-.tool-cards-landing{position:relative;z-index:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;width:100%;max-width:860px;margin-bottom:36px}
-.tool-card-landing{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:24px 20px;cursor:pointer;transition:all .2s;text-align:left}
-.tool-card-landing:hover{background:rgba(255,255,255,.08);border-color:rgba(233,69,96,.4);transform:translateY(-2px)}
-.tool-card-icon{font-size:30px;margin-bottom:10px}
-.tool-card-name{font-size:15px;font-weight:800;color:#fff;margin-bottom:6px}
-.tool-card-desc{font-size:12px;color:rgba(255,255,255,.4);line-height:1.6}
-
-/* THEME PROPOSAL */
-.theme-section{position:relative;z-index:1;width:100%;max-width:860px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:24px;margin-bottom:28px}
-.section-label{font-size:11px;font-weight:800;color:rgba(255,255,255,.45);letter-spacing:.1em;margin-bottom:14px}
-.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;justify-content:center}
-.chip{padding:7px 14px;border-radius:50px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:rgba(255,255,255,.55);cursor:pointer;transition:all .15s}
+.ai-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.tool-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;width:100%;max-width:840px;margin-bottom:32px}
+.tool-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:22px 18px;cursor:pointer;transition:background .2s,transform .2s;text-align:left}
+.tool-card:hover{background:rgba(255,255,255,.08);border-color:rgba(233,69,96,.4);transform:translateY(-2px)}
+.tc-icon{font-size:28px;margin-bottom:8px}
+.tc-name{font-size:15px;font-weight:800;color:#fff;margin-bottom:5px}
+.tc-desc{font-size:12px;color:rgba(255,255,255,.4);line-height:1.6}
+.tc-badge{display:inline-block;background:rgba(233,69,96,.2);border:1px solid rgba(233,69,96,.4);border-radius:100px;padding:2px 8px;font-size:9px;color:#e94560;font-weight:800;letter-spacing:.1em;margin-bottom:8px}
+.theme-box{width:100%;max-width:840px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:22px;margin-bottom:24px}
+.box-label{font-size:11px;font-weight:800;color:rgba(255,255,255,.45);letter-spacing:.1em;margin-bottom:12px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:14px}
+.chip{padding:7px 13px;border-radius:50px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:rgba(255,255,255,.55);cursor:pointer;transition:all .15s}
 .chip:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8)}
-.chip.on{background:rgba(233,69,96,.2);border-color:rgba(233,69,96,.6);color:#fff}
-.chip.age-on{background:rgba(99,102,241,.2);border-color:rgba(99,102,241,.6);color:#fff}
-.theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-bottom:16px}
-.theme-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,.8);line-height:1.5;text-align:left}
-.theme-card:hover{background:rgba(255,255,255,.08);border-color:rgba(233,69,96,.35)}
-.theme-card.on{background:rgba(233,69,96,.12);border-color:rgba(233,69,96,.6)}
-.theme-num{font-size:11px;font-weight:800;color:rgba(255,255,255,.25);min-width:18px}
-.sw-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
-.sw-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:9px 11px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.65);margin-bottom:6px;transition:all .12s;line-height:1.5}
+.chip-on{background:rgba(233,69,96,.2);border-color:rgba(233,69,96,.6);color:#fff}
+.chip-age-on{background:rgba(99,102,241,.2);border-color:rgba(99,102,241,.6);color:#fff}
+.theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;margin-bottom:14px}
+.theme-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:11px 13px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:13px;color:rgba(255,255,255,.8);line-height:1.5;text-align:left;transition:all .15s}
+.theme-item:hover{background:rgba(255,255,255,.08);border-color:rgba(233,69,96,.35)}
+.theme-item-on{background:rgba(233,69,96,.12);border-color:rgba(233,69,96,.6)}
+.theme-num{font-size:11px;font-weight:800;color:rgba(255,255,255,.25);min-width:16px;flex-shrink:0}
+.sw-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.sw-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:7px;padding:9px 11px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.65);margin-bottom:5px;transition:all .12s;line-height:1.5}
 .sw-item:hover{background:rgba(255,255,255,.08)}
-.sw-item.sit-on{background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.5);color:#fff}
-.sw-item.wry-on{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.4);color:#fff}
-.sw-col-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:8px}
+.sw-item-sit{background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.5);color:#fff}
+.sw-item-wry{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.4);color:#fff}
+.sw-col-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:7px}
 .btn-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.btn-back{padding:8px 14px;border-radius:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.55);font-size:13px;cursor:pointer}
+.btn-back-sm{padding:8px 14px;border-radius:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.55);font-size:13px;cursor:pointer}
 .btn-reload{display:flex;align-items:center;gap:6px;padding:9px 18px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.6);font-size:13px;cursor:pointer}
-.btn-decide{padding:11px 26px;border-radius:10px;background:linear-gradient(135deg,#e94560,#c2185b);border:none;color:#fff;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(233,69,96,.4)}
-.btn-decide:disabled{opacity:.4;cursor:not-allowed}
-.btn-start{width:100%;padding:15px;border-radius:12px;background:linear-gradient(135deg,#e94560,#c2185b);border:none;color:#fff;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 5px 20px rgba(233,69,96,.4)}
-.spin{display:inline-block;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-msg{text-align:center;padding:20px;color:rgba(255,255,255,.4);font-size:13px}
-
-/* CONTACT */
-.contact-box{position:relative;z-index:1;width:100%;max-width:600px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:28px 24px;margin-bottom:28px}
-.contact-input{width:100%;padding:11px 13px;margin-bottom:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:9px;color:#fff;font-size:14px;outline:none;font-family:inherit}
-.contact-input:focus{border-color:rgba(233,69,96,.5)}
-.contact-textarea{resize:vertical;min-height:110px}
-.btn-send{width:100%;padding:13px;border-radius:9px;background:linear-gradient(135deg,#e94560,#c2185b);border:none;color:#fff;font-size:14px;font-weight:800;cursor:pointer}
-
-/* APP WRAP */
-.app-wrap{min-height:100vh;background:linear-gradient(135deg,#0d0d1a 0%,#1a0a2e 50%,#0a1628 100%)}
-.app-header{background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.07);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;backdrop-filter:blur(10px)}
-.app-header-left{display:flex;align-items:center;gap:10px}
-.back-btn{padding:7px 14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:rgba(255,255,255,.6);font-size:13px;cursor:pointer}
-.app-title{font-size:17px;font-weight:900;color:#fff;margin:0}
+.btn-primary{padding:11px 26px;border-radius:10px;background:linear-gradient(135deg,#e94560,#c2185b);border:none;color:#fff;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(233,69,96,.4)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-go{width:100%;padding:15px;border-radius:12px;background:linear-gradient(135deg,#e94560,#c2185b);border:none;color:#fff;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 5px 18px rgba(233,69,96,.4)}
+.loading-txt{text-align:center;padding:18px;color:rgba(255,255,255,.4);font-size:13px}
+.contact-box{width:100%;max-width:580px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;margin-bottom:24px}
+.ci{width:100%;padding:11px 13px;margin-bottom:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-size:14px;outline:none}
+.ci:focus{border-color:rgba(233,69,96,.5)}
+.ci-ta{resize:vertical;min-height:100px}
+.btn-send{width:100%;padding:13px;border-radius:8px;background:linear-gradient(135deg,#e94560,#c2185b);border:none;color:#fff;font-size:14px;font-weight:800;cursor:pointer}
+.app-wrap{min-height:100vh;background:linear-gradient(135deg,#0d0d1a,#1a0a2e 50%,#0a1628)}
+.app-hd{background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.07);padding:12px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;backdrop-filter:blur(10px)}
+.app-hd-l{display:flex;align-items:center;gap:10px}
+.back-btn{padding:7px 13px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:7px;color:rgba(255,255,255,.6);font-size:13px;cursor:pointer}
+.app-title{font-size:16px;font-weight:900;color:#fff;margin:0}
 .app-sub{font-size:11px;color:rgba(255,255,255,.35);margin:2px 0 0}
-.key-btn{padding:8px 14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:8px;color:rgba(255,255,255,.6);font-size:13px;cursor:pointer}
-.app-body{max-width:760px;margin:0 auto;padding:20px 14px}
-.app-badge{background:linear-gradient(135deg,#e94560,#c2185b);border-radius:6px;padding:3px 9px;font-size:10px;font-weight:800;letter-spacing:.08em}
-
-/* TABS */
+.aibadge{background:linear-gradient(135deg,#e94560,#c2185b);border-radius:5px;padding:2px 8px;font-size:10px;font-weight:800;letter-spacing:.07em}
+.key-btn{padding:7px 13px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:7px;color:rgba(255,255,255,.6);font-size:13px;cursor:pointer}
+.app-body{max-width:740px;margin:0 auto;padding:18px 14px}
 .dark-tabs{background:rgba(255,255,255,.02);border-bottom:1px solid rgba(255,255,255,.06);display:flex;overflow-x:auto}
-.tab-btn{padding:12px 18px;background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,.35);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
-.tab-btn.on{color:#fff;border-bottom-color:#e94560}
+.tab-btn{padding:12px 16px;background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,.35);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+.tab-on{color:#fff;border-bottom-color:#e94560}
 .tab-btn:disabled{opacity:.25;cursor:not-allowed}
-
-/* CARD */
-.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 20px;margin-bottom:14px}
-.lbl{color:rgba(255,255,255,.55);font-size:11px;font-weight:700;letter-spacing:.1em;display:block;margin-bottom:12px}
-.inp{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:9px;color:#fff;font-size:14px;outline:none;padding:11px 13px;font-family:inherit}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:16px 18px;margin-bottom:12px}
+.lbl{color:rgba(255,255,255,.55);font-size:11px;font-weight:700;letter-spacing:.1em;display:block;margin-bottom:10px}
+.inp{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-size:14px;outline:none;padding:11px 13px}
 .inp:focus{border-color:rgba(233,69,96,.5)}
-.hint{font-size:11px;color:rgba(255,255,255,.28);margin-top:6px}
-.pill{padding:6px 13px;border-radius:50px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s}
-.pill.on{background:rgba(233,69,96,.2);border-color:rgba(233,69,96,.5);color:#fff}
-.pill-row{display:flex;flex-wrap:wrap;gap:7px}
-
-/* GENERATE BTN */
-.gen-btn{width:100%;border-radius:13px;border:none;cursor:pointer;position:relative;overflow:hidden;transition:opacity .15s}
-.gen-btn:disabled{opacity:.6;cursor:not-allowed}
-.gen-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(233,69,96,.35);transition:width .5s}
-.gen-overlay{position:absolute;inset:0;background:rgba(0,0,0,.3);border-radius:13px}
-.gen-inner{position:relative;z-index:2;padding:18px 24px;display:flex;flex-direction:column;align-items:center;gap:6px}
-
-/* WARN */
-.warn{background:rgba(255,180,0,.09);border:1px solid rgba(255,180,0,.3);border-radius:10px;padding:12px 14px;font-size:12px;color:#fcd34d;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px}
-.err{background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:12px 14px;font-size:13px;color:#f87171;margin-bottom:12px}
-
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
-.modal-box{background:#1a1a2e;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:28px 24px;width:100%;max-width:420px}
-
-/* PREVIEW */
-.preview-wrap{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.4)}
-.preview-free-hd{background:#f0fdf4;border-bottom:2px solid #86efac;padding:8px 20px}
-.preview-paid-wall{background:linear-gradient(135deg,#1a1a2e,#0f3460);margin:0 20px 20px;border-radius:12px;padding:28px 20px;text-align:center;color:#fff}
-.preview-price-tag{background:linear-gradient(135deg,#e94560,#c2185b);display:inline-block;border-radius:50px;padding:9px 28px;font-size:15px;font-weight:800}
-.copy-btn{padding:7px 14px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid;transition:all .15s}
-
-/* RANGE */
-input[type=range]{accent-color:#e94560;width:100%}
-
-/* POST TAB */
-.post-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden;margin-bottom:10px}
-.post-card-hd{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
-.post-card-body{padding:12px 16px;max-height:110px;overflow-y:auto;font-size:13px;color:rgba(255,255,255,.5);white-space:pre-wrap;line-height:1.7}
-
-/* NOTE OPEN BTN */
-.note-open-btn{display:block;text-align:center;background:linear-gradient(135deg,#41c9b4,#0ea5e9);color:#fff;text-decoration:none;padding:13px;border-radius:12px;font-size:14px;font-weight:800;margin-top:6px}
-
-/* BONUS */
-.bonus-result{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 16px;margin-bottom:8px}
-.bonus-check{display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:8px}
-
-/* AI SELECTOR */
-.ai-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.ai-card{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:11px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .15s}
-.ai-card.on{border-color:currentColor;background:rgba(255,255,255,.1)}
-.ai-card-icon{font-size:22px;margin-bottom:5px}
-.ai-card-name{font-size:11px;font-weight:700}
-.ai-card-status{font-size:10px;margin-top:3px}
-
-/* RESPONSIVE */
-@media(max-width:560px){
-.landing-title{font-size:48px}
-.sw-grid{grid-template-columns:1fr}
-.ai-grid{grid-template-columns:repeat(2,1fr)}
-.tool-cards-landing{grid-template-columns:repeat(2,1fr)}
-.theme-grid{grid-template-columns:1fr}
-.app-title{font-size:14px}
-.tool-card-desc{display:none}
+.hint{font-size:11px;color:rgba(255,255,255,.28);margin-top:5px}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{padding:6px 12px;border-radius:50px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s}
+.pill:hover{background:rgba(255,255,255,.1)}
+.pill-on{background:rgba(233,69,96,.2);border-color:rgba(233,69,96,.5);color:#fff}
+.warn{background:rgba(255,180,0,.09);border:1px solid rgba(255,180,0,.3);border-radius:9px;padding:11px 13px;font-size:12px;color:#fcd34d;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.err{background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.3);border-radius:9px;padding:11px 13px;font-size:13px;color:#f87171;margin-bottom:10px}
+.gen-btn{width:100%;border-radius:12px;border:none;cursor:pointer;position:relative;overflow:hidden}
+.gen-btn:disabled{cursor:not-allowed}
+.gen-overlay{position:absolute;inset:0;background:rgba(0,0,0,.3);border-radius:12px}
+.gen-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(233,69,96,.35)}
+.gen-inner{position:relative;z-index:2;padding:17px 22px;display:flex;flex-direction:column;align-items:center;gap:5px}
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-box{background:#1a1a2e;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:26px 22px;width:100%;max-width:400px}
+.ai-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.ai-card{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 7px;text-align:center;cursor:pointer;transition:all .15s}
+.ai-card-on{border-color:#e94560;background:rgba(255,255,255,.1)}
+.ai-icon{font-size:20px;margin-bottom:4px}
+.ai-name{font-size:11px;font-weight:700;color:#fff}
+.ai-status{font-size:10px;margin-top:2px}
+.preview-box{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.4)}
+.post-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:11px;overflow:hidden;margin-bottom:9px}
+.post-hd{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.06)}
+.post-body{padding:11px 14px;max-height:100px;overflow-y:auto;font-size:13px;color:rgba(255,255,255,.5);white-space:pre-wrap;line-height:1.7}
+.copy-btn{padding:6px 13px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;transition:all .15s}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;animation:spin .7s linear infinite}
+@media(max-width:540px){
+  .landing-title{font-size:44px}
+  .sw-grid{grid-template-columns:1fr}
+  .ai-grid{grid-template-columns:repeat(2,1fr)}
+  .tool-cards{grid-template-columns:repeat(2,1fr)}
+  .theme-grid{grid-template-columns:1fr}
+  .app-title{font-size:14px}
+  .tc-desc{display:none}
 }
 </style>
-
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const {useState,useEffect,useCallback,useRef} = React;
+// ─────────────────────────────────────────────
+// Hooks
+// ─────────────────────────────────────────────
+var useState    = React.useState;
+var useEffect   = React.useEffect;
+var useCallback = React.useCallback;
+var useRef      = React.useRef;
 
-/* ── レスポンシブ ── */
-function useIsMobile(){
-const [m,setM] = useState(window.innerWidth<=520);
-useEffect(()=>{
-const h=()=>setM(window.innerWidth<=520);
-window.addEventListener(‘resize’,h);
-return ()=>window.removeEventListener(‘resize’,h);
-},[]);
-return m;
+function useIsMobile() {
+var s = useState(window.innerWidth <= 520);
+var mobile = s[0]; var setMobile = s[1];
+useEffect(function() {
+function onResize() { setMobile(window.innerWidth <= 520); }
+window.addEventListener(‘resize’, onResize);
+return function() { window.removeEventListener(‘resize’, onResize); };
+}, []);
+return mobile;
 }
 
-/* ── 定数 ── */
-const AI_LIST = [
-{id:‘claude’,  label:‘Claude’,  color:’#e07b39’, icon:‘🟠’},
-{id:‘gemini’,  label:‘Gemini’,  color:’#4285f4’, icon:‘🔵’},
-{id:‘chatgpt’, label:‘ChatGPT’, color:’#10a37f’, icon:‘🟢’},
-{id:‘grok’,    label:‘Grok’,    color:’#6b7280’, icon:‘⚫’},
+// ─────────────────────────────────────────────
+// 定数
+// ─────────────────────────────────────────────
+var AI_LIST = [
+{ id: ‘claude’,  label: ‘Claude’,  color: ‘#e07b39’, icon: ‘🟠’ },
+{ id: ‘gemini’,  label: ‘Gemini’,  color: ‘#4285f4’, icon: ‘🔵’ },
+{ id: ‘chatgpt’, label: ‘ChatGPT’, color: ‘#10a37f’, icon: ‘🟢’ },
+{ id: ‘grok’,    label: ‘Grok’,    color: ‘#6b7280’, icon: ‘⚫’ },
 ];
-const KEY_STORE = ‘noteAiKeys_v2’;
-const loadKeys = ()=>{ try{return JSON.parse(localStorage.getItem(KEY_STORE)||’{}’)}catch{return {}} };
-const saveKey  = (id,v)=>{ const k=loadKeys(); k[id]=v; localStorage.setItem(KEY_STORE,JSON.stringify(k)); };
-const getKey   = id => loadKeys()[id]||’’;
 
-/* ── API呼び出し ── */
-async function callClaude(msgs,sys,max){
-const key=getKey(‘claude’); if(!key) throw new Error(‘Claude APIキー未設定’);
-const body={model:‘claude-sonnet-4-20250514’,max_tokens:max,messages:msgs};
-if(sys) body.system=sys;
-const r=await fetch(‘https://api.anthropic.com/v1/messages’,{
-method:‘POST’,
-headers:{‘Content-Type’:‘application/json’,‘x-api-key’:key,‘anthropic-version’:‘2023-06-01’,‘anthropic-dangerous-direct-browser-access’:‘true’},
-body:JSON.stringify(body)
+var KEY_STORE = ‘noteAiKeys_v2’;
+function loadKeys() {
+try { return JSON.parse(localStorage.getItem(KEY_STORE) || ‘{}’); } catch(e) { return {}; }
+}
+function saveKey(id, val) {
+var k = loadKeys(); k[id] = val;
+localStorage.setItem(KEY_STORE, JSON.stringify(k));
+}
+function getKey(id) { return loadKeys()[id] || ‘’; }
+
+var NOTE_THEMES = [
+{ id: ‘money’,        label: ‘💰 お金・節約’ },
+{ id: ‘health’,       label: ‘💪 健康・ダイエット’ },
+{ id: ‘career’,       label: ‘🚀 キャリア・副業’ },
+{ id: ‘mindset’,      label: ‘🧠 マインドセット’ },
+{ id: ‘relationship’, label: ‘❤️ 人間関係・恋愛’ },
+{ id: ‘productivity’, label: ‘⚡ 生産性・習慣’ },
+{ id: ‘parenting’,    label: ‘👶 育児・子育て’ },
+{ id: ‘other’,        label: ‘📝 その他’ },
+];
+var NOTE_TONES = [
+{ id: ‘story’,    label: ‘📖 体験談ストーリー系’,  preview: ‘「あの日、口座残高が3桁になった。だから私は動いた——」実体験から引き込む感情的な語り口。’ },
+{ id: ‘howto’,   label: ‘📋 ハウツー解説系’,       preview: ‘「Step1: まず〇〇する。Step2: 次に〇〇を設定する」手順を明確にして行動しやすい構成。’ },
+{ id: ‘secret’,  label: ‘🔥 秘密・裏知識系’,       preview: ‘「実は99%の人が知らない方法があります」好奇心を煽るキャッチーな語り口。’ },
+{ id: ‘contrast’,label: ‘⚡ 比較・対比系’,         preview: ‘「月収30万と300万の人の違いはたった1つ」対比で問題点と解決策を鮮明にする。’ },
+{ id: ‘warm’,    label: ‘💓 共感・温かい系’,        preview: ‘「あなたの気持ち、すごくわかります。私も同じように悩んでいました」寄り添うトーン。’ },
+];
+var NOTE_AGES = [
+{ id: ‘10s’, label: ‘10代’ }, { id: ‘20s’, label: ‘20代’ },
+{ id: ‘30s’, label: ‘30代’ }, { id: ‘40s’, label: ‘40代’ },
+{ id: ‘50s’, label: ‘50代以上’ }, { id: ‘all’, label: ‘全年齢’ },
+];
+
+var SEO_KW = {
+money:        [‘副業’, ‘収入アップ’, ‘節約術’, ‘資産形成’, ‘家計管理’],
+health:       [‘ダイエット’, ‘健康習慣’, ‘体質改善’, ‘食事管理’, ‘筋トレ’],
+career:       [‘転職’, ‘キャリアアップ’, ‘副業’, ‘スキルアップ’, ‘年収アップ’],
+mindset:      [‘マインドセット’, ‘自己肯定感’, ‘モチベーション’, ‘習慣化’, ‘成功思考’],
+relationship: [‘人間関係’, ‘コミュニケーション’, ‘恋愛’, ‘話し方’, ‘信頼関係’],
+productivity: [‘生産性向上’, ‘時間管理’, ‘習慣化’, ‘タスク管理’, ‘時短術’],
+parenting:    [‘育児’, ‘子育て’, ‘子どもの教育’, ‘親子関係’, ‘幼児教育’],
+other:        [‘ライフスタイル’, ‘自己改善’, ‘生き方’, ‘人生設計’, ‘ライフハック’],
+};
+
+var BONUS_THEMES = [‘副業・お金’,‘ダイエット・健康’,‘節約・お金’,‘育児・子育て’,‘マインドセット’,‘ビジネス・キャリア’,‘人間関係’,‘ライフスタイル’,‘その他’];
+var BONUS_AGES   = [‘10代’,‘20代前半’,‘20代後半’,‘30代前半’,‘30代後半’,‘40代’,‘50代以上’,‘全年齢’];
+var IMG_STYLES   = [‘イラスト・アニメ風’,‘リアル・写真風’,‘シンプル・フラット’,‘3D・CGレンダリング’,‘水彩・手描き風’,‘ミニマル・モダン’];
+var IMG_TOOLS    = [‘Midjourney’,‘DALL-E 3’,‘Stable Diffusion’,‘Adobe Firefly’,‘Ideogram’];
+var IMG_USES     = [
+{ id: ‘thumbnail’, label: ‘📸 サムネイル’ },
+{ id: ‘header’,    label: ‘🖼️ ヘッダー’ },
+{ id: ‘section’,   label: ‘📌 セクション’ },
+{ id: ‘profile’,   label: ‘👤 プロフィール’ },
+{ id: ‘cover’,     label: ‘📖 表紙’ },
+];
+
+var TOOLS = [
+{ id: ‘note’,  icon: ‘📝’, name: ‘note記事生成’,      desc: ‘テーマ・文字数を設定してAIが有料記事を自動生成’, badge: ‘人気No.1’ },
+{ id: ‘bonus’, icon: ‘🎁’, name: ‘購入者特典生成’,     desc: ‘記事から特典コンテンツを自動提案・生成’,         badge: ‘NEW’ },
+{ id: ‘image’, icon: ‘🖼️’, name: ‘画像プロンプト生成’, desc: ‘記事に合うAI画像プロンプトを自動生成’,           badge: ‘’ },
+];
+
+var GENRES = NOTE_THEMES;
+var AGES   = NOTE_AGES;
+
+// フォールバックデータ
+var FB_THEMES = {
+money:        [‘月5万円副業を3ヶ月で達成した完全ロードマップ’,‘節約で年間100万円を貯めた実践記録’,‘サラリーマンが副業収入を2倍にした5つの秘訣’,‘貯金ゼロから始める資産形成の教科書’,‘お金の不安を消す家計管理の完全ガイド’],
+health:       [‘1ヶ月-8kg達成したダイエット完全ガイド’,‘リバウンドしない食事改善の科学的アプローチ’,‘忙しい人のための10分筋トレ習慣術’,‘在宅ワークで運動不足を解消する方法’,‘年齢に負けない体を手に入れる習慣術’],
+career:       [‘未経験からWebエンジニアに転職した全記録’,‘副業で月収10万を稼ぐフリーランス入門’,‘30代からでも遅くない市場価値の高め方’,‘スキルゼロから高単価案件を取る戦略’,‘転職面接で落ちない自己PR作成の極意’],
+mindset:      [‘先延ばし癖を完全克服した行動心理学’,‘自己肯定感を高める思考習慣の作り方’,‘やる気が続く目標設定と達成習慣の法則’,‘不安を力に変えるマインドセット完全版’,‘挫折しない習慣化の科学的アプローチ’],
+relationship: [‘彼女を作った内向型男子の恋愛戦略’,‘職場の人間関係を劇的に改善した会話術’,‘好感度が上がる話し方と聞き方の極意’,‘人間関係のストレスをゼロにする境界線術’,‘信頼を勝ち取るコミュニケーション法則’],
+productivity: [‘タスク管理で残業ゼロになった仕事術’,‘集中力を3倍にする環境づくりと習慣’,‘スマホ依存を断ち切って生産性を上げた方法’,‘週4日勤務を実現した仕事の効率化術’,‘毎日2時間を生み出す時間管理の科学’],
+parenting:    [‘イヤイヤ期を乗り越えた育児の実践メソッド’,‘子どもの自己肯定感を育てる声かけ完全版’,‘褒め方ひとつで子どもの才能が開花する’,‘スマホ育児から脱却した親子時間の作り方’,‘受験で後悔しない小学生からの学習習慣’],
+other:        [‘人生が変わった本10冊の読み方と実践法’,‘断捨離で部屋も心もスッキリした体験記’,‘ストレスフリーな生活を手に入れた方法’,‘副業から独立した自由な働き方の全記録’,‘自分らしく生きるためのキャリア設計法’],
+};
+var FB_SIT = {
+money:        [‘会社員で副業を始めたいが何から手をつけるか分からない’,‘毎月赤字で貯金がまったくできていない’,‘老後の資金が全く準備できていない’],
+health:       [‘ダイエットを何度も挫折してきた’,‘在宅ワークで体を動かす機会が極端に減った’,‘健康診断で引っかかったが何から始めるか分からない’],
+career:       [‘今の仕事に将来性がなく転職を考えている’,‘副業を始めたいが何をすればいいか迷っている’,‘昇給・昇格が見込めず給料に不満がある’],
+mindset:      [‘やる気が続かず目標を達成できない’,‘ネガティブ思考が止まらず毎日がしんどい’,‘自分に自信が持てず挑戦を諦めてしまう’],
+relationship: [‘職場のコミュニケーションが苦手で孤立している’,‘好きな人がいるが告白できずにいる’,‘人と話すのが苦手で職場での評価が上がらない’],
+productivity: [‘仕事量が多くて残業が続いている’,‘集中できずついスマホを見てしまう’,‘やることが多くて優先順位がつけられない’],
+parenting:    [‘子供のイヤイヤ期で毎日ストレスが溜まっている’,‘仕事と育児の両立で疲れ果てている’,‘子供のために何をしてあげるべきか不安’],
+other:        [‘毎日同じことの繰り返しで変化がない’,‘何かを変えたいのに最初の一歩が踏み出せない’,‘やりたいことが見つからず将来が漠然と不安’],
+};
+var FB_WORRY = {
+money:        [‘副業で詐欺に引っかかりそうで怖い’,‘収入を上げたいのに具体的な方法が分からない’,‘節約を頑張っても全然貯まらない’],
+health:       [‘運動を続けられない三日坊主になってしまう’,‘健康的に痩せたいが何が正解か分からない’,‘健康習慣を身につけたいが忙しくて無理に感じる’],
+career:       [‘転職活動をどこから始めればいいか分からない’,‘副業で稼げるか自信がない’,‘スキルがなくて市場価値が低いと感じる’],
+mindset:      [‘頭では分かっているが行動できない’,‘失敗が怖くて挑戦できない’,‘ネガティブ思考のループから抜け出せない’],
+relationship: [‘会話が続かず人間関係が浅い’,‘好きな人にどうアプローチすればいいか分からない’,‘断れずに何でも引き受けてしまう’],
+productivity: [‘集中力が続かず作業が終わらない’,‘スマホやSNSが気になって仕事に集中できない’,‘時間管理が下手でいつも時間が足りない’],
+parenting:    [‘子供の気持ちが理解できず対応に困る’,‘育児書通りにできない自分が嫌になる’,‘子供との時間が足りなくて申し訳ない’],
+other:        [‘行動しようとしても続かず自己嫌悪になる’,‘自分の強みや好きなことが分からない’,‘毎日に充実感がなくモヤモヤしている’],
+};
+
+// ─────────────────────────────────────────────
+// 管理者統計
+// ─────────────────────────────────────────────
+var ADM_CFG = ‘noteAiAdminConfig_v1’;
+var ADM_QUE = ‘noteAiAdminQueue_v1’;
+function loadAdmCfg() {
+try { return JSON.parse(localStorage.getItem(ADM_CFG) || ‘{}’); } catch(e) { return {}; }
+}
+var _flushing = false;
+function enqueueEvent(type, payload) {
+try {
+var q = JSON.parse(localStorage.getItem(ADM_QUE) || ‘[]’);
+q.push({ type: type, payload: payload, time: new Date().toISOString() });
+if (q.length > 100) q = q.slice(-100);
+localStorage.setItem(ADM_QUE, JSON.stringify(q));
+} catch(e) {}
+setTimeout(flushQueue, 500);
+}
+function flushQueue() {
+if (_flushing) return;
+var cfg = loadAdmCfg();
+if (!cfg.pat || !cfg.owner || !cfg.repo) return;
+_flushing = true;
+var q;
+try { q = JSON.parse(localStorage.getItem(ADM_QUE) || ‘[]’); } catch(e) { q = []; }
+if (!q.length) { _flushing = false; return; }
+var path = cfg.path || ‘data.json’;
+var url  = ‘https://api.github.com/repos/’ + cfg.owner + ‘/’ + cfg.repo + ‘/contents/’ + path;
+var hd   = { ‘Authorization’: ’Bearer ’ + cfg.pat, ‘Accept’: ‘application/vnd.github+json’ };
+fetch(url, { headers: hd })
+.then(function(gr) {
+var prom;
+if (gr.ok) prom = gr.json();
+else       prom = Promise.resolve(null);
+return prom;
+})
+.then(function(gd) {
+var stats = { totalAccess:0, totalGenerate:0, lastAccess:null, byTool:{}, byAi:{}, byTheme:{}, dailyAccess:{}, history:[] };
+var sha = null;
+if (gd) {
+try { stats = JSON.parse(atob(gd.content.replace(/\n/g, ‘’))); sha = gd.sha; } catch(e) {}
+}
+q.forEach(function(ev) {
+if (ev.type === ‘access’) {
+stats.totalAccess = (stats.totalAccess || 0) + 1;
+stats.lastAccess  = ev.time;
+var day = ev.time.slice(0, 10);
+if (!stats.dailyAccess) stats.dailyAccess = {};
+stats.dailyAccess[day] = (stats.dailyAccess[day] || 0) + 1;
+} else if (ev.type === ‘generate’) {
+stats.totalGenerate = (stats.totalGenerate || 0) + 1;
+if (!stats.byAi)   stats.byAi = {};
+if (!stats.byTool) stats.byTool = {};
+stats.byAi[ev.payload.ai]     = (stats.byAi[ev.payload.ai] || 0) + 1;
+stats.byTool[ev.payload.tool] = (stats.byTool[ev.payload.tool] || 0) + 1;
+if (ev.payload.theme) {
+if (!stats.byTheme) stats.byTheme = {};
+stats.byTheme[ev.payload.theme] = (stats.byTheme[ev.payload.theme] || 0) + 1;
+}
+if (!stats.history) stats.history = [];
+stats.history.unshift({ time: ev.time, ai: ev.payload.ai, tool: ev.payload.tool, theme: ev.payload.theme || ‘’ });
+if (stats.history.length > 100) stats.history = stats.history.slice(0, 100);
+}
 });
-if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error((e.error&&e.error.message)||‘Claude APIエラー ‘+r.status);}
-const d=await r.json();
-return d.content.filter(c=>c.type===‘text’).map(c=>c.text).join(’’);
-}
-
-async function callGemini(msgs,sys,max){
-const key=getKey(‘gemini’); if(!key) throw new Error(‘Gemini APIキー未設定’);
-const models=[‘gemini-2.5-pro-exp-03-25’,‘gemini-2.0-flash’,‘gemini-1.5-flash’];
-const contents=msgs.map(m=>({role:m.role===‘assistant’?‘model’:‘user’,parts:[{text:m.content}]}));
-const body={contents,generationConfig:{maxOutputTokens:max}};
-if(sys) body.systemInstruction={parts:[{text:sys}]};
-async function tryModel(i){
-if(i>=models.length) throw new Error(‘Gemini 全モデル失敗’);
-const r=await fetch(‘https://generativelanguage.googleapis.com/v1beta/models/’+models[i]+’:generateContent?key=’+key,{
-method:‘POST’,headers:{‘Content-Type’:‘application/json’},body:JSON.stringify(body)
+var body = {
+message: ‘Update stats’,
+content: btoa(unescape(encodeURIComponent(JSON.stringify(stats, null, 2))))
+};
+if (sha) body.sha = sha;
+return fetch(url, {
+method: ‘PUT’,
+headers: Object.assign({}, hd, { ‘Content-Type’: ‘application/json’ }),
+body: JSON.stringify(body)
 });
-if(!r.ok){ if(r.status===404||r.status===429) return tryModel(i+1); const e=await r.json().catch(()=>({})); throw new Error((e.error&&e.error.message)||‘Gemini APIエラー’); }
-const d=await r.json();
-return ((d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[]).map(p=>p.text||’’).join(’’);
+})
+.then(function(pr) {
+if (pr && pr.ok) localStorage.removeItem(ADM_QUE);
+_flushing = false;
+})
+.catch(function() { _flushing = false; });
 }
-return tryModel(0);
-}
-
-async function callChatGPT(msgs,sys,max){
-const key=getKey(‘chatgpt’); if(!key) throw new Error(‘ChatGPT APIキー未設定’);
-const messages=sys?[{role:‘system’,content:sys},…msgs]:[…msgs];
-const r=await fetch(‘https://api.openai.com/v1/chat/completions’,{
-method:‘POST’,
-headers:{‘Content-Type’:‘application/json’,‘Authorization’:’Bearer ’+key},
-body:JSON.stringify({model:‘gpt-4o’,max_tokens:max,messages})
-});
-if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error((e.error&&e.error.message)||‘ChatGPT APIエラー ‘+r.status);}
-const d=await r.json();
-return (d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||’’;
-}
-
-async function callGrok(msgs,sys,max){
-const key=getKey(‘grok’); if(!key) throw new Error(‘Grok APIキー未設定’);
-const models=[‘grok-3’,‘grok-2’];
-const messages=sys?[{role:‘system’,content:sys},…msgs]:[…msgs];
-async function tryModel(i){
-if(i>=models.length) throw new Error(‘Grok 全モデル失敗’);
-const r=await fetch(‘https://api.x.ai/v1/chat/completions’,{
-method:‘POST’,
-headers:{‘Content-Type’:‘application/json’,‘Authorization’:‘Bearer ‘+key},
-body:JSON.stringify({model:models[i],max_tokens:max,messages})
-});
-if(!r.ok){ if(r.status===404) return tryModel(i+1); const e=await r.json().catch(()=>({})); throw new Error((e.error&&e.error.message)||‘Grok APIエラー’); }
-const d=await r.json();
-return (d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||’’;
-}
-return tryModel(0);
-}
-
-function callAI(aiId,msgs,sys,max){
-if(aiId===‘claude’)  return callClaude(msgs,sys,max);
-if(aiId===‘gemini’)  return callGemini(msgs,sys,max);
-if(aiId===‘chatgpt’) return callChatGPT(msgs,sys,max);
-if(aiId===‘grok’)    return callGrok(msgs,sys,max);
-throw new Error(’不明なAI: ’+aiId);
-}
-
-/* ── 管理者統計（軽量版） ── */
-const ADM_CFG = ‘noteAiAdminConfig_v1’;
-const ADM_QUE = ‘noteAiAdminQueue_v1’;
-const loadCfg = ()=>{ try{return JSON.parse(localStorage.getItem(ADM_CFG)||’{}’)}catch{return {}} };
-let _flushing=false;
-
-function enqueueEvent(type,payload){
-try{
-const q=JSON.parse(localStorage.getItem(ADM_QUE)||’[]’);
-q.push({type,payload,time:new Date().toISOString()});
-localStorage.setItem(ADM_QUE,JSON.stringify(q.slice(-100)));
-}catch{}
-setTimeout(flushQueue,300);
-}
-
-async function flushQueue(){
-if(_flushing) return;
-const cfg=loadCfg();
-if(!cfg.pat||!cfg.owner||!cfg.repo) return;
-_flushing=true;
-try{
-const q=JSON.parse(localStorage.getItem(ADM_QUE)||’[]’);
-if(!q.length){_flushing=false;return;}
-const path=cfg.path||‘data.json’;
-const url=‘https://api.github.com/repos/’+cfg.owner+’/’+cfg.repo+’/contents/’+path;
-const hd={‘Authorization’:‘Bearer ‘+cfg.pat,‘Accept’:‘application/vnd.github+json’};
-const gr=await fetch(url,{headers:hd});
-let stats={totalAccess:0,totalGenerate:0,lastAccess:null,byTool:{},byAi:{},byTheme:{},dailyAccess:{},history:[]};
-let sha=null;
-if(gr.ok){const gd=await gr.json();stats=JSON.parse(atob(gd.content.replace(/\n/g,’’)));sha=gd.sha;}
-q.forEach(ev=>{
-if(ev.type===‘access’){
-stats.totalAccess=(stats.totalAccess||0)+1;
-stats.lastAccess=ev.time;
-const day=ev.time.slice(0,10);
-stats.dailyAccess=stats.dailyAccess||{};
-stats.dailyAccess[day]=(stats.dailyAccess[day]||0)+1;
-const days=Object.keys(stats.dailyAccess).sort();
-if(days.length>60) days.slice(0,days.length-60).forEach(k=>delete stats.dailyAccess[k]);
-} else if(ev.type===‘generate’){
-stats.totalGenerate=(stats.totalGenerate||0)+1;
-stats.byAi=stats.byAi||{};stats.byAi[ev.payload.ai]=(stats.byAi[ev.payload.ai]||0)+1;
-stats.byTool=stats.byTool||{};stats.byTool[ev.payload.tool]=(stats.byTool[ev.payload.tool]||0)+1;
-if(ev.payload.theme){stats.byTheme=stats.byTheme||{};stats.byTheme[ev.payload.theme]=(stats.byTheme[ev.payload.theme]||0)+1;}
-stats.history=stats.history||[];
-stats.history.unshift({time:ev.time,ai:ev.payload.ai,tool:ev.payload.tool,theme:ev.payload.theme||’’});
-if(stats.history.length>100) stats.history=stats.history.slice(0,100);
-}
-});
-const body={message:‘Update stats’,content:btoa(unescape(encodeURIComponent(JSON.stringify(stats,null,2))))};
-if(sha) body.sha=sha;
-const pr=await fetch(url,{method:‘PUT’,headers:{…hd,‘Content-Type’:‘application/json’},body:JSON.stringify(body)});
-if(pr.ok) localStorage.removeItem(ADM_QUE);
-}catch{}
-_flushing=false;
-}
-
-function recordAccess(){ enqueueEvent(‘access’,{}); }
-function recordGenerate(ai,tool,theme){ enqueueEvent(‘generate’,{ai,tool,theme:theme||’’}); }
+function recordAccess()           { enqueueEvent(‘access’, {}); }
+function recordGenerate(ai, tool, theme) { enqueueEvent(‘generate’, { ai: ai, tool: tool, theme: theme || ‘’ }); }
 recordAccess();
 
-/* ── APIキーモーダル ── */
-function ApiKeyModal({onClose}){
-const [keys,setKeys]=useState(loadKeys());
-const save=(id,v)=>{ saveKey(id,v); setKeys({…loadKeys()}); };
+// ─────────────────────────────────────────────
+// API呼び出し
+// ─────────────────────────────────────────────
+function callClaude(msgs, sys, max) {
+var key = getKey(‘claude’);
+if (!key) return Promise.reject(new Error(‘Claude APIキー未設定’));
+var body = { model: ‘claude-sonnet-4-20250514’, max_tokens: max, messages: msgs };
+if (sys) body.system = sys;
+return fetch(‘https://api.anthropic.com/v1/messages’, {
+method: ‘POST’,
+headers: {
+‘Content-Type’: ‘application/json’,
+‘x-api-key’: key,
+‘anthropic-version’: ‘2023-06-01’,
+‘anthropic-dangerous-direct-browser-access’: ‘true’
+},
+body: JSON.stringify(body)
+}).then(function(r) {
+if (!r.ok) return r.json().catch(function(){return{};}).then(function(e) { throw new Error((e.error && e.error.message) || (‘Claude APIエラー ’ + r.status)); });
+return r.json();
+}).then(function(d) {
+return d.content.filter(function(c){return c.type===‘text’;}).map(function(c){return c.text;}).join(’’);
+});
+}
+
+function callGemini(msgs, sys, max) {
+var key = getKey(‘gemini’);
+if (!key) return Promise.reject(new Error(‘Gemini APIキー未設定’));
+var models = [‘gemini-2.5-pro-exp-03-25’,‘gemini-2.0-flash’,‘gemini-1.5-flash’];
+var contents = msgs.map(function(m) {
+return { role: m.role === ‘assistant’ ? ‘model’ : ‘user’, parts: [{ text: m.content }] };
+});
+var body = { contents: contents, generationConfig: { maxOutputTokens: max } };
+if (sys) body.systemInstruction = { parts: [{ text: sys }] };
+function tryModel(i) {
+if (i >= models.length) return Promise.reject(new Error(‘Gemini 全モデル失敗’));
+return fetch(‘https://generativelanguage.googleapis.com/v1beta/models/’ + models[i] + ‘:generateContent?key=’ + key, {
+method: ‘POST’, headers: { ‘Content-Type’: ‘application/json’ }, body: JSON.stringify(body)
+}).then(function(r) {
+if (!r.ok) {
+if (r.status === 404 || r.status === 429) return tryModel(i + 1);
+return r.json().catch(function(){return{};}).then(function(e) { throw new Error((e.error && e.error.message) || ‘Gemini APIエラー’); });
+}
+return r.json();
+}).then(function(d) {
+var parts = d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts;
+return (parts || []).map(function(p){return p.text||’’;}).join(’’);
+});
+}
+return tryModel(0);
+}
+
+function callChatGPT(msgs, sys, max) {
+var key = getKey(‘chatgpt’);
+if (!key) return Promise.reject(new Error(‘ChatGPT APIキー未設定’));
+var messages = sys ? [{ role: ‘system’, content: sys }].concat(msgs) : msgs;
+return fetch(‘https://api.openai.com/v1/chat/completions’, {
+method: ‘POST’,
+headers: { ‘Content-Type’: ‘application/json’, ‘Authorization’: ’Bearer ’ + key },
+body: JSON.stringify({ model: ‘gpt-4o’, max_tokens: max, messages: messages })
+}).then(function(r) {
+if (!r.ok) return r.json().catch(function(){return{};}).then(function(e) { throw new Error((e.error && e.error.message) || (’ChatGPT APIエラー ’ + r.status)); });
+return r.json();
+}).then(function(d) {
+return (d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content) || ‘’;
+});
+}
+
+function callGrok(msgs, sys, max) {
+var key = getKey(‘grok’);
+if (!key) return Promise.reject(new Error(‘Grok APIキー未設定’));
+var models   = [‘grok-3’, ‘grok-2’];
+var messages = sys ? [{ role: ‘system’, content: sys }].concat(msgs) : msgs;
+function tryModel(i) {
+if (i >= models.length) return Promise.reject(new Error(‘Grok 全モデル失敗’));
+return fetch(‘https://api.x.ai/v1/chat/completions’, {
+method: ‘POST’,
+headers: { ‘Content-Type’: ‘application/json’, ‘Authorization’: ’Bearer ’ + key },
+body: JSON.stringify({ model: models[i], max_tokens: max, messages: messages })
+}).then(function(r) {
+if (!r.ok) {
+if (r.status === 404) return tryModel(i + 1);
+return r.json().catch(function(){return{};}).then(function(e) { throw new Error((e.error && e.error.message) || ‘Grok APIエラー’); });
+}
+return r.json();
+}).then(function(d) {
+return (d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content) || ‘’;
+});
+}
+return tryModel(0);
+}
+
+function callAI(aiId, msgs, sys, max) {
+if (aiId === ‘claude’)  return callClaude(msgs, sys, max);
+if (aiId === ‘gemini’)  return callGemini(msgs, sys, max);
+if (aiId === ‘chatgpt’) return callChatGPT(msgs, sys, max);
+if (aiId === ‘grok’)    return callGrok(msgs, sys, max);
+return Promise.reject(new Error(’不明なAI: ’ + aiId));
+}
+
+// ─────────────────────────────────────────────
+// プロンプト生成
+// ─────────────────────────────────────────────
+function buildPrompt(opts) {
+var theme     = opts.theme;
+var topic     = opts.topic;
+var tone      = opts.tone;
+var price     = opts.price;
+var freeWC    = opts.freeWC;
+var paidWC    = opts.paidWC;
+var age       = opts.age;
+var situation = opts.situation;
+var worry     = opts.worry;
+
+var tl    = (NOTE_THEMES.find(function(t){ return t.id === theme; }) || {}).label || theme;
+var toneL = (NOTE_TONES.find(function(t){ return t.id === tone; }) || {}).label || tone;
+var ageL  = (NOTE_AGES.find(function(a){ return a.id === age; }) || {}).label || age;
+var ageCtxMap = { ‘10s’:‘10代・学生・バイト・部活’, ‘20s’:‘20代・社会人・転職・恋愛’, ‘30s’:‘30代・育児・住宅・キャリア’, ‘40s’:‘40代・老後・子育て・健康’, ‘50s’:‘50代以上・定年・健康・老後’, ‘all’:‘全年代共通’ };
+var ageCtx = ageCtxMap[age] || ‘’;
+var kw     = (SEO_KW[theme] || SEO_KW.other).slice(0, 4).join(’・’);
+var ft     = Math.max(50, Math.round(freeWC * 0.1));
+var pt     = Math.max(50, Math.round(paidWC * 0.1));
+
+return ‘あなたは人気noteクリエイターかつSEOライターです。以下の条件でnoteの有料記事を作成してください。\n\n’
++ ‘## ターゲット読者\n’
++ ’- 年齢: ’ + ageL + ’ / ライフスタイル: ’ + ageCtx + ‘\n’
++ ’- 状況: ’ + (situation || ‘特に指定なし’) + ’ / 悩み: ’ + (worry || ‘特に指定なし’) + ‘\n\n’
++ ‘## 記事設定\n’
++ ’- ジャンル: ’ + tl + ’ / テーマ: ’ + (topic || ‘ジャンルで最も読まれるテーマ’) + ‘\n’
++ ‘- 文体: ’ + toneL + ’ / 販売価格: ¥’ + price.toLocaleString() + ‘\n\n’
++ ‘## SEO（必須）\n’
++ ’- キーワード: ’ + kw + ‘\n’
++ ‘- タイトルと冒頭200文字以内にキーワードを自然に含める\n\n’
++ ‘## 文字数（厳守）\n’
++ ’- 無料: ’ + freeWC + ‘文字（許容±’ + ft + ’） / 有料: ’ + paidWC + ‘文字（許容±’ + pt + ‘）\n\n’
++ ‘## 構成\n’
++ ‘タイトルは「# 」で始める。冒頭50〜100文字の要約。\n’
++ ‘—FREE_START— で無料開始 → —FREE_END— で終了\n’
++ ‘—PAID_START— で有料開始 → —PAID_END— で終了\n\n’
++ ‘—FREE_START—\n（ここから無料パート）\n—FREE_END—\n’
++ ‘—PAID_START—\n（ここから有料パート）\n—PAID_END—’;
+}
+
+// ─────────────────────────────────────────────
+// APIキーモーダル
+// ─────────────────────────────────────────────
+function ApiKeyModal(props) {
+var onClose = props.onClose;
+var keysState = useState(loadKeys());
+var keys = keysState[0]; var setKeys = keysState[1];
+function save(id, val) { saveKey(id, val); setKeys(loadKeys()); }
 return (
-<div className="modal-overlay" onClick={onClose}>
-<div className=“modal-box” onClick={e=>e.stopPropagation()}>
-<div style={{display:‘flex’,justifyContent:‘space-between’,alignItems:‘center’,marginBottom:20}}>
-<span style={{fontWeight:900,fontSize:16}}>🔑 APIキー設定</span>
-<button onClick={onClose} style={{background:‘none’,border:‘none’,color:‘rgba(255,255,255,.5)’,fontSize:20,cursor:‘pointer’}}>×</button>
+<div className="modal-ov" onClick={onClose}>
+<div className=“modal-box” onClick={function(e){ e.stopPropagation(); }}>
+<div style={{ display:‘flex’, justifyContent:‘space-between’, alignItems:‘center’, marginBottom:18 }}>
+<span style={{ fontWeight:900, fontSize:15 }}>🔑 APIキー設定</span>
+<button onClick={onClose} style={{ background:‘none’, border:‘none’, color:‘rgba(255,255,255,.5)’, fontSize:22, cursor:‘pointer’, lineHeight:1 }}>×</button>
 </div>
-{AI_LIST.map(ai=>(
-<div key={ai.id} style={{marginBottom:14}}>
-<label style={{fontSize:12,color:‘rgba(255,255,255,.5)’,fontWeight:700,display:‘flex’,alignItems:‘center’,gap:6,marginBottom:6}}>
-<span>{ai.icon}</span>{ai.label}
-{keys[ai.id]&&<span style={{background:‘rgba(74,222,128,.15)’,border:‘1px solid rgba(74,222,128,.3)’,borderRadius:4,padding:‘1px 6px’,fontSize:10,color:’#4ade80’}}>✓ 設定済み</span>}
+{AI_LIST.map(function(ai) {
+return (
+<div key={ai.id} style={{ marginBottom:12 }}>
+<label style={{ fontSize:12, color:‘rgba(255,255,255,.5)’, fontWeight:700, display:‘flex’, alignItems:‘center’, gap:6, marginBottom:5 }}>
+<span>{ai.icon}</span><span>{ai.label}</span>
+{keys[ai.id] && <span style={{ background:‘rgba(74,222,128,.15)’, border:‘1px solid rgba(74,222,128,.3)’, borderRadius:4, padding:‘1px 6px’, fontSize:10, color:’#4ade80’ }}>✓ 設定済み</span>}
 </label>
-<input className=“inp” type=“password” placeholder={ai.label+” APIキー”}
-defaultValue={keys[ai.id]||’’}
-onBlur={e=>save(ai.id,e.target.value.trim())}/>
+<input className=“inp” type=“password” placeholder={ai.label + ’ APIキー’}
+defaultValue={keys[ai.id] || ‘’}
+onBlur={function(e){ save(ai.id, e.target.value.trim()); }}/>
 </div>
-))}
-<p style={{fontSize:11,color:‘rgba(255,255,255,.25)’,lineHeight:1.7,marginTop:8}}>APIキーはブラウザのlocalStorageに保存されます。外部送信はありません。</p>
+);
+})}
+<p style={{ fontSize:11, color:‘rgba(255,255,255,.25)’, lineHeight:1.7, marginTop:8 }}>APIキーはlocalStorageに保存。外部送信なし。</p>
 </div>
 </div>
 );
 }
 
-/* ── AIセレクター ── */
-function AiSelector({value,onChange}){
-const keys=loadKeys();
+// ─────────────────────────────────────────────
+// AIセレクター
+// ─────────────────────────────────────────────
+function AiSelector(props) {
+var value    = props.value;
+var onChange = props.onChange;
+var keys = loadKeys();
 return (
 <div className="ai-grid">
-{AI_LIST.map(ai=>{
-const has=!!keys[ai.id];
+{AI_LIST.map(function(ai) {
+var has = !!keys[ai.id];
 return (
-<div key={ai.id} className={‘ai-card’+(value===ai.id?’ on’:’’)} style={{color:ai.color}} onClick={()=>onChange(ai.id)}>
-<div className="ai-card-icon">{ai.icon}</div>
-<div className=“ai-card-name” style={{color:’#fff’}}>{ai.label}</div>
-<div className=“ai-card-status” style={{color:has?’#4ade80’:‘rgba(255,255,255,.3)’}}>{has?‘✓ 設定済’:‘API未設定’}</div>
+<div key={ai.id} className={‘ai-card’ + (value === ai.id ? ’ ai-card-on’ : ‘’)}
+onClick={function(){ onChange(ai.id); }}>
+<div className="ai-icon">{ai.icon}</div>
+<div className="ai-name">{ai.label}</div>
+<div className=“ai-status” style={{ color: has ? ‘#4ade80’ : ‘rgba(255,255,255,.3)’ }}>
+{has ? ‘✓ 設定済’ : ‘API未設定’}
+</div>
 </div>
 );
 })}
@@ -364,707 +533,297 @@ return (
 );
 }
 
-/* ── NOTE_THEMES/TONES/AGES ── */
-const NOTE_THEMES=[
-{id:‘money’,label:‘💰 お金・節約’},{id:‘health’,label:‘💪 健康・ダイエット’},
-{id:‘career’,label:‘🚀 キャリア・副業’},{id:‘mindset’,label:‘🧠 マインドセット’},
-{id:‘relationship’,label:‘❤️ 人間関係・恋愛’},{id:‘productivity’,label:‘⚡ 生産性・習慣’},
-{id:‘parenting’,label:‘👶 育児・子育て’},{id:‘other’,label:‘📝 その他’},
-];
-const NOTE_TONES=[
-{id:‘story’,label:‘📖 体験談ストーリー系’,preview:’「あの日、口座残高が3桁になった。だから私は動いた——」実体験から読者を引き込む感情的な語り口。’},
-{id:‘howto’,label:‘📋 ハウツー解説系’,preview:’「Step1: まず〇〇する。Step2: 次に〇〇を設定する」手順を明確にして読者が行動しやすい構成。’},
-{id:‘secret’,label:‘🔥 秘密・裏知識系’,preview:’「実は99%の人が知らない方法があります。私が3年かけて発見した裏技を公開します」好奇心を煽る。’},
-{id:‘contrast’,label:‘⚡ 比較・対比系’,preview:’「月収30万と300万の人の違いはたった1つ」対比を使って問題点と解決策を鮮明に浮かび上がらせる。’},
-{id:‘warm’,label:‘💓 共感・温かい系’,preview:’「あなたの気持ち、すごくわかります。私も同じように悩んでいました」読者に寄り添う優しいトーン。’},
-];
-const NOTE_AGES=[
-{id:‘10s’,label:‘10代’},{id:‘20s’,label:‘20代’},{id:‘30s’,label:‘30代’},
-{id:‘40s’,label:‘40代’},{id:‘50s’,label:‘50代以上’},{id:‘all’,label:‘全年齢’},
-];
+// ─────────────────────────────────────────────
+// NoteGenerator
+// ─────────────────────────────────────────────
+function NoteGenerator(props) {
+var onBack        = props.onBack;
+var initTheme     = props.initTheme     || ‘money’;
+var initTopic     = props.initTopic     || ‘’;
+var initAge       = props.initAge       || ‘30s’;
+var initSituation = props.initSituation || ‘’;
+var initWorry     = props.initWorry     || ‘’;
 
-/* ── SEO対応プロンプト生成 ── */
-const SEO_KW={
-money:[‘副業’,‘収入アップ’,‘節約術’,‘資産形成’,‘家計管理’],
-health:[‘ダイエット’,‘健康習慣’,‘体質改善’,‘食事管理’,‘筋トレ’],
-career:[‘転職’,‘キャリアアップ’,‘副業’,‘スキルアップ’,‘年収アップ’],
-mindset:[‘マインドセット’,‘自己肯定感’,‘モチベーション’,‘習慣化’,‘成功思考’],
-relationship:[‘人間関係’,‘コミュニケーション’,‘恋愛’,‘話し方’,‘信頼関係’],
-productivity:[‘生産性向上’,‘時間管理’,‘習慣化’,‘タスク管理’,‘時短術’],
-parenting:[‘育児’,‘子育て’,‘子どもの教育’,‘親子関係’,‘幼児教育’],
-other:[‘ライフスタイル’,‘自己改善’,‘生き方’,‘人生設計’,‘ライフハック’],
-};
+var isMobile = useIsMobile();
+var showApiS  = useState(false);     var showApi = showApiS[0];  var setShowApi  = showApiS[1];
+var aiIdS     = useState(‘claude’);  var aiId    = aiIdS[0];     var setAiId     = aiIdS[1];
+var themeS    = useState(initTheme); var theme   = themeS[0];    var setTheme    = themeS[1];
+var topicS    = useState(initTopic); var topic   = topicS[0];    var setTopic    = topicS[1];
+var toneS     = useState(‘story’);   var tone    = toneS[0];     var setTone     = toneS[1];
+var priceS    = useState(980);       var price   = priceS[0];    var setPrice    = priceS[1];
+var freeWCS   = useState(800);       var freeWC  = freeWCS[0];   var setFreeWC   = freeWCS[1];
+var paidWCS   = useState(2000);      var paidWC  = paidWCS[0];   var setPaidWC   = paidWCS[1];
+var ageS      = useState(initAge);   var age     = ageS[0];      var setAge      = ageS[1];
+var sitS      = useState(initSituation); var situation = sitS[0]; var setSituation = sitS[1];
+var worryS    = useState(initWorry); var worry   = worryS[0];    var setWorry    = worryS[1];
+var tabS      = useState(‘settings’);var tab     = tabS[0];      var setTab      = tabS[1];
+var loadingS  = useState(false);     var loading = loadingS[0];  var setLoading  = loadingS[1];
+var errorS    = useState(’’);        var error   = errorS[0];    var setError    = errorS[1];
+var genTextS  = useState(’’);        var genText = genTextS[0];  var setGenText  = genTextS[1];
+var editTextS = useState(’’);        var editText= editTextS[0]; var setEditText = editTextS[1];
+var copiedS   = useState({});        var copied  = copiedS[0];   var setCopied   = copiedS[1];
+var progressS = useState(0);         var progress= progressS[0]; var setProgress = progressS[1];
+var elapsedS  = useState(0);         var elapsed = elapsedS[0];  var setElapsed  = elapsedS[1];
+var timerRef  = useRef(null);
+var aiRef     = useRef(aiId);
+aiRef.current = aiId;
 
-function buildPrompt({theme,topic,tone,price,freeWC,paidWC,age,situation,worry}){
-const tl=(NOTE_THEMES.find(t=>t.id===theme)||{}).label||theme;
-const toneL=(NOTE_TONES.find(t=>t.id===tone)||{}).label||tone;
-const ageL=(NOTE_AGES.find(a=>a.id===age)||{}).label||age;
-const ageCtx={
-‘10s’:‘10代・学生・バイト・部活’,‘20s’:‘20代・社会人・転職・恋愛’,
-‘30s’:‘30代・育児・住宅・キャリア’,‘40s’:‘40代・老後・子育て・健康’,
-‘50s’:‘50代以上・定年・健康・老後’,‘all’:‘全年代共通’
-}[age]||’’;
-const kw=(SEO_KW[theme]||SEO_KW.other).slice(0,4).join(’・’);
-const ft=Math.max(50,Math.round(freeWC*.1)),pt=Math.max(50,Math.round(paidWC*.1));
-return ‘あなたは人気noteクリエイターかつSEOライターです。以下の条件でnoteの有料記事を作成してください。\n\n’
-+ ‘## ターゲット読者\n’
-+ ’- 年齢: ’ + ageL + ’ / ライフスタイル: ’ + ageCtx + ‘\n’
-+ ’- 状況: ’ + (situation||‘特に指定なし’) + ’ / 悩み: ’ + (worry||‘特に指定なし’) + ‘\n\n’
-+ ‘## 記事設定\n’
-+ ’- ジャンル: ’ + tl + ’ / テーマ: ’ + (topic||‘ジャンルで最も読まれるテーマ’) + ‘\n’
-+ ‘- 文体: ’ + toneL + ’ / 販売価格: ¥’ + price.toLocaleString() + ‘\n\n’
-+ ‘## SEO\n’
-+ ’- キーワード（必ず含める）: ’ + kw + ‘\n’
-+ ‘- タイトルにキーワードを含め、冒頭200文字以内にも自然に入れる\n\n’
-+ ‘## 文字数（厳守）\n’
-+ ’- 無料: ’ + freeWC + ‘文字（許容±’ + ft + ’）/ 有料: ’ + paidWC + ‘文字（許容±’ + pt + ‘）\n\n’
-+ ‘## 構成\n’
-+ ‘タイトル「# 」で始める。冒頭50-100文字の要約。\n’
-+ ‘—FREE_START— で無料開始 → —FREE_END— で終了\n’
-+ ‘—PAID_START— で有料開始 → —PAID_END— で終了\n\n’
-+ ‘—FREE_START—\n（ここから無料パート）\n—FREE_END—\n’
-+ ‘—PAID_START—\n（ここから有料パート）\n—PAID_END—’;
+useEffect(function() { setSituation(’’); setWorry(’’); }, [age]);
+
+var hasArt = editText.length > 0;
+var freeM  = editText.match(/—FREE_START—([\s\S]*?)—FREE_END—/);
+var paidM  = editText.match(/—PAID_START—([\s\S]*?)—PAID_END—/);
+var freeT  = freeM ? freeM[1].trim() : ‘’;
+var paidT  = paidM ? paidM[1].trim() : ‘’;
+var titleM = editText.match(/^# (.+)/m);
+var dispTitle = titleM ? titleM[1] : (topic || ‘note記事’);
+var cfgAI  = AI_LIST.filter(function(a){ return !!getKey(a.id); });
+var curAI  = AI_LIST.find(function(a){ return a.id === aiId; }) || AI_LIST[0];
+
+function doCopy(text, key) {
+navigator.clipboard.writeText(text).catch(function(){});
+setCopied(function(s){ var n = Object.assign({}, s); n[key] = true; return n; });
+setTimeout(function(){ setCopied(function(s){ var n = Object.assign({}, s); n[key] = false; return n; }); }, 2000);
 }
-
-/* ── NoteGenerator ── */
-function NoteGenerator({onBack,initTheme,initTopic,initAge,initSituation,initWorry}){
-const isMobile=useIsMobile();
-const [showApi,setShowApi]=useState(false);
-const [aiId,setAiId]=useState(‘claude’);
-const [theme,setTheme]=useState(initTheme||‘money’);
-const [topic,setTopic]=useState(initTopic||’’);
-const [tone,setTone]=useState(‘story’);
-const [price,setPrice]=useState(980);
-const [freeWC,setFreeWC]=useState(800);
-const [paidWC,setPaidWC]=useState(2000);
-const [age,setAge]=useState(initAge||‘30s’);
-const [situation,setSituation]=useState(initSituation||’’);
-const [worry,setWorry]=useState(initWorry||’’);
-const [tab,setTab]=useState(‘settings’);
-const [loading,setLoading]=useState(false);
-const [error,setError]=useState(’’);
-const [genText,setGenText]=useState(’’);
-const [editText,setEditText]=useState(’’);
-const [copied,setCopied]=useState({});
-const [progress,setProgress]=useState(0);
-const [elapsed,setElapsed]=useState(0);
-const timerRef=useRef(null);
-const aiRef=useRef(aiId);
-aiRef.current=aiId;
-
-useEffect(()=>{setSituation(’’);setWorry(’’);},[age]);
-
-const hasArt=editText.length>0;
-const freeM=editText.match(/—FREE_START—([\s\S]*?)—FREE_END—/);
-const paidM=editText.match(/—PAID_START—([\s\S]*?)—PAID_END—/);
-const freeT=freeM?freeM[1].trim():’’;
-const paidT=paidM?paidM[1].trim():’’;
-const titleM=editText.match(/^# (.+)/m);
-const dispTitle=titleM?titleM[1]:(topic||‘note記事’);
-const cfgAI=AI_LIST.filter(a=>!!getKey(a.id));
-const curAI=AI_LIST.find(a=>a.id===aiId)||AI_LIST[0];
-
-const doCopy=(text,key)=>{
-navigator.clipboard.writeText(text).catch(()=>{});
-setCopied(s=>({…s,[key]:true}));
-setTimeout(()=>setCopied(s=>({…s,[key]:false})),2000);
-};
-const exportTxt=()=>{
-const b=new Blob([editText],{type:‘text/plain;charset=utf-8’});
-const a=document.createElement(‘a’);a.href=URL.createObjectURL(b);
-a.download=‘note_’+Date.now()+’.txt’;a.click();
-};
-
-const handleGenerate=useCallback(()=>{
-const id=aiRef.current;
-setError(’’);setLoading(true);setProgress(0);setElapsed(0);
-const start=Date.now();
-if(timerRef.current) clearInterval(timerRef.current);
-timerRef.current=setInterval(()=>{
-const e=(Date.now()-start)/1000;
+function exportTxt() {
+var b = new Blob([editText], { type: ‘text/plain;charset=utf-8’ });
+var a = document.createElement(‘a’);
+a.href = URL.createObjectURL(b);
+a.download = ‘note_’ + Date.now() + ‘.txt’;
+a.click();
+}
+function handleGenerate() {
+var id    = aiRef.current;
+var start = Date.now();
+setError(’’); setLoading(true); setProgress(0); setElapsed(0);
+if (timerRef.current) clearInterval(timerRef.current);
+timerRef.current = setInterval(function() {
+var e = (Date.now() - start) / 1000;
 setElapsed(Math.floor(e));
-setProgress(Math.min(95,95*(1-Math.exp(-e/40))));
-},500);
-const prompt=buildPrompt({theme,topic,tone,price,freeWC,paidWC,age,situation,worry});
-const sys=‘あなたは人気noteクリエイターです。指定された構成で必ず記事を書いてください。マークダウン形式で出力してください。’;
-callAI(id,[{role:‘user’,content:prompt}],sys,8000)
-.then(res=>{
+setProgress(Math.min(95, 95 * (1 - Math.exp(-e / 40))));
+}, 500);
+var prompt = buildPrompt({ theme:theme, topic:topic, tone:tone, price:price, freeWC:freeWC, paidWC:paidWC, age:age, situation:situation, worry:worry });
+var sys    = ‘あなたは人気noteクリエイターです。指定された構成で必ず記事を書いてください。マークダウン形式で出力してください。’;
+callAI(id, [{ role: ‘user’, content: prompt }], sys, 8000)
+.then(function(res) {
 clearInterval(timerRef.current);
 setProgress(100);
-const text=res.replace(/`[\w]*\n?/gm,'').replace(/`$/gm,’’).trim();
-if(text.length<200) throw new Error(‘生成テキストが短すぎます’);
-recordGenerate(id,‘note’,theme);
-setGenText(text);setEditText(text);setTab(‘edit’);
-setLoading(false);setElapsed(Math.round((Date.now()-start)/100)/10);
+var text = res.replace(/`[\w]*\n?/gm, '').replace(/`$/gm, ‘’).trim();
+if (text.length < 200) throw new Error(‘生成テキストが短すぎます’);
+recordGenerate(id, ‘note’, theme);
+setGenText(text); setEditText(text); setTab(‘edit’);
+setLoading(false); setElapsed(Math.round((Date.now() - start) / 100) / 10);
 })
-.catch(e=>{
+.catch(function(e) {
 clearInterval(timerRef.current);
-setProgress(0);setError(e.message);setLoading(false);
+setProgress(0); setError(e.message); setLoading(false);
 });
-},[theme,topic,tone,price,freeWC,paidWC,age,situation,worry]);
+}
 
 return (
 <div className="app-wrap">
-<style>{’@keyframes spin{to{transform:rotate(360deg)}}’}</style>
-{showApi&&<ApiKeyModal onClose={()=>setShowApi(false)}/>}
-<div className="app-header">
-<div className="app-header-left">
+{showApi && <ApiKeyModal onClose={function(){ setShowApi(false); }}/>}
+<div className="app-hd">
+<div className="app-hd-l">
 <button className="back-btn" onClick={onBack}>← 戻る</button>
 <div>
-<div style={{display:‘flex’,alignItems:‘center’,gap:7}}>
-<span className="app-badge">AI POWERED</span>
+<div style={{ display:‘flex’, alignItems:‘center’, gap:7 }}>
+<span className="aibadge">AI POWERED</span>
 <h1 className="app-title">📝 note有料記事生成</h1>
 </div>
-<p className="app-sub">
-{cfgAI.length>0?’✓ ‘+cfgAI.map(a=>a.label).join(’ ’):‘APIキー未設定’}
-</p>
+<p className="app-sub">{cfgAI.length > 0 ? ‘✓ ’ + cfgAI.map(function(a){return a.label;}).join(’ ‘) : ‘APIキー未設定’}</p>
 </div>
 </div>
-<button className=“key-btn” onClick={()=>setShowApi(true)}>🔑 APIキー設定</button>
+<button className=“key-btn” onClick={function(){ setShowApi(true); }}>🔑 APIキー設定</button>
 </div>
-
-```
-  <div className="dark-tabs">
-    {[['settings','⚙️ 設定',false],['edit','✏️ 編集',!hasArt],['preview','👁 プレビュー',!hasArt],['post','📤 投稿',!hasArt]].map(([id,lbl,dis])=>(
-      <button key={id} className={'tab-btn'+(tab===id?' on':'')} disabled={dis}
-        onClick={()=>!dis&&setTab(id)}>{lbl}</button>
-    ))}
-  </div>
-
-  <div className="app-body">
-    {/* 設定タブ */}
-    {tab==='settings'&&(
-      <div>
-        {!getKey(aiId)&&(
-          <div className="warn">
-            <span style={{fontSize:13}}>⚠️ {curAI.label}のAPIキーが未設定です</span>
-            <button onClick={()=>setShowApi(true)} style={{background:'#e07b39',border:'none',borderRadius:7,padding:'6px 12px',color:'#fff',fontWeight:700,cursor:'pointer',fontSize:12}}>設定する</button>
-          </div>
-        )}
-
-        <div className="card">
-          <span className="lbl">🤖 使用するAI</span>
-          <AiSelector value={aiId} onChange={id=>{setAiId(id);aiRef.current=id;}}/>
-        </div>
-
-        <div className="card">
-          <span className="lbl">📂 ジャンル</span>
-          <div className="pill-row">
-            {NOTE_THEMES.map(t=>(
-              <button key={t.id} className={'pill'+(theme===t.id?' on':'')} onClick={()=>setTheme(t.id)}>{t.label}</button>
-            ))}
-          </div>
-        </div>
-
-        <div className="card">
-          <span className="lbl">✏️ テーマ（自由入力）</span>
-          <input className="inp" type="text" value={topic} onChange={e=>setTopic(e.target.value)}
-            placeholder="例: 月5万円副業を3ヶ月で達成した方法"/>
-          <p className="hint">空欄の場合はAIが最適なテーマを選びます</p>
-        </div>
-
-        <div className="card">
-          <span className="lbl">🎨 文体スタイル</span>
-          <div className="pill-row" style={{marginBottom:12}}>
-            {NOTE_TONES.map(t=>(
-              <button key={t.id} className={'pill'+(tone===t.id?' on':'')} onClick={()=>setTone(t.id)}>{t.label}</button>
-            ))}
-          </div>
-          {NOTE_TONES.filter(t=>t.id===tone).map(t=>(
-            <div key={t.id} style={{background:'rgba(233,69,96,.06)',border:'1px solid rgba(233,69,96,.2)',borderRadius:8,padding:'10px 12px'}}>
-              <p style={{fontSize:10,color:'#e94560',fontWeight:800,marginBottom:5}}>📝 文体イメージ</p>
-              <p style={{fontSize:12,color:'rgba(255,255,255,.7)',lineHeight:1.7,fontStyle:'italic'}}>{t.preview}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="card">
-          <span className="lbl">👥 ターゲット読者</span>
-          <div style={{marginBottom:14}}>
-            <p style={{fontSize:12,color:'rgba(255,255,255,.45)',marginBottom:8}}>年齢層</p>
-            <div className="pill-row">
-              {NOTE_AGES.map(a=>(
-                <button key={a.id} className={'pill'+(age===a.id?' on':'')} onClick={()=>setAge(a.id)}>{a.label}</button>
-              ))}
-            </div>
-          </div>
-          <div style={{marginBottom:12}}>
-            <p style={{fontSize:12,color:'rgba(255,255,255,.45)',marginBottom:6}}>読者の状況（任意）</p>
-            <input className="inp" type="text" value={situation} onChange={e=>setSituation(e.target.value)}
-              placeholder="例: 副業を始めたいが何から始めればよいか分からない"/>
-          </div>
-          <div>
-            <p style={{fontSize:12,color:'rgba(255,255,255,.45)',marginBottom:6}}>読者の悩み（任意）</p>
-            <input className="inp" type="text" value={worry} onChange={e=>setWorry(e.target.value)}
-              placeholder="例: 時間がなくて副業に踏み出せない"/>
-          </div>
-        </div>
-
-        <div className="card">
-          <span className="lbl">📊 価格・文字数設定</span>
-          {[
-            {label:'🆓 無料部分',color:'#4ade80',val:freeWC,set:setFreeWC,min:300,max:3000},
-            {label:'🔒 有料部分',color:'#f87171',val:paidWC,set:setPaidWC,min:500,max:8000},
-            {label:'💰 販売価格',color:'#fbbf24',val:price,set:setPrice,min:300,max:9800},
-          ].map(({label,color,val,set,min,max})=>(
-            <div key={label} style={{marginBottom:14}}>
-              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
-                <span style={{fontSize:12,fontWeight:700,color}}>{label}</span>
-                <span style={{background:'rgba(255,255,255,.08)',borderRadius:5,padding:'2px 8px',fontSize:12,fontWeight:700}}>
-                  {label.includes('価格')?'¥'+val.toLocaleString():val.toLocaleString()+'文字'}
-                </span>
-              </div>
-              <input type="range" min={min} max={max} step={100} value={val}
-                onChange={e=>set(Number(e.target.value))} style={{accentColor:color}}/>
-            </div>
-          ))}
-          <div style={{borderTop:'1px solid rgba(255,255,255,.07)',paddingTop:10,display:'flex',justifyContent:'space-between'}}>
-            <span style={{fontSize:12,color:'rgba(255,255,255,.35)'}}>合計文字数</span>
-            <span style={{fontWeight:800,fontSize:14}}>{(freeWC+paidWC).toLocaleString()}文字</span>
-          </div>
-        </div>
-
-        {error&&<div className="err">❌ {error}</div>}
-
-        <button className="gen-btn" onClick={handleGenerate} disabled={loading}
-          style={{background:loading?'rgba(233,69,96,.15)':'linear-gradient(135deg,#e94560,#c2185b)',color:'#fff'}}>
-          {loading&&<div className="gen-overlay"/>}
-          {loading&&<div className="gen-bar" style={{width:progress+'%'}}/>}
-          <div className="gen-inner">
-            {loading?(
-              <div>
-                <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
-                  <span className="spin" style={{fontSize:18}}>⚙️</span>
-                  <span style={{fontSize:15}}>{curAI.label} で生成中...</span>
-                </div>
-                <div style={{fontSize:12,opacity:.8,display:'flex',gap:14,justifyContent:'center'}}>
-                  <span>⏱ {elapsed}秒</span><span>|</span><span>{Math.round(progress)}%</span>
-                  <span>|</span><span>{progress<30?'送信中...':progress<60?'執筆中...':'仕上げ中...'}</span>
-                </div>
-              </div>
-            ):(
-              <span style={{fontSize:16,fontWeight:800,padding:'2px 0'}}>{curAI.icon} {curAI.label} で記事を生成する</span>
-            )}
-          </div>
-        </button>
-      </div>
-    )}
-
-    {/* 編集タブ */}
-    {tab==='edit'&&hasArt&&(
-      <div>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-          <div style={{display:'flex',gap:12,fontSize:13}}>
-            <span style={{color:'#4ade80',fontWeight:700}}>無料 {freeT.replace(/\s/g,'').length}文字</span>
-            <span style={{color:'rgba(255,255,255,.2)'}}>|</span>
-            <span style={{color:'#f87171',fontWeight:700}}>有料 {paidT.replace(/\s/g,'').length}文字</span>
-          </div>
-          <div style={{display:'flex',gap:6}}>
-            <button className="copy-btn" style={{background:'rgba(255,255,255,.07)',borderColor:'rgba(255,255,255,.15)',color:'rgba(255,255,255,.7)'}}
-              onClick={()=>setEditText(genText)}>↺ リセット</button>
-            <button className="copy-btn" style={{background:'rgba(255,255,255,.07)',borderColor:'rgba(255,255,255,.15)',color:'rgba(255,255,255,.7)'}}
-              onClick={exportTxt}>💾 保存</button>
-          </div>
-        </div>
-        <textarea value={editText} onChange={e=>setEditText(e.target.value)}
-          style={{width:'100%',minHeight:560,padding:14,background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.1)',borderRadius:12,color:'#fff',fontSize:14,lineHeight:1.8,resize:'vertical',outline:'none',fontFamily:'monospace'}}/>
-      </div>
-    )}
-
-    {/* プレビュータブ */}
-    {tab==='preview'&&hasArt&&(
-      <div>
-        <div style={{display:'flex',justifyContent:'flex-end',marginBottom:12}}>
-          <button className="copy-btn" style={{background:copied.full?'rgba(74,222,128,.15)':'rgba(255,255,255,.07)',borderColor:copied.full?'rgba(74,222,128,.4)':'rgba(255,255,255,.15)',color:copied.full?'#4ade80':'rgba(255,255,255,.7)'}}
-            onClick={()=>doCopy(editText,'full')}>{copied.full?'✓ コピー済み':'📋 全文コピー'}</button>
-        </div>
-        <div className="preview-wrap">
-          <div className="preview-free-hd">
-            <span style={{color:'#16a34a',fontSize:12,fontWeight:700}}>📓 無料部分プレビュー</span>
-          </div>
-          <div style={{padding:'24px 28px'}}>
-            <h1 style={{fontSize:20,fontWeight:900,lineHeight:1.4,color:'#1a1a1a',marginBottom:16}}>{dispTitle}</h1>
-            <div style={{fontSize:14,lineHeight:1.9,color:'#333',whiteSpace:'pre-wrap'}}>{freeT}</div>
-          </div>
-          <div className="preview-paid-wall">
-            <div style={{fontSize:30,marginBottom:10}}>🔐</div>
-            <h3 style={{fontSize:16,fontWeight:900,margin:'0 0 8px'}}>ここから先は有料コンテンツです</h3>
-            <p style={{fontSize:12,opacity:.6,margin:'0 0 16px',lineHeight:1.7}}>具体的な方法・Q&A・アクションプランを公開</p>
-            <div className="preview-price-tag">¥{price.toLocaleString()} で購入</div>
-          </div>
-        </div>
-      </div>
-    )}
-
-    {/* 投稿タブ */}
-    {tab==='post'&&hasArt&&(
-      <div>
-        <p style={{fontSize:13,color:'rgba(255,255,255,.45)',marginBottom:14}}>各パートをコピーしてnoteの投稿画面に貼り付けてください</p>
-        {[
-          {key:'title',label:'🏷️ タイトル',text:dispTitle,color:'#fbbf24'},
-          {key:'free', label:'🆓 無料パート',text:freeT,color:'#4ade80'},
-          {key:'paid', label:'🔒 有料パート',text:paidT,color:'#f87171'},
-        ].map(item=>(
-          <div key={item.key} className="post-card">
-            <div className="post-card-hd">
-              <div>
-                <span style={{fontWeight:700,fontSize:14}}>{item.label}</span>
-                <span style={{fontSize:11,color:'rgba(255,255,255,.3)',marginLeft:8}}>{item.text.replace(/\s/g,'').length}文字</span>
-              </div>
-              <button className="copy-btn" style={{background:copied[item.key]?'rgba(74,222,128,.15)':'rgba(255,255,255,.07)',borderColor:copied[item.key]?'rgba(74,222,128,.4)':'rgba(255,255,255,.15)',color:copied[item.key]?'#4ade80':'rgba(255,255,255,.7)'}}
-                onClick={()=>doCopy(item.text,item.key)}>{copied[item.key]?'✓ コピー済み':'📋 コピー'}</button>
-            </div>
-            <div className="post-card-body">{item.text}</div>
-          </div>
-        ))}
-        <a href="https://note.com/notes/new" target="_blank" rel="noopener noreferrer" className="note-open-btn">
-          📤 noteの投稿画面を開く
-        </a>
-      </div>
-    )}
-
-    {(tab==='edit'||tab==='preview'||tab==='post')&&!hasArt&&(
-      <div style={{textAlign:'center',padding:'72px 20px',color:'rgba(255,255,255,.3)'}}>
-        <div style={{fontSize:44,marginBottom:14}}>✏️</div>
-        <p style={{fontSize:14,marginBottom:6}}>まだ記事が生成されていません</p>
-        <p style={{fontSize:12}}>⚙️ 設定タブで条件を設定して生成してください</p>
-      </div>
-    )}
-  </div>
-</div>
-```
-
-);
-}
-
-/* ── BonusGenerator ── */
-const BONUS_THEMES=[‘副業・お金’,‘ダイエット・健康’,‘節約・お金’,‘育児・子育て’,‘マインドセット’,‘ビジネス・キャリア’,‘人間関係’,‘ライフスタイル’,‘その他’];
-const BONUS_AGES=[‘10代’,‘20代前半’,‘20代後半’,‘30代前半’,‘30代後半’,‘40代’,‘50代以上’,‘全年齢’];
-const BONUS_TYPES=[
-{id:‘checklist’,label:‘📋 チェックリスト’,desc:‘読者が行動に移しやすいチェック式リスト’},
-{id:‘template’, label:‘📄 テンプレート’,  desc:‘そのまま使えるテンプレート・フォーマット’},
-{id:‘ebook’,    label:‘📚 ミニeBook’,      desc:‘PDF形式で配布できる補足資料’},
-{id:‘audio’,    label:‘🎙 音声スクリプト’, desc:‘Podcastや音声コンテンツの台本’},
-{id:‘video’,    label:‘🎬 動画台本’,        desc:‘YouTube等の動画コンテンツ台本’},
-];
-
-async function readFileText(file){
-if(!file) return ‘’;
-if(file.name.toLowerCase().endsWith(’.docx’)&&typeof mammoth!==‘undefined’){
-const buf=await file.arrayBuffer();
-const res=await mammoth.extractRawText({arrayBuffer:buf});
-return res.value;
-}
-return new Promise((res,rej)=>{
-const r=new FileReader();
-r.onload=e=>res(e.target.result);
-r.onerror=rej;
-r.readAsText(file,‘utf-8’);
-});
-}
-
-function BonusGenerator({onBack}){
-const isMobile=useIsMobile();
-const [showApi,setShowApi]=useState(false);
-const [aiId,setAiId]=useState(‘claude’);
-const [theme,setTheme]=useState(BONUS_THEMES[0]);
-const [age,setAge]=useState(BONUS_AGES[4]);
-const [articleText,setArticleText]=useState(’’);
-const [articleFile,setArticleFile]=useState(null);
-const [loading,setLoading]=useState(false);
-const [error,setError]=useState(’’);
-const [suggestions,setSuggestions]=useState([]);
-const [selected,setSelected]=useState([]);
-const [results,setResults]=useState({});
-const aiRef=useRef(aiId);
-aiRef.current=aiId;
-
-const handleFile=useCallback(async e=>{
-const file=e.target.files&&e.target.files[0];
-if(!file) return;
-setArticleFile(file);
-try{const t=await readFileText(file);setArticleText(t);}catch(e){setError(’ファイル読み込みエラー: ’+e.message);}
-},[]);
-
-const handleAnalyze=useCallback(()=>{
-const id=aiRef.current;
-if(!articleText.trim()){setError(‘記事テキストを入力またはアップロードしてください’);return;}
-setError(’’);setLoading(true);setSuggestions([]);setSelected([]);setResults({});
-const prompt=‘以下のnote記事を分析して、購入者向けの特典コンテンツを8つ提案してください。\n\n【ジャンル】’+theme+’\n【ターゲット年齢】’+age+’\n\n’+articleText.slice(0,3000)+’\n\n出力形式（JSONのみ・前置きなし）:\n{“suggestions”:[{“id”:“1”,“title”:“特典タイトル”,“type”:“checklist”,“desc”:“内容説明（30文字以内）”},…]}\n\ntypeは checklist/template/ebook/audio/video のいずれか’;
-callAI(id,[{role:‘user’,content:prompt}],null,1200)
-.then(res=>{
-try{
-const clean=res.replace(/`json/g,'').replace(/`/g,’’).trim();
-const m=clean.match(/{[\s\S]*}/);
-const p=JSON.parse(m?m[0]:clean);
-if((p.suggestions&&p.suggestions.length)>0) setSuggestions(p.suggestions);
-else throw new Error(‘提案が取得できませんでした’);
-}catch{setError(‘解析エラー。もう一度お試しください。’);}
-setLoading(false);
-})
-.catch(e=>{setError(e.message);setLoading(false);});
-},[articleText,theme,age]);
-
-const handleGenerate=useCallback((s)=>{
-const id=aiRef.current;
-setLoading(true);
-const typeLabel=(BONUS_TYPES.find(t=>t.id===s.type)||{label:s.type}).label;
-const prompt=‘以下の特典コンテンツを作成してください。\n\n元記事（要約）:\n’+articleText.slice(0,2000)+’\n\n特典タイトル: ‘+s.title+’\n特典タイプ: ‘+typeLabel+’\nターゲット: ‘+age+’\n\n実際に使える完成度で作成してください。’;
-callAI(id,[{role:‘user’,content:prompt}],null,2000)
-.then(res=>{
-recordGenerate(id,‘bonus’,’’);
-setResults(r=>({…r,[s.id]:res}));setLoading(false);
-})
-.catch(e=>{setError(e.message);setLoading(false);});
-},[articleText,age]);
-
-const downloadXlsx=()=>{
-if(typeof XLSX===‘undefined’){alert(‘XLSXライブラリが読み込まれていません’);return;}
-const rows=selected.map(id=>{
-const s=suggestions.find(x=>x.id===id);
-return {タイトル:(s&&s.title)||’’,内容:results[id]||’’};
-});
-const ws=XLSX.utils.json_to_sheet(rows);
-const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,‘特典’);
-XLSX.writeFile(wb,‘bonus_’+Date.now()+’.xlsx’);
-};
-
-const cfgAI=AI_LIST.filter(a=>!!getKey(a.id));
-
-return (
-<div className="app-wrap">
-{showApi&&<ApiKeyModal onClose={()=>setShowApi(false)}/>}
-<div className="app-header">
-<div className="app-header-left">
-<button className="back-btn" onClick={onBack}>← 戻る</button>
-<div>
-<div style={{display:‘flex’,alignItems:‘center’,gap:7}}>
-<span className="app-badge">AI POWERED</span>
-<h1 className="app-title">🎁 購入者特典生成</h1>
-</div>
-<p className="app-sub">{cfgAI.length>0?‘✓ ‘+cfgAI.map(a=>a.label).join(’ ‘):‘APIキー未設定’}</p>
-</div>
-</div>
-<button className=“key-btn” onClick={()=>setShowApi(true)}>🔑 APIキー設定</button>
+<div className="dark-tabs">
+{[[‘settings’,‘⚙️ 設定’,false],[‘edit’,‘✏️ 編集’,!hasArt],[‘preview’,‘👁 プレビュー’,!hasArt],[‘post’,‘📤 投稿’,!hasArt]].map(function(x) {
+return <button key={x[0]} className={‘tab-btn’ + (tab === x[0] ? ’ tab-on’ : ‘’)} disabled={x[2]} onClick={function(){ if(!x[2]) setTab(x[0]); }}>{x[1]}</button>;
+})}
 </div>
 <div className="app-body">
-{!getKey(aiId)&&(
-<div className="warn">
-<span>⚠️ {(AI_LIST.find(a=>a.id===aiId)||{label:aiId}).label}のAPIキーが未設定です</span>
-<button onClick={()=>setShowApi(true)} style={{background:’#e07b39’,border:‘none’,borderRadius:7,padding:‘5px 10px’,color:’#fff’,fontWeight:700,cursor:‘pointer’,fontSize:12}}>設定</button>
-</div>
-)}
-
-```
-    <div className="card">
-      <span className="lbl">🤖 使用するAI</span>
-      <AiSelector value={aiId} onChange={id=>{setAiId(id);aiRef.current=id;}}/>
-    </div>
-
-    <div className="card">
-      <span className="lbl">📂 ジャンル & 年齢</span>
-      <div style={{marginBottom:12}}>
-        <select value={theme} onChange={e=>setTheme(e.target.value)} className="inp">
-          {BONUS_THEMES.map(t=><option key={t} value={t}>{t}</option>)}
-        </select>
-      </div>
-      <select value={age} onChange={e=>setAge(e.target.value)} className="inp">
-        {BONUS_AGES.map(a=><option key={a} value={a}>{a}</option>)}
-      </select>
-    </div>
-
-    <div className="card">
-      <span className="lbl">📄 元記事テキスト</span>
-      <textarea className="inp" style={{minHeight:140,resize:'vertical',marginBottom:10}}
-        value={articleText} onChange={e=>setArticleText(e.target.value)}
-        placeholder="note記事の本文をここに貼り付けてください..."/>
-      <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer',fontSize:13,color:'rgba(255,255,255,.5)'}}>
-        <span>📎 ファイルアップロード (.txt / .md / .docx)</span>
-        <input type="file" accept=".txt,.md,.docx" onChange={handleFile} style={{display:'none'}}/>
-      </label>
-      {articleFile&&<p style={{fontSize:12,color:'#4ade80',marginTop:6}}>✓ {articleFile.name}</p>}
-    </div>
-
-    {error&&<div className="err">❌ {error}</div>}
-
-    <button onClick={handleAnalyze} disabled={loading||!articleText.trim()}
-      style={{width:'100%',padding:'14px',borderRadius:12,background:loading?'rgba(224,123,57,.2)':'linear-gradient(135deg,#e07b39,#c2185b)',border:'none',color:'#fff',fontSize:15,fontWeight:800,cursor:loading?'not-allowed':'pointer',marginBottom:20,opacity:loading?0.7:1}}>
-      {loading?<span><span className="spin">⚙️</span> 分析・生成中...</span>:'🎁 特典コンテンツを提案する'}
-    </button>
-
-    {suggestions.length>0&&(
-      <div>
-        <p style={{fontSize:13,color:'rgba(255,255,255,.45)',marginBottom:12}}>生成する特典を選んでください（複数可）</p>
-        {suggestions.map(s=>{
-          const isSel=selected.includes(s.id);
-          const typeInfo=BONUS_TYPES.find(t=>t.id===s.type)||{label:s.type};
-          return (
-            <div key={s.id} className="bonus-result">
-              <div className="bonus-check" onClick={()=>setSelected(sel=>isSel?sel.filter(x=>x!==s.id):[...sel,s.id])}>
-                <div style={{width:20,height:20,borderRadius:5,border:'2px solid '+(isSel?'#e94560':'rgba(255,255,255,.3)'),background:isSel?'rgba(233,69,96,.2)':'transparent',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                  {isSel&&<span style={{color:'#e94560',fontSize:14,fontWeight:900}}>✓</span>}
-                </div>
-                <div>
-                  <p style={{fontWeight:700,fontSize:14,marginBottom:3}}>{s.title}</p>
-                  <p style={{fontSize:12,color:'rgba(255,255,255,.45)'}}>{typeInfo.label} — {s.desc}</p>
-                </div>
-              </div>
-              {isSel&&(
-                <div style={{paddingLeft:30}}>
-                  <button onClick={()=>handleGenerate(s)} disabled={loading}
-                    style={{padding:'7px 16px',borderRadius:8,background:'rgba(224,123,57,.2)',border:'1px solid rgba(224,123,57,.4)',color:'#e07b39',fontSize:13,fontWeight:700,cursor:'pointer',marginBottom:8}}>
-                    {loading?'生成中...':'⚡ 生成する'}
-                  </button>
-                  {results[s.id]&&(
-                    <pre style={{fontSize:12,color:'rgba(255,255,255,.7)',whiteSpace:'pre-wrap',lineHeight:1.7,background:'rgba(255,255,255,.03)',borderRadius:8,padding:'10px 12px'}}>{results[s.id]}</pre>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
-        {selected.length>0&&Object.keys(results).length>0&&(
-          <button onClick={downloadXlsx} style={{width:'100%',padding:'12px',borderRadius:10,background:'linear-gradient(135deg,#4ade80,#16a34a)',border:'none',color:'#fff',fontSize:14,fontWeight:800,cursor:'pointer',marginTop:8}}>
-            📥 選択した特典をExcelでダウンロード
-          </button>
-        )}
-      </div>
-    )}
-  </div>
-</div>
-```
-
-);
-}
-
-/* ── ImagePromptGenerator ── */
-const IMG_STYLES=[‘イラスト・アニメ風’,‘リアル・写真風’,‘シンプル・フラット’,‘3D・CGレンダリング’,‘水彩・手描き風’,‘ミニマル・モダン’];
-const IMG_TOOLS=[‘Midjourney’,‘DALL-E 3’,‘Stable Diffusion’,‘Adobe Firefly’,‘Ideogram’];
-const IMG_USES=[
-{id:‘thumbnail’,label:‘📸 サムネイル’},
-{id:‘header’,   label:‘🖼️ ヘッダー画像’},
-{id:‘section’,  label:‘📌 セクション区切り’},
-{id:‘profile’,  label:‘👤 プロフィール’},
-{id:‘cover’,    label:‘📖 表紙’},
-];
-
-function ImagePromptGenerator({onBack}){
-const [showApi,setShowApi]=useState(false);
-const [aiId,setAiId]=useState(‘claude’);
-const [style,setStyle]=useState(IMG_STYLES[0]);
-const [tool,setTool]=useState(IMG_TOOLS[0]);
-const [uses,setUses]=useState([‘thumbnail’]);
-const [keyword,setKeyword]=useState(’’);
-const [loading,setLoading]=useState(false);
-const [error,setError]=useState(’’);
-const [prompts,setPrompts]=useState([]);
-const [copied,setCopied]=useState({});
-const aiRef=useRef(aiId);
-aiRef.current=aiId;
-
-const toggleUse=id=>setUses(u=>u.includes(id)?u.filter(x=>x!==id):[…u,id]);
-const doCopy=(text,key)=>{
-navigator.clipboard.writeText(text).catch(()=>{});
-setCopied(c=>({…c,[key]:true}));
-setTimeout(()=>setCopied(c=>({…c,[key]:false})),2000);
-};
-
-const handleGenerate=useCallback(()=>{
-const id=aiRef.current;
-setError(’’);setLoading(true);setPrompts([]);
-const useLabels=uses.map(u=>(IMG_USES.find(x=>x.id===u)||{label:u}).label).join(’・’);
-const prompt=‘以下の条件でAI画像生成ツール用の英語プロンプトを5種類作成してください。\n\nスタイル: ‘+style+’\nツール: ‘+tool+’\n用途: ‘+useLabels+’\nキーワード: ‘+(keyword||‘note記事のカバー画像’)+’\n\n出力形式（JSONのみ）:\n{“prompts”:[“英語プロンプト1”,“英語プロンプト2”,“英語プロンプト3”,“英語プロンプト4”,“英語プロンプト5”]}\n\n各プロンプトは具体的で’+tool+‘に最適化した英語で書いてください。’;
-
-```
-callAI(id,[{role:'user',content:prompt}],null,1000)
-  .then(res=>{
-    try{
-      const clean=res.replace(/```json/g,'').replace(/```/g,'').trim();
-      const m=clean.match(/\{[\s\S]*\}/);
-      const p=JSON.parse(m?m[0]:clean);
-      if((p.prompts&&p.prompts.length)>0){recordGenerate(id,'image','');setPrompts(p.prompts);}
-      else throw new Error('プロンプトが取得できませんでした');
-    }catch{setError('解析エラー。もう一度お試しください。');}
-    setLoading(false);
-  })
-  .catch(e=>{setError(e.message);setLoading(false);});
-```
-
-},[style,tool,uses,keyword]);
-
-const cfgAI=AI_LIST.filter(a=>!!getKey(a.id));
-
-return (
-<div className="app-wrap">
-<style>{’@keyframes spin{to{transform:rotate(360deg)}}’}</style>
-{showApi&&<ApiKeyModal onClose={()=>setShowApi(false)}/>}
-<div className="app-header">
-<div className="app-header-left">
-<button className="back-btn" onClick={onBack}>← 戻る</button>
+{tab === ‘settings’ && (
 <div>
-<div style={{display:‘flex’,alignItems:‘center’,gap:7}}>
-<span className="app-badge">AI POWERED</span>
-<h1 className="app-title">🖼️ 画像プロンプト生成</h1>
-</div>
-<p className="app-sub">{cfgAI.length>0?‘✓ ‘+cfgAI.map(a=>a.label).join(’ ‘):‘APIキー未設定’}</p>
-</div>
-</div>
-<button className=“key-btn” onClick={()=>setShowApi(true)}>🔑 APIキー設定</button>
-</div>
-<div className="app-body">
-{!getKey(aiId)&&(
+{!getKey(aiId) && (
 <div className="warn">
-<span>⚠️ {(AI_LIST.find(a=>a.id===aiId)||{label:aiId}).label}のAPIキーが未設定です</span>
-<button onClick={()=>setShowApi(true)} style={{background:’#e07b39’,border:‘none’,borderRadius:7,padding:‘5px 10px’,color:’#fff’,fontWeight:700,cursor:‘pointer’,fontSize:12}}>設定</button>
+<span>⚠️ {curAI.label}のAPIキーが未設定です</span>
+<button onClick={function(){ setShowApi(true); }} style={{ background:’#e07b39’, border:‘none’, borderRadius:7, padding:‘5px 11px’, color:’#fff’, fontWeight:700, cursor:‘pointer’, fontSize:12 }}>設定する</button>
 </div>
 )}
 <div className="card">
 <span className="lbl">🤖 使用するAI</span>
-<AiSelector value={aiId} onChange={id=>{setAiId(id);aiRef.current=id;}}/>
+<AiSelector value={aiId} onChange={function(id){ setAiId(id); aiRef.current = id; }}/>
 </div>
 <div className="card">
-<span className="lbl">🎨 画像スタイル</span>
-<select value={style} onChange={e=>setStyle(e.target.value)} className=“inp”>
-{IMG_STYLES.map(s=><option key={s} value={s}>{s}</option>)}
-</select>
-</div>
-<div className="card">
-<span className="lbl">🛠 生成ツール</span>
-<select value={tool} onChange={e=>setTool(e.target.value)} className=“inp”>
-{IMG_TOOLS.map(t=><option key={t} value={t}>{t}</option>)}
-</select>
-</div>
-<div className="card">
-<span className="lbl">📌 用途（複数選択可）</span>
-<div className="pill-row">
-{IMG_USES.map(u=>(
-<button key={u.id} className={‘pill’+(uses.includes(u.id)?’ on’:’’)} onClick={()=>toggleUse(u.id)}>{u.label}</button>
-))}
+<span className="lbl">📂 ジャンル</span>
+<div className="pills">
+{NOTE_THEMES.map(function(t) {
+return <button key={t.id} className={‘pill’ + (theme === t.id ? ’ pill-on’ : ‘’)} onClick={function(){ setTheme(t.id); }}>{t.label}</button>;
+})}
 </div>
 </div>
 <div className="card">
-<span className="lbl">🔑 キーワード・テーマ（任意）</span>
-<input className=“inp” type=“text” value={keyword} onChange={e=>setKeyword(e.target.value)}
-placeholder=“例: 副業 ビジネス 成功 シンプル”/>
+<span className="lbl">✏️ テーマ（自由入力）</span>
+<input className=“inp” type=“text” value={topic} onChange={function(e){ setTopic(e.target.value); }} placeholder=“例: 月5万円副業を3ヶ月で達成した方法”/>
+<p className="hint">空欄の場合はAIが最適なテーマを選びます</p>
 </div>
-{error&&<div className="err">❌ {error}</div>}
-<button onClick={handleGenerate} disabled={loading}
-style={{width:‘100%’,padding:‘14px’,borderRadius:12,background:loading?‘rgba(99,102,241,.2)’:‘linear-gradient(135deg,#6366f1,#4f46e5)’,border:‘none’,color:’#fff’,fontSize:15,fontWeight:800,cursor:loading?‘not-allowed’:‘pointer’,marginBottom:20,opacity:loading?0.7:1}}>
-{loading?<span><span className="spin">⚙️</span> 生成中…</span>:‘✨ プロンプトを生成する’}
-</button>
-{prompts.length>0&&(
+<div className="card">
+<span className="lbl">🎨 文体スタイル</span>
+<div className=“pills” style={{ marginBottom:10 }}>
+{NOTE_TONES.map(function(t) {
+return <button key={t.id} className={‘pill’ + (tone === t.id ? ’ pill-on’ : ‘’)} onClick={function(){ setTone(t.id); }}>{t.label}</button>;
+})}
+</div>
+{NOTE_TONES.filter(function(t){ return t.id === tone; }).map(function(t) {
+return (
+<div key={t.id} style={{ background:‘rgba(233,69,96,.06)’, border:‘1px solid rgba(233,69,96,.2)’, borderRadius:8, padding:‘9px 11px’ }}>
+<p style={{ fontSize:10, color:’#e94560’, fontWeight:800, marginBottom:4 }}>📝 文体イメージ</p>
+<p style={{ fontSize:12, color:‘rgba(255,255,255,.7)’, lineHeight:1.75, fontStyle:‘italic’ }}>{t.preview}</p>
+</div>
+);
+})}
+</div>
+<div className="card">
+<span className="lbl">👥 ターゲット読者</span>
+<p style={{ fontSize:12, color:‘rgba(255,255,255,.45)’, marginBottom:7 }}>年齢層</p>
+<div className=“pills” style={{ marginBottom:12 }}>
+{NOTE_AGES.map(function(a) {
+return <button key={a.id} className={‘pill’ + (age === a.id ? ’ pill-on’ : ‘’)} onClick={function(){ setAge(a.id); }}>{a.label}</button>;
+})}
+</div>
+<p style={{ fontSize:12, color:‘rgba(255,255,255,.45)’, marginBottom:5 }}>読者の状況（任意）</p>
+<input className=“inp” type=“text” value={situation} onChange={function(e){ setSituation(e.target.value); }} placeholder=“例: 副業を始めたいが何から始めればよいか分からない” style={{ marginBottom:10 }}/>
+<p style={{ fontSize:12, color:‘rgba(255,255,255,.45)’, marginBottom:5 }}>読者の悩み（任意）</p>
+<input className=“inp” type=“text” value={worry} onChange={function(e){ setWorry(e.target.value); }} placeholder=“例: 時間がなくて副業に踏み出せない”/>
+</div>
+<div className="card">
+<span className="lbl">📊 価格・文字数設定</span>
+{[
+{ label:‘🆓 無料部分’, color:’#4ade80’, val:freeWC, set:setFreeWC, min:300, max:3000 },
+{ label:‘🔒 有料部分’, color:’#f87171’, val:paidWC, set:setPaidWC, min:500, max:8000 },
+{ label:‘💰 販売価格’, color:’#fbbf24’, val:price,  set:setPrice,  min:300, max:9800 },
+].map(function(x) {
+return (
+<div key={x.label} style={{ marginBottom:12 }}>
+<div style={{ display:‘flex’, justifyContent:‘space-between’, marginBottom:3 }}>
+<span style={{ fontSize:12, fontWeight:700, color:x.color }}>{x.label}</span>
+<span style={{ background:‘rgba(255,255,255,.08)’, borderRadius:5, padding:‘2px 7px’, fontSize:12, fontWeight:700 }}>
+{x.label.indexOf(‘価格’) >= 0 ? ‘¥’ + x.val.toLocaleString() : x.val.toLocaleString() + ‘文字’}
+</span>
+</div>
+<input type=“range” min={x.min} max={x.max} step={100} value={x.val}
+onChange={function(e){ x.set(Number(e.target.value)); }}
+style={{ width:‘100%’, accentColor:x.color }}/>
+</div>
+);
+})}
+<div style={{ borderTop:‘1px solid rgba(255,255,255,.07)’, paddingTop:9, display:‘flex’, justifyContent:‘space-between’ }}>
+<span style={{ fontSize:12, color:‘rgba(255,255,255,.35)’ }}>合計文字数</span>
+<span style={{ fontWeight:800, fontSize:14 }}>{(freeWC + paidWC).toLocaleString()}文字</span>
+</div>
+</div>
+{error && <div className="err">❌ {error}</div>}
+<button className=“gen-btn” onClick={handleGenerate} disabled={loading}
+style={{ background: loading ? ‘rgba(233,69,96,.15)’ : ‘linear-gradient(135deg,#e94560,#c2185b)’, color:’#fff’ }}>
+{loading && <div className="gen-overlay"/>}
+{loading && <div className=“gen-bar” style={{ width: progress + ‘%’ }}/>}
+<div className="gen-inner">
+{loading ? (
 <div>
-<p style={{fontSize:13,color:‘rgba(255,255,255,.45)’,marginBottom:12}}>生成された英語プロンプト（クリックでコピー）</p>
-{prompts.map((p,i)=>(
-<div key={i} style={{background:copied[i]?‘rgba(74,222,128,.06)’:‘rgba(255,255,255,.04)’,border:‘1px solid ‘+(copied[i]?‘rgba(74,222,128,.3)’:‘rgba(255,255,255,.08)’),borderRadius:10,padding:‘12px 14px’,marginBottom:8,cursor:‘pointer’,transition:‘all .15s’}}
-onClick={()=>doCopy(p,i)}>
-<div style={{display:‘flex’,justifyContent:‘space-between’,alignItems:‘center’,marginBottom:6}}>
-<span style={{fontSize:11,fontWeight:700,color:‘rgba(255,255,255,.4)’}}>#{i+1}</span>
-<span style={{fontSize:11,color:copied[i]?’#4ade80’:‘rgba(255,255,255,.35)’}}>{copied[i]?‘✓ コピー済み’:‘📋 コピー’}</span>
+<div style={{ display:‘flex’, alignItems:‘center’, gap:8, marginBottom:4 }}>
+<span className=“spin” style={{ fontSize:17 }}>⚙️</span>
+<span style={{ fontSize:14 }}>{curAI.label} で生成中…</span>
 </div>
-<p style={{fontSize:13,color:‘rgba(255,255,255,.8)’,lineHeight:1.6}}>{p}</p>
+<div style={{ fontSize:12, opacity:.8, display:‘flex’, gap:12, justifyContent:‘center’ }}>
+<span>⏱ {elapsed}秒</span><span>|</span><span>{Math.round(progress)}%</span>
+<span>|</span>
+<span>{progress < 30 ? ‘送信中…’ : progress < 60 ? ‘執筆中…’ : ‘仕上げ中…’}</span>
 </div>
-))}
+</div>
+) : (
+<span style={{ fontSize:15, fontWeight:800, padding:‘2px 0’ }}>{curAI.icon} {curAI.label} で記事を生成する</span>
+)}
+</div>
+</button>
+</div>
+)}
+{tab === ‘edit’ && hasArt && (
+<div>
+<div style={{ display:‘flex’, justifyContent:‘space-between’, alignItems:‘center’, marginBottom:10 }}>
+<div style={{ display:‘flex’, gap:10, fontSize:13 }}>
+<span style={{ color:’#4ade80’, fontWeight:700 }}>無料 {freeT.replace(/\s/g,’’).length}文字</span>
+<span style={{ color:‘rgba(255,255,255,.2)’ }}>|</span>
+<span style={{ color:’#f87171’, fontWeight:700 }}>有料 {paidT.replace(/\s/g,’’).length}文字</span>
+</div>
+<div style={{ display:‘flex’, gap:5 }}>
+<button className=“copy-btn” style={{ background:‘rgba(255,255,255,.07)’, borderColor:‘rgba(255,255,255,.15)’, color:‘rgba(255,255,255,.7)’ }} onClick={function(){ setEditText(genText); }}>↺ リセット</button>
+<button className=“copy-btn” style={{ background:‘rgba(255,255,255,.07)’, borderColor:‘rgba(255,255,255,.15)’, color:‘rgba(255,255,255,.7)’ }} onClick={exportTxt}>💾 保存</button>
+</div>
+</div>
+<textarea value={editText} onChange={function(e){ setEditText(e.target.value); }}
+style={{ width:‘100%’, minHeight:520, padding:13, background:‘rgba(255,255,255,.04)’, border:‘1px solid rgba(255,255,255,.1)’, borderRadius:11, color:’#fff’, fontSize:14, lineHeight:1.8, resize:‘vertical’, outline:‘none’, fontFamily:‘monospace’ }}/>
+</div>
+)}
+{tab === ‘preview’ && hasArt && (
+<div>
+<div style={{ display:‘flex’, justifyContent:‘flex-end’, marginBottom:10 }}>
+<button className=“copy-btn” style={{ background:copied.full?‘rgba(74,222,128,.15)’:‘rgba(255,255,255,.07)’, borderColor:copied.full?‘rgba(74,222,128,.4)’:‘rgba(255,255,255,.15)’, color:copied.full?’#4ade80’:‘rgba(255,255,255,.7)’ }}
+onClick={function(){ doCopy(editText, ‘full’); }}>
+{copied.full ? ‘✓ コピー済み’ : ‘📋 全文コピー’}
+</button>
+</div>
+<div className="preview-box">
+<div style={{ background:’#f0fdf4’, borderBottom:‘2px solid #86efac’, padding:‘8px 18px’ }}>
+<span style={{ color:’#16a34a’, fontSize:12, fontWeight:700 }}>📓 無料部分プレビュー</span>
+</div>
+<div style={{ padding:‘22px 26px’ }}>
+<h1 style={{ fontSize:19, fontWeight:900, lineHeight:1.4, color:’#1a1a1a’, marginBottom:14 }}>{dispTitle}</h1>
+<div style={{ fontSize:14, lineHeight:1.9, color:’#333’, whiteSpace:‘pre-wrap’ }}>{freeT}</div>
+</div>
+<div style={{ background:‘linear-gradient(135deg,#1a1a2e,#0f3460)’, margin:‘0 20px 20px’, borderRadius:11, padding:‘24px 18px’, textAlign:‘center’, color:’#fff’ }}>
+<div style={{ fontSize:28, marginBottom:8 }}>🔐</div>
+<h3 style={{ fontSize:15, fontWeight:900, margin:‘0 0 7px’ }}>ここから先は有料コンテンツです</h3>
+<p style={{ fontSize:12, opacity:.55, margin:‘0 0 14px’, lineHeight:1.7 }}>具体的な方法・Q&A・アクションプランを公開</p>
+<div style={{ background:‘linear-gradient(135deg,#e94560,#c2185b)’, display:‘inline-block’, borderRadius:50, padding:‘8px 24px’, fontSize:14, fontWeight:800 }}>¥{price.toLocaleString()} で購入</div>
+</div>
+</div>
+</div>
+)}
+{tab === ‘post’ && hasArt && (
+<div>
+<p style={{ fontSize:13, color:‘rgba(255,255,255,.45)’, marginBottom:12 }}>各パートをコピーしてnoteの投稿画面に貼り付けてください</p>
+{[
+{ key:‘title’, label:‘🏷️ タイトル’,  text:dispTitle, color:’#fbbf24’ },
+{ key:‘free’,  label:‘🆓 無料パート’, text:freeT,     color:’#4ade80’ },
+{ key:‘paid’,  label:‘🔒 有料パート’, text:paidT,     color:’#f87171’ },
+].map(function(item) {
+return (
+<div key={item.key} className="post-card">
+<div className="post-hd">
+<div>
+<span style={{ fontWeight:700, fontSize:13 }}>{item.label}</span>
+<span style={{ fontSize:11, color:‘rgba(255,255,255,.3)’, marginLeft:8 }}>{item.text.replace(/\s/g,’’).length}文字</span>
+</div>
+<button className=“copy-btn” style={{ background:copied[item.key]?‘rgba(74,222,128,.15)’:‘rgba(255,255,255,.07)’, borderColor:copied[item.key]?‘rgba(74,222,128,.4)’:‘rgba(255,255,255,.15)’, color:copied[item.key]?’#4ade80’:‘rgba(255,255,255,.7)’ }}
+onClick={function(){ doCopy(item.text, item.key); }}>
+{copied[item.key] ? ‘✓ コピー済み’ : ‘📋 コピー’}
+</button>
+</div>
+<div className="post-body">{item.text}</div>
+</div>
+);
+})}
+<a href=“https://note.com/notes/new” target=”_blank” rel=“noopener noreferrer”
+style={{ display:‘block’, textAlign:‘center’, background:‘linear-gradient(135deg,#41c9b4,#0ea5e9)’, color:’#fff’, textDecoration:‘none’, padding:‘13px’, borderRadius:11, fontSize:14, fontWeight:800, marginTop:5 }}>
+📤 noteの投稿画面を開く
+</a>
+</div>
+)}
+{(tab === ‘edit’ || tab === ‘preview’ || tab === ‘post’) && !hasArt && (
+<div style={{ textAlign:‘center’, padding:‘64px 16px’, color:‘rgba(255,255,255,.3)’ }}>
+<div style={{ fontSize:40, marginBottom:12 }}>✏️</div>
+<p style={{ fontSize:14, marginBottom:5 }}>まだ記事が生成されていません</p>
+<p style={{ fontSize:12 }}>⚙️ 設定タブで条件を設定して生成してください</p>
 </div>
 )}
 </div>
@@ -1072,155 +831,406 @@ onClick={()=>doCopy(p,i)}>
 );
 }
 
-/* ── App ── */
-const TOOLS=[
-{id:‘note’, icon:‘📝’,name:‘note記事生成’,   desc:‘テーマ・文字数を設定してAIが有料記事を自動生成’,badge:‘人気No.1’},
-{id:‘bonus’,icon:‘🎁’,name:‘購入者特典生成’, desc:‘記事から特典コンテンツを自動提案・生成’,        badge:‘NEW’},
-{id:‘image’,icon:‘🖼️’,name:‘画像プロンプト’, desc:‘記事に合うAI画像プロンプトを自動生成’,          badge:’’},
-];
-const GENRES=[
-{id:‘money’,label:‘💰 お金・節約’},{id:‘health’,label:‘💪 健康・ダイエット’},
-{id:‘career’,label:‘🚀 キャリア・副業’},{id:‘mindset’,label:‘🧠 マインドセット’},
-{id:‘relationship’,label:‘❤️ 人間関係・恋愛’},{id:‘productivity’,label:‘⚡ 生産性・習慣’},
-{id:‘parenting’,label:‘👶 育児・子育て’},{id:‘other’,label:‘📝 その他’},
-];
-const AGES=[
-{id:‘10s’,label:‘10代’},{id:‘20s’,label:‘20代’},{id:‘30s’,label:‘30代’},
-{id:‘40s’,label:‘40代’},{id:‘50s’,label:‘50代以上’},{id:‘all’,label:‘全年齢’},
-];
-
-const FB_THEMES={
-money:[‘月5万円副業を3ヶ月で達成した完全ロードマップ’,‘節約で年間100万円を貯めた実践記録’,‘サラリーマンが副業収入を2倍にした5つの秘訣’,‘貯金ゼロから始める資産形成の教科書’,‘お金の不安を消す家計管理の完全ガイド’],
-health:[‘1ヶ月-8kg達成したダイエット完全ガイド’,‘リバウンドしない食事改善の科学的アプローチ’,‘忙しい人のための10分筋トレ習慣術’,‘在宅ワークで運動不足を解消する方法’,‘年齢に負けない体を手に入れる習慣術’],
-career:[‘未経験からWebエンジニアに転職した全記録’,‘副業で月収10万を稼ぐフリーランス入門’,‘30代からでも遅くない市場価値の高め方’,‘スキルゼロから高単価案件を取る戦略’,‘転職面接で落ちない自己PR作成の極意’],
-mindset:[‘先延ばし癖を完全克服した行動心理学’,‘自己肯定感を高める思考習慣の作り方’,‘やる気が続く目標設定と達成習慣の法則’,‘不安を力に変えるマインドセット完全版’,‘挫折しない習慣化の科学的アプローチ’],
-relationship:[‘彼女を作った内向型男子の恋愛戦略’,‘職場の人間関係を劇的に改善した会話術’,‘好感度が上がる話し方と聞き方の極意’,‘人間関係のストレスをゼロにする境界線術’,‘信頼を勝ち取るコミュニケーション法則’],
-productivity:[‘タスク管理で残業ゼロになった仕事術’,‘集中力を3倍にする環境づくりと習慣’,‘スマホ依存を断ち切って生産性を上げた方法’,‘週4日勤務を実現した仕事の効率化術’,‘毎日2時間を生み出す時間管理の科学’],
-parenting:[‘イヤイヤ期を乗り越えた育児の実践メソッド’,‘子どもの自己肯定感を育てる声かけ完全版’,‘褒め方ひとつで子どもの才能が開花する’,‘スマホ育児から脱却した親子時間の作り方’,‘受験で後悔しない小学生からの学習習慣’],
-other:[‘人生が変わった本10冊の読み方と実践法’,‘断捨離で部屋も心もスッキリした体験記’,‘ストレスフリーな生活を手に入れた方法’,‘副業から独立した自由な働き方の全記録’,‘自分らしく生きるためのキャリア設計法’],
-};
-const FB_SIT={
-money:[‘会社員で副業を始めたいが何から手をつけるか分からない’,‘毎月赤字で貯金がまったくできていない’,‘老後の資金が全く準備できていない’],
-health:[‘ダイエットを何度も挫折してきた’,‘在宅ワークで体を動かす機会が極端に減った’,‘健康診断で引っかかったが何から始めるか分からない’],
-career:[‘今の仕事に将来性がなく転職を考えている’,‘副業を始めたいが何をすればいいか迷っている’,‘昇給・昇格が見込めず給料に不満がある’],
-mindset:[‘やる気が続かず目標を達成できない’,‘ネガティブ思考が止まらず毎日がしんどい’,‘自分に自信が持てず挑戦を諦めてしまう’],
-relationship:[‘職場のコミュニケーションが苦手で孤立している’,‘好きな人がいるが告白できずにいる’,‘人と話すのが苦手で職場での評価が上がらない’],
-productivity:[‘仕事量が多くて残業が続いている’,‘集中できずついスマホを見てしまう’,‘やることが多くて優先順位がつけられない’],
-parenting:[‘子供のイヤイヤ期で毎日ストレスが溜まっている’,‘仕事と育児の両立で疲れ果てている’,‘子供のために何をしてあげるべきか不安’],
-other:[‘毎日同じことの繰り返しで変化がない’,‘何かを変えたいのに最初の一歩が踏み出せない’,‘やりたいことが見つからず将来が漠然と不安’],
-};
-const FB_WORRY={
-money:[‘副業で詐欺に引っかかりそうで怖い’,‘収入を上げたいのに具体的な方法が分からない’,‘節約を頑張っても全然貯まらない’],
-health:[‘運動を続けられない三日坊主になってしまう’,‘健康的に痩せたいが何が正解か分からない’,‘健康習慣を身につけたいが忙しくて無理に感じる’],
-career:[‘転職活動をどこから始めればいいか分からない’,‘副業で稼げるか自信がない’,‘スキルがなくて市場価値が低いと感じる’],
-mindset:[‘頭では分かっているが行動できない’,‘失敗が怖くて挑戦できない’,‘ネガティブ思考のループから抜け出せない’],
-relationship:[‘会話が続かず人間関係が浅い’,‘好きな人にどうアプローチすればいいか分からない’,‘断れずに何でも引き受けてしまう’],
-productivity:[‘集中力が続かず作業が終わらない’,‘スマホやSNSが気になって仕事に集中できない’,‘時間管理が下手でいつも時間が足りない’],
-parenting:[‘子供の気持ちが理解できず対応に困る’,‘育児書通りにできない自分が嫌になる’,‘子供との時間が足りなくて申し訳ない’],
-other:[‘行動しようとしても続かず自己嫌悪になる’,‘自分の強みや好きなことが分からない’,‘毎日に充実感がなくモヤモヤしている’],
-};
-
-function App(){
-const [screen,setScreen]=useState(‘landing’);
-const [initTheme,setInitTheme]=useState(‘money’);
-const [initTopic,setInitTopic]=useState(’’);
-const [initAge,setInitAge]=useState(‘30s’);
-const [initSit,setInitSit]=useState(’’);
-const [initWorry,setInitWorry]=useState(’’);
-const [step,setStep]=useState(‘genre’);
-const [genre,setGenre]=useState(‘money’);
-const [themes,setThemes]=useState([]);
-const [thLoading,setThLoading]=useState(false);
-const [thIdx,setThIdx]=useState(-1);
-const [prevThemes,setPrevThemes]=useState([]);
-const [selAge,setSelAge]=useState(‘30s’);
-const [sugSit,setSugSit]=useState([]);
-const [sugWorry,setSugWorry]=useState([]);
-const [swLoading,setSwLoading]=useState(false);
-const [selSit,setSelSit]=useState(-1);
-const [selWry,setSelWry]=useState(-1);
-const [contactSent,setContactSent]=useState(false);
-
-function getBestAi(){
-return [‘claude’,‘gemini’,‘chatgpt’,‘grok’].find(id=>getKey(id))||null;
+// ─────────────────────────────────────────────
+// BonusGenerator
+// ─────────────────────────────────────────────
+function readFileText(file) {
+if (!file) return Promise.resolve(’’);
+if (file.name.toLowerCase().indexOf(’.docx’) >= 0 && typeof mammoth !== ‘undefined’) {
+return file.arrayBuffer().then(function(buf) {
+return mammoth.extractRawText({ arrayBuffer: buf });
+}).then(function(res) { return res.value; });
+}
+return new Promise(function(resolve, reject) {
+var r = new FileReader();
+r.onload  = function(e) { resolve(e.target.result); };
+r.onerror = reject;
+r.readAsText(file, ‘utf-8’);
+});
 }
 
-function genThemes(gid,prev){
-const ai=getBestAi();
-const gl=(GENRES.find(g=>g.id===gid)||{}).label||gid;
-const clean=gl.replace(/[^\u3040-\u30FF\u4E00-\u9FFF\uFF00-\uFFEFa-zA-Z\s]/g,’’).trim();
-setThLoading(true);setThemes([]);setThIdx(-1);
-if(!ai){setThemes(FB_THEMES[gid]||FB_THEMES.other);setThLoading(false);return;}
-const exclude=prev&&prev.length>0?’\n以下のテーマは除外:\n’+prev.slice(-20).join(’\n’):’’;
-const prompt=‘note有料記事のテーマを10個生成してください。\nジャンル: ‘+clean+’\n条件: 購入したくなる魅力的なタイトル（25〜40文字）、読者の悩みを解決する具体的な内容’+exclude+’\n出力形式（JSONのみ）:\n{“themes”:[“テーマ1”,“テーマ2”,“テーマ3”,“テーマ4”,“テーマ5”,“テーマ6”,“テーマ7”,“テーマ8”,“テーマ9”,“テーマ10”]}’;
-callAI(ai,[{role:‘user’,content:prompt}],null,600)
-.then(res=>{
-try{
-const m=res.replace(/`json/g,'').replace(/`/g,’’).trim().match(/{[\s\S]*}/);
-const p=JSON.parse(m?m[0]:res);
-const arr=Array.isArray(p.themes)?p.themes.slice(0,10):[];
-setThemes(arr.length>=5?arr:(FB_THEMES[gid]||FB_THEMES.other));
-}catch{setThemes(FB_THEMES[gid]||FB_THEMES.other);}
-setThLoading(false);
+function BonusGenerator(props) {
+var onBack = props.onBack;
+var showApiS    = useState(false);         var showApi    = showApiS[0];    var setShowApi    = showApiS[1];
+var aiIdS       = useState(‘claude’);      var aiId       = aiIdS[0];       var setAiId       = aiIdS[1];
+var themeS      = useState(BONUS_THEMES[0]);var theme     = themeS[0];      var setTheme      = themeS[1];
+var ageS        = useState(BONUS_AGES[4]); var age        = ageS[0];        var setAge        = ageS[1];
+var artTextS    = useState(’’);            var artText    = artTextS[0];    var setArtText    = artTextS[1];
+var artFileS    = useState(null);          var artFile    = artFileS[0];    var setArtFile    = artFileS[1];
+var loadingS    = useState(false);         var loading    = loadingS[0];    var setLoading    = loadingS[1];
+var errorS      = useState(’’);            var error      = errorS[0];      var setError      = errorS[1];
+var suggestionsS= useState([]);            var suggestions= suggestionsS[0];var setSuggestions= suggestionsS[1];
+var selectedS   = useState([]);            var selected   = selectedS[0];   var setSelected   = selectedS[1];
+var resultsS    = useState({});            var results    = resultsS[0];    var setResults    = resultsS[1];
+var aiRef = useRef(aiId);
+aiRef.current = aiId;
+
+function handleFile(e) {
+var file = e.target.files && e.target.files[0];
+if (!file) return;
+setArtFile(file);
+readFileText(file).then(function(t){ setArtText(t); }).catch(function(e){ setError(‘ファイル読み込みエラー: ’ + e.message); });
+}
+function handleAnalyze() {
+var id = aiRef.current;
+if (!artText.trim()) { setError(‘記事テキストを入力またはアップロードしてください’); return; }
+setError(’’); setLoading(true); setSuggestions([]); setSelected([]); setResults({});
+var prompt = ‘以下のnote記事を分析して、購入者向けの特典コンテンツを8つ提案してください。\n\n【ジャンル】’ + theme + ‘\n【ターゲット年齢】’ + age + ‘\n\n’ + artText.slice(0, 3000) + ‘\n\n出力形式（JSONのみ・前置きなし）:\n{“suggestions”:[{“id”:“1”,“title”:“特典タイトル”,“type”:“checklist”,“desc”:“内容説明（30文字以内）”}]}\n\ntypeは checklist/template/ebook/audio/video のいずれか’;
+callAI(id, [{ role:‘user’, content:prompt }], null, 1200)
+.then(function(res) {
+try {
+var clean = res.replace(/`json/g,'').replace(/`/g,’’).trim();
+var m     = clean.match(/{[\s\S]*}/);
+var p     = JSON.parse(m ? m[0] : clean);
+if (p.suggestions && p.suggestions.length > 0) setSuggestions(p.suggestions);
+else throw new Error(‘提案が取得できませんでした’);
+} catch(e) { setError(‘解析エラー。もう一度お試しください。’); }
+setLoading(false);
 })
-.catch(()=>{setThemes(FB_THEMES[gid]||FB_THEMES.other);setThLoading(false);});
+.catch(function(e) { setError(e.message); setLoading(false); });
 }
-
-function genSitWorry(gid,aid){
-const ai=getBestAi();
-const gl=(GENRES.find(g=>g.id===gid)||{}).label||gid;
-const al=(AGES.find(a=>a.id===aid)||{}).label||aid;
-const clean=gl.replace(/[^\u3040-\u30FF\u4E00-\u9FFF\uFF00-\uFFEFa-zA-Z\s]/g,’’).trim();
-setSwLoading(true);setSugSit([]);setSugWorry([]);setSelSit(-1);setSelWry(-1);
-if(!ai){setSugSit(FB_SIT[gid]||FB_SIT.other);setSugWorry(FB_WORRY[gid]||FB_WORRY.other);setSwLoading(false);return;}
-const prompt=‘note記事のターゲット読者の「状況」と「悩み」を5件ずつ生成してください。\nジャンル: ‘+clean+’ / 年齢: ‘+al+’\n出力形式（JSONのみ）:\n{“situations”:[“状況1”,“状況2”,“状況3”,“状況4”,“状況5”],“worries”:[“悩み1”,“悩み2”,“悩み3”,“悩み4”,“悩み5”]}’;
-callAI(ai,[{role:‘user’,content:prompt}],null,600)
-.then(res=>{
-try{
-const m=res.replace(/`json/g,'').replace(/`/g,’’).trim().match(/{[\s\S]*}/);
-const p=JSON.parse(m?m[0]:res);
-const sits=Array.isArray(p.situations)?p.situations.slice(0,5):[];
-const wrys=Array.isArray(p.worries)?p.worries.slice(0,5):[];
-setSugSit(sits.length>=3?sits:(FB_SIT[gid]||FB_SIT.other));
-setSugWorry(wrys.length>=3?wrys:(FB_WORRY[gid]||FB_WORRY.other));
-}catch{setSugSit(FB_SIT[gid]||FB_SIT.other);setSugWorry(FB_WORRY[gid]||FB_WORRY.other);}
-setSwLoading(false);
+function handleGenBonus(s) {
+var id = aiRef.current;
+setLoading(true);
+var prompt = ‘以下の特典コンテンツを作成してください。\n\n元記事（要約）:\n’ + artText.slice(0, 2000) + ’\n\n特典タイトル: ’ + s.title + ’\nターゲット: ’ + age + ‘\n\n実際に使える完成度で作成してください。’;
+callAI(id, [{ role:‘user’, content:prompt }], null, 2000)
+.then(function(res) {
+recordGenerate(id, ‘bonus’, ‘’);
+setResults(function(r){ var n = Object.assign({}, r); n[s.id] = res; return n; });
+setLoading(false);
 })
-.catch(()=>{setSugSit(FB_SIT[gid]||FB_SIT.other);setSugWorry(FB_WORRY[gid]||FB_WORRY.other);setSwLoading(false);});
+.catch(function(e) { setError(e.message); setLoading(false); });
+}
+function downloadXlsx() {
+if (typeof XLSX === ‘undefined’) { alert(‘XLSXライブラリが読み込まれていません’); return; }
+var rows = selected.map(function(id) {
+var s = suggestions.find(function(x){ return x.id === id; });
+return { ‘タイトル’: s ? s.title : ‘’, ‘内容’: results[id] || ‘’ };
+});
+var ws = XLSX.utils.json_to_sheet(rows);
+var wb = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb, ws, ‘特典’);
+XLSX.writeFile(wb, ‘bonus_’ + Date.now() + ‘.xlsx’);
+}
+var cfgAI = AI_LIST.filter(function(a){ return !!getKey(a.id); });
+
+return (
+<div className="app-wrap">
+{showApi && <ApiKeyModal onClose={function(){ setShowApi(false); }}/>}
+<div className="app-hd">
+<div className="app-hd-l">
+<button className="back-btn" onClick={onBack}>← 戻る</button>
+<div>
+<div style={{ display:‘flex’, alignItems:‘center’, gap:7 }}>
+<span className="aibadge">AI POWERED</span>
+<h1 className="app-title">🎁 購入者特典生成</h1>
+</div>
+<p className="app-sub">{cfgAI.length > 0 ? ‘✓ ’ + cfgAI.map(function(a){return a.label;}).join(’ ‘) : ‘APIキー未設定’}</p>
+</div>
+</div>
+<button className=“key-btn” onClick={function(){ setShowApi(true); }}>🔑 APIキー設定</button>
+</div>
+<div className="app-body">
+<div className="card"><span className="lbl">🤖 使用するAI</span><AiSelector value={aiId} onChange={function(id){ setAiId(id); aiRef.current = id; }}/></div>
+<div className="card">
+<span className="lbl">📂 ジャンル & 年齢</span>
+<select value={theme} onChange={function(e){ setTheme(e.target.value); }} className=“inp” style={{ marginBottom:9 }}>
+{BONUS_THEMES.map(function(t){ return <option key={t} value={t}>{t}</option>; })}
+</select>
+<select value={age} onChange={function(e){ setAge(e.target.value); }} className=“inp”>
+{BONUS_AGES.map(function(a){ return <option key={a} value={a}>{a}</option>; })}
+</select>
+</div>
+<div className="card">
+<span className="lbl">📄 元記事テキスト</span>
+<textarea className=“inp” style={{ minHeight:130, resize:‘vertical’, marginBottom:9 }}
+value={artText} onChange={function(e){ setArtText(e.target.value); }}
+placeholder=“note記事の本文をここに貼り付けてください…”/>
+<label style={{ display:‘flex’, alignItems:‘center’, gap:7, cursor:‘pointer’, fontSize:13, color:‘rgba(255,255,255,.5)’ }}>
+<span>📎 ファイルアップロード (.txt / .md / .docx)</span>
+<input type=“file” accept=”.txt,.md,.docx” onChange={handleFile} style={{ display:‘none’ }}/>
+</label>
+{artFile && <p style={{ fontSize:12, color:’#4ade80’, marginTop:5 }}>✓ {artFile.name}</p>}
+</div>
+{error && <div className="err">❌ {error}</div>}
+<button onClick={handleAnalyze} disabled={loading || !artText.trim()}
+style={{ width:‘100%’, padding:‘14px’, borderRadius:11, background: loading ? ‘rgba(224,123,57,.2)’ : ‘linear-gradient(135deg,#e07b39,#c2185b)’, border:‘none’, color:’#fff’, fontSize:14, fontWeight:800, cursor: loading ? ‘not-allowed’ : ‘pointer’, marginBottom:18, opacity: loading ? 0.7 : 1 }}>
+{loading ? <span><span className="spin">⚙️</span> 分析・生成中…</span> : ‘🎁 特典コンテンツを提案する’}
+</button>
+{suggestions.length > 0 && (
+<div>
+<p style={{ fontSize:13, color:‘rgba(255,255,255,.45)’, marginBottom:10 }}>生成する特典を選んでください（複数可）</p>
+{suggestions.map(function(s) {
+var isSel = selected.indexOf(s.id) >= 0;
+return (
+<div key={s.id} style={{ background:‘rgba(255,255,255,.04)’, border:‘1px solid rgba(255,255,255,.08)’, borderRadius:11, padding:‘12px 14px’, marginBottom:7 }}>
+<div style={{ display:‘flex’, alignItems:‘flex-start’, gap:9, cursor:‘pointer’, marginBottom: isSel ? 8 : 0 }}
+onClick={function(){ setSelected(function(sel){ return isSel ? sel.filter(function(x){ return x !== s.id; }) : sel.concat([s.id]); }); }}>
+<div style={{ width:19, height:19, borderRadius:5, border:‘2px solid ‘+(isSel?’#e94560’:‘rgba(255,255,255,.3)’), background:isSel?‘rgba(233,69,96,.2)’:‘transparent’, display:‘flex’, alignItems:‘center’, justifyContent:‘center’, flexShrink:0, marginTop:2 }}>
+{isSel && <span style={{ color:’#e94560’, fontSize:13, fontWeight:900 }}>✓</span>}
+</div>
+<div>
+<p style={{ fontWeight:700, fontSize:13, marginBottom:2 }}>{s.title}</p>
+<p style={{ fontSize:11, color:‘rgba(255,255,255,.45)’ }}>{s.type} — {s.desc}</p>
+</div>
+</div>
+{isSel && (
+<div style={{ paddingLeft:28 }}>
+<button onClick={function(){ handleGenBonus(s); }} disabled={loading}
+style={{ padding:‘6px 14px’, borderRadius:7, background:‘rgba(224,123,57,.2)’, border:‘1px solid rgba(224,123,57,.4)’, color:’#e07b39’, fontSize:12, fontWeight:700, cursor:‘pointer’, marginBottom:7 }}>
+{loading ? ‘生成中…’ : ‘⚡ 生成する’}
+</button>
+{results[s.id] && (
+<pre style={{ fontSize:12, color:‘rgba(255,255,255,.7)’, whiteSpace:‘pre-wrap’, lineHeight:1.7, background:‘rgba(255,255,255,.03)’, borderRadius:7, padding:‘9px 11px’ }}>{results[s.id]}</pre>
+)}
+</div>
+)}
+</div>
+);
+})}
+{selected.length > 0 && Object.keys(results).length > 0 && (
+<button onClick={downloadXlsx}
+style={{ width:‘100%’, padding:‘12px’, borderRadius:9, background:‘linear-gradient(135deg,#4ade80,#16a34a)’, border:‘none’, color:’#fff’, fontSize:13, fontWeight:800, cursor:‘pointer’, marginTop:7 }}>
+📥 選択した特典をExcelでダウンロード
+</button>
+)}
+</div>
+)}
+</div>
+</div>
+);
 }
 
-if(screen===‘note’)  return <NoteGenerator onBack={()=>setScreen(‘landing’)} initTheme={initTheme} initTopic={initTopic} initAge={initAge} initSituation={initSit} initWorry={initWorry}/>;
-if(screen===‘bonus’) return <BonusGenerator onBack={()=>setScreen(‘landing’)}/>;
-if(screen===‘image’) return <ImagePromptGenerator onBack={()=>setScreen(‘landing’)}/>;
+// ─────────────────────────────────────────────
+// ImagePromptGenerator
+// ─────────────────────────────────────────────
+function ImagePromptGenerator(props) {
+var onBack = props.onBack;
+var showApiS  = useState(false);       var showApi  = showApiS[0];  var setShowApi  = showApiS[1];
+var aiIdS     = useState(‘claude’);    var aiId     = aiIdS[0];     var setAiId     = aiIdS[1];
+var styleS    = useState(IMG_STYLES[0]);var style   = styleS[0];    var setStyle    = styleS[1];
+var toolS     = useState(IMG_TOOLS[0]);var tool     = toolS[0];     var setTool     = toolS[1];
+var usesS     = useState([‘thumbnail’]);var uses     = usesS[0];    var setUses     = usesS[1];
+var keywordS  = useState(’’);          var keyword  = keywordS[0];  var setKeyword  = keywordS[1];
+var loadingS  = useState(false);       var loading  = loadingS[0];  var setLoading  = loadingS[1];
+var errorS    = useState(’’);          var error    = errorS[0];    var setError    = errorS[1];
+var promptsS  = useState([]);          var prompts  = promptsS[0];  var setPrompts  = promptsS[1];
+var copiedS   = useState({});          var copied   = copiedS[0];   var setCopied   = copiedS[1];
+var aiRef = useRef(aiId);
+aiRef.current = aiId;
+
+function toggleUse(id) {
+setUses(function(u){ return u.indexOf(id) >= 0 ? u.filter(function(x){ return x !== id; }) : u.concat([id]); });
+}
+function doCopy(text, key) {
+navigator.clipboard.writeText(text).catch(function(){});
+setCopied(function(c){ var n = Object.assign({}, c); n[key] = true; return n; });
+setTimeout(function(){ setCopied(function(c){ var n = Object.assign({}, c); n[key] = false; return n; }); }, 2000);
+}
+function handleGenerate() {
+var id = aiRef.current;
+setError(’’); setLoading(true); setPrompts([]);
+var useLabels = uses.map(function(u){ return (IMG_USES.find(function(x){ return x.id === u; }) || { label:u }).label; }).join(’・’);
+var prompt = ’以下の条件でAI画像生成ツール用の英語プロンプトを5種類作成してください。\n\nスタイル: ’ + style + ’\nツール: ’ + tool + ‘\n用途: ’ + useLabels + ‘\nキーワード: ’ + (keyword || ‘note記事のカバー画像’) + ‘\n\n出力形式（JSONのみ）:\n{“prompts”:[“英語プロンプト1”,“英語プロンプト2”,“英語プロンプト3”,“英語プロンプト4”,“英語プロンプト5”]}\n\n各プロンプトは’ + tool + ‘に最適化した英語で書いてください。’;
+callAI(id, [{ role:‘user’, content:prompt }], null, 1000)
+.then(function(res) {
+try {
+var clean = res.replace(/`json/g,'').replace(/`/g,’’).trim();
+var m     = clean.match(/{[\s\S]*}/);
+var p     = JSON.parse(m ? m[0] : clean);
+if (p.prompts && p.prompts.length > 0) {
+recordGenerate(id, ‘image’, ‘’);
+setPrompts(p.prompts);
+} else throw new Error(‘プロンプトが取得できませんでした’);
+} catch(e) { setError(‘解析エラー。もう一度お試しください。’); }
+setLoading(false);
+})
+.catch(function(e) { setError(e.message); setLoading(false); });
+}
+var cfgAI = AI_LIST.filter(function(a){ return !!getKey(a.id); });
+
+return (
+<div className="app-wrap">
+{showApi && <ApiKeyModal onClose={function(){ setShowApi(false); }}/>}
+<div className="app-hd">
+<div className="app-hd-l">
+<button className="back-btn" onClick={onBack}>← 戻る</button>
+<div>
+<div style={{ display:‘flex’, alignItems:‘center’, gap:7 }}>
+<span className="aibadge">AI POWERED</span>
+<h1 className="app-title">🖼️ 画像プロンプト生成</h1>
+</div>
+<p className="app-sub">{cfgAI.length > 0 ? ‘✓ ’ + cfgAI.map(function(a){return a.label;}).join(’ ‘) : ‘APIキー未設定’}</p>
+</div>
+</div>
+<button className=“key-btn” onClick={function(){ setShowApi(true); }}>🔑 APIキー設定</button>
+</div>
+<div className="app-body">
+<div className="card"><span className="lbl">🤖 使用するAI</span><AiSelector value={aiId} onChange={function(id){ setAiId(id); aiRef.current = id; }}/></div>
+<div className="card">
+<span className="lbl">🎨 画像スタイル</span>
+<select value={style} onChange={function(e){ setStyle(e.target.value); }} className=“inp”>
+{IMG_STYLES.map(function(s){ return <option key={s} value={s}>{s}</option>; })}
+</select>
+</div>
+<div className="card">
+<span className="lbl">🛠 生成ツール</span>
+<select value={tool} onChange={function(e){ setTool(e.target.value); }} className=“inp”>
+{IMG_TOOLS.map(function(t){ return <option key={t} value={t}>{t}</option>; })}
+</select>
+</div>
+<div className="card">
+<span className="lbl">📌 用途（複数選択可）</span>
+<div className="pills">
+{IMG_USES.map(function(u) {
+return <button key={u.id} className={‘pill’ + (uses.indexOf(u.id) >= 0 ? ’ pill-on’ : ‘’)} onClick={function(){ toggleUse(u.id); }}>{u.label}</button>;
+})}
+</div>
+</div>
+<div className="card">
+<span className="lbl">🔑 キーワード・テーマ（任意）</span>
+<input className=“inp” type=“text” value={keyword} onChange={function(e){ setKeyword(e.target.value); }} placeholder=“例: 副業 ビジネス 成功 シンプル”/>
+</div>
+{error && <div className="err">❌ {error}</div>}
+<button onClick={handleGenerate} disabled={loading}
+style={{ width:‘100%’, padding:‘14px’, borderRadius:11, background: loading ? ‘rgba(99,102,241,.2)’ : ‘linear-gradient(135deg,#6366f1,#4f46e5)’, border:‘none’, color:’#fff’, fontSize:14, fontWeight:800, cursor: loading ? ‘not-allowed’ : ‘pointer’, marginBottom:18, opacity: loading ? 0.7 : 1 }}>
+{loading ? <span><span className="spin">⚙️</span> 生成中…</span> : ‘✨ プロンプトを生成する’}
+</button>
+{prompts.length > 0 && (
+<div>
+<p style={{ fontSize:13, color:‘rgba(255,255,255,.45)’, marginBottom:10 }}>生成された英語プロンプト（クリックでコピー）</p>
+{prompts.map(function(p, i) {
+return (
+<div key={i} style={{ background: copied[i] ? ‘rgba(74,222,128,.06)’ : ‘rgba(255,255,255,.04)’, border: ’1px solid ’ + (copied[i] ? ‘rgba(74,222,128,.3)’ : ‘rgba(255,255,255,.08)’), borderRadius:9, padding:‘11px 13px’, marginBottom:7, cursor:‘pointer’ }}
+onClick={function(){ doCopy(p, i); }}>
+<div style={{ display:‘flex’, justifyContent:‘space-between’, alignItems:‘center’, marginBottom:5 }}>
+<span style={{ fontSize:11, fontWeight:700, color:‘rgba(255,255,255,.4)’ }}>#{i+1}</span>
+<span style={{ fontSize:11, color: copied[i] ? ‘#4ade80’ : ‘rgba(255,255,255,.35)’ }}>{copied[i] ? ‘✓ コピー済み’ : ‘📋 コピー’}</span>
+</div>
+<p style={{ fontSize:13, color:‘rgba(255,255,255,.8)’, lineHeight:1.6 }}>{p}</p>
+</div>
+);
+})}
+</div>
+)}
+</div>
+</div>
+);
+}
+
+// ─────────────────────────────────────────────
+// App（ランディング）
+// ─────────────────────────────────────────────
+function App() {
+var screenS      = useState(‘landing’); var screen      = screenS[0];      var setScreen      = screenS[1];
+var initThemeS   = useState(‘money’);   var initTheme   = initThemeS[0];   var setInitTheme   = initThemeS[1];
+var initTopicS   = useState(’’);        var initTopic   = initTopicS[0];   var setInitTopic   = initTopicS[1];
+var initAgeS     = useState(‘30s’);     var initAge     = initAgeS[0];     var setInitAge     = initAgeS[1];
+var initSitS     = useState(’’);        var initSit     = initSitS[0];     var setInitSit     = initSitS[1];
+var initWorryS   = useState(’’);        var initWorry   = initWorryS[0];   var setInitWorry   = initWorryS[1];
+var stepS        = useState(‘genre’);   var step        = stepS[0];        var setStep        = stepS[1];
+var genreS       = useState(‘money’);   var genre       = genreS[0];       var setGenre       = genreS[1];
+var themesS      = useState([]);        var themes      = themesS[0];      var setThemes      = themesS[1];
+var thLoadS      = useState(false);     var thLoad      = thLoadS[0];      var setThLoad      = thLoadS[1];
+var thIdxS       = useState(-1);        var thIdx       = thIdxS[0];       var setThIdx       = thIdxS[1];
+var prevThsS     = useState([]);        var prevThs     = prevThsS[0];     var setPrevThs     = prevThsS[1];
+var selAgeS      = useState(‘30s’);     var selAge      = selAgeS[0];      var setSelAge      = selAgeS[1];
+var sugSitS      = useState([]);        var sugSit      = sugSitS[0];      var setSugSit      = sugSitS[1];
+var sugWryS      = useState([]);        var sugWry      = sugWryS[0];      var setSugWry      = sugWryS[1];
+var swLoadS      = useState(false);     var swLoad      = swLoadS[0];      var setSwLoad      = swLoadS[1];
+var selSitS      = useState(-1);        var selSit      = selSitS[0];      var setSelSit      = selSitS[1];
+var selWryS      = useState(-1);        var selWry      = selWryS[0];      var setSelWry      = selWryS[1];
+var sentS        = useState(false);     var sent        = sentS[0];        var setSent        = sentS[1];
+
+function getBestAi() {
+var ids = [‘claude’,‘gemini’,‘chatgpt’,‘grok’];
+for (var i = 0; i < ids.length; i++) { if (getKey(ids[i])) return ids[i]; }
+return null;
+}
+
+function genThemes(gid, prev) {
+var ai = getBestAi();
+var gObj = GENRES.find(function(g){ return g.id === gid; });
+var gl   = gObj ? gObj.label : gid;
+var clean = gl.replace(/[^\u3040-\u30FF\u4E00-\u9FFF\uFF00-\uFFEFa-zA-Z0-9\s]/g, ‘’).trim();
+setThLoad(true); setThemes([]); setThIdx(-1);
+if (!ai) { setThemes(FB_THEMES[gid] || FB_THEMES.other); setThLoad(false); return; }
+var exclude = (prev && prev.length > 0) ? ‘\n以下は除外:\n’ + prev.slice(-20).join(’\n’) : ‘’;
+var prompt  = ‘note有料記事のテーマを10個生成してください。\nジャンル: ’ + clean + ‘\n条件: 購入したくなるタイトル（25〜40文字）、読者の悩みを解決する内容’ + exclude + ‘\n出力形式（JSONのみ）:\n{“themes”:[“テーマ1”,“テーマ2”,“テーマ3”,“テーマ4”,“テーマ5”,“テーマ6”,“テーマ7”,“テーマ8”,“テーマ9”,“テーマ10”]}’;
+callAI(ai, [{ role:‘user’, content:prompt }], null, 600)
+.then(function(res) {
+try {
+var clean2 = res.replace(/`json/g,'').replace(/`/g,’’).trim();
+var m      = clean2.match(/{[\s\S]*}/);
+var p      = JSON.parse(m ? m[0] : clean2);
+var arr    = Array.isArray(p.themes) ? p.themes.slice(0, 10) : [];
+setThemes(arr.length >= 5 ? arr : (FB_THEMES[gid] || FB_THEMES.other));
+} catch(e) { setThemes(FB_THEMES[gid] || FB_THEMES.other); }
+setThLoad(false);
+})
+.catch(function() { setThemes(FB_THEMES[gid] || FB_THEMES.other); setThLoad(false); });
+}
+
+function genSitWorry(gid, aid) {
+var ai   = getBestAi();
+var gObj = GENRES.find(function(g){ return g.id === gid; });
+var aObj = AGES.find(function(a){ return a.id === aid; });
+var gl   = gObj ? gObj.label : gid;
+var al   = aObj ? aObj.label : aid;
+var clean = gl.replace(/[^\u3040-\u30FF\u4E00-\u9FFF\uFF00-\uFFEFa-zA-Z0-9\s]/g, ‘’).trim();
+setSwLoad(true); setSugSit([]); setSugWry([]); setSelSit(-1); setSelWry(-1);
+if (!ai) { setSugSit(FB_SIT[gid] || FB_SIT.other); setSugWry(FB_WORRY[gid] || FB_WORRY.other); setSwLoad(false); return; }
+var prompt = ‘note記事のターゲット読者の「状況」と「悩み」を5件ずつ生成してください。\nジャンル: ’ + clean + ’ / 年齢: ’ + al + ‘\n出力形式（JSONのみ）:\n{“situations”:[“状況1”,“状況2”,“状況3”,“状況4”,“状況5”],“worries”:[“悩み1”,“悩み2”,“悩み3”,“悩み4”,“悩み5”]}’;
+callAI(ai, [{ role:‘user’, content:prompt }], null, 600)
+.then(function(res) {
+try {
+var clean2 = res.replace(/`json/g,'').replace(/`/g,’’).trim();
+var m      = clean2.match(/{[\s\S]*}/);
+var p      = JSON.parse(m ? m[0] : clean2);
+var sits   = Array.isArray(p.situations) ? p.situations.slice(0, 5) : [];
+var wrys   = Array.isArray(p.worries)    ? p.worries.slice(0, 5)    : [];
+setSugSit(sits.length >= 3 ? sits : (FB_SIT[gid] || FB_SIT.other));
+setSugWry(wrys.length >= 3 ? wrys : (FB_WORRY[gid] || FB_WORRY.other));
+} catch(e) { setSugSit(FB_SIT[gid] || FB_SIT.other); setSugWry(FB_WORRY[gid] || FB_WORRY.other); }
+setSwLoad(false);
+})
+.catch(function() { setSugSit(FB_SIT[gid] || FB_SIT.other); setSugWry(FB_WORRY[gid] || FB_WORRY.other); setSwLoad(false); });
+}
+
+if (screen === ‘note’)  return <NoteGenerator onBack={function(){ setScreen(‘landing’); }} initTheme={initTheme} initTopic={initTopic} initAge={initAge} initSituation={initSit} initWorry={initWorry}/>;
+if (screen === ‘bonus’) return <BonusGenerator onBack={function(){ setScreen(‘landing’); }}/>;
+if (screen === ‘image’) return <ImagePromptGenerator onBack={function(){ setScreen(‘landing’); }}/>;
 
 return (
 <div className="landing">
 <div className="landing-grid"/>
-<div className="landing-badge">✦ note AI Tools</div>
-<h1 className="landing-title">note<span>AI</span><br/>Tools</h1>
-<p className="landing-sub">Claude・Gemini・ChatGPT・Grokを使った<br/>note特化AIツール集</p>
-<div className="ai-badges">
-{AI_LIST.map(ai=>(
+<div className="lz1 landing-badge">✦ note AI Tools</div>
+<h1 className="lz1 landing-title">note<span>AI</span><br/>Tools</h1>
+<p className="lz1 landing-sub">Claude・Gemini・ChatGPT・Grokを使った<br/>note特化AIツール集</p>
+<div className="lz1 ai-badges">
+{AI_LIST.map(function(ai) {
+return (
 <div key={ai.id} className="ai-badge">
-<div className="ai-dot" style={{background:ai.color}}/>
+<div className=“ai-dot” style={{ background: ai.color }}/>
 {ai.label}
 </div>
-))}
+);
+})}
 </div>
 
 ```
   {/* ステップ1: ジャンル選択 */}
-  {step==='genre'&&(
-    <div className="theme-section">
-      <p className="section-label">✨ AIがあなたにぴったりのテーマを提案します</p>
-      <p style={{fontSize:12,color:'rgba(255,255,255,.4)',marginBottom:12,textAlign:'left',fontWeight:700}}>① ジャンルを選択</p>
-      <div className="chip-row">
-        {GENRES.map(g=>(
-          <button key={g.id} className={'chip'+(genre===g.id?' on':'')} onClick={()=>setGenre(g.id)}>{g.label}</button>
-        ))}
+  {step === 'genre' && (
+    <div className="lz1 theme-box">
+      <p className="box-label">✨ AIがあなたにぴったりのテーマを提案します</p>
+      <p style={{ fontSize:12, color:'rgba(255,255,255,.4)', marginBottom:10, fontWeight:700 }}>① ジャンルを選択</p>
+      <div className="chips">
+        {GENRES.map(function(g) {
+          return <button key={g.id} className={'chip ' + (genre === g.id ? 'chip-on' : '')} onClick={function(){ setGenre(g.id); }}>{g.label}</button>;
+        })}
       </div>
       <div className="btn-row">
-        <button className="btn-decide" onClick={()=>{setInitTheme(genre);setStep('themes');genThemes(genre,[]);}}>
+        <button className="btn-primary" onClick={function(){ setInitTheme(genre); setStep('themes'); genThemes(genre, []); }}>
           このジャンルでテーマを生成 →
         </button>
       </div>
@@ -1228,122 +1238,135 @@ return (
   )}
 
   {/* ステップ2: テーマ選択 */}
-  {step==='themes'&&(
-    <div className="theme-section">
-      <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14,flexWrap:'wrap'}}>
-        <button className="btn-back" onClick={()=>setStep('genre')}>← ジャンルに戻る</button>
-        <p className="section-label" style={{margin:0}}>{(GENRES.find(g=>g.id===genre)||{}).label} のテーマ候補</p>
+  {step === 'themes' && (
+    <div className="lz1 theme-box">
+      <div style={{ display:'flex', alignItems:'center', gap:9, marginBottom:12, flexWrap:'wrap' }}>
+        <button className="btn-back-sm" onClick={function(){ setStep('genre'); }}>← ジャンルに戻る</button>
+        <p className="box-label" style={{ margin:0 }}>
+          {(GENRES.find(function(g){ return g.id === genre; }) || {}).label} のテーマ候補
+        </p>
       </div>
-      {thLoading?(
-        <p className="loading-msg"><span className="spin">⚙️</span> AIがテーマを生成中...</p>
-      ):(
+      {thLoad ? (
+        <p className="loading-txt"><span className="spin">⚙️</span> AIがテーマを生成中...</p>
+      ) : (
         <div className="theme-grid">
-          {themes.map((t,i)=>(
-            <div key={i} className={'theme-card'+(thIdx===i?' on':'')} onClick={()=>setThIdx(i)}>
-              <span className="theme-num">{i+1}</span>
-              <span style={{flex:1}}>{t}</span>
-              {thIdx===i&&<span style={{color:'#e94560'}}>✓</span>}
-            </div>
-          ))}
+          {themes.map(function(t, i) {
+            return (
+              <div key={i} className={'theme-item ' + (thIdx === i ? 'theme-item-on' : '')} onClick={function(){ setThIdx(i); }}>
+                <span className="theme-num">{i + 1}</span>
+                <span style={{ flex:1 }}>{t}</span>
+                {thIdx === i && <span style={{ color:'#e94560' }}>✓</span>}
+              </div>
+            );
+          })}
         </div>
       )}
       <div className="btn-row">
-        <button className="btn-reload" disabled={thLoading}
-          onClick={()=>{setPrevThemes(p=>p.concat(themes));genThemes(genre,prevThemes.concat(themes));}}>
-          <span className={thLoading?'spin':''}>🔄</span> 別のテーマを生成
+        <button className="btn-reload" disabled={thLoad}
+          onClick={function(){ setPrevThs(prevThs.concat(themes)); genThemes(genre, prevThs.concat(themes)); }}>
+          <span className={thLoad ? 'spin' : ''}>🔄</span> 別のテーマを生成
         </button>
-        <button className="btn-decide" disabled={thIdx<0||thLoading}
-          onClick={()=>{setInitTopic(themes[thIdx]);setStep('age');genSitWorry(genre,selAge);}}>
+        <button className="btn-primary" disabled={thIdx < 0 || thLoad}
+          onClick={function(){ setInitTopic(themes[thIdx]); setStep('age'); genSitWorry(genre, selAge); }}>
           このテーマで決定 →
         </button>
       </div>
     </div>
   )}
 
-  {/* ステップ3: 年齢・状況・悩み選択 */}
-  {step==='age'&&(
-    <div className="theme-section">
-      <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14,flexWrap:'wrap'}}>
-        <button className="btn-back" onClick={()=>setStep('themes')}>← テーマに戻る</button>
-        <p style={{fontSize:13,color:'rgba(255,255,255,.7)',fontWeight:700,margin:0}}>📝 {initTopic}</p>
+  {/* ステップ3: 年齢・状況・悩み */}
+  {step === 'age' && (
+    <div className="lz1 theme-box">
+      <div style={{ display:'flex', alignItems:'center', gap:9, marginBottom:12, flexWrap:'wrap' }}>
+        <button className="btn-back-sm" onClick={function(){ setStep('themes'); }}>← テーマに戻る</button>
+        <p style={{ fontSize:13, color:'rgba(255,255,255,.7)', fontWeight:700, margin:0 }}>📝 {initTopic}</p>
       </div>
-      <p style={{fontSize:12,color:'rgba(255,255,255,.4)',marginBottom:10,fontWeight:700}}>② ターゲット読者の年齢を選択</p>
-      <div className="chip-row" style={{marginBottom:18}}>
-        {AGES.map(a=>(
-          <button key={a.id} className={'chip'+(selAge===a.id?' age-on':'')} onClick={()=>{setSelAge(a.id);setSelSit(-1);setSelWry(-1);genSitWorry(genre,a.id);}}>
-            {a.label}
-          </button>
-        ))}
+      <p style={{ fontSize:12, color:'rgba(255,255,255,.4)', marginBottom:9, fontWeight:700 }}>② ターゲット読者の年齢を選択</p>
+      <div className="chips" style={{ marginBottom:16 }}>
+        {AGES.map(function(a) {
+          return (
+            <button key={a.id} className={'chip ' + (selAge === a.id ? 'chip-age-on' : '')}
+              onClick={function(){ setSelAge(a.id); setSelSit(-1); setSelWry(-1); genSitWorry(genre, a.id); }}>
+              {a.label}
+            </button>
+          );
+        })}
       </div>
-      {swLoading?(
-        <p className="loading-msg"><span className="spin">⚙️</span> AIが状況・悩みを生成中...</p>
-      ):(
+      {swLoad ? (
+        <p className="loading-txt"><span className="spin">⚙️</span> AIが状況・悩みを生成中...</p>
+      ) : (
         <div className="sw-grid">
           <div>
-            <p className="sw-col-label">👤 読者の状況（任意・タップで選択）</p>
-            {sugSit.map((s,i)=>(
-              <div key={i} className={'sw-item'+(selSit===i?' sit-on':'')}
-                onClick={()=>{const n=selSit===i?-1:i;setSelSit(n);setInitSit(n>=0?sugSit[n]:'');}}>
-                {selSit===i&&'✓ '}{s}
-              </div>
-            ))}
+            <p className="sw-col-label">👤 読者の状況（任意）</p>
+            {sugSit.map(function(s, i) {
+              return (
+                <div key={i} className={'sw-item ' + (selSit === i ? 'sw-item-sit' : '')}
+                  onClick={function(){ var n = selSit === i ? -1 : i; setSelSit(n); setInitSit(n >= 0 ? sugSit[n] : ''); }}>
+                  {selSit === i ? '✓ ' : ''}{s}
+                </div>
+              );
+            })}
           </div>
           <div>
-            <p className="sw-col-label">💭 読者の悩み（任意・タップで選択）</p>
-            {sugWorry.map((w,i)=>(
-              <div key={i} className={'sw-item'+(selWry===i?' wry-on':'')}
-                onClick={()=>{const n=selWry===i?-1:i;setSelWry(n);setInitWorry(n>=0?sugWorry[n]:'');}}>
-                {selWry===i&&'✓ '}{w}
-              </div>
-            ))}
+            <p className="sw-col-label">💭 読者の悩み（任意）</p>
+            {sugWry.map(function(w, i) {
+              return (
+                <div key={i} className={'sw-item ' + (selWry === i ? 'sw-item-wry' : '')}
+                  onClick={function(){ var n = selWry === i ? -1 : i; setSelWry(n); setInitWorry(n >= 0 ? sugWry[n] : ''); }}>
+                  {selWry === i ? '✓ ' : ''}{w}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
-      <button className="btn-start" onClick={()=>{setInitAge(selAge);setScreen('note');}}>
+      <button className="btn-go" onClick={function(){ setInitAge(selAge); setScreen('note'); }}>
         📝 note記事を生成する →
       </button>
     </div>
   )}
 
   {/* ツールカード */}
-  <div className="tool-cards-landing">
-    {TOOLS.map(t=>(
-      <div key={t.id} className="tool-card-landing" onClick={()=>setScreen(t.id)}>
-        {t.badge&&<div style={{display:'inline-block',background:'rgba(233,69,96,.2)',border:'1px solid rgba(233,69,96,.4)',borderRadius:100,padding:'2px 8px',fontSize:9,color:'#e94560',fontWeight:800,letterSpacing:'.1em',marginBottom:8}}>{t.badge}</div>}
-        <div className="tool-card-icon">{t.icon}</div>
-        <div className="tool-card-name">{t.name}</div>
-        <div className="tool-card-desc">{t.desc}</div>
-      </div>
-    ))}
+  <div className="lz1 tool-cards">
+    {TOOLS.map(function(t) {
+      return (
+        <div key={t.id} className="tool-card" onClick={function(){ setScreen(t.id); }}>
+          {t.badge && <div className="tc-badge">{t.badge}</div>}
+          <div className="tc-icon">{t.icon}</div>
+          <div className="tc-name">{t.name}</div>
+          <div className="tc-desc">{t.desc}</div>
+        </div>
+      );
+    })}
   </div>
 
   {/* お問い合わせ */}
-  <div className="contact-box">
-    <p style={{fontSize:16,fontWeight:800,marginBottom:6}}>📬 お問い合わせ</p>
-    <p style={{fontSize:13,color:'rgba(255,255,255,.4)',marginBottom:18}}>ご質問・ご要望・不具合報告などはこちらからどうぞ</p>
-    {contactSent?(
-      <div style={{textAlign:'center',padding:'20px',color:'#4ade80',fontSize:15,fontWeight:700}}>
+  <div className="lz1 contact-box">
+    <p style={{ fontSize:15, fontWeight:800, marginBottom:5 }}>📬 お問い合わせ</p>
+    <p style={{ fontSize:13, color:'rgba(255,255,255,.4)', marginBottom:16 }}>ご質問・ご要望・不具合報告などはこちらからどうぞ</p>
+    {sent ? (
+      <div style={{ textAlign:'center', padding:'18px', color:'#4ade80', fontSize:14, fontWeight:700 }}>
         ✅ お問い合わせを受け付けました。ありがとうございます。
       </div>
-    ):(
+    ) : (
       <div>
-        <input type="text" id="c-name" className="contact-input" placeholder="お名前"/>
-        <input type="email" id="c-email" className="contact-input" placeholder="メールアドレス"/>
-        <textarea id="c-msg" className="contact-input contact-textarea" placeholder="お問い合わせ内容を入力してください..."/>
-        <button className="btn-send" onClick={()=>{
-          const name=document.getElementById('c-name').value.trim();
-          const email=document.getElementById('c-email').value.trim();
-          const msg=document.getElementById('c-msg').value.trim();
-          if(!name||!email||!msg){alert('すべての項目を入力してください。');return;}
-          if(!email.includes('@')){alert('正しいメールアドレスを入力してください。');return;}
-          window.open('mailto:?subject='+encodeURIComponent('[note AI Tools] お問い合わせ from '+name)+'&body='+encodeURIComponent('お名前: '+name+'\nメール: '+email+'\n\n'+msg));
-          setContactSent(true);
+        <input type="text"  id="c-name"  className="ci" placeholder="お名前"/>
+        <input type="email" id="c-email" className="ci" placeholder="メールアドレス"/>
+        <textarea id="c-msg" className="ci ci-ta" placeholder="お問い合わせ内容を入力してください..."/>
+        <button className="btn-send" onClick={function() {
+          var name  = document.getElementById('c-name').value.trim();
+          var email = document.getElementById('c-email').value.trim();
+          var msg   = document.getElementById('c-msg').value.trim();
+          if (!name || !email || !msg) { alert('すべての項目を入力してください。'); return; }
+          if (email.indexOf('@') < 0)  { alert('正しいメールアドレスを入力してください。'); return; }
+          window.open('mailto:?subject=' + encodeURIComponent('[note AI Tools] お問い合わせ from ' + name) + '&body=' + encodeURIComponent('お名前: ' + name + '\nメール: ' + email + '\n\n' + msg));
+          setSent(true);
         }}>送信する</button>
       </div>
     )}
   </div>
 
-  <p style={{position:'relative',zIndex:1,fontSize:11,color:'rgba(255,255,255,.18)',marginTop:4,marginBottom:20}}>
+  <p className="lz1" style={{ fontSize:11, color:'rgba(255,255,255,.18)', marginTop:4, marginBottom:20 }}>
     APIキーはブラウザに安全に保存。サーバーには送信されません。
   </p>
 </div>
