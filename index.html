@@ -235,6 +235,165 @@ a { color: inherit; }
   .tool-card-desc { display: none; }
   .app-title { font-size: 13px; }
 }
+
+/* =========================================
+   X LOGIN SCREEN
+   ========================================= */
+.x-login-screen {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0a1628 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 20px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.x-login-box {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 24px; padding: 48px 40px;
+  width: 420px; max-width: 95vw;
+  position: relative; z-index: 1;
+}
+.x-login-logo { font-size: 56px; margin-bottom: 16px; }
+.x-login-title { font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 8px; }
+.x-login-sub { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 32px; line-height: 1.7; }
+.x-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 16px 24px;
+  background: #000; border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50px; color: #fff; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; margin-bottom: 12px;
+}
+.x-btn:hover { background: #1a1a1a; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+.x-btn-icon { font-size: 20px; font-weight: 900; }
+.x-login-note { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 20px; line-height: 1.7; }
+.x-setup-link { color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 16px; cursor: pointer; text-decoration: underline; }
+.x-user-badge {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50px; padding: 6px 14px 6px 6px; font-size: 13px; color: rgba(255,255,255,0.8);
+}
+.x-user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #1d9bf0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+
+/* =========================================
+   AI THEME PROPOSAL (LANDING)
+   ========================================= */
+.theme-proposal-section {
+  width: 100%; max-width: 900px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 28px 24px;
+  margin-bottom: 32px; position: relative; z-index: 1;
+}
+.theme-section-title { font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.7); margin-bottom: 16px; letter-spacing: 0.05em; }
+.genre-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
+.genre-btn {
+  padding: 7px 14px; border-radius: 50px; font-size: 12px; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.55); cursor: pointer; transition: all 0.15s;
+}
+.genre-btn.active {
+  background: rgba(233,69,96,0.2); border-color: rgba(233,69,96,0.6); color: #fff;
+}
+.genre-btn:hover:not(.active) { background: rgba(255,255,255,0.09); color: rgba(255,255,255,0.8); }
+.theme-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.theme-item {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; text-align: left;
+  display: flex; align-items: center; gap: 10px;
+}
+.theme-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(233,69,96,0.4); transform: translateY(-1px); }
+.theme-item.selected { background: rgba(233,69,96,0.12); border-color: rgba(233,69,96,0.6); }
+.theme-item-num { font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.3); min-width: 20px; }
+.theme-item-text { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5; flex: 1; }
+.theme-controls { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; }
+.reload-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 9px 18px; border-radius: 10px;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.6); font-size: 13px; cursor: pointer; transition: all 0.15s;
+}
+.reload-btn:hover { background: rgba(255,255,255,0.12); }
+.decide-btn {
+  padding: 11px 28px; border-radius: 10px;
+  background: linear-gradient(135deg, #e94560, #c2185b);
+  border: none; color: #fff; font-size: 14px; font-weight: 800;
+  cursor: pointer; box-shadow: 0 4px 16px rgba(233,69,96,0.4);
+  transition: all 0.15s;
+}
+.decide-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.decide-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.theme-loading { text-align: center; padding: 24px; color: rgba(255,255,255,0.4); font-size: 13px; }
+
+/* AGE SELECTOR (LANDING) */
+.age-selector-section {
+  width: 100%; max-width: 900px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 28px 24px;
+  margin-bottom: 32px; position: relative; z-index: 1;
+}
+.age-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
+.age-btn {
+  padding: 8px 20px; border-radius: 50px; font-size: 13px; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.55); cursor: pointer; transition: all 0.15s;
+}
+.age-btn.active { background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.6); color: #fff; }
+.sitworry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.sitworry-col-title { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 10px; letter-spacing: 0.08em; }
+.sitworry-item {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px; padding: 10px 12px; cursor: pointer;
+  font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 7px;
+  transition: all 0.12s; line-height: 1.5;
+}
+.sitworry-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+.sitworry-item.sit-selected { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.5); color: #fff; }
+.sitworry-item.worry-selected { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.4); color: #fff; }
+.start-tool-btn {
+  width: 100%; padding: 16px; border-radius: 14px;
+  background: linear-gradient(135deg, #e94560, #c2185b);
+  border: none; color: #fff; font-size: 16px; font-weight: 900;
+  cursor: pointer; box-shadow: 0 6px 24px rgba(233,69,96,0.45); transition: all 0.15s;
+}
+.start-tool-btn:hover { opacity: 0.88; }
+.start-tool-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* CONTACT SECTION */
+.contact-section {
+  width: 100%; max-width: 620px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 32px 28px;
+  margin-bottom: 32px; position: relative; z-index: 1;
+}
+.contact-title { font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+.contact-sub   { font-size: 13px; color: rgba(255,255,255,0.45); margin-bottom: 20px; }
+.contact-input {
+  width: 100%; padding: 12px 14px; margin-bottom: 12px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px; color: #fff; font-size: 14px; outline: none;
+  font-family: inherit;
+}
+.contact-input:focus { border-color: rgba(233,69,96,0.5); }
+.contact-textarea { resize: vertical; min-height: 120px; }
+.contact-send-btn {
+  width: 100%; padding: 14px; border-radius: 10px;
+  background: linear-gradient(135deg, #e94560, #c2185b);
+  border: none; color: #fff; font-size: 15px; font-weight: 800;
+  cursor: pointer; box-shadow: 0 4px 16px rgba(233,69,96,0.4);
+}
+.contact-send-btn:hover { opacity: 0.88; }
+
+@media (max-width: 600px) {
+  .x-login-box { padding: 32px 20px; }
+  .theme-proposal-section { padding: 20px 16px; }
+  .theme-list { grid-template-columns: 1fr; }
+  .sitworry-grid { grid-template-columns: 1fr; }
+  .age-selector-section { padding: 20px 16px; }
+  .contact-section { padding: 24px 16px; }
+}
 </style>
 </head>
 <body>
@@ -524,6 +683,135 @@ async function callGrok(messages, systemPrompt, maxTokens) {
   return tryGrokModel(['grok-3', 'grok-4'], 0);
 }
 
+/* --- 管理者用統計記録（GitHub API書き込み版） --- */
+// 設定キー（管理画面のlocalStorageと共有）
+var ADMIN_CFG_KEY   = 'noteAiAdminConfig_v1';
+var ADMIN_QUEUE_KEY = 'noteAiAdminQueue_v1';  // 送信失敗時のキュー
+
+function loadAdminConfig() {
+  try { return JSON.parse(localStorage.getItem(ADMIN_CFG_KEY) || 'null') || {}; }
+  catch(e) { return {}; }
+}
+
+function makeEmptyStats() {
+  return {
+    totalAccess: 0, totalGenerate: 0, lastAccess: null,
+    byTool: {}, byAi: {}, byTheme: {}, dailyAccess: {}, history: []
+  };
+}
+
+// GitHub APIでdata.jsonを取得
+async function fetchRemoteStats(cfg) {
+  if (!cfg.pat || !cfg.owner || !cfg.repo) return null;
+  try {
+    var url = 'https://api.github.com/repos/' + cfg.owner + '/' + cfg.repo + '/contents/' + (cfg.path || 'data.json');
+    var r = await fetch(url, {
+      headers: { 'Authorization': 'Bearer ' + cfg.pat, 'Accept': 'application/vnd.github+json' }
+    });
+    if (r.status === 404) return { stats: makeEmptyStats(), sha: null };
+    if (!r.ok) return null;
+    var d = await r.json();
+    var decoded = JSON.parse(atob(d.content.replace(/\n/g, '')));
+    return { stats: decoded, sha: d.sha };
+  } catch(e) { return null; }
+}
+
+// GitHub APIでdata.jsonを上書き保存
+async function saveRemoteStats(cfg, stats, sha) {
+  if (!cfg.pat || !cfg.owner || !cfg.repo) return false;
+  try {
+    var url = 'https://api.github.com/repos/' + cfg.owner + '/' + cfg.repo + '/contents/' + (cfg.path || 'data.json');
+    var body = {
+      message: 'Update stats ' + new Date().toISOString().slice(0,16),
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(stats, null, 2)))),
+    };
+    if (sha) body.sha = sha;
+    var r = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + cfg.pat,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    return r.ok;
+  } catch(e) { return false; }
+}
+
+// キューに積んで非同期でGitHubに送信
+function enqueueEvent(type, payload) {
+  try {
+    var q = JSON.parse(localStorage.getItem(ADMIN_QUEUE_KEY) || '[]');
+    q.push({ type: type, payload: payload, time: new Date().toISOString() });
+    if (q.length > 100) q = q.slice(-100);
+    localStorage.setItem(ADMIN_QUEUE_KEY, JSON.stringify(q));
+  } catch(e) {}
+  // 非同期でフラッシュ
+  setTimeout(flushQueue, 200);
+}
+
+// キューをGitHubに書き込む
+var _flushing = false;
+async function flushQueue() {
+  if (_flushing) return;
+  var cfg = loadAdminConfig();
+  if (!cfg.pat || !cfg.owner || !cfg.repo) return;  // PAT未設定なら何もしない
+  _flushing = true;
+  try {
+    var q = JSON.parse(localStorage.getItem(ADMIN_QUEUE_KEY) || '[]');
+    if (q.length === 0) { _flushing = false; return; }
+
+    var remote = await fetchRemoteStats(cfg);
+    if (!remote) { _flushing = false; return; }
+    var s = remote.stats;
+    var sha = remote.sha;
+
+    // キューのイベントをまとめて統計に反映
+    q.forEach(function(ev) {
+      if (ev.type === 'access') {
+        s.totalAccess = (s.totalAccess || 0) + 1;
+        s.lastAccess = ev.time;
+        var day = ev.time.slice(0, 10);
+        s.dailyAccess = s.dailyAccess || {};
+        s.dailyAccess[day] = (s.dailyAccess[day] || 0) + 1;
+        var days = Object.keys(s.dailyAccess).sort();
+        if (days.length > 60) { days.slice(0, days.length-60).forEach(function(k){delete s.dailyAccess[k];}); }
+      } else if (ev.type === 'generate') {
+        s.totalGenerate = (s.totalGenerate || 0) + 1;
+        s.byAi = s.byAi || {};
+        s.byAi[ev.payload.ai] = (s.byAi[ev.payload.ai] || 0) + 1;
+        s.byTool = s.byTool || {};
+        s.byTool[ev.payload.tool] = (s.byTool[ev.payload.tool] || 0) + 1;
+        if (ev.payload.theme) {
+          s.byTheme = s.byTheme || {};
+          s.byTheme[ev.payload.theme] = (s.byTheme[ev.payload.theme] || 0) + 1;
+        }
+        s.history = s.history || [];
+        s.history.unshift({ time: ev.time, ai: ev.payload.ai, tool: ev.payload.tool, theme: ev.payload.theme || '' });
+        if (s.history.length > 100) s.history = s.history.slice(0, 100);
+      }
+    });
+
+    var ok = await saveRemoteStats(cfg, s, sha);
+    if (ok) {
+      localStorage.removeItem(ADMIN_QUEUE_KEY);
+    }
+  } catch(e) {}
+  _flushing = false;
+}
+
+function recordAccess() {
+  enqueueEvent('access', {});
+}
+
+function recordGenerate(aiId, toolId, themeId) {
+  enqueueEvent('generate', { ai: aiId, tool: toolId, theme: themeId || '' });
+}
+
+// ページ読み込み時にアクセス記録
+recordAccess();
+
 /* --- 統合AI呼び出し関数 --- */
 async function callAI(aiId, messages, systemPrompt, maxTokens) {
   if (aiId === 'claude')  return await callClaude(messages, systemPrompt, maxTokens);
@@ -702,19 +990,75 @@ function buildNotePrompt(opts) {
   var paidWCMin = paidWC - paidWCTol;
   var paidWCMax = paidWC + paidWCTol;
 
-  return 'あなたは人気noteクリエイターです。以下の条件でnoteの有料記事を作成してください。\n\n'    + '## ターゲット読者\n'    + '- 年齢: ' + ageLabel + '\n'    + '- 状況: ' + (situation || '特に指定なし') + '\n'    + '- 悩み: ' + (worry || '特に指定なし') + '\n'    + '- ライフスタイル: ' + ageCtx + '\n\n'    + '## 記事設定\n'    + '- ジャンル: ' + themeLabel + '\n'    + '- テーマ: ' + (topic || 'ジャンルで最も読まれるテーマ') + '\n'    + '- 文体: ' + toneLabel + '\n'    + '- 販売価格: ¥' + price.toLocaleString() + '\n\n'    + '## 【最重要】文字数厳守ルール\n'    + '- 無料部分: ' + freeWC + '文字（許容範囲: ' + freeWCMin + '〜' + freeWCMax + '文字）\n'    + '- 有料部分: ' + paidWC + '文字（許容範囲: ' + paidWCMin + '〜' + paidWCMax + '文字）\n'    + '- 文字数は日本語1文字=1文字、英数字1文字=1文字でカウントしてください\n'    + '- 文字数が不足の場合は内容を追加し、超過の場合は削除して調整してください\n\n'    + '## 構成ルール\n'    + '1. タイトルは「# 」で始める 2. 冒頭に50〜100文字の要約 3. 「---FREE_START---」から無料部分開始 4. 「---FREE_END---」で無料終了 5. 「---PAID_START---」から有料部分開始 6. 「---PAID_END---」で有料終了\n\n'    + '## 無料パート（' + freeWCMin + '〜' + freeWCMax + '文字厳守）\n'    + '読者の悩みに共感し、記事を読む価値を伝える。続きへの期待感を高める。\n\n'    + '## 購入壁\n'    + '続きを読むためには購入が必要と明示。価格を改めて示す。\n\n'    + '## 有料パート（' + paidWCMin + '〜' + paidWCMax + '文字厳守）\n'    + '具体的な解決策・ノウハウ・実践ステップを詳しく解説。Q&A・よくある誤解・チェックリストを含む。\n\n'    + '---FREE_START---\n\n（ここから無料パートを書く）\n\n---FREE_END---\n---PAID_START---\n\n（ここから有料パートを書く）\n\n---PAID_END---';
+  // SEOキーワード候補（ジャンルと年齢ベース）
+  var seoKeywords = {
+    money: ['副業', '収入アップ', '節約術', '資産形成', 'お金の増やし方', '家計管理', '投資初心者'],
+    health: ['ダイエット', '健康習慣', '痩せる方法', '食事制限', '筋トレ', '体質改善', '健康管理'],
+    career: ['転職', 'キャリアアップ', '副業', 'フリーランス', 'スキルアップ', '年収アップ', '仕事術'],
+    mindset: ['マインドセット', 'メンタル強化', '自己肯定感', 'モチベーション', '習慣化', '成功思考', '自己成長'],
+    relationship: ['人間関係', 'コミュニケーション', '恋愛', '友人関係', '職場の人間関係', '話し方', '信頼関係'],
+    productivity: ['生産性向上', '時間管理', '習慣化', 'タスク管理', '効率化', '集中力', '時短術'],
+    parenting: ['育児', '子育て', '子どもの教育', '親子関係', '幼児教育', '子どもの自己肯定感', '共働き育児'],
+    other: ['ライフスタイル', '自己改善', '生き方', '人生設計', 'ライフハック']
+  };
+  var kwList = seoKeywords[theme] || seoKeywords['other'];
+  var kwStr = kwList.slice(0, 5).join('・');
+
+  return 'あなたは人気noteクリエイターかつSEOライターです。以下の条件でnoteの有料記事を作成してください。\n\n'
+    + '## ターゲット読者\n'
+    + '- 年齢: ' + ageLabel + '\n'
+    + '- 状況: ' + (situation || '特に指定なし') + '\n'
+    + '- 悩み: ' + (worry || '特に指定なし') + '\n'
+    + '- ライフスタイル: ' + ageCtx + '\n\n'
+    + '## 記事設定\n'
+    + '- ジャンル: ' + themeLabel + '\n'
+    + '- テーマ: ' + (topic || 'ジャンルで最も読まれるテーマ') + '\n'
+    + '- 文体: ' + toneLabel + '\n'
+    + '- 販売価格: ¥' + price.toLocaleString() + '\n\n'
+    + '## 【SEO対策ルール】\n'
+    + '- SEOキーワード（必ず含める）: ' + kwStr + '\n'
+    + '- タイトルにメインキーワードを含める（例: 「' + kwList[0] + '」「' + kwList[1] + '」）\n'
+    + '- 見出し（##）にキーワードを自然に配置する\n'
+    + '- 冒頭200文字以内にメインキーワードを入れる\n'
+    + '- 読者の検索意図に合った具体的な内容にする\n'
+    + '- 共起語・関連語を自然に散りばめる\n'
+    + '- 箇条書き・番号リストを活用し、読みやすい構成にする\n\n'
+    + '## 【最重要】文字数厳守ルール\n'
+    + '- 無料部分: ' + freeWC + '文字（許容範囲: ' + freeWCMin + '〜' + freeWCMax + '文字）\n'
+    + '- 有料部分: ' + paidWC + '文字（許容範囲: ' + paidWCMin + '〜' + paidWCMax + '文字）\n'
+    + '- 文字数は日本語1文字=1文字、英数字1文字=1文字でカウントしてください\n'
+    + '- 文字数が不足の場合は内容を追加し、超過の場合は削除して調整してください\n\n'
+    + '## 構成ルール\n'
+    + '1. タイトルは「# 」で始め、SEOキーワードを含める'
+    + ' 2. 冒頭100文字以内にメインキーワードを自然に含める'
+    + ' 3. 「---FREE_START---」から無料部分開始'
+    + ' 4. 「---FREE_END---」で無料終了'
+    + ' 5. 「---PAID_START---」から有料部分開始'
+    + ' 6. 「---PAID_END---」で有料終了\n\n'
+    + '## 無料パート（' + freeWCMin + '〜' + freeWCMax + '文字厳守）\n'
+    + '読者の悩みに共感し、記事を読む価値を伝える。SEOキーワードを自然に含める。続きへの期待感を高める。\n\n'
+    + '## 購入壁\n'
+    + '続きを読むためには購入が必要と明示。価格を改めて示す。\n\n'
+    + '## 有料パート（' + paidWCMin + '〜' + paidWCMax + '文字厳守）\n'
+    + '具体的な解決策・ノウハウ・実践ステップを詳しく解説。SEO的に価値の高い情報を盛り込む。Q&A・よくある誤解・チェックリストを含む。\n\n'
+    + '---FREE_START---\n\n（ここから無料パートを書く）\n\n---FREE_END---\n---PAID_START---\n\n（ここから有料パートを書く）\n\n---PAID_END---';
 }
 
 function NoteGenerator(props) {
-  var onBack = props.onBack;
+  var onBack      = props.onBack;
+  var initTheme   = props.initTheme     || 'money';
+  var initTopic   = props.initTopic     || '';
+  var initAge     = props.initAge       || '30s';
+  var initSit     = props.initSituation || '';
+  var initWry     = props.initWorry     || '';
   var isMobile = useIsMobile();
   var showApi = useState(false);
   var setShowApi = showApi[1]; showApi = showApi[0];
   var aiState = useState('claude');
   var aiId = aiState[0]; var setAiId = aiState[1];
-  var themeState = useState('money');
+  var themeState = useState(initTheme);
   var theme = themeState[0]; var setTheme = themeState[1];
-  var topicState = useState('');
+  var topicState = useState(initTopic);
   var topic = topicState[0]; var setTopic = topicState[1];
   var toneState = useState('story');
   var tone = toneState[0]; var setTone = toneState[1];
@@ -724,11 +1068,11 @@ function NoteGenerator(props) {
   var freeWC = freeWCState[0]; var setFreeWC = freeWCState[1];
   var paidWCState = useState(2000);
   var paidWC = paidWCState[0]; var setPaidWC = paidWCState[1];
-  var ageState = useState('30s');
+  var ageState = useState(initAge);
   var age = ageState[0]; var setAge = ageState[1];
-  var sitState = useState('');
+  var sitState = useState(initSit);
   var situation = sitState[0]; var setSituation = sitState[1];
-  var worryState = useState('');
+  var worryState = useState(initWry);
   var worry = worryState[0]; var setWorry = worryState[1];
   var tabState = useState('settings');
   var tab = tabState[0]; var setTab = tabState[1];
@@ -754,13 +1098,7 @@ function NoteGenerator(props) {
   var genProgress = genProgressState[0]; var setGenProgress = genProgressState[1];
   var genTimerRefState = useRef(null);
 
-  // Web検索例のstate
-  var topicExState = useState({ items:[], loading:false });
-  var topicEx = topicExState[0]; var setTopicEx = topicExState[1];
-  var sitExState = useState({ items:[], loading:false });
-  var sitEx = sitExState[0]; var setSitEx = sitExState[1];
-  var worryExState = useState({ items:[], loading:false });
-  var worryEx = worryExState[0]; var setWorryEx = worryExState[1];
+
 
   var hasArticle = editText.length > 0;
   var freeMatch = editText.match(/---FREE_START---([\s\S]*?)---FREE_END---/);
@@ -786,108 +1124,6 @@ function NoteGenerator(props) {
     setWorry('');
   }, [age]);
 
-  // === 例取得関数（再検索ボタン・テーマ/年齢変更で共有） ===
-  // フォールバックデータ（組み込みの高品質な例）
-  var FB_TOPICS = { money:['月5万円副業を3ヶ月で達成した方法','節約で年間100万円貯めた実践記録','サラリーマンが副業で収入を2倍にした秘訣'], health:['1ヶ月-8kg減量ダイエット完全ガイド','リバウンドしない食事改善の習慣術','40代から始める体質改善メソッド'], career:['未経験からWebエンジニアに転職した全記録','副業で月収10万円を稼ぐフリーランス入門','年収UPのための交渉術と転職タイミング'], mindset:['成功者が実践する朝のルーティン7選','先延ばし癖をなくす行動心理学テクニック','自己肯定感を高める思考習慣の作り方'], relationship:['彼女ができない男性が変わった3つのきっかけ','職場の人間関係を劇的に改善した会話術','SNSで好感度を上げるコミュニケーション法'], productivity:['タスク管理で残業ゼロになった仕事術','集中力を3倍にする環境づくりと習慣','ノートアプリ活用で仕事効率が激変した話'], parenting:['イヤイヤ期を乗り越えた育児のコツ','子どもの自己肯定感を育てる声かけ方法','共働きでも子どもとの時間を増やす工夫'], other:['人生が変わった本10冊の読み方と実践法','断捨離で部屋も心もスッキリした体験記','ストレスフリーな生活を手に入れた方法'] };
-  var FB_SIT = { money:['会社員で副業を始めたいが何から手をつければいいか迷っている','毎月赤字で貯金ゼロ、家計を立て直したい','子育て中でお金の余裕がなく将来が不安'], health:['ダイエットを何度も挫折してきた','運動する時間がなくて体型が崩れてきた','食事制限で体重は落ちたがリバウンドしてしまった'], career:['今の仕事に不満はないが将来性が不安','30代で転職を考えているがスキルに自信がない','フリーランスに興味があるが収入が安定するか心配'], mindset:['やる気が続かず目標を達成できない','他人の目が気になって行動できない','ネガティブ思考が止まらず毎日がしんどい'], relationship:['好きな人がいるが告白できずにいる','職場のコミュニケーションが苦手で孤立している','SNSで発信したいがどう思われるか怖い'], productivity:['仕事量が多くて残業が続いている','タスクが多すぎて何から手をつけるか分からない','集中できずついスマホを見てしまう'], parenting:['子供のイヤイヤ期で毎日ストレスが溜まっている','仕事と育児の両立で疲れ果てている','子供に怒りすぎてしまい自己嫌悪になる'], other:['毎日同じことの繰り返しで人生に変化がない','友達が少なくて休日が孤独','やりたいことが見つからず将来が漠然と不安'] };
-  var FB_WORRY = { money:['副業で稼げるか不安、詐欺に引っかかりそう','収入を上げたいのに具体的な方法が分からない','節約を頑張っても全然貯まらない'], health:['運動を続けられない、三日坊主になってしまう','食事制限が辛くてストレスになる','健康的に痩せたいが何が正解か分からない'], career:['転職活動をどこから始めればいいか分からない','スキルがなくて市場価値が低いと感じる','面接が苦手で選考に通らない'], mindset:['頭では分かっているが行動できない','自分に自信が持てず挑戦を諦めてしまう','モチベーションが続かず中途半端になる'], relationship:['会話が続かず人間関係が浅い','感情的になってしまい後から後悔する','好きな人にどうアプローチすればいいか分からない'], productivity:['やることが多すぎて優先順位がつけられない','集中力が続かず作業が終わらない','スマホやSNSが気になって仕事に集中できない'], parenting:['子供の気持ちが理解できず対応に困る','怒らない育児を試みるが限界がくる','子供の学力や将来が心配で焦っている'], other:['何か変えたいが何から始めればいいか分からない','行動しようとしても続かず自己嫌悪になる','周りの目を気にしてチャレンジできない'] };
-
-  // 例取得のコア関数（再検索ボタン・自動更新で共通使用）
-  // themeKey, currentAge を引数で受け取り現在stateに依存しない
-  function fetchExamples(themeKey, currentAge) {
-    var themeLabel = (NOTE_THEMES.find(function(t) { return t.id === themeKey; }) || {}).label || themeKey;
-    var cleanLabel = themeLabel.replace(/[\u{1F300}-\u{1FFFF}]/gu, '').replace(/[\u2600-\u26FF]/gu, '').trim();
-    var ageLabel = { '10s':'10代', '20s':'20代', '30s':'30代', '40s':'40代', '50s':'50代以上', 'all':'全年齢' }[currentAge] || '全年齢';
-
-    setTopicEx({ items:[], loading:true });
-    setSitEx({ items:[], loading:true });
-    setWorryEx({ items:[], loading:true });
-
-    var aiIdForEx = getKey('claude') ? 'claude' : getKey('gemini') ? 'gemini' : getKey('chatgpt') ? 'chatgpt' : getKey('grok') ? 'grok' : null;
-
-    function applyFallback() {
-      setTopicEx({ items: FB_TOPICS[themeKey] || FB_TOPICS['other'], loading: false });
-      setSitEx({ items: FB_SIT[themeKey] || FB_SIT['other'], loading: false });
-      setWorryEx({ items: FB_WORRY[themeKey] || FB_WORRY['other'], loading: false });
-    }
-
-    if (aiIdForEx) {
-      // AIキーあり: AI（Gemini/Claude/ChatGPT/Grok）で高精度な例を生成
-      var aiPrompt = 'note記事生成ツールのUI用に、以下の条件でリストを3件ずつ生成してください。\n\nジャンル: ' + cleanLabel + '\n対象年齢: ' + ageLabel + '\n\n出力形式はJSONのみ（コードブロック不要、前置きなし）:\n{"topics":["テーマ例1","テーマ例2","テーマ例3"],"situations":["状況例1","状況例2","状況例3"],"worries":["悩み例1","悩み例2","悩み例3"]}\n\n各項目の条件:\n- topics: ' + cleanLabel + 'ジャンルのnote有料記事として売れそうな具体的タイトル（20〜35文字）\n- situations: ' + ageLabel + 'の読者がよく置かれている状況（15〜35文字）\n- worries: ' + ageLabel + 'の読者がよく抱える悩み（15〜30文字）\n\n必ずJSONのみ返してください。';
-
-      callAI(aiIdForEx, [{ role:'user', content: aiPrompt }], null, 600)
-        .then(function(aiResult) {
-          try {
-            var clean = aiResult.replace(/```json/g,'').replace(/```/g,'').trim();
-            // JSON部分だけ抽出（前後に余分なテキストがある場合）
-            var jsonMatch = clean.match(/\{[\s\S]*\}/);
-            var parsed = JSON.parse(jsonMatch ? jsonMatch[0] : clean);
-            var topics = Array.isArray(parsed.topics) ? parsed.topics.slice(0,3) : [];
-            var situations = Array.isArray(parsed.situations) ? parsed.situations.slice(0,3) : [];
-            var worries = Array.isArray(parsed.worries) ? parsed.worries.slice(0,3) : [];
-            // AIが返したアイテムが少ない場合はフォールバックで補完
-            if (topics.length === 0) topics = FB_TOPICS[themeKey] || FB_TOPICS['other'];
-            if (situations.length === 0) situations = FB_SIT[themeKey] || FB_SIT['other'];
-            if (worries.length === 0) worries = FB_WORRY[themeKey] || FB_WORRY['other'];
-            setTopicEx({ items: topics, loading: false });
-            setSitEx({ items: situations, loading: false });
-            setWorryEx({ items: worries, loading: false });
-          } catch(e) {
-            applyFallback();
-          }
-        })
-        .catch(function() {
-          applyFallback();
-        });
-    } else {
-      // APIキーなし: DuckDuckGo検索 → フォールバック
-      var q1 = encodeURIComponent(cleanLabel + ' note 人気記事テーマ');
-      var q2 = encodeURIComponent(cleanLabel + ' ' + ageLabel + ' 悩み 状況');
-      var q3 = encodeURIComponent(cleanLabel + ' ' + ageLabel + ' よくある悩み');
-
-      function safeFetch(q) {
-        return fetch('https://api.duckduckgo.com/?q=' + q + '&format=json&no_html=1&skip_disambig=1&no_redirect=1')
-          .then(function(r) { return r.ok ? r.json() : null; })
-          .catch(function() { return null; });
-      }
-
-      function extractPhrases(d, maxLen) {
-        if (!d) return [];
-        var results = [];
-        if (d.AbstractText) {
-          d.AbstractText.split(/[。！？!?\n]/).forEach(function(s) {
-            var t = s.trim();
-            if (t.length >= 8 && t.length <= (maxLen || 40)) results.push(t);
-          });
-        }
-        if (d.RelatedTopics && results.length < 3) {
-          d.RelatedTopics.slice(0, 10).forEach(function(rt) {
-            if (results.length >= 3) return;
-            var txt = rt.Text || '';
-            txt.split(/[。！？!?\n]/).forEach(function(s) {
-              var t = s.replace(/https?:\/\/\S+/g, '').trim();
-              if (t.length >= 8 && t.length <= (maxLen || 40) && results.length < 3) results.push(t);
-            });
-          });
-        }
-        return results.slice(0, 3);
-      }
-
-      Promise.all([safeFetch(q1), safeFetch(q2), safeFetch(q3)]).then(function(res) {
-        var topicItems = extractPhrases(res[0], 45);
-        var sitItems = extractPhrases(res[1], 45);
-        var worryItems = extractPhrases(res[2], 45);
-        setTopicEx({ items: topicItems.length >= 2 ? topicItems : (FB_TOPICS[themeKey] || FB_TOPICS['other']), loading: false });
-        setSitEx({ items: sitItems.length >= 2 ? sitItems : (FB_SIT[themeKey] || FB_SIT['other']), loading: false });
-        setWorryEx({ items: worryItems.length >= 2 ? worryItems : (FB_WORRY[themeKey] || FB_WORRY['other']), loading: false });
-      });
-    }
-  }
-
-  // テーマ・年齢変更時に自動更新
-  useEffect(function() {
-    fetchExamples(theme, age);
-  }, [theme, age]);
 
   var handleGenerate = useCallback(function() {
     var currentAiId = aiIdRef.current;
@@ -917,6 +1153,7 @@ function NoteGenerator(props) {
         setGenProgress(100);
         var text = result.replace(/```[\w]*\n?/gm, '').replace(/```$/gm, '').trim();
         if (text.length < 200) throw new Error('生成されたテキストが短すぎます');
+        recordGenerate(currentAiId, 'note', theme);
         setGenText(text); setEditText(text); setTab('edit');
         setLoading(false); setGenElapsed(elapsed);
       })
@@ -945,7 +1182,166 @@ function NoteGenerator(props) {
 
   return (
     <div style={{ minHeight:'100vh', background:'linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0a1628 100%)' }}>
-      <style>{'@keyframes spin{to{transform:rotate(360deg)}} @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}'}</style>
+      <style>{'@keyframes spin{to{transform:rotate(360deg)}} @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}'}
+/* =========================================
+   X LOGIN SCREEN
+   ========================================= */
+.x-login-screen {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0a1628 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 20px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.x-login-box {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 24px; padding: 48px 40px;
+  width: 420px; max-width: 95vw;
+  position: relative; z-index: 1;
+}
+.x-login-logo { font-size: 56px; margin-bottom: 16px; }
+.x-login-title { font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 8px; }
+.x-login-sub { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 32px; line-height: 1.7; }
+.x-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 16px 24px;
+  background: #000; border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50px; color: #fff; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; margin-bottom: 12px;
+}
+.x-btn:hover { background: #1a1a1a; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+.x-btn-icon { font-size: 20px; font-weight: 900; }
+.x-login-note { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 20px; line-height: 1.7; }
+.x-setup-link { color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 16px; cursor: pointer; text-decoration: underline; }
+.x-user-badge {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50px; padding: 6px 14px 6px 6px; font-size: 13px; color: rgba(255,255,255,0.8);
+}
+.x-user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #1d9bf0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+
+/* =========================================
+   AI THEME PROPOSAL (LANDING)
+   ========================================= */
+.theme-proposal-section {
+  width: 100%; max-width: 900px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 28px 24px;
+  margin-bottom: 32px; position: relative; z-index: 1;
+}
+.theme-section-title { font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.7); margin-bottom: 16px; letter-spacing: 0.05em; }
+.genre-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
+.genre-btn {
+  padding: 7px 14px; border-radius: 50px; font-size: 12px; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.55); cursor: pointer; transition: all 0.15s;
+}
+.genre-btn.active {
+  background: rgba(233,69,96,0.2); border-color: rgba(233,69,96,0.6); color: #fff;
+}
+.genre-btn:hover:not(.active) { background: rgba(255,255,255,0.09); color: rgba(255,255,255,0.8); }
+.theme-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.theme-item {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; text-align: left;
+  display: flex; align-items: center; gap: 10px;
+}
+.theme-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(233,69,96,0.4); transform: translateY(-1px); }
+.theme-item.selected { background: rgba(233,69,96,0.12); border-color: rgba(233,69,96,0.6); }
+.theme-item-num { font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.3); min-width: 20px; }
+.theme-item-text { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5; flex: 1; }
+.theme-controls { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; }
+.reload-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 9px 18px; border-radius: 10px;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.6); font-size: 13px; cursor: pointer; transition: all 0.15s;
+}
+.reload-btn:hover { background: rgba(255,255,255,0.12); }
+.decide-btn {
+  padding: 11px 28px; border-radius: 10px;
+  background: linear-gradient(135deg, #e94560, #c2185b);
+  border: none; color: #fff; font-size: 14px; font-weight: 800;
+  cursor: pointer; box-shadow: 0 4px 16px rgba(233,69,96,0.4);
+  transition: all 0.15s;
+}
+.decide-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.decide-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.theme-loading { text-align: center; padding: 24px; color: rgba(255,255,255,0.4); font-size: 13px; }
+
+/* AGE SELECTOR (LANDING) */
+.age-selector-section {
+  width: 100%; max-width: 900px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 28px 24px;
+  margin-bottom: 32px; position: relative; z-index: 1;
+}
+.age-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
+.age-btn {
+  padding: 8px 20px; border-radius: 50px; font-size: 13px; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.55); cursor: pointer; transition: all 0.15s;
+}
+.age-btn.active { background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.6); color: #fff; }
+.sitworry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.sitworry-col-title { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 10px; letter-spacing: 0.08em; }
+.sitworry-item {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px; padding: 10px 12px; cursor: pointer;
+  font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 7px;
+  transition: all 0.12s; line-height: 1.5;
+}
+.sitworry-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+.sitworry-item.sit-selected { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.5); color: #fff; }
+.sitworry-item.worry-selected { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.4); color: #fff; }
+.start-tool-btn {
+  width: 100%; padding: 16px; border-radius: 14px;
+  background: linear-gradient(135deg, #e94560, #c2185b);
+  border: none; color: #fff; font-size: 16px; font-weight: 900;
+  cursor: pointer; box-shadow: 0 6px 24px rgba(233,69,96,0.45); transition: all 0.15s;
+}
+.start-tool-btn:hover { opacity: 0.88; }
+.start-tool-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* CONTACT SECTION */
+.contact-section {
+  width: 100%; max-width: 620px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 32px 28px;
+  margin-bottom: 32px; position: relative; z-index: 1;
+}
+.contact-title { font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+.contact-sub   { font-size: 13px; color: rgba(255,255,255,0.45); margin-bottom: 20px; }
+.contact-input {
+  width: 100%; padding: 12px 14px; margin-bottom: 12px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px; color: #fff; font-size: 14px; outline: none;
+  font-family: inherit;
+}
+.contact-input:focus { border-color: rgba(233,69,96,0.5); }
+.contact-textarea { resize: vertical; min-height: 120px; }
+.contact-send-btn {
+  width: 100%; padding: 14px; border-radius: 10px;
+  background: linear-gradient(135deg, #e94560, #c2185b);
+  border: none; color: #fff; font-size: 15px; font-weight: 800;
+  cursor: pointer; box-shadow: 0 4px 16px rgba(233,69,96,0.4);
+}
+.contact-send-btn:hover { opacity: 0.88; }
+
+@media (max-width: 600px) {
+  .x-login-box { padding: 32px 20px; }
+  .theme-proposal-section { padding: 20px 16px; }
+  .theme-list { grid-template-columns: 1fr; }
+  .sitworry-grid { grid-template-columns: 1fr; }
+  .age-selector-section { padding: 20px 16px; }
+  .contact-section { padding: 24px 16px; }
+}
+</style>
       {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} />}
 
       {/* ヘッダー */}
@@ -1015,32 +1411,6 @@ function NoteGenerator(props) {
               <input type="text" value={topic} onChange={function(e) { setTopic(e.target.value); }}
                 placeholder="例: 月5万円副業を3ヶ月で達成した方法" style={inputStyle} />
               <div style={{ fontSize:11, color:'rgba(255,255,255,0.3)', marginTop:6 }}>空欄の場合はAIが最適なテーマを選びます</div>
-              {/* Web検索例 */}
-              <div style={{ marginTop:12, background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, padding:'10px 12px' }}>
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
-                  <span style={{ fontSize:11, color:'rgba(255,255,255,0.45)', fontWeight:700 }}>🌐 Web検索からのテーマ例</span>
-                  <button onClick={function() { fetchExamples(theme, age); }} disabled={topicEx.loading}
-                    style={{ background:'none', border:'1px solid rgba(255,255,255,0.15)', borderRadius:6, padding:'3px 8px', color:'rgba(255,255,255,0.5)', fontSize:11, cursor: topicEx.loading ? 'not-allowed' : 'pointer', display:'flex', alignItems:'center', gap:4 }}>
-                    <span style={{ display:'inline-block', animation: topicEx.loading ? 'spin 0.8s linear infinite' : 'none' }}>🔄</span>
-                    {topicEx.loading ? '検索中...' : '再検索'}
-                  </button>
-                </div>
-                {topicEx.loading
-                  ? <div style={{ color:'rgba(255,255,255,0.3)', fontSize:12, padding:'6px 0' }}>⏳ 検索中...</div>
-                  : topicEx.items.length === 0
-                    ? <div style={{ color:'rgba(255,255,255,0.2)', fontSize:12 }}>クリックして検索例を取得</div>
-                    : topicEx.items.map(function(item, idx) {
-                        return (
-                          <div key={idx} onClick={function() { setTopic(item); }}
-                            style={{ background:'rgba(233,69,96,0.08)', border:'1px solid rgba(233,69,96,0.2)', borderRadius:7, padding:'7px 10px', marginBottom:5, cursor:'pointer', fontSize:12, color:'rgba(255,255,255,0.75)', lineHeight:1.5, transition:'background 0.15s' }}
-                            onMouseEnter={function(e) { e.currentTarget.style.background='rgba(233,69,96,0.18)'; }}
-                            onMouseLeave={function(e) { e.currentTarget.style.background='rgba(233,69,96,0.08)'; }}>
-                            <span style={{ color:'#e94560', marginRight:6 }}>💡</span>{item}
-                          </div>
-                        );
-                      })
-                }
-              </div>
             </div>
 
             {/* 文体 */}
@@ -1089,63 +1459,11 @@ function NoteGenerator(props) {
                 <div style={{ fontSize:12, color:'rgba(255,255,255,0.5)', marginBottom:6 }}>読者の状況（任意）</div>
                 <input type="text" value={situation} onChange={function(e) { setSituation(e.target.value); }}
                   placeholder="例: 副業を始めたいが何から始めればよいか分からない" style={inputStyle} />
-                {/* 状況のWeb検索例 */}
-                <div style={{ marginTop:8, background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, padding:'10px 12px' }}>
-                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:7 }}>
-                    <span style={{ fontSize:11, color:'rgba(255,255,255,0.45)', fontWeight:700 }}>🌐 Web検索からの状況例</span>
-                    <button onClick={function() { fetchExamples(theme, age); }} disabled={sitEx.loading}
-                      style={{ background:'none', border:'1px solid rgba(255,255,255,0.15)', borderRadius:6, padding:'3px 8px', color:'rgba(255,255,255,0.5)', fontSize:11, cursor: sitEx.loading ? 'not-allowed' : 'pointer', display:'flex', alignItems:'center', gap:4 }}>
-                      <span style={{ display:'inline-block', animation: sitEx.loading ? 'spin 0.8s linear infinite' : 'none' }}>🔄</span>
-                      {sitEx.loading ? '検索中...' : '再検索'}
-                    </button>
-                  </div>
-                  {sitEx.loading
-                    ? <div style={{ color:'rgba(255,255,255,0.3)', fontSize:12, padding:'4px 0' }}>⏳ 検索中...</div>
-                    : sitEx.items.length === 0
-                      ? <div style={{ color:'rgba(255,255,255,0.2)', fontSize:12 }}>クリックして検索例を取得</div>
-                      : sitEx.items.map(function(item, idx) {
-                          return (
-                            <div key={idx} onClick={function() { setSituation(item); }}
-                              style={{ background:'rgba(99,102,241,0.08)', border:'1px solid rgba(99,102,241,0.2)', borderRadius:7, padding:'7px 10px', marginBottom:5, cursor:'pointer', fontSize:12, color:'rgba(255,255,255,0.75)', lineHeight:1.5, transition:'background 0.15s' }}
-                              onMouseEnter={function(e) { e.currentTarget.style.background='rgba(99,102,241,0.18)'; }}
-                              onMouseLeave={function(e) { e.currentTarget.style.background='rgba(99,102,241,0.08)'; }}>
-                              <span style={{ color:'#818cf8', marginRight:6 }}>👤</span>{item}
-                            </div>
-                          );
-                        })
-                  }
-                </div>
               </div>
               <div>
                 <div style={{ fontSize:12, color:'rgba(255,255,255,0.5)', marginBottom:6 }}>読者の悩み（任意）</div>
                 <input type="text" value={worry} onChange={function(e) { setWorry(e.target.value); }}
                   placeholder="例: 時間がなくて副業に踏み出せない" style={inputStyle} />
-                {/* 悩みのWeb検索例 */}
-                <div style={{ marginTop:8, background:'rgba(255,255,255,0.03)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, padding:'10px 12px' }}>
-                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:7 }}>
-                    <span style={{ fontSize:11, color:'rgba(255,255,255,0.45)', fontWeight:700 }}>🌐 Web検索からの悩み例</span>
-                    <button onClick={function() { fetchExamples(theme, age); }} disabled={worryEx.loading}
-                      style={{ background:'none', border:'1px solid rgba(255,255,255,0.15)', borderRadius:6, padding:'3px 8px', color:'rgba(255,255,255,0.5)', fontSize:11, cursor: worryEx.loading ? 'not-allowed' : 'pointer', display:'flex', alignItems:'center', gap:4 }}>
-                      <span style={{ display:'inline-block', animation: worryEx.loading ? 'spin 0.8s linear infinite' : 'none' }}>🔄</span>
-                      {worryEx.loading ? '検索中...' : '再検索'}
-                    </button>
-                  </div>
-                  {worryEx.loading
-                    ? <div style={{ color:'rgba(255,255,255,0.3)', fontSize:12, padding:'4px 0' }}>⏳ 検索中...</div>
-                    : worryEx.items.length === 0
-                      ? <div style={{ color:'rgba(255,255,255,0.2)', fontSize:12 }}>クリックして検索例を取得</div>
-                      : worryEx.items.map(function(item, idx) {
-                          return (
-                            <div key={idx} onClick={function() { setWorry(item); }}
-                              style={{ background:'rgba(251,191,36,0.08)', border:'1px solid rgba(251,191,36,0.2)', borderRadius:7, padding:'7px 10px', marginBottom:5, cursor:'pointer', fontSize:12, color:'rgba(255,255,255,0.75)', lineHeight:1.5, transition:'background 0.15s' }}
-                              onMouseEnter={function(e) { e.currentTarget.style.background='rgba(251,191,36,0.18)'; }}
-                              onMouseLeave={function(e) { e.currentTarget.style.background='rgba(251,191,36,0.08)'; }}>
-                              <span style={{ color:'#fbbf24', marginRight:6 }}>💭</span>{item}
-                            </div>
-                          );
-                        })
-                  }
-                </div>
               </div>
             </div>
 
@@ -1326,6 +1644,7 @@ function NoteGenerator(props) {
       </div>
     </div>
   );
+    </div>
 }
 
 /* =============================================
@@ -1406,6 +1725,7 @@ function BonusGenerator(props) {
       .then(function(result) {
         var clean = result.replace(/```json/g, '').replace(/```/g, '').trim();
         var parsed = JSON.parse(clean);
+        recordGenerate(currentAiId, 'bonus', '');
         setSuggestions(parsed); setLoading(false);
       })
       .catch(function(err) {
@@ -1451,7 +1771,166 @@ function BonusGenerator(props) {
 
   return (
     <div className="app-wrap">
-      <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}</style>
+      <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}
+/* =========================================
+   X LOGIN SCREEN
+   ========================================= */
+.x-login-screen {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0a1628 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 20px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.x-login-box {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 24px; padding: 48px 40px;
+  width: 420px; max-width: 95vw;
+  position: relative; z-index: 1;
+}
+.x-login-logo { font-size: 56px; margin-bottom: 16px; }
+.x-login-title { font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 8px; }
+.x-login-sub { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 32px; line-height: 1.7; }
+.x-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 16px 24px;
+  background: #000; border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50px; color: #fff; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; margin-bottom: 12px;
+}
+.x-btn:hover { background: #1a1a1a; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+.x-btn-icon { font-size: 20px; font-weight: 900; }
+.x-login-note { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 20px; line-height: 1.7; }
+.x-setup-link { color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 16px; cursor: pointer; text-decoration: underline; }
+.x-user-badge {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50px; padding: 6px 14px 6px 6px; font-size: 13px; color: rgba(255,255,255,0.8);
+}
+.x-user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #1d9bf0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+
+/* =========================================
+   AI THEME PROPOSAL (LANDING)
+   ========================================= */
+.theme-proposal-section {
+  width: 100%; max-width: 900px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 28px 24px;
+  margin-bottom: 32px; position: relative; z-index: 1;
+}
+.theme-section-title { font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.7); margin-bottom: 16px; letter-spacing: 0.05em; }
+.genre-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
+.genre-btn {
+  padding: 7px 14px; border-radius: 50px; font-size: 12px; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.55); cursor: pointer; transition: all 0.15s;
+}
+.genre-btn.active {
+  background: rgba(233,69,96,0.2); border-color: rgba(233,69,96,0.6); color: #fff;
+}
+.genre-btn:hover:not(.active) { background: rgba(255,255,255,0.09); color: rgba(255,255,255,0.8); }
+.theme-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.theme-item {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; text-align: left;
+  display: flex; align-items: center; gap: 10px;
+}
+.theme-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(233,69,96,0.4); transform: translateY(-1px); }
+.theme-item.selected { background: rgba(233,69,96,0.12); border-color: rgba(233,69,96,0.6); }
+.theme-item-num { font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.3); min-width: 20px; }
+.theme-item-text { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5; flex: 1; }
+.theme-controls { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; }
+.reload-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 9px 18px; border-radius: 10px;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.6); font-size: 13px; cursor: pointer; transition: all 0.15s;
+}
+.reload-btn:hover { background: rgba(255,255,255,0.12); }
+.decide-btn {
+  padding: 11px 28px; border-radius: 10px;
+  background: linear-gradient(135deg, #e94560, #c2185b);
+  border: none; color: #fff; font-size: 14px; font-weight: 800;
+  cursor: pointer; box-shadow: 0 4px 16px rgba(233,69,96,0.4);
+  transition: all 0.15s;
+}
+.decide-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.decide-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.theme-loading { text-align: center; padding: 24px; color: rgba(255,255,255,0.4); font-size: 13px; }
+
+/* AGE SELECTOR (LANDING) */
+.age-selector-section {
+  width: 100%; max-width: 900px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 28px 24px;
+  margin-bottom: 32px; position: relative; z-index: 1;
+}
+.age-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
+.age-btn {
+  padding: 8px 20px; border-radius: 50px; font-size: 13px; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.55); cursor: pointer; transition: all 0.15s;
+}
+.age-btn.active { background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.6); color: #fff; }
+.sitworry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.sitworry-col-title { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 10px; letter-spacing: 0.08em; }
+.sitworry-item {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px; padding: 10px 12px; cursor: pointer;
+  font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 7px;
+  transition: all 0.12s; line-height: 1.5;
+}
+.sitworry-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+.sitworry-item.sit-selected { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.5); color: #fff; }
+.sitworry-item.worry-selected { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.4); color: #fff; }
+.start-tool-btn {
+  width: 100%; padding: 16px; border-radius: 14px;
+  background: linear-gradient(135deg, #e94560, #c2185b);
+  border: none; color: #fff; font-size: 16px; font-weight: 900;
+  cursor: pointer; box-shadow: 0 6px 24px rgba(233,69,96,0.45); transition: all 0.15s;
+}
+.start-tool-btn:hover { opacity: 0.88; }
+.start-tool-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* CONTACT SECTION */
+.contact-section {
+  width: 100%; max-width: 620px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 32px 28px;
+  margin-bottom: 32px; position: relative; z-index: 1;
+}
+.contact-title { font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+.contact-sub   { font-size: 13px; color: rgba(255,255,255,0.45); margin-bottom: 20px; }
+.contact-input {
+  width: 100%; padding: 12px 14px; margin-bottom: 12px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px; color: #fff; font-size: 14px; outline: none;
+  font-family: inherit;
+}
+.contact-input:focus { border-color: rgba(233,69,96,0.5); }
+.contact-textarea { resize: vertical; min-height: 120px; }
+.contact-send-btn {
+  width: 100%; padding: 14px; border-radius: 10px;
+  background: linear-gradient(135deg, #e94560, #c2185b);
+  border: none; color: #fff; font-size: 15px; font-weight: 800;
+  cursor: pointer; box-shadow: 0 4px 16px rgba(233,69,96,0.4);
+}
+.contact-send-btn:hover { opacity: 0.88; }
+
+@media (max-width: 600px) {
+  .x-login-box { padding: 32px 20px; }
+  .theme-proposal-section { padding: 20px 16px; }
+  .theme-list { grid-template-columns: 1fr; }
+  .sitworry-grid { grid-template-columns: 1fr; }
+  .age-selector-section { padding: 20px 16px; }
+  .contact-section { padding: 24px 16px; }
+}
+</style>
       {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} />}
       <div className="app-header">
         <div className="app-header-left">
@@ -1586,6 +2065,8 @@ function ImagePromptGenerator(props) {
   var setShowApi = showApi[1]; showApi = showApi[0];
   var aiState = useState('claude');
   var aiId = aiState[0]; var setAiId = aiState[1];
+  var aiRef = useRef(aiId);
+  aiRef.current = aiId;
   var fileState = useState(null);
   var articleFile = fileState[0]; var setArticleFile = fileState[1];
   var textState = useState('');
@@ -1622,6 +2103,7 @@ function ImagePromptGenerator(props) {
       .then(function(result) {
         var clean = result.replace(/```json/g, '').replace(/```/g, '').trim();
         var parsed = JSON.parse(clean);
+        recordGenerate(currentAiId, 'image', '');
         setPrompts(parsed); setLoading(false);
       })
       .catch(function(err) {
@@ -1640,7 +2122,166 @@ function ImagePromptGenerator(props) {
 
   return (
     <div className="app-wrap">
-      <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}</style>
+      <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}
+/* =========================================
+   X LOGIN SCREEN
+   ========================================= */
+.x-login-screen {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0a1628 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 20px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.x-login-box {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 24px; padding: 48px 40px;
+  width: 420px; max-width: 95vw;
+  position: relative; z-index: 1;
+}
+.x-login-logo { font-size: 56px; margin-bottom: 16px; }
+.x-login-title { font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 8px; }
+.x-login-sub { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 32px; line-height: 1.7; }
+.x-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 16px 24px;
+  background: #000; border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50px; color: #fff; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; margin-bottom: 12px;
+}
+.x-btn:hover { background: #1a1a1a; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+.x-btn-icon { font-size: 20px; font-weight: 900; }
+.x-login-note { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 20px; line-height: 1.7; }
+.x-setup-link { color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 16px; cursor: pointer; text-decoration: underline; }
+.x-user-badge {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50px; padding: 6px 14px 6px 6px; font-size: 13px; color: rgba(255,255,255,0.8);
+}
+.x-user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #1d9bf0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+
+/* =========================================
+   AI THEME PROPOSAL (LANDING)
+   ========================================= */
+.theme-proposal-section {
+  width: 100%; max-width: 900px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 28px 24px;
+  margin-bottom: 32px; position: relative; z-index: 1;
+}
+.theme-section-title { font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.7); margin-bottom: 16px; letter-spacing: 0.05em; }
+.genre-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
+.genre-btn {
+  padding: 7px 14px; border-radius: 50px; font-size: 12px; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.55); cursor: pointer; transition: all 0.15s;
+}
+.genre-btn.active {
+  background: rgba(233,69,96,0.2); border-color: rgba(233,69,96,0.6); color: #fff;
+}
+.genre-btn:hover:not(.active) { background: rgba(255,255,255,0.09); color: rgba(255,255,255,0.8); }
+.theme-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.theme-item {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; text-align: left;
+  display: flex; align-items: center; gap: 10px;
+}
+.theme-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(233,69,96,0.4); transform: translateY(-1px); }
+.theme-item.selected { background: rgba(233,69,96,0.12); border-color: rgba(233,69,96,0.6); }
+.theme-item-num { font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.3); min-width: 20px; }
+.theme-item-text { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5; flex: 1; }
+.theme-controls { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; }
+.reload-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 9px 18px; border-radius: 10px;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.6); font-size: 13px; cursor: pointer; transition: all 0.15s;
+}
+.reload-btn:hover { background: rgba(255,255,255,0.12); }
+.decide-btn {
+  padding: 11px 28px; border-radius: 10px;
+  background: linear-gradient(135deg, #e94560, #c2185b);
+  border: none; color: #fff; font-size: 14px; font-weight: 800;
+  cursor: pointer; box-shadow: 0 4px 16px rgba(233,69,96,0.4);
+  transition: all 0.15s;
+}
+.decide-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.decide-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.theme-loading { text-align: center; padding: 24px; color: rgba(255,255,255,0.4); font-size: 13px; }
+
+/* AGE SELECTOR (LANDING) */
+.age-selector-section {
+  width: 100%; max-width: 900px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 28px 24px;
+  margin-bottom: 32px; position: relative; z-index: 1;
+}
+.age-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
+.age-btn {
+  padding: 8px 20px; border-radius: 50px; font-size: 13px; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.55); cursor: pointer; transition: all 0.15s;
+}
+.age-btn.active { background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.6); color: #fff; }
+.sitworry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.sitworry-col-title { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 10px; letter-spacing: 0.08em; }
+.sitworry-item {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px; padding: 10px 12px; cursor: pointer;
+  font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 7px;
+  transition: all 0.12s; line-height: 1.5;
+}
+.sitworry-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+.sitworry-item.sit-selected { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.5); color: #fff; }
+.sitworry-item.worry-selected { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.4); color: #fff; }
+.start-tool-btn {
+  width: 100%; padding: 16px; border-radius: 14px;
+  background: linear-gradient(135deg, #e94560, #c2185b);
+  border: none; color: #fff; font-size: 16px; font-weight: 900;
+  cursor: pointer; box-shadow: 0 6px 24px rgba(233,69,96,0.45); transition: all 0.15s;
+}
+.start-tool-btn:hover { opacity: 0.88; }
+.start-tool-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* CONTACT SECTION */
+.contact-section {
+  width: 100%; max-width: 620px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 32px 28px;
+  margin-bottom: 32px; position: relative; z-index: 1;
+}
+.contact-title { font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+.contact-sub   { font-size: 13px; color: rgba(255,255,255,0.45); margin-bottom: 20px; }
+.contact-input {
+  width: 100%; padding: 12px 14px; margin-bottom: 12px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px; color: #fff; font-size: 14px; outline: none;
+  font-family: inherit;
+}
+.contact-input:focus { border-color: rgba(233,69,96,0.5); }
+.contact-textarea { resize: vertical; min-height: 120px; }
+.contact-send-btn {
+  width: 100%; padding: 14px; border-radius: 10px;
+  background: linear-gradient(135deg, #e94560, #c2185b);
+  border: none; color: #fff; font-size: 15px; font-weight: 800;
+  cursor: pointer; box-shadow: 0 4px 16px rgba(233,69,96,0.4);
+}
+.contact-send-btn:hover { opacity: 0.88; }
+
+@media (max-width: 600px) {
+  .x-login-box { padding: 32px 20px; }
+  .theme-proposal-section { padding: 20px 16px; }
+  .theme-list { grid-template-columns: 1fr; }
+  .sitworry-grid { grid-template-columns: 1fr; }
+  .age-selector-section { padding: 20px 16px; }
+  .contact-section { padding: 24px 16px; }
+}
+</style>
       {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} />}
       <div className="app-header">
         <div className="app-header-left">
@@ -1743,98 +2384,207 @@ function ImagePromptGenerator(props) {
 }
 
 /* =============================================
-   DASHBOARD (使用履歴・メモ機能は削除し軽量化)
-   ============================================= */
-function Dashboard(props) {
-  var onBack = props.onBack;
-  var isMobile = useIsMobile();
-  var showApi = useState(false);
-  var setShowApi = showApi[1]; showApi = showApi[0];
-  var apiKeys = loadKeys();
-  var configuredKeys = AI_LIST.filter(function(ai) { return !!apiKeys[ai.id]; });
-
-  var toolStats = [
-    { icon:'📝', name:'note記事生成', desc:'テーマ・ターゲット・文字数を設定して有料記事を自動生成', color:'#e94560' },
-    { icon:'🎁', name:'特典ジェネレーター', desc:'購入者向けの豪華特典コンテンツを記事から自動提案・生成', color:'#e07b39' },
-    { icon:'🖼️', name:'画像プロンプト生成', desc:'記事に合うAI画像用プロンプトを自動生成', color:'#6366f1' },
-  ];
-
-  return (
-    <div className="app-wrap">
-      {showApi && <ApiKeyModal onClose={function() { setShowApi(false); }} />}
-      <div className="app-header">
-        <div className="app-header-left">
-          <button className="back-btn" onClick={onBack}>← 戻る</button>
-          <div>
-            <h1 className="app-title">📊 ダッシュボード</h1>
-            <p className="app-sub">ツール一覧とAPIキー管理</p>
-          </div>
-        </div>
-        <button className="key-btn" onClick={function() { setShowApi(true); }}>🔑 APIキー設定</button>
-      </div>
-      <div className="app-body">
-        {/* APIキー状態 */}
-        <div style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.09)', borderRadius:18, padding:'22px 26px', marginBottom:24 }}>
-          <div style={{ color:'rgba(255,255,255,0.6)', fontSize:12, fontWeight:700, letterSpacing:'0.1em', marginBottom:14 }}>🔑 APIキー状態</div>
-          <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap:10 }}>
-            {AI_LIST.map(function(ai) {
-              var hasKey = !!apiKeys[ai.id];
-              return (
-                <div key={ai.id} style={{ background: hasKey ? 'rgba(74,222,128,0.08)' : 'rgba(255,255,255,0.03)', border: hasKey ? '1px solid rgba(74,222,128,0.25)' : '1px solid rgba(255,255,255,0.08)', borderRadius:12, padding:'12px', textAlign:'center' }}>
-                  <div style={{ fontSize:20, marginBottom:6 }}>{ai.icon}</div>
-                  <div style={{ fontSize:12, fontWeight:700, color: hasKey ? '#4ade80' : 'rgba(255,255,255,0.4)' }}>{ai.label}</div>
-                  <div style={{ fontSize:10, color: hasKey ? '#4ade80' : 'rgba(255,255,255,0.25)', marginTop:2 }}>{hasKey ? '✓ 設定済み' : '未設定'}</div>
-                </div>
-              );
-            })}
-          </div>
-          {configuredKeys.length === 0 && (
-            <div style={{ marginTop:14, textAlign:'center' }}>
-              <button onClick={function() { setShowApi(true); }} style={{ background:'#e07b39', border:'none', borderRadius:8, padding:'10px 24px', color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer' }}>
-                APIキーを設定する
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* ツール一覧 */}
-        <div style={{ color:'rgba(255,255,255,0.6)', fontSize:12, fontWeight:700, letterSpacing:'0.1em', marginBottom:12 }}>🛠️ ツール一覧</div>
-        <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(240px, 1fr))', gap:14, marginBottom:32 }}>
-          {toolStats.map(function(t) {
-            return (
-              <div key={t.name} style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.09)', borderRadius:16, padding:'20px', cursor:'pointer', transition:'all 0.2s' }}
-                onClick={onBack}>
-                <div style={{ fontSize:28, marginBottom:10 }}>{t.icon}</div>
-                <div style={{ fontSize:15, fontWeight:700, color:'#fff', marginBottom:6 }}>{t.name}</div>
-                <div style={{ fontSize:12, color:'rgba(255,255,255,0.45)', lineHeight:1.5 }}>{t.desc}</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* =============================================
    LANDING / APP ROUTER
    ============================================= */
+/* =============================================
+   TOOLS 配列（ダッシュボード削除済み）
+   ============================================= */
 var TOOLS = [
-  { id:'note',   icon:'📝', name:'note記事生成',       desc:'テーマ・文字数を設定してAIが有料記事を自動生成',  badge:'人気No.1' },
-  { id:'bonus',  icon:'🎁', name:'購入者特典生成',      desc:'記事から特典コンテンツを自動提案・生成',          badge:'NEW' },
-  { id:'image',  icon:'🖼️', name:'画像プロンプト生成',  desc:'記事に合うAI画像プロンプトを自動生成',            badge:'' },
-  { id:'dash',   icon:'📊', name:'ダッシュボード',      desc:'ツール一覧とAPIキー管理',                         badge:'' },
+  { id:'note',   icon:'📝', name:'note記事生成',      desc:'テーマ・文字数を設定してAIが有料記事を自動生成', badge:'人気No.1' },
+  { id:'bonus',  icon:'🎁', name:'購入者特典生成',     desc:'記事から特典コンテンツを自動提案・生成',         badge:'NEW' },
+  { id:'image',  icon:'🖼️', name:'画像プロンプト生成', desc:'記事に合うAI画像プロンプトを自動生成',           badge:'' },
 ];
 
+/* =============================================
+   APP （ランディング・テーマ提案・お問い合わせ含む）
+   ============================================= */
 function App() {
   var screenState = useState('landing');
   var screen = screenState[0]; var setScreen = screenState[1];
 
-  if (screen === 'note')   return <NoteGenerator onBack={function() { setScreen('landing'); }} />;
-  if (screen === 'bonus')  return <BonusGenerator onBack={function() { setScreen('landing'); }} />;
-  if (screen === 'image')  return <ImagePromptGenerator onBack={function() { setScreen('landing'); }} />;
-  if (screen === 'dash')   return <Dashboard onBack={function() { setScreen('landing'); }} />;
+  // ===== NoteGeneratorに渡す初期値 =====
+  var initThemeState = useState('money');
+  var initTheme = initThemeState[0]; var setInitTheme = initThemeState[1];
+  var initTopicState = useState('');
+  var initTopic = initTopicState[0]; var setInitTopic = initTopicState[1];
+  var initAgeState = useState('30s');
+  var initAge = initAgeState[0]; var setInitAge = initAgeState[1];
+  var initSitState = useState('');
+  var initSit = initSitState[0]; var setInitSit = initSitState[1];
+  var initWorryState = useState('');
+  var initWorry = initWorryState[0]; var setInitWorry = initWorryState[1];
 
+  // ===== AIテーマ提案 state =====
+  var landingStepState = useState('genre'); // 'genre' | 'themes' | 'age'
+  var landingStep = landingStepState[0]; var setLandingStep = landingStepState[1];
+  var selectedGenreState = useState('money');
+  var selectedGenre = selectedGenreState[0]; var setSelectedGenre = selectedGenreState[1];
+  var themesState = useState([]);
+  var themes = themesState[0]; var setThemes = themesState[1];
+  var themesLoadingState = useState(false);
+  var themesLoading = themesLoadingState[0]; var setThemesLoading = themesLoadingState[1];
+  var selectedThemeIdxState = useState(-1);
+  var selectedThemeIdx = selectedThemeIdxState[0]; var setSelectedThemeIdx = selectedThemeIdxState[1];
+  var prevThemesState = useState([]);
+  var prevThemes = prevThemesState[0]; var setPrevThemes = prevThemesState[1];
+  var sitWorryLoadingState = useState(false);
+  var sitWorryLoading = sitWorryLoadingState[0]; var setSitWorryLoading = sitWorryLoadingState[1];
+  var sugSitState = useState([]);
+  var sugSit = sugSitState[0]; var setSugSit = sugSitState[1];
+  var sugWorryState = useState([]);
+  var sugWorry = sugWorryState[0]; var setSugWorry = sugWorryState[1];
+  var selSitIdxState = useState(-1);
+  var selSitIdx = selSitIdxState[0]; var setSelSitIdx = selSitIdxState[1];
+  var selWorryIdxState = useState(-1);
+  var selWorryIdx = selWorryIdxState[0]; var setSelWorryIdx = selWorryIdxState[1];
+  var contactSentState = useState(false);
+  var contactSent = contactSentState[0]; var setContactSent = contactSentState[1];
+
+  var GENRE_LIST = [
+    { id:'money',        label:'💰 お金・節約' },
+    { id:'health',       label:'💪 健康・ダイエット' },
+    { id:'career',       label:'🚀 キャリア・副業' },
+    { id:'mindset',      label:'🧠 マインドセット' },
+    { id:'relationship', label:'❤️ 人間関係・恋愛' },
+    { id:'productivity', label:'⚡ 生産性・習慣' },
+    { id:'parenting',    label:'👶 育児・子育て' },
+    { id:'other',        label:'📝 その他' },
+  ];
+
+  var AGE_LIST = [
+    { id:'10s', label:'10代' }, { id:'20s', label:'20代' },
+    { id:'30s', label:'30代' }, { id:'40s', label:'40代' },
+    { id:'50s', label:'50代以上' }, { id:'all', label:'全年齢' },
+  ];
+
+  // ===== AIでテーマ10個を生成 =====
+  function generateThemes(genreId) {
+    var aiId = getKey('claude') ? 'claude' : getKey('gemini') ? 'gemini' : getKey('chatgpt') ? 'chatgpt' : getKey('grok') ? 'grok' : null;
+    var genreLabel = (GENRE_LIST.find(function(g){ return g.id === genreId; }) || {}).label || genreId;
+    var cleanLabel = genreLabel.replace(/[💰💪🚀🧠❤️⚡👶📝]/gu, '').trim();
+
+    setThemesLoading(true);
+    setThemes([]);
+    setSelectedThemeIdx(-1);
+
+    var fallbackThemes = {
+      money:        ['月5万円副業を3ヶ月で達成した完全ロードマップ','節約だけで年間100万円を貯めた実践記録','サラリーマンが副業収入を2倍にした5つの秘訣','貯金ゼロから始める資産形成の教科書','副業初心者がやりがちな失敗と回避法','家計を劇的に改善した節約術10選','月収30万→50万を達成したフリーランスの道','お金の不安を消す家計管理の完全ガイド','投資初心者でも稼げるポートフォリオ術','給料日前でも困らないお金の管理法'],
+      health:       ['1ヶ月-8kg達成したダイエット完全ガイド','リバウンドしない食事改善の科学的アプローチ','40代から始める体質改善メソッド完全版','忙しい人のための10分筋トレ習慣術','糖質制限より効果的な食事管理の真実','睡眠の質を劇的に上げた7つの習慣','ストレスで食べ過ぎない心理テクニック','在宅ワークで運動不足を解消する方法','血糖値スパイクを防ぐ食べ方の新常識','年齢に負けない体を手に入れる習慣術'],
+      career:       ['未経験からWebエンジニアに転職した全記録','副業で月収10万を稼ぐフリーランス入門','年収100万UPを実現した転職戦略の全貌','30代からでも遅くない市場価値の高め方','副業を本業にするための段階的ロードマップ','職場評価を上げる仕事術と立ち回り方','在宅ワーク案件を獲得する実践的な方法','苦手な上司と上手くやる大人のコミュ術','スキルゼロから高単価案件を取る戦略','転職面接で落ちない自己PR作成の極意'],
+      mindset:      ['先延ばし癖を完全克服した行動心理学','成功者が実践する朝のルーティン完全版','自己肯定感を高める思考習慣の作り方','ネガティブ思考を書き換えるマインド術','やる気が続く目標設定と達成習慣の法則','ストレスに強いメンタルを作る7つの方法','完璧主義を手放して成果を出す思考法','人生が変わった読書術と知識の活用法','不安を力に変えるマインドセット完全版','挫折しない習慣化の科学的アプローチ'],
+      relationship: ['彼女を作った内向型男子の恋愛戦略','職場の人間関係を劇的に改善した会話術','好感度が上がる話し方と聞き方の極意','SNSで本当のファンを増やすコミュ術','初対面で印象を残すための鉄板テクニック','人間関係のストレスをゼロにする境界線術','モテる人がやっている無意識の行動習慣','恋愛が続かない人の共通パターンと改善法','職場の苦手な人と上手くやる大人の術','信頼を勝ち取るコミュニケーション法則'],
+      productivity: ['タスク管理で残業ゼロになった仕事術','集中力を3倍にする環境づくりと習慣','ノートアプリ活用で仕事効率が激変した話','朝型生活で人生が変わった実践ロードマップ','先延ばしをなくす5秒ルールの実践法','スマホ依存を断ち切って生産性を上げた方法','週4日勤務を実現した仕事の効率化術','マルチタスクをやめて成果が上がった理由','GTD法で仕事のストレスをゼロにする方法','毎日2時間を生み出す時間管理の科学'],
+      parenting:    ['イヤイヤ期を乗り越えた育児の実践メソッド','子どもの自己肯定感を育てる声かけ完全版','共働きでも子どもとの時間を増やす工夫','褒め方ひとつで子どもの才能が開花する','スマホ育児から脱却した親子時間の作り方','子どもの「なぜ」に答える知的好奇心の育て方','受験で後悔しない小学生からの学習習慣','兄弟げんかを減らす親の介入術と境界線','モンテッソーリで子どもの才能を伸ばす方法','パパが本気で育児参加した結果と方法'],
+      other:        ['人生が変わった本10冊の読み方と実践法','断捨離で部屋も心もスッキリした体験記','ストレスフリーな生活を手に入れた方法','40代から始めた趣味が人生を変えた話','SNSを断ってわかった本当の幸福の形','ミニマリストになって気づいた生活の本質','地方移住で実現した理想の働き方と生活','副業から独立した自由な働き方の全記録','老後の不安をなくすライフプランの作り方','自分らしく生きるためのキャリア設計法'],
+    };
+
+    if (!aiId) {
+      var fb = fallbackThemes[genreId] || fallbackThemes['other'];
+      setThemes(fb);
+      setThemesLoading(false);
+      return;
+    }
+
+    var aiPrompt = 'note有料記事のテーマを10個生成してください。\n\nジャンル: ' + cleanLabel + '\n\n条件:\n- 実際に購入したくなるような魅力的なタイトル（25〜40文字）\n- 読者の悩みを直接解決する具体的な内容\n- 前回と被らない新しいテーマ\n\n出力形式はJSONのみ（前置きなし）:\n{"themes":["テーマ1","テーマ2","テーマ3","テーマ4","テーマ5","テーマ6","テーマ7","テーマ8","テーマ9","テーマ10"]}' + (prevThemes.length > 0 ? '\n\n以下のテーマは除外してください:\n' + prevThemes.join('\n') : '');
+
+    callAI(aiId, [{ role:'user', content: aiPrompt }], null, 800)
+      .then(function(result) {
+        try {
+          var clean = result.replace(/```json/g,'').replace(/```/g,'').trim();
+          var m = clean.match(/\{[\s\S]*\}/);
+          var parsed = JSON.parse(m ? m[0] : clean);
+          var arr = Array.isArray(parsed.themes) ? parsed.themes.slice(0,10) : [];
+          if (arr.length < 5) arr = fallbackThemes[genreId] || fallbackThemes['other'];
+          setThemes(arr);
+        } catch(e) {
+          setThemes(fallbackThemes[genreId] || fallbackThemes['other']);
+        }
+        setThemesLoading(false);
+      })
+      .catch(function() {
+        setThemes(fallbackThemes[genreId] || fallbackThemes['other']);
+        setThemesLoading(false);
+      });
+  }
+
+  // ===== AIで状況・悩みを5個ずつ生成 =====
+  function generateSitWorry(genreId, ageId) {
+    var aiId = getKey('claude') ? 'claude' : getKey('gemini') ? 'gemini' : getKey('chatgpt') ? 'chatgpt' : getKey('grok') ? 'grok' : null;
+    var genreLabel = (GENRE_LIST.find(function(g){ return g.id === genreId; }) || {}).label || genreId;
+    var ageLabel = (AGE_LIST.find(function(a){ return a.id === ageId; }) || {}).label || ageId;
+    var cleanGenre = genreLabel.replace(/[💰💪🚀🧠❤️⚡👶📝]/gu, '').trim();
+
+    setSitWorryLoading(true);
+    setSugSit([]);
+    setSugWorry([]);
+    setSelSitIdx(-1);
+    setSelWorryIdx(-1);
+
+    var fallbackSit = {
+      money:   ['会社員で副業を始めたいが何から手をつけるか分からない','毎月赤字で貯金がまったくできていない','子育て中でお金の余裕がなく将来が不安','フリーランスで収入が不安定な状態が続いている','老後の資金が全く準備できていない'],
+      health:  ['ダイエットを何度も挫折してきた','運動する時間がなくて体型が崩れてきた','食事制限はできるがリバウンドしてしまう','在宅ワークで体を動かす機会が極端に減った','健康診断で引っかかったが何から始めるか分からない'],
+      career:  ['今の仕事に将来性がなく転職を考えている','30代でスキルの幅が狭く市場価値が低いと感じる','フリーランスに興味があるが安定するか不安','副業を始めたいが何をすればいいか迷っている','昇給・昇格が見込めず給料に不満がある'],
+      mindset: ['やる気が続かず目標を達成できない','他人の目が気になって行動できない','ネガティブ思考が止まらず毎日がしんどい','仕事もプライベートも中途半端に感じる','自分に自信が持てず挑戦を諦めてしまう'],
+      relationship:['好きな人がいるが告白できずにいる','職場のコミュニケーションが苦手で孤立している','SNSで発信したいがどう思われるか怖い','友人関係が希薄になってきて孤独を感じる','人と話すのが苦手で職場での評価が上がらない'],
+      productivity:['仕事量が多くて残業が続いている','タスクが多すぎて何から手をつけるか分からない','集中できずついスマホを見てしまう','やることが多くて優先順位がつけられない','仕事の効率が悪く残業が当たり前になっている'],
+      parenting:['子供のイヤイヤ期で毎日ストレスが溜まっている','仕事と育児の両立で疲れ果てている','子供に怒りすぎてしまい自己嫌悪になる','スマホ育児が増えていて罪悪感がある','子供の将来のために何をしてあげるべきか不安'],
+      other:   ['毎日同じことの繰り返しで変化がない','やりたいことが見つからず将来が漠然と不安','行動しようとしても続かず自己嫌悪になる','周りに合わせてばかりで自分を見失っている','何かを変えたいのに最初の一歩が踏み出せない'],
+    };
+    var fallbackWorry = {
+      money:   ['副業で詐欺に引っかかりそうで怖い','収入を上げたいのに具体的な方法が分からない','節約を頑張っても全然貯まらない','お金の知識がなくて投資が怖い','家計の無駄を減らしたいが何が無駄か分からない'],
+      health:  ['運動を続けられない三日坊主になってしまう','食事制限が辛くてストレスになる','健康的に痩せたいが何が正解か分からない','筋トレを始めたいがフォームが不安','健康習慣を身につけたいが忙しくて無理に感じる'],
+      career:  ['転職活動をどこから始めればいいか分からない','スキルがなくて市場価値が低いと感じる','面接が苦手で選考に通らない','副業で稼げるか自信がない','仕事の方向性が決まらず迷い続けている'],
+      mindset: ['頭では分かっているが行動できない','モチベーションが続かず中途半端になる','失敗が怖くて挑戦できない','自己肯定感が低くて決断できない','ネガティブ思考のループから抜け出せない'],
+      relationship:['会話が続かず人間関係が浅い','感情的になってしまい後から後悔する','好きな人にどうアプローチすればいいか分からない','人に頼れず一人で抱え込んでしまう','断れずに何でも引き受けてしまう'],
+      productivity:['やることが多すぎて優先順位がつけられない','集中力が続かず作業が終わらない','スマホやSNSが気になって仕事に集中できない','完璧主義で作業が進まない','時間管理が下手でいつも時間が足りない'],
+      parenting:['子供の気持ちが理解できず対応に困る','怒らない育児を試みるが限界がくる','子供の学力や将来が心配で焦っている','育児書通りにできない自分が嫌になる','子供との時間が足りなくて申し訳ない'],
+      other:   ['何か変えたいが何から始めればいいか分からない','行動しようとしても続かず自己嫌悪になる','周りの目を気にしてチャレンジできない','自分の強みや好きなことが分からない','毎日に充実感がなくモヤモヤしている'],
+    };
+
+    if (!aiId) {
+      setSugSit(fallbackSit[genreId] || fallbackSit['other']);
+      setSugWorry(fallbackWorry[genreId] || fallbackWorry['other']);
+      setSitWorryLoading(false);
+      return;
+    }
+
+    var aiPrompt = '以下の条件でnote記事のターゲット読者の「状況」と「悩み」を5件ずつ生成してください。\n\nジャンル: ' + cleanGenre + '\n年齢: ' + ageLabel + '\n\n出力形式はJSONのみ（前置きなし）:\n{"situations":["状況1","状況2","状況3","状況4","状況5"],"worries":["悩み1","悩み2","悩み3","悩み4","悩み5"]}\n\n条件:\n- situations: ' + ageLabel + 'の読者がよく置かれている具体的な状況（20〜40文字）\n- worries: ' + ageLabel + 'の読者が' + cleanGenre + 'に関して抱えている具体的な悩み（15〜35文字）\n- 必ずJSONのみ返してください';
+
+    callAI(aiId, [{ role:'user', content: aiPrompt }], null, 700)
+      .then(function(result) {
+        try {
+          var clean = result.replace(/```json/g,'').replace(/```/g,'').trim();
+          var m = clean.match(/\{[\s\S]*\}/);
+          var parsed = JSON.parse(m ? m[0] : clean);
+          var sits   = Array.isArray(parsed.situations) ? parsed.situations.slice(0,5) : [];
+          var worries= Array.isArray(parsed.worries)    ? parsed.worries.slice(0,5)    : [];
+          if (sits.length < 3)    sits    = fallbackSit[genreId]   || fallbackSit['other'];
+          if (worries.length < 3) worries = fallbackWorry[genreId] || fallbackWorry['other'];
+          setSugSit(sits);
+          setSugWorry(worries);
+        } catch(e) {
+          setSugSit(fallbackSit[genreId] || fallbackSit['other']);
+          setSugWorry(fallbackWorry[genreId] || fallbackWorry['other']);
+        }
+        setSitWorryLoading(false);
+      })
+      .catch(function() {
+        setSugSit(fallbackSit[genreId] || fallbackSit['other']);
+        setSugWorry(fallbackWorry[genreId] || fallbackWorry['other']);
+        setSitWorryLoading(false);
+      });
+  }
+
+  // ===== ルーティング =====
+  if (screen === 'note')  return <NoteGenerator
+    onBack={function() { setScreen('landing'); }}
+    initTheme={initTheme} initTopic={initTopic}
+    initAge={initAge} initSituation={initSit} initWorry={initWorry}
+  />;
+  if (screen === 'bonus') return <BonusGenerator onBack={function() { setScreen('landing'); }} />;
+  if (screen === 'image') return <ImagePromptGenerator onBack={function() { setScreen('landing'); }} />;
+
+  // ===== ランディングページ =====
   return (
     <div className="landing">
       <div className="landing-grid" />
@@ -1856,6 +2606,174 @@ function App() {
           );
         })}
       </div>
+
+      {/* ===== AIテーマ提案セクション ===== */}
+      {landingStep === 'genre' && (
+        <div className="theme-proposal-section">
+          <div className="theme-section-title">✨ AIがあなたにぴったりのテーマを提案します</div>
+
+          {/* ジャンル選択 */}
+          <div style={{ fontSize:12, color:'rgba(255,255,255,0.45)', marginBottom:10, textAlign:'left', fontWeight:700, letterSpacing:'0.08em' }}>① ジャンルを選択</div>
+          <div className="genre-selector">
+            {GENRE_LIST.map(function(g) {
+              return (
+                <button key={g.id} className={'genre-btn' + (selectedGenre === g.id ? ' active' : '')}
+                  onClick={function() { setSelectedGenre(g.id); }}>
+                  {g.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="theme-controls">
+            <button className="decide-btn"
+              onClick={function() {
+                setInitTheme(selectedGenre);
+                setLandingStep('themes');
+                generateThemes(selectedGenre);
+              }}>
+              このジャンルでテーマを生成 →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {landingStep === 'themes' && (
+        <div className="theme-proposal-section">
+          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:16, flexWrap:'wrap' }}>
+            <button onClick={function() { setLandingStep('genre'); }}
+              style={{ background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:8, padding:'6px 12px', color:'rgba(255,255,255,0.6)', fontSize:13, cursor:'pointer' }}>
+              ← ジャンルに戻る
+            </button>
+            <div className="theme-section-title" style={{ margin:0 }}>
+              {(GENRE_LIST.find(function(g){return g.id===selectedGenre;})||{}).label} のテーマ候補
+            </div>
+          </div>
+
+          {themesLoading ? (
+            <div className="theme-loading">
+              <span style={{ display:'inline-block', animation:'spin 0.8s linear infinite' }}>⚙️</span> AIがテーマを生成中...
+            </div>
+          ) : (
+            <div className="theme-list">
+              {themes.map(function(t, idx) {
+                return (
+                  <div key={idx}
+                    className={'theme-item' + (selectedThemeIdx === idx ? ' selected' : '')}
+                    onClick={function() { setSelectedThemeIdx(idx); }}>
+                    <div className="theme-item-num">{idx+1}</div>
+                    <div className="theme-item-text">{t}</div>
+                    {selectedThemeIdx === idx && <span style={{ color:'#e94560', fontSize:16 }}>✓</span>}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="theme-controls">
+            <button className="reload-btn" disabled={themesLoading}
+              onClick={function() {
+                setPrevThemes(prevThemes.concat(themes));
+                generateThemes(selectedGenre);
+              }}>
+              <span style={{ display:'inline-block', animation: themesLoading ? 'spin 0.8s linear infinite' : 'none' }}>🔄</span>
+              別のテーマを生成
+            </button>
+            <button className="decide-btn"
+              disabled={selectedThemeIdx < 0 || themesLoading}
+              onClick={function() {
+                if (selectedThemeIdx < 0) return;
+                setInitTopic(themes[selectedThemeIdx]);
+                setLandingStep('age');
+                generateSitWorry(selectedGenre, initAge);
+              }}>
+              このテーマで決定 →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {landingStep === 'age' && (
+        <div className="age-selector-section">
+          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:16, flexWrap:'wrap' }}>
+            <button onClick={function() { setLandingStep('themes'); }}
+              style={{ background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:8, padding:'6px 12px', color:'rgba(255,255,255,0.6)', fontSize:13, cursor:'pointer' }}>
+              ← テーマに戻る
+            </button>
+            <div style={{ fontSize:13, color:'rgba(255,255,255,0.7)', fontWeight:700 }}>
+              📝 {initTopic}
+            </div>
+          </div>
+
+          {/* 年齢選択 */}
+          <div style={{ fontSize:12, color:'rgba(255,255,255,0.45)', marginBottom:10, fontWeight:700, letterSpacing:'0.08em' }}>② ターゲット読者の年齢を選択</div>
+          <div className="age-buttons">
+            {AGE_LIST.map(function(a) {
+              return (
+                <button key={a.id}
+                  className={'age-btn' + (initAge === a.id ? ' active' : '')}
+                  onClick={function() {
+                    setInitAge(a.id);
+                    setSelSitIdx(-1);
+                    setSelWorryIdx(-1);
+                    generateSitWorry(selectedGenre, a.id);
+                  }}>
+                  {a.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 状況・悩みの提案 */}
+          {sitWorryLoading ? (
+            <div className="theme-loading">
+              <span style={{ display:'inline-block', animation:'spin 0.8s linear infinite' }}>⚙️</span> AIが状況・悩みを生成中...
+            </div>
+          ) : (
+            <div className="sitworry-grid">
+              <div>
+                <div className="sitworry-col-title">👤 読者の状況（任意・タップで選択）</div>
+                {sugSit.map(function(s, idx) {
+                  return (
+                    <div key={idx}
+                      className={'sitworry-item' + (selSitIdx === idx ? ' sit-selected' : '')}
+                      onClick={function() {
+                        var newIdx = selSitIdx === idx ? -1 : idx;
+                        setSelSitIdx(newIdx);
+                        setInitSit(newIdx >= 0 ? sugSit[newIdx] : '');
+                      }}>
+                      {selSitIdx === idx && '✓ '}{s}
+                    </div>
+                  );
+                })}
+              </div>
+              <div>
+                <div className="sitworry-col-title">💭 読者の悩み（任意・タップで選択）</div>
+                {sugWorry.map(function(w, idx) {
+                  return (
+                    <div key={idx}
+                      className={'sitworry-item' + (selWorryIdx === idx ? ' worry-selected' : '')}
+                      onClick={function() {
+                        var newIdx = selWorryIdx === idx ? -1 : idx;
+                        setSelWorryIdx(newIdx);
+                        setInitWorry(newIdx >= 0 ? sugWorry[newIdx] : '');
+                      }}>
+                      {selWorryIdx === idx && '✓ '}{w}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <button className="start-tool-btn"
+            onClick={function() { setScreen('note'); }}>
+            📝 note記事を生成する →
+          </button>
+        </div>
+      )}
+
+      {/* ===== ツールカード ===== */}
       <div className="tool-cards-landing">
         {TOOLS.map(function(tool) {
           return (
@@ -1870,7 +2788,40 @@ function App() {
           );
         })}
       </div>
-      <p style={{ position:'relative', zIndex:1, fontSize:12, color:'rgba(255,255,255,0.2)', marginTop:8 }}>
+
+      {/* ===== お問い合わせ ===== */}
+      <div className="contact-section">
+        <div className="contact-title">📬 お問い合わせ</div>
+        <div className="contact-sub">ご質問・ご要望・不具合報告などはこちらからどうぞ</div>
+        {contactSent ? (
+          <div style={{ textAlign:'center', padding:'24px 0', color:'#4ade80', fontSize:15, fontWeight:700 }}>
+            ✅ お問い合わせを受け付けました。ありがとうございます。
+          </div>
+        ) : (
+          <div>
+            <input type="text" id="contact-name" className="contact-input" placeholder="お名前" />
+            <input type="email" id="contact-email" className="contact-input" placeholder="メールアドレス" />
+            <textarea id="contact-message" className="contact-input contact-textarea" placeholder="お問い合わせ内容を入力してください..."></textarea>
+            <button className="contact-send-btn"
+              onClick={function() {
+                var name = document.getElementById('contact-name').value.trim();
+                var email = document.getElementById('contact-email').value.trim();
+                var msg = document.getElementById('contact-message').value.trim();
+                if (!name || !email || !msg) { alert('すべての項目を入力してください。'); return; }
+                if (!email.includes('@')) { alert('正しいメールアドレスを入力してください。'); return; }
+                // mailto形式で送信（静的サイトのため）
+                var subject = encodeURIComponent('[note AI Tools] お問い合わせ from ' + name);
+                var body = encodeURIComponent('お名前: ' + name + '\nメール: ' + email + '\n\n' + msg);
+                window.open('mailto:?subject=' + subject + '&body=' + body);
+                setContactSent(true);
+              }}>
+              送信する
+            </button>
+          </div>
+        )}
+      </div>
+
+      <p style={{ position:'relative', zIndex:1, fontSize:12, color:'rgba(255,255,255,0.2)', marginTop:8, marginBottom:20 }}>
         APIキーはブラウザに安全に保存。サーバーには送信されません。
       </p>
     </div>
@@ -1878,6 +2829,7 @@ function App() {
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
 </script>
 </body>
 </html>
