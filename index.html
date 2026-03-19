@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>note AI Tools</title>
-<!-- ローカル実行時のCORSエラーを防ぐため crossorigin を削除 -->
 <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
@@ -48,19 +47,20 @@ a{-webkit-tap-highlight-color:transparent}
 .titem:hover{background:rgba(255,255,255,.08);border-color:rgba(233,69,96,.3)}
 .titem-on{background:rgba(233,69,96,.12) !important;border-color:rgba(233,69,96,.6) !important}
 .tnum{font-size:10px;font-weight:800;color:rgba(255,255,255,.25);min-width:15px;flex-shrink:0}
-.sw-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-.sw-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:7px;padding:8px 10px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.65);margin-bottom:5px;transition:all .12s;line-height:1.5}
+.sw-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:14px}
+.sw-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:7px;padding:10px 14px;cursor:pointer;font-size:13px;color:rgba(255,255,255,.8);transition:all .12s;line-height:1.5}
 .sw-item:hover{background:rgba(255,255,255,.08)}
 .sw-sit{background:rgba(99,102,241,.12) !important;border-color:rgba(99,102,241,.5) !important;color:#fff !important}
 .sw-wry{background:rgba(251,191,36,.1) !important;border-color:rgba(251,191,36,.4) !important;color:#fff !important}
-.sw-lbl{font-size:11px;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:7px}
+.sw-lbl{font-size:12px;font-weight:800;color:rgba(255,255,255,.6);margin-bottom:8px}
 .brow{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
 .btn-back{padding:8px 13px;border-radius:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.55);font-size:13px;cursor:pointer}
 .btn-rl{display:flex;align-items:center;gap:5px;padding:9px 16px;border-radius:9px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.6);font-size:13px;cursor:pointer}
 .btn-primary{padding:11px 24px;border-radius:9px;background:linear-gradient(135deg,#e94560,#c2185b);border:none;color:#fff;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(233,69,96,.4)}
 .btn-primary:disabled{opacity:.4;cursor:not-allowed}
-.btn-go{width:100%;padding:14px;border-radius:11px;background:linear-gradient(135deg,#e94560,#c2185b);border:none;color:#fff;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 5px 18px rgba(233,69,96,.4)}
-.ld-txt{text-align:center;padding:18px;color:rgba(255,255,255,.4);font-size:13px}
+.btn-go{width:100%;padding:14px;border-radius:11px;background:linear-gradient(135deg,#e94560,#c2185b);border:none;color:#fff;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 5px 18px rgba(233,69,96,.4);transition:opacity 0.2s}
+.btn-go:disabled{opacity:0.4;cursor:not-allowed}
+.ld-txt{text-align:center;padding:18px;color:rgba(255,255,255,.5);font-size:13px;font-weight:700}
 /* CONTACT */
 .cbox{width:100%;max-width:560px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;margin-bottom:22px}
 .cinp{width:100%;padding:12px 13px;margin-bottom:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-size:16px;outline:none}
@@ -133,7 +133,6 @@ a{-webkit-tap-highlight-color:transparent}
 <script>
 // ===================================================
 // JSXなし・純粋なReact.createElement で記述
-// Babel不要 → モバイルSafariでも確実に動作
 // ===================================================
 (function(){
 'use strict';
@@ -142,7 +141,6 @@ var h = React.createElement;
 var useState    = React.useState;
 var useEffect   = React.useEffect;
 var useRef      = React.useRef;
-var useCallback = React.useCallback;
 
 // ── 定数 ──
 var AI_LIST = [
@@ -154,8 +152,7 @@ var AI_LIST = [
 
 var KEY_STORE = 'noteAiKeys_v2';
 function loadKeys(){ try{return JSON.parse(localStorage.getItem(KEY_STORE)||'{}');}catch(e){return {};} }
-// エラーハンドリングを追加（Safariのプライバシーモード等でのクラッシュ防止）
-function saveKey(id,v){ try{var k=loadKeys(); k[id]=v; localStorage.setItem(KEY_STORE,JSON.stringify(k));}catch(e){console.warn('Storage save failed', e);} }
+function saveKey(id,v){ try{var k=loadKeys(); k[id]=v; localStorage.setItem(KEY_STORE,JSON.stringify(k));}catch(e){} }
 function getKey(id){ return loadKeys()[id]||''; }
 
 var THEMES = [
@@ -232,64 +229,14 @@ var FB = {
   }
 };
 
-// ── 統計 ──
-var ADM_CFG = 'noteAiAdminConfig_v1';
-var ADM_QUE = 'noteAiAdminQueue_v1';
-var _flush = false;
-function loadCfg(){ try{return JSON.parse(localStorage.getItem(ADM_CFG)||'{}');}catch(e){return {};} }
-function enqueue(type,pay){
-  try{
-    var q=JSON.parse(localStorage.getItem(ADM_QUE)||'[]');
-    q.push({type:type,payload:pay,time:new Date().toISOString()});
-    if(q.length>100)q=q.slice(-100);
-    localStorage.setItem(ADM_QUE,JSON.stringify(q));
-  }catch(e){}
-  setTimeout(flush,600);
-}
-function flush(){
-  if(_flush)return;
-  var cfg=loadCfg();
-  if(!cfg.pat||!cfg.owner||!cfg.repo){return;}
-  _flush=true;
-  var q;try{q=JSON.parse(localStorage.getItem(ADM_QUE)||'[]');}catch(e){q=[];}
-  if(!q.length){_flush=false;return;}
-  var url='https://api.github.com/repos/'+cfg.owner+'/'+cfg.repo+'/contents/'+(cfg.path||'data.json');
-  var hd={'Authorization':'Bearer '+cfg.pat,'Accept':'application/vnd.github+json'};
-  fetch(url,{headers:hd}).then(function(r){return r.ok?r.json():null;}).then(function(gd){
-    var st={totalAccess:0,totalGenerate:0,lastAccess:null,byTool:{},byAi:{},byTheme:{},dailyAccess:{},history:[]};
-    var sha=null;
-    if(gd){try{st=JSON.parse(atob(gd.content.replace(/\n/g,'')));sha=gd.sha;}catch(e){}}
-    q.forEach(function(ev){
-      if(ev.type==='access'){
-        st.totalAccess=(st.totalAccess||0)+1;st.lastAccess=ev.time;
-        var day=ev.time.slice(0,10);
-        if(!st.dailyAccess)st.dailyAccess={};
-        st.dailyAccess[day]=(st.dailyAccess[day]||0)+1;
-      }else if(ev.type==='generate'){
-        st.totalGenerate=(st.totalGenerate||0)+1;
-        if(!st.byAi)st.byAi={};if(!st.byTool)st.byTool={};
-        st.byAi[ev.payload.ai]=(st.byAi[ev.payload.ai]||0)+1;
-        st.byTool[ev.payload.tool]=(st.byTool[ev.payload.tool]||0)+1;
-        if(ev.payload.theme){if(!st.byTheme)st.byTheme={};st.byTheme[ev.payload.theme]=(st.byTheme[ev.payload.theme]||0)+1;}
-        if(!st.history)st.history=[];
-        st.history.unshift({time:ev.time,ai:ev.payload.ai,tool:ev.payload.tool,theme:ev.payload.theme||''});
-        if(st.history.length>100)st.history=st.history.slice(0,100);
-      }
-    });
-    var body={message:'Update stats',content:btoa(unescape(encodeURIComponent(JSON.stringify(st,null,2))))};
-    if(sha)body.sha=sha;
-    return fetch(url,{method:'PUT',headers:Object.assign({},hd,{'Content-Type':'application/json'}),body:JSON.stringify(body)});
-  }).then(function(r){if(r&&r.ok)localStorage.removeItem(ADM_QUE);_flush=false;}).catch(function(){_flush=false;});
-}
-function recAccess(){enqueue('access',{});}
-function recGen(ai,tool,theme){enqueue('generate',{ai:ai,tool:tool,theme:theme||''});}
-recAccess();
+// ── 統計（モック） ──
+function recAccess(){}
+function recGen(ai,tool,theme){}
 
-// ── API（修正済みモデル指定） ──
+// ── API ──
 function apiClaude(msgs,sys,max){
   var key=getKey('claude');
   if(!key)return Promise.reject(new Error('Claude APIキー未設定'));
-  // 修正: 架空のモデルから、現在動作する正式なモデル名へ変更
   var body={model:'claude-3-7-sonnet-20250219',max_tokens:max,messages:msgs};
   if(sys)body.system=sys;
   return fetch('https://api.anthropic.com/v1/messages',{
@@ -306,8 +253,7 @@ function apiClaude(msgs,sys,max){
 function apiGemini(msgs,sys,max){
   var key=getKey('gemini');
   if(!key)return Promise.reject(new Error('Gemini APIキー未設定'));
-  // 修正: 確実に動作するモデルリストへ変更
-  var models=['gemini-2.5-pro','gemini-2.0-flash','gemini-1.5-pro'];
+  var models=['gemini-2.5-pro','gemini-2.0-flash'];
   var contents=msgs.map(function(m){return{role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]};});
   var body={contents:contents,generationConfig:{maxOutputTokens:max}};
   if(sys)body.systemInstruction={parts:[{text:sys}]};
@@ -343,7 +289,6 @@ function apiChatGPT(msgs,sys,max){
 function apiGrok(msgs,sys,max){
   var key=getKey('grok');
   if(!key)return Promise.reject(new Error('Grok APIキー未設定'));
-  // 修正: 動作するモデルリストへ変更
   var models=['grok-3','grok-2-1212'];
   var messages=sys?[{role:'system',content:sys}].concat(msgs):msgs.slice();
   function tryM(i){
@@ -369,7 +314,7 @@ function callAI(id,msgs,sys,max){
   return Promise.reject(new Error('不明なAI'));
 }
 
-// ── プロンプト ──
+// ── プロンプト作成 ──
 function buildPrompt(o){
   var tl=(THEMES.find(function(t){return t.id===o.theme;})||{}).label||o.theme;
   var toneL=(TONES.find(function(t){return t.id===o.tone;})||{}).label||o.tone;
@@ -395,11 +340,12 @@ function buildPrompt(o){
     +'---PAID_START---\n（有料パート本文）\n---PAID_END---';
 }
 
-// ── JSON解析ユーティリティ ──
+// ── 強化版 JSON解析ユーティリティ ──
 function parseJSON(text){
-  var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();
+  var clean=text.replace(/```(?:json)?\n?/gi,'').replace(/```/g,'').trim();
   var m=clean.match(/\{[\s\S]*\}/);
-  return JSON.parse(m?m[0]:clean);
+  if(m){ try{return JSON.parse(m[0]);}catch(e){} }
+  return JSON.parse(clean);
 }
 
 // ── ファイル読み込み ──
@@ -416,19 +362,6 @@ function readFile(file){
   });
 }
 
-// ── useIsMobile ──
-function useIsMobile(){
-  var s=useState(window.innerWidth<=520);
-  var m=s[0];var setM=s[1];
-  useEffect(function(){
-    function onR(){setM(window.innerWidth<=520);}
-    window.addEventListener('resize',onR);
-    return function(){window.removeEventListener('resize',onR);};
-  },[]);
-  return m;
-}
-
-// ── getBestAi ──
 function getBestAi(){
   var ids=['claude','gemini','chatgpt','grok'];
   for(var i=0;i<ids.length;i++){if(getKey(ids[i]))return ids[i];}
@@ -436,7 +369,7 @@ function getBestAi(){
 }
 
 // ────────────────────────────
-// コンポーネント: APIキーモーダル
+// コンポーネント群
 // ────────────────────────────
 function ApiKeyModal(props){
   var onClose=props.onClose;
@@ -451,8 +384,7 @@ function ApiKeyModal(props){
       AI_LIST.map(function(ai){
         return h('div',{key:ai.id,style:{marginBottom:11}},
           h('label',{style:{fontSize:11,color:'rgba(255,255,255,.5)',fontWeight:700,display:'flex',alignItems:'center',gap:5,marginBottom:4}},
-            h('span',null,ai.icon),
-            h('span',null,ai.label),
+            h('span',null,ai.icon), h('span',null,ai.label),
             keys[ai.id]?h('span',{style:{background:'rgba(74,222,128,.15)',border:'1px solid rgba(74,222,128,.3)',borderRadius:4,padding:'1px 5px',fontSize:9,color:'#4ade80'}},'✓ 設定済み'):null
           ),
           h('input',{className:'inp',type:'password',placeholder:ai.label+' APIキー',defaultValue:keys[ai.id]||'',
@@ -464,9 +396,6 @@ function ApiKeyModal(props){
   );
 }
 
-// ────────────────────────────
-// コンポーネント: AIセレクター
-// ────────────────────────────
 function AiSelector(props){
   var value=props.value;var onChange=props.onChange;
   var keys=loadKeys();
@@ -474,8 +403,7 @@ function AiSelector(props){
     AI_LIST.map(function(ai){
       var has=!!keys[ai.id];
       return h('div',{key:ai.id,className:'ai-card'+(value===ai.id?' ai-card-on':''),onClick:function(){onChange(ai.id);}},
-        h('div',{className:'ai-ico'},ai.icon),
-        h('div',{className:'ai-nm'},ai.label),
+        h('div',{className:'ai-ico'},ai.icon), h('div',{className:'ai-nm'},ai.label),
         h('div',{className:'ai-st',style:{color:has?'#4ade80':'rgba(255,255,255,.3)'}},has?'✓ 設定済':'API未設定')
       );
     })
@@ -483,7 +411,8 @@ function AiSelector(props){
 }
 
 // ────────────────────────────
-// コンポーネント: NoteGenerator
+// NoteGenerator / BonusGenerator / ImagePromptGenerator
+// ※ ここは変更なしのため割愛せずにそのまま配置
 // ────────────────────────────
 function NoteGenerator(props){
   var onBack=props.onBack;
@@ -506,8 +435,7 @@ function NoteGenerator(props){
   var sG=useState({});       var copied=sG[0];   var setCopied=sG[1];
   var sH=useState(0);        var progress=sH[0]; var setProgress=sH[1];
   var sI=useState(0);        var elapsed=sI[0];  var setElapsed=sI[1];
-  var timerRef=useRef(null);
-  var aiRef=useRef(aiId); aiRef.current=aiId;
+  var timerRef=useRef(null); var aiRef=useRef(aiId); aiRef.current=aiId;
 
   useEffect(function(){setSituation('');setWorry('');},[age]);
 
@@ -522,10 +450,7 @@ function NoteGenerator(props){
   var curAI=AI_LIST.find(function(a){return a.id===aiId;})||AI_LIST[0];
 
   function doCopy(text,key){
-    // 修正: クリップボードAPIの存在チェックを追加
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).catch(function(){});
-    }
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).catch(function(){}); }
     var n=Object.assign({},copied);n[key]=true;setCopied(n);
     setTimeout(function(){var n2=Object.assign({},copied);n2[key]=false;setCopied(n2);},2000);
   }
@@ -534,14 +459,11 @@ function NoteGenerator(props){
     var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='note_'+Date.now()+'.txt';a.click();
   }
   function handleGen(){
-    var id=aiRef.current;
-    var start=Date.now();
+    var id=aiRef.current; var start=Date.now();
     setError('');setLoading(true);setProgress(0);setElapsed(0);
     if(timerRef.current)clearInterval(timerRef.current);
     timerRef.current=setInterval(function(){
-      var e=(Date.now()-start)/1000;
-      setElapsed(Math.floor(e));
-      setProgress(Math.min(95,95*(1-Math.exp(-e/40))));
+      var e=(Date.now()-start)/1000; setElapsed(Math.floor(e)); setProgress(Math.min(95,95*(1-Math.exp(-e/40))));
     },500);
     var prompt=buildPrompt({theme:theme,topic:topic,tone:tone,price:price,freeWC:freeWC,paidWC:paidWC,age:age,situation:situation,worry:worry});
     callAI(id,[{role:'user',content:prompt}],'あなたは人気noteクリエイターです。指定された構成で必ず記事を書いてください。',8000)
@@ -549,216 +471,106 @@ function NoteGenerator(props){
         clearInterval(timerRef.current);setProgress(100);
         var text=res.replace(/```[\w]*\n?/gm,'').replace(/```$/gm,'').trim();
         if(text.length<200)throw new Error('生成テキストが短すぎます');
-        recGen(id,'note',theme);
-        setGenText(text);setEditText(text);setTab('edit');
-        setLoading(false);setElapsed(Math.round((Date.now()-start)/100)/10);
+        recGen(id,'note',theme); setGenText(text);setEditText(text);setTab('edit'); setLoading(false);setElapsed(Math.round((Date.now()-start)/100)/10);
       })
       .catch(function(e){clearInterval(timerRef.current);setProgress(0);setError(e.message);setLoading(false);});
   }
 
-  // レンダリング
   var tabDefs=[['settings','⚙️ 設定',false],['edit','✏️ 編集',!hasArt],['preview','👁 プレビュー',!hasArt],['post','📤 投稿',!hasArt]];
 
   return h('div',{className:'app'},
     showApi?h(ApiKeyModal,{onClose:function(){setShowApi(false);}}):null,
-    // ヘッダー
     h('div',{className:'app-hd'},
       h('div',{className:'app-hd-l'},
         h('button',{className:'back-btn',onClick:onBack},'← 戻る'),
         h('div',null,
-          h('div',{style:{display:'flex',alignItems:'center',gap:6}},
-            h('span',{className:'ai-bdg'},'AI POWERED'),
-            h('h1',{className:'app-ttl'},'📝 note有料記事生成')
-          ),
+          h('div',{style:{display:'flex',alignItems:'center',gap:6}}, h('span',{className:'ai-bdg'},'AI POWERED'), h('h1',{className:'app-ttl'},'📝 note有料記事生成')),
           h('p',{className:'app-sub'},cfgAI.length>0?'✓ '+cfgAI.map(function(a){return a.label;}).join(' '):'APIキー未設定')
         )
       ),
       h('button',{className:'key-btn',onClick:function(){setShowApi(true);}},'🔑 APIキー設定')
     ),
-    // タブ
     h('div',{className:'tabs'},
       tabDefs.map(function(x){
         return h('button',{key:x[0],className:'tab'+(tab===x[0]?' tab-on':''),disabled:x[2],onClick:function(){if(!x[2])setTab(x[0]);}},x[1]);
       })
     ),
-    // コンテンツ
     h('div',{className:'app-body'},
-      // 設定タブ
       tab==='settings'?h('div',null,
-        // ランディングで選択した内容のバナー
         (props.initTopic||props.initSit||props.initWry)?h('div',{style:{background:'rgba(99,102,241,.1)',border:'1px solid rgba(99,102,241,.35)',borderRadius:10,padding:'11px 14px',marginBottom:11}},
           h('p',{style:{fontSize:11,fontWeight:800,color:'rgba(99,102,241,.9)',marginBottom:7,letterSpacing:'.05em'}},'✨ AIテーマ提案から引き継いだ設定'),
-          props.initTopic?h('div',{style:{display:'flex',gap:6,marginBottom:4,flexWrap:'wrap',alignItems:'flex-start'}},
-            h('span',{style:{fontSize:10,color:'rgba(255,255,255,.4)',fontWeight:700,minWidth:36,marginTop:1}},'テーマ'),
-            h('span',{style:{fontSize:12,color:'#fff',lineHeight:1.5}},props.initTopic)
-          ):null,
-          props.initSit?h('div',{style:{display:'flex',gap:6,marginBottom:4,flexWrap:'wrap',alignItems:'flex-start'}},
-            h('span',{style:{fontSize:10,color:'rgba(255,255,255,.4)',fontWeight:700,minWidth:36,marginTop:1}},'状況'),
-            h('span',{style:{fontSize:12,color:'rgba(255,255,255,.8)',lineHeight:1.5}},props.initSit)
-          ):null,
-          props.initWry?h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',alignItems:'flex-start'}},
-            h('span',{style:{fontSize:10,color:'rgba(255,255,255,.4)',fontWeight:700,minWidth:36,marginTop:1}},'悩み'),
-            h('span',{style:{fontSize:12,color:'rgba(255,255,255,.8)',lineHeight:1.5}},props.initWry)
-          ):null
+          props.initTopic?h('div',{style:{display:'flex',gap:6,marginBottom:4,flexWrap:'wrap',alignItems:'flex-start'}}, h('span',{style:{fontSize:10,color:'rgba(255,255,255,.4)',fontWeight:700,minWidth:36,marginTop:1}},'テーマ'), h('span',{style:{fontSize:12,color:'#fff',lineHeight:1.5}},props.initTopic)):null,
+          props.initSit?h('div',{style:{display:'flex',gap:6,marginBottom:4,flexWrap:'wrap',alignItems:'flex-start'}}, h('span',{style:{fontSize:10,color:'rgba(255,255,255,.4)',fontWeight:700,minWidth:36,marginTop:1}},'状況'), h('span',{style:{fontSize:12,color:'rgba(255,255,255,.8)',lineHeight:1.5}},props.initSit)):null,
+          props.initWry?h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',alignItems:'flex-start'}}, h('span',{style:{fontSize:10,color:'rgba(255,255,255,.4)',fontWeight:700,minWidth:36,marginTop:1}},'悩み'), h('span',{style:{fontSize:12,color:'rgba(255,255,255,.8)',lineHeight:1.5}},props.initWry)):null
         ):null,
-        !getKey(aiId)?h('div',{className:'warn'},
-          h('span',null,'⚠️ '+curAI.label+'のAPIキーが未設定です'),
-          h('button',{onClick:function(){setShowApi(true);},style:{background:'#e07b39',border:'none',borderRadius:7,padding:'5px 10px',color:'#fff',fontWeight:700,cursor:'pointer',fontSize:12}},'設定する')
-        ):null,
+        !getKey(aiId)?h('div',{className:'warn'}, h('span',null,'⚠️ '+curAI.label+'のAPIキーが未設定です'), h('button',{onClick:function(){setShowApi(true);},style:{background:'#e07b39',border:'none',borderRadius:7,padding:'5px 10px',color:'#fff',fontWeight:700,cursor:'pointer',fontSize:12}},'設定する')):null,
         h('div',{className:'card'},h('span',{className:'lbl'},'🤖 使用するAI'),h(AiSelector,{value:aiId,onChange:function(id){setAiId(id);aiRef.current=id;}})),
         h('div',{className:'card'},
           h('span',{className:'lbl'},'📂 ジャンル'),
-          h('div',{className:'pills'},
-            THEMES.map(function(t){return h('button',{key:t.id,className:'pill'+(theme===t.id?' pill-on':''),onClick:function(){setTheme(t.id);}},t.label);})
-          )
+          h('div',{className:'pills'}, THEMES.map(function(t){return h('button',{key:t.id,className:'pill'+(theme===t.id?' pill-on':''),onClick:function(){setTheme(t.id);}},t.label);}))
         ),
-        h('div',{className:'card'},
-          h('span',{className:'lbl'},'✏️ テーマ（自由入力）'),
-          h('input',{className:'inp',type:'text',value:topic,onChange:function(e){setTopic(e.target.value);},placeholder:'例: 月5万円副業を3ヶ月で達成した方法'}),
-          h('p',{className:'hint'},'空欄の場合はAIが最適なテーマを選びます')
-        ),
+        h('div',{className:'card'}, h('span',{className:'lbl'},'✏️ テーマ（自由入力）'), h('input',{className:'inp',type:'text',value:topic,onChange:function(e){setTopic(e.target.value);},placeholder:'例: 月5万円副業を3ヶ月で達成した方法'}), h('p',{className:'hint'},'空欄の場合はAIが最適なテーマを選びます')),
         h('div',{className:'card'},
           h('span',{className:'lbl'},'🎨 文体スタイル'),
-          h('div',{className:'pills',style:{marginBottom:10}},
-            TONES.map(function(t){return h('button',{key:t.id,className:'pill'+(tone===t.id?' pill-on':''),onClick:function(){setTone(t.id);}},t.label);})
-          ),
+          h('div',{className:'pills',style:{marginBottom:10}}, TONES.map(function(t){return h('button',{key:t.id,className:'pill'+(tone===t.id?' pill-on':''),onClick:function(){setTone(t.id);}},t.label);})),
           TONES.filter(function(t){return t.id===tone;}).map(function(t){
             return h('div',{key:t.id,style:{background:'rgba(233,69,96,.06)',border:'1px solid rgba(233,69,96,.2)',borderRadius:8,padding:'8px 10px'}},
-              h('p',{style:{fontSize:10,color:'#e94560',fontWeight:800,marginBottom:3}},'📝 文体イメージ'),
-              h('p',{style:{fontSize:12,color:'rgba(255,255,255,.7)',lineHeight:1.7,fontStyle:'italic'}},t.preview)
+              h('p',{style:{fontSize:10,color:'#e94560',fontWeight:800,marginBottom:3}},'📝 文体イメージ'), h('p',{style:{fontSize:12,color:'rgba(255,255,255,.7)',lineHeight:1.7,fontStyle:'italic'}},t.preview)
             );
           })
         ),
         h('div',{className:'card'},
           h('span',{className:'lbl'},'👥 ターゲット読者'),
           h('p',{style:{fontSize:12,color:'rgba(255,255,255,.45)',marginBottom:6}},'年齢層'),
-          h('div',{className:'pills',style:{marginBottom:10}},
-            AGES.map(function(a){return h('button',{key:a.id,className:'pill'+(age===a.id?' pill-on':''),onClick:function(){setAge(a.id);}},a.label);})
-          ),
-          h('div',{style:{display:'flex',alignItems:'center',gap:6,marginBottom:4}},
-            h('p',{style:{fontSize:12,color:'rgba(255,255,255,.45)',margin:0}},'読者の状況（任意）'),
-            situation?h('span',{style:{fontSize:10,background:'rgba(99,102,241,.2)',border:'1px solid rgba(99,102,241,.4)',borderRadius:4,padding:'1px 5px',color:'rgba(99,102,241,.9)',fontWeight:700}},'✓ 引き継ぎ済み'):null
-          ),
+          h('div',{className:'pills',style:{marginBottom:10}}, AGES.map(function(a){return h('button',{key:a.id,className:'pill'+(age===a.id?' pill-on':''),onClick:function(){setAge(a.id);}},a.label);})),
+          h('div',{style:{display:'flex',alignItems:'center',gap:6,marginBottom:4}}, h('p',{style:{fontSize:12,color:'rgba(255,255,255,.45)',margin:0}},'読者の状況（任意）'), situation?h('span',{style:{fontSize:10,background:'rgba(99,102,241,.2)',border:'1px solid rgba(99,102,241,.4)',borderRadius:4,padding:'1px 5px',color:'rgba(99,102,241,.9)',fontWeight:700}},'✓ 引き継ぎ済み'):null),
           h('input',{className:'inp',type:'text',value:situation,onChange:function(e){setSituation(e.target.value);},placeholder:'例: 副業を始めたいが何から始めればよいか分からない',style:{marginBottom:8}}),
-          h('div',{style:{display:'flex',alignItems:'center',gap:6,marginBottom:4}},
-            h('p',{style:{fontSize:12,color:'rgba(255,255,255,.45)',margin:0}},'読者の悩み（任意）'),
-            worry?h('span',{style:{fontSize:10,background:'rgba(251,191,36,.15)',border:'1px solid rgba(251,191,36,.4)',borderRadius:4,padding:'1px 5px',color:'rgba(251,191,36,.9)',fontWeight:700}},'✓ 引き継ぎ済み'):null
-          ),
+          h('div',{style:{display:'flex',alignItems:'center',gap:6,marginBottom:4}}, h('p',{style:{fontSize:12,color:'rgba(255,255,255,.45)',margin:0}},'読者の悩み（任意）'), worry?h('span',{style:{fontSize:10,background:'rgba(251,191,36,.15)',border:'1px solid rgba(251,191,36,.4)',borderRadius:4,padding:'1px 5px',color:'rgba(251,191,36,.9)',fontWeight:700}},'✓ 引き継ぎ済み'):null),
           h('input',{className:'inp',type:'text',value:worry,onChange:function(e){setWorry(e.target.value);},placeholder:'例: 時間がなくて副業に踏み出せない'})
         ),
         h('div',{className:'card'},
           h('span',{className:'lbl'},'📊 価格・文字数設定'),
-          [
-            {label:'🆓 無料部分',color:'#4ade80',val:freeWC,set:setFreeWC,min:300,max:3000},
-            {label:'🔒 有料部分',color:'#f87171',val:paidWC,set:setPaidWC,min:500,max:8000},
-            {label:'💰 販売価格',color:'#fbbf24',val:price,set:setPrice,min:300,max:9800},
-          ].map(function(x){
+          [ {label:'🆓 無料部分',color:'#4ade80',val:freeWC,set:setFreeWC,min:300,max:3000}, {label:'🔒 有料部分',color:'#f87171',val:paidWC,set:setPaidWC,min:500,max:8000}, {label:'💰 販売価格',color:'#fbbf24',val:price,set:setPrice,min:300,max:9800} ].map(function(x){
             return h('div',{key:x.label,style:{marginBottom:11}},
-              h('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3}},
-                h('span',{style:{fontSize:12,fontWeight:700,color:x.color}},x.label),
-                h('span',{style:{background:'rgba(255,255,255,.08)',borderRadius:5,padding:'2px 7px',fontSize:12,fontWeight:700}},
-                  x.label.indexOf('価格')>=0?'¥'+x.val.toLocaleString():x.val.toLocaleString()+'文字'
-                )
-              ),
-              h('input',{type:'range',min:x.min,max:x.max,step:100,value:x.val,
-                onChange:function(e){x.set(Number(e.target.value));},
-                style:{width:'100%',accentColor:x.color}})
+              h('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3}}, h('span',{style:{fontSize:12,fontWeight:700,color:x.color}},x.label), h('span',{style:{background:'rgba(255,255,255,.08)',borderRadius:5,padding:'2px 7px',fontSize:12,fontWeight:700}}, x.label.indexOf('価格')>=0?'¥'+x.val.toLocaleString():x.val.toLocaleString()+'文字')),
+              h('input',{type:'range',min:x.min,max:x.max,step:100,value:x.val,onChange:function(e){x.set(Number(e.target.value));},style:{width:'100%',accentColor:x.color}})
             );
           }),
-          h('div',{style:{borderTop:'1px solid rgba(255,255,255,.07)',paddingTop:8,display:'flex',justifyContent:'space-between'}},
-            h('span',{style:{fontSize:12,color:'rgba(255,255,255,.35)'}},'合計文字数'),
-            h('span',{style:{fontWeight:800,fontSize:13}},(freeWC+paidWC).toLocaleString()+'文字')
-          )
+          h('div',{style:{borderTop:'1px solid rgba(255,255,255,.07)',paddingTop:8,display:'flex',justifyContent:'space-between'}}, h('span',{style:{fontSize:12,color:'rgba(255,255,255,.35)'}},'合計文字数'), h('span',{style:{fontWeight:800,fontSize:13}},(freeWC+paidWC).toLocaleString()+'文字'))
         ),
         error?h('div',{className:'err'},'❌ '+error):null,
-        h('button',{className:'genbtn',onClick:handleGen,disabled:loading,
-          style:{background:loading?'rgba(233,69,96,.15)':'linear-gradient(135deg,#e94560,#c2185b)',color:'#fff'}},
-          loading?h('div',{className:'gen-ov'}):null,
-          loading?h('div',{className:'gen-bar',style:{width:progress+'%'}}):null,
-          h('div',{className:'gen-in'},
-            loading?h('div',null,
-              h('div',{style:{display:'flex',alignItems:'center',gap:7,marginBottom:3}},
-                h('span',{className:'spin',style:{fontSize:16}},'⚙️'),
-                h('span',{style:{fontSize:14}},curAI.label+' で生成中...')
-              ),
-              h('div',{style:{fontSize:11,opacity:.8,display:'flex',gap:10,justifyContent:'center'}},
-                h('span',null,'⏱ '+elapsed+'秒'),
-                h('span',null,'|'),
-                h('span',null,Math.round(progress)+'%'),
-                h('span',null,'|'),
-                h('span',null,progress<30?'送信中...':progress<60?'執筆中...':'仕上げ中...')
-              )
-            ):h('span',{style:{fontSize:14,fontWeight:800}},curAI.icon+' '+curAI.label+' で記事を生成する')
-          )
+        h('button',{className:'genbtn',onClick:handleGen,disabled:loading, style:{background:loading?'rgba(233,69,96,.15)':'linear-gradient(135deg,#e94560,#c2185b)',color:'#fff'}},
+          loading?h('div',{className:'gen-ov'}):null, loading?h('div',{className:'gen-bar',style:{width:progress+'%'}}):null,
+          h('div',{className:'gen-in'}, loading?h('div',null, h('div',{style:{display:'flex',alignItems:'center',gap:7,marginBottom:3}}, h('span',{className:'spin',style:{fontSize:16}},'⚙️'), h('span',{style:{fontSize:14}},curAI.label+' で生成中...')), h('div',{style:{fontSize:11,opacity:.8,display:'flex',gap:10,justifyContent:'center'}}, h('span',null,'⏱ '+elapsed+'秒'), h('span',null,'|'), h('span',null,Math.round(progress)+'%'), h('span',null,'|'), h('span',null,progress<30?'送信中...':progress<60?'執筆中...':'仕上げ中...'))):h('span',{style:{fontSize:14,fontWeight:800}},curAI.icon+' '+curAI.label+' で記事を生成する'))
         )
       ):null,
-      // 編集タブ
       tab==='edit'&&hasArt?h('div',null,
         h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}},
-          h('div',{style:{display:'flex',gap:10,fontSize:13}},
-            h('span',{style:{color:'#4ade80',fontWeight:700}},'無料 '+freeT.replace(/\s/g,'').length+'文字'),
-            h('span',{style:{color:'rgba(255,255,255,.2)'}},'|'),
-            h('span',{style:{color:'#f87171',fontWeight:700}},'有料 '+paidT.replace(/\s/g,'').length+'文字')
-          ),
-          h('div',{style:{display:'flex',gap:5}},
-            h('button',{className:'cpbtn',style:{background:'rgba(255,255,255,.07)',borderColor:'rgba(255,255,255,.15)',color:'rgba(255,255,255,.7)'},onClick:function(){setEditText(genText);}},'↺ リセット'),
-            h('button',{className:'cpbtn',style:{background:'rgba(255,255,255,.07)',borderColor:'rgba(255,255,255,.15)',color:'rgba(255,255,255,.7)'},onClick:exportTxt},'💾 保存')
-          )
+          h('div',{style:{display:'flex',gap:10,fontSize:13}}, h('span',{style:{color:'#4ade80',fontWeight:700}},'無料 '+freeT.replace(/\s/g,'').length+'文字'), h('span',{style:{color:'rgba(255,255,255,.2)'}},'|'), h('span',{style:{color:'#f87171',fontWeight:700}},'有料 '+paidT.replace(/\s/g,'').length+'文字')),
+          h('div',{style:{display:'flex',gap:5}}, h('button',{className:'cpbtn',style:{background:'rgba(255,255,255,.07)',borderColor:'rgba(255,255,255,.15)',color:'rgba(255,255,255,.7)'},onClick:function(){setEditText(genText);}},'↺ リセット'), h('button',{className:'cpbtn',style:{background:'rgba(255,255,255,.07)',borderColor:'rgba(255,255,255,.15)',color:'rgba(255,255,255,.7)'},onClick:exportTxt},'💾 保存'))
         ),
         h('textarea',{className:'edit-ta',value:editText,onChange:function(e){setEditText(e.target.value);}})
       ):null,
-      // プレビュータブ
       tab==='preview'&&hasArt?h('div',null,
-        h('div',{style:{display:'flex',justifyContent:'flex-end',marginBottom:10}},
-          h('button',{className:'cpbtn',style:{background:copied.full?'rgba(74,222,128,.15)':'rgba(255,255,255,.07)',borderColor:copied.full?'rgba(74,222,128,.4)':'rgba(255,255,255,.15)',color:copied.full?'#4ade80':'rgba(255,255,255,.7)'},onClick:function(){doCopy(editText,'full');}},copied.full?'✓ コピー済み':'📋 全文コピー')
-        ),
+        h('div',{style:{display:'flex',justifyContent:'flex-end',marginBottom:10}}, h('button',{className:'cpbtn',style:{background:copied.full?'rgba(74,222,128,.15)':'rgba(255,255,255,.07)',borderColor:copied.full?'rgba(74,222,128,.4)':'rgba(255,255,255,.15)',color:copied.full?'#4ade80':'rgba(255,255,255,.7)'},onClick:function(){doCopy(editText,'full');}},copied.full?'✓ コピー済み':'📋 全文コピー')),
         h('div',{className:'prev-box'},
           h('div',{style:{background:'#f0fdf4',borderBottom:'2px solid #86efac',padding:'7px 16px'}},h('span',{style:{color:'#16a34a',fontSize:12,fontWeight:700}},'📓 無料部分プレビュー')),
-          h('div',{style:{padding:'20px 22px'}},
-            h('h1',{style:{fontSize:18,fontWeight:900,lineHeight:1.4,color:'#1a1a1a',marginBottom:12}},dispTitle),
-            h('div',{style:{fontSize:14,lineHeight:1.9,color:'#333',whiteSpace:'pre-wrap'}},freeT)
-          ),
-          h('div',{style:{background:'linear-gradient(135deg,#1a1a2e,#0f3460)',margin:'0 16px 16px',borderRadius:10,padding:'20px 16px',textAlign:'center',color:'#fff'}},
-            h('div',{style:{fontSize:26,marginBottom:7}},'🔐'),
-            h('h3',{style:{fontSize:14,fontWeight:900,margin:'0 0 6px'}},'ここから先は有料コンテンツです'),
-            h('p',{style:{fontSize:11,opacity:.55,margin:'0 0 12px',lineHeight:1.7}},'具体的な方法・Q&A・アクションプランを公開'),
-            h('div',{style:{background:'linear-gradient(135deg,#e94560,#c2185b)',display:'inline-block',borderRadius:50,padding:'7px 20px',fontSize:13,fontWeight:800}},'¥'+price.toLocaleString()+' で購入')
-          )
+          h('div',{style:{padding:'20px 22px'}}, h('h1',{style:{fontSize:18,fontWeight:900,lineHeight:1.4,color:'#1a1a1a',marginBottom:12}},dispTitle), h('div',{style:{fontSize:14,lineHeight:1.9,color:'#333',whiteSpace:'pre-wrap'}},freeT)),
+          h('div',{style:{background:'linear-gradient(135deg,#1a1a2e,#0f3460)',margin:'0 16px 16px',borderRadius:10,padding:'20px 16px',textAlign:'center',color:'#fff'}}, h('div',{style:{fontSize:26,marginBottom:7}},'🔐'), h('h3',{style:{fontSize:14,fontWeight:900,margin:'0 0 6px'}},'ここから先は有料コンテンツです'), h('p',{style:{fontSize:11,opacity:.55,margin:'0 0 12px',lineHeight:1.7}},'具体的な方法・Q&A・アクションプランを公開'), h('div',{style:{background:'linear-gradient(135deg,#e94560,#c2185b)',display:'inline-block',borderRadius:50,padding:'7px 20px',fontSize:13,fontWeight:800}},'¥'+price.toLocaleString()+' で購入'))
         )
       ):null,
-      // 投稿タブ
       tab==='post'&&hasArt?h('div',null,
         h('p',{style:{fontSize:13,color:'rgba(255,255,255,.45)',marginBottom:10}},'各パートをコピーしてnoteの投稿画面に貼り付けてください'),
-        [
-          {key:'title',label:'🏷️ タイトル',text:dispTitle},
-          {key:'free', label:'🆓 無料パート',text:freeT},
-          {key:'paid', label:'🔒 有料パート',text:paidT},
-        ].map(function(item){
-          return h('div',{key:item.key,className:'post-card'},
-            h('div',{className:'post-hd'},
-              h('div',null,
-                h('span',{style:{fontWeight:700,fontSize:13}},item.label),
-                h('span',{style:{fontSize:11,color:'rgba(255,255,255,.3)',marginLeft:7}},item.text.replace(/\s/g,'').length+'文字')
-              ),
-              h('button',{className:'cpbtn',style:{background:copied[item.key]?'rgba(74,222,128,.15)':'rgba(255,255,255,.07)',borderColor:copied[item.key]?'rgba(74,222,128,.4)':'rgba(255,255,255,.15)',color:copied[item.key]?'#4ade80':'rgba(255,255,255,.7)'},onClick:function(){doCopy(item.text,item.key);}},copied[item.key]?'✓ コピー済み':'📋 コピー')
-            ),
-            h('div',{className:'post-body'},item.text)
-          );
+        [ {key:'title',label:'🏷️ タイトル',text:dispTitle}, {key:'free', label:'🆓 無料パート',text:freeT}, {key:'paid', label:'🔒 有料パート',text:paidT} ].map(function(item){
+          return h('div',{key:item.key,className:'post-card'}, h('div',{className:'post-hd'}, h('div',null, h('span',{style:{fontWeight:700,fontSize:13}},item.label), h('span',{style:{fontSize:11,color:'rgba(255,255,255,.3)',marginLeft:7}},item.text.replace(/\s/g,'').length+'文字')), h('button',{className:'cpbtn',style:{background:copied[item.key]?'rgba(74,222,128,.15)':'rgba(255,255,255,.07)',borderColor:copied[item.key]?'rgba(74,222,128,.4)':'rgba(255,255,255,.15)',color:copied[item.key]?'#4ade80':'rgba(255,255,255,.7)'},onClick:function(){doCopy(item.text,item.key);}},copied[item.key]?'✓ コピー済み':'📋 コピー')), h('div',{className:'post-body'},item.text));
         }),
         h('a',{href:'https://note.com/notes/new',target:'_blank',rel:'noopener noreferrer',style:{display:'block',textAlign:'center',background:'linear-gradient(135deg,#41c9b4,#0ea5e9)',color:'#fff',textDecoration:'none',padding:'12px',borderRadius:10,fontSize:14,fontWeight:800,marginTop:5}},'📤 noteの投稿画面を開く')
       ):null,
-      (tab==='edit'||tab==='preview'||tab==='post')&&!hasArt?h('div',{style:{textAlign:'center',padding:'60px 16px',color:'rgba(255,255,255,.3)'}},
-        h('div',{style:{fontSize:38,marginBottom:10}},'✏️'),
-        h('p',{style:{fontSize:14,marginBottom:5}},'まだ記事が生成されていません'),
-        h('p',{style:{fontSize:12}},'⚙️ 設定タブで条件を設定して生成してください')
-      ):null
+      (tab==='edit'||tab==='preview'||tab==='post')&&!hasArt?h('div',{style:{textAlign:'center',padding:'60px 16px',color:'rgba(255,255,255,.3)'}}, h('div',{style:{fontSize:38,marginBottom:10}},'✏️'), h('p',{style:{fontSize:14,marginBottom:5}},'まだ記事が生成されていません'), h('p',{style:{fontSize:12}},'⚙️ 設定タブで条件を設定して生成してください')):null
     )
   );
 }
 
-// ────────────────────────────
-// コンポーネント: BonusGenerator
-// ────────────────────────────
 function BonusGenerator(props){
   var onBack=props.onBack;
   var s0=useState(false);    var showApi=s0[0];  var setShowApi=s0[1];
@@ -769,101 +581,56 @@ function BonusGenerator(props){
   var s5=useState(null);     var artFile=s5[0];  var setArtFile=s5[1];
   var s6=useState(false);    var loading=s6[0];  var setLoading=s6[1];
   var s7=useState('');       var error=s7[0];    var setError=s7[1];
-  var s8=useState([]);       var suggs=s8[0];    var suggestions=suggs; var setSuggestions=s8[1];
+  var s8=useState([]);       var suggestions=s8[0]; var setSuggestions=s8[1];
   var s9=useState([]);       var selected=s9[0]; var setSelected=s9[1];
   var sA=useState({});       var results=sA[0];  var setResults=sA[1];
   var aiRef=useRef(aiId);aiRef.current=aiId;
   var cfgAI=AI_LIST.filter(function(a){return !!getKey(a.id);});
 
   function handleFile(e){
-    var file=e.target.files&&e.target.files[0];
-    if(!file)return;
-    setArtFile(file);
-    readFile(file).then(function(t){setArtText(t);}).catch(function(err){setError('ファイル読み込みエラー: '+err.message);});
+    var file=e.target.files&&e.target.files[0]; if(!file)return;
+    setArtFile(file); readFile(file).then(function(t){setArtText(t);}).catch(function(err){setError('ファイルエラー: '+err.message);});
   }
   function handleAnalyze(){
-    var id=aiRef.current;
-    if(!artText.trim()){setError('記事テキストを入力またはアップロードしてください');return;}
+    var id=aiRef.current; if(!artText.trim()){setError('記事テキストを入力してください');return;}
     setError('');setLoading(true);setSuggestions([]);setSelected([]);setResults({});
-    var prompt='以下のnote記事を分析して、購入者向けの特典コンテンツを8つ提案してください。\n\n【ジャンル】'+theme+'\n【ターゲット年齢】'+age+'\n\n'+artText.slice(0,3000)+'\n\n出力形式（JSONのみ・前置きなし）:\n{"suggestions":[{"id":"1","title":"特典タイトル","type":"checklist","desc":"内容説明（30文字以内）"}]}';
+    var prompt='以下のnote記事を分析して、購入者向けの特典コンテンツを8つ提案してください。\n【ジャンル】'+theme+'\n【ターゲット年齢】'+age+'\n\n'+artText.slice(0,3000)+'\n\n出力形式（JSONのみ・前置きなし）:\n{"suggestions":[{"id":"1","title":"特典タイトル","type":"checklist","desc":"内容説明（30文字以内）"}]}';
     callAI(id,[{role:'user',content:prompt}],null,1200)
-      .then(function(res){
-        try{var p=parseJSON(res);if(p.suggestions&&p.suggestions.length>0){setSuggestions(p.suggestions);}else{throw new Error('提案が取得できませんでした');}}
-        catch(e){setError('解析エラー。もう一度お試しください。');}
-        setLoading(false);
-      }).catch(function(e){setError(e.message);setLoading(false);});
+      .then(function(res){ try{var p=parseJSON(res);if(p.suggestions&&p.suggestions.length>0)setSuggestions(p.suggestions);else throw new Error();}catch(e){setError('解析エラー。もう一度お試しください。');} setLoading(false); })
+      .catch(function(e){setError(e.message);setLoading(false);});
   }
   function handleGenBonus(s){
-    var id=aiRef.current;
-    setLoading(true);
-    var prompt='以下の特典コンテンツを作成してください。\n\n元記事（要約）:\n'+artText.slice(0,2000)+'\n\n特典タイトル: '+s.title+'\nターゲット: '+age+'\n\n実際に使える完成度で作成してください。';
+    var id=aiRef.current; setLoading(true);
+    var prompt='以下の特典コンテンツを作成してください。\n元記事:\n'+artText.slice(0,2000)+'\n\n特典タイトル: '+s.title+'\nターゲット: '+age+'\n\n実際に使える完成度で作成してください。';
     callAI(id,[{role:'user',content:prompt}],null,2000)
-      .then(function(res){
-        recGen(id,'bonus','');
-        var n=Object.assign({},results);n[s.id]=res;setResults(n);setLoading(false);
-      }).catch(function(e){setError(e.message);setLoading(false);});
+      .then(function(res){ recGen(id,'bonus',''); var n=Object.assign({},results);n[s.id]=res;setResults(n);setLoading(false); })
+      .catch(function(e){setError(e.message);setLoading(false);});
   }
   function downloadXlsx(){
-    if(typeof XLSX==='undefined'){alert('XLSXライブラリが読み込まれていません');return;}
+    if(typeof XLSX==='undefined')return;
     var rows=selected.map(function(id){var s=suggestions.find(function(x){return x.id===id;});return{'タイトル':s?s.title:'','内容':results[id]||''};});
     var ws=XLSX.utils.json_to_sheet(rows);var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'特典');XLSX.writeFile(wb,'bonus_'+Date.now()+'.xlsx');
   }
 
   return h('div',{className:'app'},
     showApi?h(ApiKeyModal,{onClose:function(){setShowApi(false);}}):null,
-    h('div',{className:'app-hd'},
-      h('div',{className:'app-hd-l'},
-        h('button',{className:'back-btn',onClick:onBack},'← 戻る'),
-        h('div',null,
-          h('div',{style:{display:'flex',alignItems:'center',gap:6}},h('span',{className:'ai-bdg'},'AI POWERED'),h('h1',{className:'app-ttl'},'🎁 購入者特典生成')),
-          h('p',{className:'app-sub'},cfgAI.length>0?'✓ '+cfgAI.map(function(a){return a.label;}).join(' '):'APIキー未設定')
-        )
-      ),
-      h('button',{className:'key-btn',onClick:function(){setShowApi(true);}},'🔑 APIキー設定')
-    ),
+    h('div',{className:'app-hd'}, h('div',{className:'app-hd-l'}, h('button',{className:'back-btn',onClick:onBack},'← 戻る'), h('div',null, h('div',{style:{display:'flex',alignItems:'center',gap:6}},h('span',{className:'ai-bdg'},'AI POWERED'),h('h1',{className:'app-ttl'},'🎁 購入者特典生成')), h('p',{className:'app-sub'},cfgAI.length>0?'✓ '+cfgAI.map(function(a){return a.label;}).join(' '):'APIキー未設定'))), h('button',{className:'key-btn',onClick:function(){setShowApi(true);}},'🔑 APIキー設定')),
     h('div',{className:'app-body'},
       h('div',{className:'card'},h('span',{className:'lbl'},'🤖 使用するAI'),h(AiSelector,{value:aiId,onChange:function(id){setAiId(id);aiRef.current=id;}})),
-      h('div',{className:'card'},
-        h('span',{className:'lbl'},'📂 ジャンル & 年齢'),
-        h('select',{value:theme,onChange:function(e){setTheme(e.target.value);},className:'inp',style:{marginBottom:8}},
-          BONUS_THEMES.map(function(t){return h('option',{key:t,value:t},t);})),
-        h('select',{value:age,onChange:function(e){setAge(e.target.value);},className:'inp'},
-          BONUS_AGES.map(function(a){return h('option',{key:a,value:a},a);}))
-      ),
-      h('div',{className:'card'},
-        h('span',{className:'lbl'},'📄 元記事テキスト'),
-        h('textarea',{className:'inp',style:{minHeight:120,resize:'vertical',marginBottom:8},value:artText,onChange:function(e){setArtText(e.target.value);},placeholder:'note記事の本文をここに貼り付けてください...'}),
-        h('label',{style:{display:'flex',alignItems:'center',gap:7,cursor:'pointer',fontSize:13,color:'rgba(255,255,255,.5)'}},
-          h('span',null,'📎 ファイルアップロード (.txt / .md / .docx)'),
-          h('input',{type:'file',accept:'.txt,.md,.docx',onChange:handleFile,style:{display:'none'}})
-        ),
-        artFile?h('p',{style:{fontSize:12,color:'#4ade80',marginTop:4}},'✓ '+artFile.name):null
-      ),
+      h('div',{className:'card'}, h('span',{className:'lbl'},'📂 ジャンル & 年齢'), h('select',{value:theme,onChange:function(e){setTheme(e.target.value);},className:'inp',style:{marginBottom:8}}, BONUS_THEMES.map(function(t){return h('option',{key:t,value:t},t);})), h('select',{value:age,onChange:function(e){setAge(e.target.value);},className:'inp'}, BONUS_AGES.map(function(a){return h('option',{key:a,value:a},a);}))),
+      h('div',{className:'card'}, h('span',{className:'lbl'},'📄 元記事テキスト'), h('textarea',{className:'inp',style:{minHeight:120,resize:'vertical',marginBottom:8},value:artText,onChange:function(e){setArtText(e.target.value);},placeholder:'note記事の本文をここに貼り付けてください...'}), h('label',{style:{display:'flex',alignItems:'center',gap:7,cursor:'pointer',fontSize:13,color:'rgba(255,255,255,.5)'}}, h('span',null,'📎 ファイルアップロード (.txt / .md / .docx)'), h('input',{type:'file',accept:'.txt,.md,.docx',onChange:handleFile,style:{display:'none'}})), artFile?h('p',{style:{fontSize:12,color:'#4ade80',marginTop:4}},'✓ '+artFile.name):null),
       error?h('div',{className:'err'},'❌ '+error):null,
-      h('button',{onClick:handleAnalyze,disabled:loading||!artText.trim(),style:{width:'100%',padding:'13px',borderRadius:10,background:loading?'rgba(224,123,57,.2)':'linear-gradient(135deg,#e07b39,#c2185b)',border:'none',color:'#fff',fontSize:14,fontWeight:800,cursor:loading?'not-allowed':'pointer',marginBottom:16,opacity:loading?0.7:1}},
-        loading?h('span',null,h('span',{className:'spin'},'⚙️'),' 分析・生成中...'):'🎁 特典コンテンツを提案する'
-      ),
+      h('button',{onClick:handleAnalyze,disabled:loading||!artText.trim(),style:{width:'100%',padding:'13px',borderRadius:10,background:loading?'rgba(224,123,57,.2)':'linear-gradient(135deg,#e07b39,#c2185b)',border:'none',color:'#fff',fontSize:14,fontWeight:800,cursor:loading?'not-allowed':'pointer',marginBottom:16,opacity:loading?0.7:1}}, loading?h('span',null,h('span',{className:'spin'},'⚙️'),' 分析・生成中...'):'🎁 特典コンテンツを提案する'),
       suggestions.length>0?h('div',null,
         h('p',{style:{fontSize:13,color:'rgba(255,255,255,.45)',marginBottom:9}},'生成する特典を選んでください（複数可）'),
         suggestions.map(function(s){
           var isSel=selected.indexOf(s.id)>=0;
           return h('div',{key:s.id,style:{background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.08)',borderRadius:10,padding:'11px 13px',marginBottom:6}},
-            h('div',{style:{display:'flex',alignItems:'flex-start',gap:8,cursor:'pointer',marginBottom:isSel?7:0},
-              onClick:function(){setSelected(function(sel){return isSel?sel.filter(function(x){return x!==s.id;}):sel.concat([s.id]);});}},
-              h('div',{style:{width:18,height:18,borderRadius:4,border:'2px solid '+(isSel?'#e94560':'rgba(255,255,255,.3)'),background:isSel?'rgba(233,69,96,.2)':'transparent',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:2}},
-                isSel?h('span',{style:{color:'#e94560',fontSize:12,fontWeight:900}},'✓'):null
-              ),
-              h('div',null,
-                h('p',{style:{fontWeight:700,fontSize:13,marginBottom:2}},s.title),
-                h('p',{style:{fontSize:11,color:'rgba(255,255,255,.45)'}},s.type+' — '+s.desc)
-              )
+            h('div',{style:{display:'flex',alignItems:'flex-start',gap:8,cursor:'pointer',marginBottom:isSel?7:0}, onClick:function(){setSelected(function(sel){return isSel?sel.filter(function(x){return x!==s.id;}):sel.concat([s.id]);});}},
+              h('div',{style:{width:18,height:18,borderRadius:4,border:'2px solid '+(isSel?'#e94560':'rgba(255,255,255,.3)'),background:isSel?'rgba(233,69,96,.2)':'transparent',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:2}}, isSel?h('span',{style:{color:'#e94560',fontSize:12,fontWeight:900}},'✓'):null),
+              h('div',null, h('p',{style:{fontWeight:700,fontSize:13,marginBottom:2}},s.title), h('p',{style:{fontSize:11,color:'rgba(255,255,255,.45)'}},s.type+' — '+s.desc))
             ),
-            isSel?h('div',{style:{paddingLeft:26}},
-              h('button',{onClick:function(){handleGenBonus(s);},disabled:loading,style:{padding:'5px 12px',borderRadius:7,background:'rgba(224,123,57,.2)',border:'1px solid rgba(224,123,57,.4)',color:'#e07b39',fontSize:12,fontWeight:700,cursor:'pointer',marginBottom:6}},
-                loading?'生成中...':'⚡ 生成する'
-              ),
-              results[s.id]?h('pre',{style:{fontSize:12,color:'rgba(255,255,255,.7)',whiteSpace:'pre-wrap',lineHeight:1.7,background:'rgba(255,255,255,.03)',borderRadius:7,padding:'8px 10px'}},results[s.id]):null
-            ):null
+            isSel?h('div',{style:{paddingLeft:26}}, h('button',{onClick:function(){handleGenBonus(s);},disabled:loading,style:{padding:'5px 12px',borderRadius:7,background:'rgba(224,123,57,.2)',border:'1px solid rgba(224,123,57,.4)',color:'#e07b39',fontSize:12,fontWeight:700,cursor:'pointer',marginBottom:6}}, loading?'生成中...':'⚡ 生成する'), results[s.id]?h('pre',{style:{fontSize:12,color:'rgba(255,255,255,.7)',whiteSpace:'pre-wrap',lineHeight:1.7,background:'rgba(255,255,255,.03)',borderRadius:7,padding:'8px 10px'}},results[s.id]):null):null
           );
         }),
         (selected.length>0&&Object.keys(results).length>0)?h('button',{onClick:downloadXlsx,style:{width:'100%',padding:'11px',borderRadius:9,background:'linear-gradient(135deg,#4ade80,#16a34a)',border:'none',color:'#fff',fontSize:13,fontWeight:800,cursor:'pointer',marginTop:6}},'📥 選択した特典をExcelでダウンロード'):null
@@ -872,9 +639,6 @@ function BonusGenerator(props){
   );
 }
 
-// ────────────────────────────
-// コンポーネント: ImagePromptGenerator
-// ────────────────────────────
 function ImagePromptGenerator(props){
   var onBack=props.onBack;
   var s0=useState(false);      var showApi=s0[0];  var setShowApi=s0[1];
@@ -891,61 +655,32 @@ function ImagePromptGenerator(props){
   var cfgAI=AI_LIST.filter(function(a){return !!getKey(a.id);});
 
   function toggleUse(id){setUses(function(u){return u.indexOf(id)>=0?u.filter(function(x){return x!==id;}):u.concat([id]);});}
-  function doCopy(text,key){
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).catch(function(){});
-    }
-    var n=Object.assign({},copied);n[key]=true;setCopied(n);
-    setTimeout(function(){var n2=Object.assign({},copied);n2[key]=false;setCopied(n2);},2000);
-  }
+  function doCopy(text,key){ if(navigator.clipboard && navigator.clipboard.writeText){navigator.clipboard.writeText(text).catch(function(){});} var n=Object.assign({},copied);n[key]=true;setCopied(n); setTimeout(function(){var n2=Object.assign({},copied);n2[key]=false;setCopied(n2);},2000); }
   function handleGen(){
-    var id=aiRef.current;
-    setError('');setLoading(true);setPrompts([]);
+    var id=aiRef.current; setError('');setLoading(true);setPrompts([]);
     var useLabels=uses.map(function(u){return (IMG_USES.find(function(x){return x.id===u;})||{label:u}).label;}).join('・');
-    var prompt='以下の条件でAI画像生成ツール用の英語プロンプトを5種類作成してください。\n\nスタイル: '+style+'\nツール: '+tool+'\n用途: '+useLabels+'\nキーワード: '+(keyword||'note記事のカバー画像')+'\n\n出力形式（JSONのみ）:\n{"prompts":["英語プロンプト1","英語プロンプト2","英語プロンプト3","英語プロンプト4","英語プロンプト5"]}';
+    var prompt='以下の条件でAI画像生成ツール用の英語プロンプトを5種類作成してください。\nスタイル: '+style+'\nツール: '+tool+'\n用途: '+useLabels+'\nキーワード: '+(keyword||'note記事のカバー画像')+'\n\n出力形式（JSONのみ）:\n{"prompts":["英語プロンプト1","英語プロンプト2","英語プロンプト3","英語プロンプト4","英語プロンプト5"]}';
     callAI(id,[{role:'user',content:prompt}],null,1000)
-      .then(function(res){
-        try{var p=parseJSON(res);if(p.prompts&&p.prompts.length>0){recGen(id,'image','');setPrompts(p.prompts);}else{throw new Error('プロンプトが取得できませんでした');}}
-        catch(e){setError('解析エラー。もう一度お試しください。');}
-        setLoading(false);
-      }).catch(function(e){setError(e.message);setLoading(false);});
+      .then(function(res){ try{var p=parseJSON(res);if(p.prompts&&p.prompts.length>0){recGen(id,'image','');setPrompts(p.prompts);}else throw new Error();}catch(e){setError('解析エラー。もう一度お試しください。');} setLoading(false); })
+      .catch(function(e){setError(e.message);setLoading(false);});
   }
 
   return h('div',{className:'app'},
     showApi?h(ApiKeyModal,{onClose:function(){setShowApi(false);}}):null,
-    h('div',{className:'app-hd'},
-      h('div',{className:'app-hd-l'},
-        h('button',{className:'back-btn',onClick:onBack},'← 戻る'),
-        h('div',null,
-          h('div',{style:{display:'flex',alignItems:'center',gap:6}},h('span',{className:'ai-bdg'},'AI POWERED'),h('h1',{className:'app-ttl'},'🖼️ 画像プロンプト生成')),
-          h('p',{className:'app-sub'},cfgAI.length>0?'✓ '+cfgAI.map(function(a){return a.label;}).join(' '):'APIキー未設定')
-        )
-      ),
-      h('button',{className:'key-btn',onClick:function(){setShowApi(true);}},'🔑 APIキー設定')
-    ),
+    h('div',{className:'app-hd'}, h('div',{className:'app-hd-l'}, h('button',{className:'back-btn',onClick:onBack},'← 戻る'), h('div',null, h('div',{style:{display:'flex',alignItems:'center',gap:6}},h('span',{className:'ai-bdg'},'AI POWERED'),h('h1',{className:'app-ttl'},'🖼️ 画像プロンプト生成')), h('p',{className:'app-sub'},cfgAI.length>0?'✓ '+cfgAI.map(function(a){return a.label;}).join(' '):'APIキー未設定'))), h('button',{className:'key-btn',onClick:function(){setShowApi(true);}},'🔑 APIキー設定')),
     h('div',{className:'app-body'},
       h('div',{className:'card'},h('span',{className:'lbl'},'🤖 使用するAI'),h(AiSelector,{value:aiId,onChange:function(id){setAiId(id);aiRef.current=id;}})),
       h('div',{className:'card'},h('span',{className:'lbl'},'🎨 画像スタイル'),h('select',{value:style,onChange:function(e){setStyle(e.target.value);},className:'inp'},IMG_STYLES.map(function(s){return h('option',{key:s,value:s},s);}))),
       h('div',{className:'card'},h('span',{className:'lbl'},'🛠 生成ツール'),h('select',{value:tool,onChange:function(e){setTool(e.target.value);},className:'inp'},IMG_TOOLS.map(function(t){return h('option',{key:t,value:t},t);}))),
-      h('div',{className:'card'},
-        h('span',{className:'lbl'},'📌 用途（複数選択可）'),
-        h('div',{className:'pills'},
-          IMG_USES.map(function(u){return h('button',{key:u.id,className:'pill'+(uses.indexOf(u.id)>=0?' pill-on':''),onClick:function(){toggleUse(u.id);}},u.label);})
-        )
-      ),
+      h('div',{className:'card'}, h('span',{className:'lbl'},'📌 用途（複数選択可）'), h('div',{className:'pills'}, IMG_USES.map(function(u){return h('button',{key:u.id,className:'pill'+(uses.indexOf(u.id)>=0?' pill-on':''),onClick:function(){toggleUse(u.id);}},u.label);}))),
       h('div',{className:'card'},h('span',{className:'lbl'},'🔑 キーワード・テーマ（任意）'),h('input',{className:'inp',type:'text',value:keyword,onChange:function(e){setKeyword(e.target.value);},placeholder:'例: 副業 ビジネス 成功 シンプル'})),
       error?h('div',{className:'err'},'❌ '+error):null,
-      h('button',{onClick:handleGen,disabled:loading,style:{width:'100%',padding:'13px',borderRadius:10,background:loading?'rgba(99,102,241,.2)':'linear-gradient(135deg,#6366f1,#4f46e5)',border:'none',color:'#fff',fontSize:14,fontWeight:800,cursor:loading?'not-allowed':'pointer',marginBottom:16,opacity:loading?0.7:1}},
-        loading?h('span',null,h('span',{className:'spin'},'⚙️'),' 生成中...'):'✨ プロンプトを生成する'
-      ),
+      h('button',{onClick:handleGen,disabled:loading,style:{width:'100%',padding:'13px',borderRadius:10,background:loading?'rgba(99,102,241,.2)':'linear-gradient(135deg,#6366f1,#4f46e5)',border:'none',color:'#fff',fontSize:14,fontWeight:800,cursor:loading?'not-allowed':'pointer',marginBottom:16,opacity:loading?0.7:1}}, loading?h('span',null,h('span',{className:'spin'},'⚙️'),' 生成中...'):'✨ プロンプトを生成する'),
       prompts.length>0?h('div',null,
         h('p',{style:{fontSize:13,color:'rgba(255,255,255,.45)',marginBottom:9}},'生成された英語プロンプト（クリックでコピー）'),
         prompts.map(function(p,i){
           return h('div',{key:i,style:{background:copied[i]?'rgba(74,222,128,.06)':'rgba(255,255,255,.04)',border:'1px solid '+(copied[i]?'rgba(74,222,128,.3)':'rgba(255,255,255,.08)'),borderRadius:9,padding:'10px 12px',marginBottom:6,cursor:'pointer'},onClick:function(){doCopy(p,i);}},
-            h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}},
-              h('span',{style:{fontSize:11,fontWeight:700,color:'rgba(255,255,255,.4)'}},'#'+(i+1)),
-              h('span',{style:{fontSize:11,color:copied[i]?'#4ade80':'rgba(255,255,255,.35)'}},copied[i]?'✓ コピー済み':'📋 コピー')
-            ),
+            h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}, h('span',{style:{fontSize:11,fontWeight:700,color:'rgba(255,255,255,.4)'}},'#'+(i+1)), h('span',{style:{fontSize:11,color:copied[i]?'#4ade80':'rgba(255,255,255,.35)'}},copied[i]?'✓ コピー済み':'📋 コピー')),
             h('p',{style:{fontSize:13,color:'rgba(255,255,255,.8)',lineHeight:1.6}},p)
           );
         })
@@ -966,54 +701,80 @@ function App(){
   var initAge=noteProps.age;
   var initSit=noteProps.sit;
   var initWry=noteProps.wry;
+
   function setInitTheme(v){setNoteProps(function(p){return Object.assign({},p,{theme:v});});}
   function setInitTopic(v){setNoteProps(function(p){return Object.assign({},p,{topic:v});});}
-  function setInitAge(v){setNoteProps(function(p){return Object.assign({},p,{age:v});});}
   function setInitSit(v){setNoteProps(function(p){return Object.assign({},p,{sit:v});});}
   function setInitWry(v){setNoteProps(function(p){return Object.assign({},p,{wry:v});});}
+
   var s6=useState('genre');    var step=s6[0];      var setStep=s6[1];
   var s7=useState('money');    var genre=s7[0];     var setGenre=s7[1];
   var s8=useState([]);         var themes=s8[0];    var setThemes=s8[1];
   var s9=useState(false);      var thLoad=s9[0];    var setThLoad=s9[1];
   var sA=useState(-1);         var thIdx=sA[0];     var setThIdx=sA[1];
   var sB=useState([]);         var prevThs=sB[0];   var setPrevThs=sB[1];
+  
+  // 対象ペルソナステート
   var sC=useState('30s');      var selAge=sC[0];    var setSelAge=sC[1];
   var sD=useState([]);         var sugSit=sD[0];    var setSugSit=sD[1];
   var sE=useState([]);         var sugWry=sE[0];    var setSugWry=sE[1];
-  var sF=useState(false);      var swLoad=sF[0];    var setSwLoad=sF[1];
+  var sF=useState(false);      var sitLoad=sF[0];   var setSitLoad=sF[1];
+  var sW=useState(false);      var wryLoad=sW[0];   var setWryLoad=sW[1];
   var sG=useState(-1);         var selSit=sG[0];    var setSelSit=sG[1];
   var sH=useState(-1);         var selWry=sH[0];    var setSelWry=sH[1];
   var sI=useState(false);      var sent=sI[0];      var setSent=sI[1];
 
+  // テーマ生成（被り防止プロンプト強化）
   function genThemes(gid,prev){
     var ai=getBestAi();
     var gl=(THEMES.find(function(g){return g.id===gid;})||{}).label||gid;
     var clean=gl.replace(/[^\u3040-\u30FF\u4E00-\u9FFF\uFF00-\uFFEFa-zA-Z0-9\s]/g,'').trim();
     setThLoad(true);setThemes([]);setThIdx(-1);
     if(!ai){setThemes(FB.themes[gid]||FB.themes.other);setThLoad(false);return;}
-    var excl=(prev&&prev.length>0)?'\n以下は除外:\n'+prev.slice(-20).join('\n'):'';
-    var prompt='note有料記事のテーマを10個生成してください。\nジャンル: '+clean+'\n条件: 購入したくなるタイトル（25〜40文字）、読者の悩みを解決する内容'+excl+'\n出力形式（JSONのみ）:\n{"themes":["テーマ1","テーマ2","テーマ3","テーマ4","テーマ5","テーマ6","テーマ7","テーマ8","テーマ9","テーマ10"]}';
-    callAI(ai,[{role:'user',content:prompt}],null,600)
+    
+    var excl=(prev&&prev.length>0)?'\n過去の提案（これらとは被らない全く新しい切り口にしてください）:\n'+prev.slice(-20).map(function(t,i){return (i+1)+". "+t;}).join('\n'):'';
+    var prompt='note有料記事のテーマ（タイトル候補）を10個生成してください。\nジャンル: '+clean+'\n条件: 購入したくなるタイトル（25〜40文字）、読者の悩みを解決する内容'+excl+'\n絶対に追加の文章やマークダウンを含めず、以下のJSON形式のみを出力してください。\n{"themes":["テーマ1","テーマ2","テーマ3","テーマ4","テーマ5","テーマ6","テーマ7","テーマ8","テーマ9","テーマ10"]}';
+    
+    callAI(ai,[{role:'user',content:prompt}],null,800)
       .then(function(res){
         try{var p=parseJSON(res);var arr=Array.isArray(p.themes)?p.themes.slice(0,10):[];setThemes(arr.length>=5?arr:(FB.themes[gid]||FB.themes.other));}
         catch(e){setThemes(FB.themes[gid]||FB.themes.other);}
         setThLoad(false);
       }).catch(function(){setThemes(FB.themes[gid]||FB.themes.other);setThLoad(false);});
   }
-  function genSitWorry(gid,aid){
+
+  // 状況生成（年齢に基づく）
+  function genSituations(gid, tid, aid){
     var ai=getBestAi();
     var gl=(THEMES.find(function(g){return g.id===gid;})||{}).label||gid;
     var al=(AGES.find(function(a){return a.id===aid;})||{}).label||aid;
-    var clean=gl.replace(/[^\u3040-\u30FF\u4E00-\u9FFF\uFF00-\uFFEFa-zA-Z0-9\s]/g,'').trim();
-    setSwLoad(true);setSugSit([]);setSugWry([]);setSelSit(-1);setSelWry(-1);
-    if(!ai){setSugSit(FB.sit[gid]||FB.sit.other);setSugWry(FB.wry[gid]||FB.wry.other);setSwLoad(false);return;}
-    var prompt='note記事のターゲット読者の「状況」と「悩み」を5件ずつ生成してください。\nジャンル: '+clean+' / 年齢: '+al+'\n出力形式（JSONのみ）:\n{"situations":["状況1","状況2","状況3","状況4","状況5"],"worries":["悩み1","悩み2","悩み3","悩み4","悩み5"]}';
+    setSitLoad(true); setSugSit([]); setSelSit(-1); setSugWry([]); setSelWry(-1);
+    if(!ai){setSugSit(FB.sit[gid]||FB.sit.other);setSitLoad(false);return;}
+    
+    var prompt='note記事のターゲット読者の具体的な「状況」を5つ生成してください。\nジャンル: '+gl+'\nテーマ: '+tid+'\n年齢層: '+al+'\n絶対に追加の文章を含めず、以下のJSON形式のみを出力してください。\n{"situations":["状況1","状況2","状況3","状況4","状況5"]}';
     callAI(ai,[{role:'user',content:prompt}],null,600)
       .then(function(res){
-        try{var p=parseJSON(res);var sits=Array.isArray(p.situations)?p.situations.slice(0,5):[];var wrys=Array.isArray(p.worries)?p.worries.slice(0,5):[];setSugSit(sits.length>=3?sits:(FB.sit[gid]||FB.sit.other));setSugWry(wrys.length>=3?wrys:(FB.wry[gid]||FB.wry.other));}
-        catch(e){setSugSit(FB.sit[gid]||FB.sit.other);setSugWry(FB.wry[gid]||FB.wry.other);}
-        setSwLoad(false);
-      }).catch(function(){setSugSit(FB.sit[gid]||FB.sit.other);setSugWry(FB.wry[gid]||FB.wry.other);setSwLoad(false);});
+        try{var p=parseJSON(res);var arr=Array.isArray(p.situations)?p.situations.slice(0,5):[];setSugSit(arr.length>=3?arr:(FB.sit[gid]||FB.sit.other));}
+        catch(e){setSugSit(FB.sit[gid]||FB.sit.other);}
+        setSitLoad(false);
+      }).catch(function(){setSugSit(FB.sit[gid]||FB.sit.other);setSitLoad(false);});
+  }
+
+  // 悩み生成（年齢・状況に基づく）
+  function genWorries(gid, tid, aid, sit){
+    var ai=getBestAi();
+    var gl=(THEMES.find(function(g){return g.id===gid;})||{}).label||gid;
+    var al=(AGES.find(function(a){return a.id===aid;})||{}).label||aid;
+    setWryLoad(true); setSugWry([]); setSelWry(-1);
+    if(!ai){setSugWry(FB.wry[gid]||FB.wry.other);setWryLoad(false);return;}
+    
+    var prompt='note記事のターゲット読者の深い「悩み」を5つ生成してください。\nジャンル: '+gl+'\nテーマ: '+tid+'\n年齢層: '+al+'\n現在の具体的な状況: '+sit+'\n絶対に追加の文章を含めず、以下のJSON形式のみを出力してください。\n{"worries":["悩み1","悩み2","悩み3","悩み4","悩み5"]}';
+    callAI(ai,[{role:'user',content:prompt}],null,600)
+      .then(function(res){
+        try{var p=parseJSON(res);var arr=Array.isArray(p.worries)?p.worries.slice(0,5):[];setSugWry(arr.length>=3?arr:(FB.wry[gid]||FB.wry.other));}
+        catch(e){setSugWry(FB.wry[gid]||FB.wry.other);}
+        setWryLoad(false);
+      }).catch(function(){setSugWry(FB.wry[gid]||FB.wry.other);setWryLoad(false);});
   }
 
   if(screen==='note') return h(NoteGenerator,{onBack:function(){setScreen('landing');},initTheme:initTheme,initTopic:initTopic,initAge:initAge,initSit:initSit,initWry:initWry,key:screen});
@@ -1021,121 +782,90 @@ function App(){
   if(screen==='image')return h(ImagePromptGenerator,{onBack:function(){setScreen('landing');}});
 
   return h('div',{className:'pg'},
-    h('div',{className:'grid-bg'}),
-    h('div',{className:'z1 badge-sm'},'✦ note AI Tools'),
-    h('h1',{className:'z1 main-ttl'},
-      'note',h('span',null,'AI'),h('br'),
-      'Tools'
-    ),
-    h('p',{className:'z1 main-sub'},'Claude・Gemini・ChatGPT・Grokを使った',h('br'),'note特化AIツール集'),
-    h('div',{className:'z1 ai-row'},
-      AI_LIST.map(function(ai){return h('div',{key:ai.id,className:'ai-chip'},h('div',{className:'ai-dot',style:{background:ai.color}}),ai.label);})
-    ),
+    h('div',{className:'grid-bg'}), h('div',{className:'z1 badge-sm'},'✦ note AI Tools'), h('h1',{className:'z1 main-ttl'}, 'note',h('span',null,'AI'),h('br'), 'Tools'), h('p',{className:'z1 main-sub'},'Claude・Gemini・ChatGPT・Grokを使った',h('br'),'note特化AIツール集'),
+    h('div',{className:'z1 ai-row'}, AI_LIST.map(function(ai){return h('div',{key:ai.id,className:'ai-chip'},h('div',{className:'ai-dot',style:{background:ai.color}}),ai.label);})),
+    
     // Step1: ジャンル
     step==='genre'?h('div',{className:'z1 tbox'},
-      h('p',{className:'blbl'},'✨ AIがあなたにぴったりのテーマを提案します'),
-      h('p',{style:{fontSize:12,color:'rgba(255,255,255,.4)',marginBottom:9,fontWeight:700}},'① ジャンルを選択'),
-      h('div',{className:'chips'},
-        THEMES.map(function(g){return h('button',{key:g.id,className:'chip'+(genre===g.id?' chip-on':''),onClick:function(){setGenre(g.id);}},g.label);})
-      ),
-      h('div',{className:'brow'},
-        h('button',{className:'btn-primary',onClick:function(){setInitTheme(genre);setStep('themes');genThemes(genre,[]);}},
-          'このジャンルでテーマを生成 →')
-      )
+      h('p',{className:'blbl'},'✨ AIがあなたにぴったりのテーマを提案します'), h('p',{style:{fontSize:12,color:'rgba(255,255,255,.4)',marginBottom:9,fontWeight:700}},'① ジャンルを選択'),
+      h('div',{className:'chips'}, THEMES.map(function(g){return h('button',{key:g.id,className:'chip'+(genre===g.id?' chip-on':''),onClick:function(){setGenre(g.id);}},g.label);})),
+      h('div',{className:'brow'}, h('button',{className:'btn-primary',onClick:function(){setInitTheme(genre);setStep('themes');genThemes(genre,[]);}}, 'このジャンルでテーマを生成 →'))
     ):null,
+    
     // Step2: テーマ
     step==='themes'?h('div',{className:'z1 tbox'},
-      h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:11,flexWrap:'wrap'}},
-        h('button',{className:'btn-back',onClick:function(){setStep('genre');}},'← ジャンルに戻る'),
-        h('p',{className:'blbl',style:{margin:0}},(THEMES.find(function(g){return g.id===genre;})||{}).label+' のテーマ候補')
-      ),
+      h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:11,flexWrap:'wrap'}}, h('button',{className:'btn-back',onClick:function(){setStep('genre');}},'← ジャンルに戻る'), h('p',{className:'blbl',style:{margin:0}},(THEMES.find(function(g){return g.id===genre;})||{}).label+' のテーマ候補')),
       thLoad?h('p',{className:'ld-txt'},h('span',{className:'spin'},'⚙️'),' AIがテーマを生成中...'):
-      h('div',{className:'tgrid'},
-        themes.map(function(t,i){
-          return h('div',{key:i,className:'titem'+(thIdx===i?' titem-on':''),onClick:function(){setThIdx(i);}},
-            h('span',{className:'tnum'},i+1),
-            h('span',{style:{flex:1}},t),
-            thIdx===i?h('span',{style:{color:'#e94560'}},'✓'):null
-          );
-        })
-      ),
+      h('div',{className:'tgrid'}, themes.map(function(t,i){return h('div',{key:i,className:'titem'+(thIdx===i?' titem-on':''),onClick:function(){setThIdx(i);}}, h('span',{className:'tnum'},i+1), h('span',{style:{flex:1}},t), thIdx===i?h('span',{style:{color:'#e94560'}},'✓'):null);})),
       h('div',{className:'brow'},
-        h('button',{className:'btn-rl',disabled:thLoad,onClick:function(){setPrevThs(prevThs.concat(themes));genThemes(genre,prevThs.concat(themes));}},
-          h('span',{className:thLoad?'spin':''},'🔄'),' 別のテーマを生成'
-        ),
-        h('button',{className:'btn-primary',disabled:thIdx<0||thLoad,onClick:function(){setInitTopic(themes[thIdx]);setStep('age');genSitWorry(genre,selAge);}},
-          'このテーマで決定 →')
+        h('button',{className:'btn-rl',disabled:thLoad,onClick:function(){var newPrev = prevThs.concat(themes); setPrevThs(newPrev); genThemes(genre,newPrev);}}, h('span',{className:thLoad?'spin':''},'🔄'),' 別のテーマを生成'),
+        h('button',{className:'btn-primary',disabled:thIdx<0||thLoad,onClick:function(){
+          setInitTopic(themes[thIdx]);
+          setStep('target');
+          setSelAge('30s'); // デフォルト値
+          genSituations(genre, themes[thIdx], '30s'); // 最初に状況を生成しておく
+        }}, 'このテーマで決定 →')
       )
     ):null,
-    // Step3: 年齢・状況・悩み
-    step==='age'?h('div',{className:'z1 tbox'},
-      h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:11,flexWrap:'wrap'}},
-        h('button',{className:'btn-back',onClick:function(){setStep('themes');}},'← テーマに戻る'),
-        h('p',{style:{fontSize:13,color:'rgba(255,255,255,.7)',fontWeight:700,margin:0}},'📝 '+initTopic)
-      ),
+    
+    // Step3: ターゲット（年齢・状況・悩み）直列フロー
+    step==='target'?h('div',{className:'z1 tbox'},
+      h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:11,flexWrap:'wrap'}}, h('button',{className:'btn-back',onClick:function(){setStep('themes');}},'← テーマに戻る'), h('p',{style:{fontSize:13,color:'rgba(255,255,255,.7)',fontWeight:700,margin:0}},'📝 '+initTopic)),
+      
       h('p',{style:{fontSize:12,color:'rgba(255,255,255,.4)',marginBottom:8,fontWeight:700}},'② ターゲット読者の年齢を選択'),
-      h('div',{className:'chips',style:{marginBottom:14}},
+      h('div',{className:'chips',style:{marginBottom:18}},
         AGES.map(function(a){
           return h('button',{key:a.id,className:'chip'+(selAge===a.id?' chip-age-on':''),
-            onClick:function(){setSelAge(a.id);setSelSit(-1);setSelWry(-1);genSitWorry(genre,a.id);}},a.label);
+            onClick:function(){
+              setSelAge(a.id);
+              genSituations(genre, initTopic, a.id);
+            }},a.label);
         })
       ),
-      swLoad?h('p',{className:'ld-txt'},h('span',{className:'spin'},'⚙️'),' AIが状況・悩みを生成中...'):
-      h('div',{className:'sw-grid'},
-        h('div',null,
-          h('p',{className:'sw-lbl'},'👤 読者の状況（任意）'),
+
+      selAge?h('div',{style:{marginBottom: 18}},
+        h('p',{className:'sw-lbl'},'③ '+ (AGES.find(function(a){return a.id===selAge;})||{}).label +'読者の具体的な「状況」を選択'),
+        sitLoad?h('p',{className:'ld-txt',style:{padding:8}},h('span',{className:'spin'},'⚙️'),' AIが状況を調査中...'):
+        h('div',{className:'sw-grid'},
           sugSit.map(function(s,i){
             return h('div',{key:i,className:'sw-item'+(selSit===i?' sw-sit':''),
-              onClick:function(){var n=selSit===i?-1:i;setSelSit(n);setInitSit(n>=0?sugSit[n]:'');}},
-              (selSit===i?'✓ ':'')+s);
-          })
-        ),
-        h('div',null,
-          h('p',{className:'sw-lbl'},'💭 読者の悩み（任意）'),
-          sugWry.map(function(w,i){
-            return h('div',{key:i,className:'sw-item'+(selWry===i?' sw-wry':''),
-              onClick:function(){var n=selWry===i?-1:i;setSelWry(n);setInitWry(n>=0?sugWry[n]:'');}},
-              (selWry===i?'✓ ':'')+w);
+              onClick:function(){
+                setSelSit(i);
+                setInitSit(sugSit[i]);
+                genWorries(genre, initTopic, selAge, sugSit[i]);
+              }}, (selSit===i?'✓ ':'')+s);
           })
         )
-      ),
-      h('button',{className:'btn-go',onClick:function(){
-          var sit=selSit>=0?sugSit[selSit]:'';
-          var wry=selWry>=0?sugWry[selWry]:'';
-          setNoteProps(function(p){return {theme:p.theme,topic:p.topic,age:selAge,sit:sit,wry:wry};});
+      ):null,
+
+      selSit>=0?h('div',{style:{marginBottom: 18}},
+        h('p',{className:'sw-lbl'},'④ その状況から生まれる深い「悩み」を選択'),
+        wryLoad?h('p',{className:'ld-txt',style:{padding:8}},h('span',{className:'spin'},'⚙️'),' AIが悩みを深掘り中...'):
+        h('div',{className:'sw-grid'},
+          sugWry.map(function(w,i){
+            return h('div',{key:i,className:'sw-item'+(selWry===i?' sw-wry':''),
+              onClick:function(){
+                setSelWry(i);
+                setInitWry(sugWry[i]);
+              }}, (selWry===i?'✓ ':'')+w);
+          })
+        )
+      ):null,
+
+      h('button',{className:'btn-go', disabled:selWry<0, onClick:function(){
+          setNoteProps(function(p){return {theme:p.theme, topic:p.topic, age:selAge, sit:sugSit[selSit], wry:sugWry[selWry]};});
           setScreen('note');
         }},'📝 note記事を生成する →')
     ):null,
+    
     // ツールカード
-    h('div',{className:'z1 tool-grid'},
-      TOOLS.map(function(t){
-        return h('div',{key:t.id,className:'tool-card',onClick:function(){setScreen(t.id);}},
-          t.badge?h('div',{className:'tc-badge'},t.badge):null,
-          h('div',{className:'tc-icon'},t.icon),
-          h('div',{className:'tc-name'},t.name),
-          h('div',{className:'tc-desc'},t.desc)
-        );
-      })
-    ),
+    h('div',{className:'z1 tool-grid'}, TOOLS.map(function(t){ return h('div',{key:t.id,className:'tool-card',onClick:function(){setScreen(t.id);}}, t.badge?h('div',{className:'tc-badge'},t.badge):null, h('div',{className:'tc-icon'},t.icon), h('div',{className:'tc-name'},t.name), h('div',{className:'tc-desc'},t.desc)); })),
+    
     // お問い合わせ
     h('div',{className:'z1 cbox'},
-      h('p',{style:{fontSize:14,fontWeight:800,marginBottom:4}},'📬 お問い合わせ'),
-      h('p',{style:{fontSize:13,color:'rgba(255,255,255,.4)',marginBottom:14}},'ご質問・ご要望・不具合報告などはこちらからどうぞ'),
+      h('p',{style:{fontSize:14,fontWeight:800,marginBottom:4}},'📬 お問い合わせ'), h('p',{style:{fontSize:13,color:'rgba(255,255,255,.4)',marginBottom:14}},'ご質問・ご要望・不具合報告などはこちらからどうぞ'),
       sent?h('div',{style:{textAlign:'center',padding:'16px',color:'#4ade80',fontSize:14,fontWeight:700}},'✅ お問い合わせを受け付けました。ありがとうございます。'):
-      h('div',null,
-        h('input',{type:'text',id:'cn',className:'cinp',placeholder:'お名前'}),
-        h('input',{type:'email',id:'ce',className:'cinp',placeholder:'メールアドレス'}),
-        h('textarea',{id:'cm',className:'cinp cta',placeholder:'お問い合わせ内容を入力してください...'}),
-        h('button',{className:'btn-send',onClick:function(){
-          var name=document.getElementById('cn').value.trim();
-          var email=document.getElementById('ce').value.trim();
-          var msg=document.getElementById('cm').value.trim();
-          if(!name||!email||!msg){alert('すべての項目を入力してください。');return;}
-          if(email.indexOf('@')<0){alert('正しいメールアドレスを入力してください。');return;}
-          window.open('mailto:?subject='+encodeURIComponent('[note AI Tools] お問い合わせ from '+name)+'&body='+encodeURIComponent('お名前: '+name+'\nメール: '+email+'\n\n'+msg));
-          setSent(true);
-        }},'送信する')
-      )
+      h('div',null, h('input',{type:'text',id:'cn',className:'cinp',placeholder:'お名前'}), h('input',{type:'email',id:'ce',className:'cinp',placeholder:'メールアドレス'}), h('textarea',{id:'cm',className:'cinp cta',placeholder:'お問い合わせ内容を入力してください...'}), h('button',{className:'btn-send',onClick:function(){ var name=document.getElementById('cn').value.trim(); var email=document.getElementById('ce').value.trim(); var msg=document.getElementById('cm').value.trim(); if(!name||!email||!msg){alert('すべての項目を入力してください。');return;} if(email.indexOf('@')<0){alert('正しいメールアドレスを入力してください。');return;} window.open('mailto:?subject='+encodeURIComponent('[note AI Tools] お問い合わせ from '+name)+'&body='+encodeURIComponent('お名前: '+name+'\nメール: '+email+'\n\n'+msg)); setSent(true); }},'送信する'))
     ),
     h('p',{className:'z1',style:{fontSize:11,color:'rgba(255,255,255,.18)',marginTop:4,marginBottom:20}},'APIキーはブラウザに安全に保存。サーバーには送信されません。')
   );
