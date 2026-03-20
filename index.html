@@ -10,551 +10,349 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:16px;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;background:#0d0d1a;color:#fff;min-height:100vh;overflow-x:hidden;line-height:1.6}
-button,input,textarea,select{font-family:inherit;font-size:16px}
+button,input,textarea,select{font-family:inherit;font-size:15px;color:#fff}
 button{-webkit-tap-highlight-color:transparent;cursor:pointer}
-a{-webkit-tap-highlight-color:transparent;text-decoration:none}
-.pg{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 16px 60px;position:relative;overflow-x:hidden;background:linear-gradient(135deg,#0d0d1a,#1a0a2e 50%,#0a1628)}
+a{text-decoration:none;color:inherit}
+.pg{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:30px 16px 80px;position:relative;background:linear-gradient(135deg,#0d0d1a,#1a0a2e 50%,#0a1628)}
 .grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03)1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
-.z1{position:relative;z-index:1;width:100%;max-width:920px}
-.main-ttl{font-size:clamp(36px,8vw,64px);font-weight:900;line-height:1.1;text-align:center;margin-bottom:12px}
+.z1{position:relative;z-index:1;width:100%;max-width:880px}
+.main-ttl{font-size:clamp(32px,8vw,56px);font-weight:900;line-height:1.1;text-align:center;margin-bottom:10px}
 .main-ttl span{color:#38bdf8}
-.main-sub{font-size:14px;color:rgba(255,255,255,.5);text-align:center;line-height:1.8;margin-bottom:32px}
-.cat-ttl{font-size:16px;font-weight:800;margin-bottom:14px;color:#38bdf8;border-bottom:2px solid rgba(56,189,248,.2);padding-bottom:6px;text-align:left}
-.tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:36px}
-.tool-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:18px 14px;cursor:pointer;transition:all .2s;text-align:left;display:flex;flex-direction:column}
-.tool-card:hover{background:rgba(255,255,255,.08);border-color:rgba(56,189,248,.4);transform:translateY(-2px)}
-.tc-badge{display:inline-block;background:rgba(233,69,96,.2);border:1px solid rgba(233,69,96,.4);border-radius:100px;padding:2px 8px;font-size:9px;color:#e94560;font-weight:800;letter-spacing:.1em;margin-bottom:7px;align-self:flex-start}
-.tc-badge-new{background:rgba(56,189,248,.2);border-color:rgba(56,189,248,.4);color:#38bdf8}
-.tc-icon{font-size:24px;margin-bottom:6px}
-.tc-name{font-size:14px;font-weight:800;color:#fff;margin-bottom:4px}
-.tc-desc{font-size:11px;color:rgba(255,255,255,.4);line-height:1.5}
-.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:15px 16px;margin-bottom:11px}
-.lbl{color:rgba(255,255,255,.55);font-size:11px;font-weight:700;letter-spacing:.1em;display:block;margin-bottom:9px}
-.inp{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;font-size:15px;outline:none;padding:11px 13px;font-family:inherit;transition:all .2s}
-.inp:focus{border-color:rgba(56,189,248,.5);background:rgba(255,255,255,.08)}
-.pills{display:flex;flex-wrap:wrap;gap:6px}
-.pill{padding:6px 12px;border-radius:50px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s}
-.pill:hover{background:rgba(255,255,255,.1)}
-.pill-on{background:rgba(56,189,248,.2) !important;border-color:rgba(56,189,248,.5) !important;color:#fff !important}
-.err{background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.3);border-radius:9px;padding:10px 12px;font-size:13px;color:#f87171;margin-bottom:9px;white-space:pre-wrap;line-height:1.5}
-.btn-primary{padding:11px 24px;border-radius:9px;background:linear-gradient(135deg,#0ea5e9,#2563eb);border:none;color:#fff;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(14,165,233,.3);transition:all .2s}
-.btn-primary:active{transform:scale(0.96)}
+.main-sub{font-size:13px;color:rgba(255,255,255,.5);text-align:center;margin-bottom:24px}
+.cat-ttl{font-size:15px;font-weight:800;margin-bottom:12px;color:#38bdf8;border-bottom:2px solid rgba(56,189,248,.2);padding-bottom:6px}
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:30px}
+.tool-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column}
+.tool-card:hover{background:rgba(255,255,255,.06);border-color:rgba(56,189,248,.4);transform:translateY(-2px)}
+.tc-icon{font-size:22px;margin-bottom:6px}
+.tc-name{font-size:14px;font-weight:800;margin-bottom:4px}
+.tc-desc{font-size:11px;color:rgba(255,255,255,.4);line-height:1.4}
+.tc-badge{background:rgba(233,69,96,.2);border:1px solid rgba(233,69,96,.4);border-radius:50px;padding:2px 8px;font-size:9px;color:#e94560;font-weight:800;align-self:flex-start;margin-bottom:6px}
+.tc-badge.new{background:rgba(56,189,248,.2);border-color:rgba(56,189,248,.4);color:#38bdf8}
+.card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px;margin-bottom:12px}
+.lbl{font-size:11px;font-weight:700;color:rgba(255,255,255,.6);display:block;margin-bottom:6px}
+.inp{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;transition:all .2s;outline:none}
+.inp:focus{border-color:#38bdf8;background:rgba(255,255,255,.08)}
+.btn-primary{background:linear-gradient(135deg,#0ea5e9,#2563eb);border:none;border-radius:8px;padding:12px 20px;font-weight:800;box-shadow:0 4px 12px rgba(14,165,233,.3);transition:all .2s;width:100%}
+.btn-primary:active{transform:scale(0.98)}
 .btn-primary:disabled{opacity:0.5;cursor:not-allowed}
-.btn-rl{display:flex;align-items:center;gap:5px;padding:9px 16px;border-radius:9px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.8);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;justify-content:center}
-.btn-rl:hover{background:rgba(255,255,255,.12)}
-.btn-rl:active{transform:scale(0.96)}
-.genbtn{width:100%;border-radius:11px;border:none;cursor:pointer;position:relative;overflow:hidden;background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff;margin-bottom:15px;box-shadow:0 4px 15px rgba(14,165,233,.3);transition:all 0.2s}
-.genbtn:active{transform:scale(0.98)}
-.genbtn:disabled{opacity:0.5;cursor:not-allowed}
-.gen-in{padding:16px 20px;display:flex;flex-direction:column;align-items:center;gap:5px}
-.app{min-height:100vh;background:linear-gradient(135deg,#0d0d1a,#1a0a2e 50%,#0a1628)}
-.app-hd{background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.07);padding:11px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;backdrop-filter:blur(10px)}
-.app-hd-l{display:flex;align-items:center;gap:9px}
-.app-ttl{font-size:15px;font-weight:900;color:#fff;margin:0}
-.app-sub{font-size:11px;color:#38bdf8;margin:2px 0 0;font-weight:700}
-.app-body{max-width:760px;margin:0 auto;padding:16px 12px}
-.tabs{background:rgba(255,255,255,.02);border-bottom:1px solid rgba(255,255,255,.06);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.tab{padding:12px 15px;background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,.35);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap; flex-shrink:0}
-.tab-on{color:#fff !important;border-bottom-color:#38bdf8 !important}
-.tab:disabled{opacity:.25;cursor:not-allowed}
-.back-btn{padding:7px 12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:7px;color:rgba(255,255,255,.6);font-size:13px;cursor:pointer}
-.post-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;overflow:hidden;margin-bottom:12px}
-.post-hd{display:flex;justify-content:space-between;align-items:center;padding:10px 13px;border-bottom:1px solid rgba(255,255,255,.06)}
-.post-body{padding:12px 14px;max-height:400px;overflow-y:auto;font-size:13.5px;color:rgba(255,255,255,.85);white-space:pre-wrap;line-height:1.7}
-.cpbtn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
-.ai-launcher-link { display:flex; align-items:center; justify-content:center; gap:6px; flex:1; padding:10px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:800; color:#fff; background:rgba(255,255,255,.1); transition:all 0.2s; white-space:nowrap;}
-.ai-launcher-link:hover { background:rgba(255,255,255,.2); transform:translateY(-2px);}
-.flex-row-gap { display:flex; gap:10px; flex-wrap:wrap; }
-.flex-col { flex:1; min-width:200px; }
-
-/* 認証・管理者画面 */
-.auth-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:32px 24px;width:100%;max-width:400px;text-align:center;backdrop-filter:blur(10px)}
-.auth-box h2{font-size:22px;font-weight:900;margin-bottom:8px;color:#fff}
-.auth-box p{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:24px}
-.auth-tabs{display:flex;gap:10px;margin-bottom:20px;background:rgba(0,0,0,.3);padding:4px;border-radius:10px}
-.auth-tab{flex:1;padding:8px;border-radius:8px;border:none;background:transparent;color:rgba(255,255,255,.5);font-weight:700;cursor:pointer;transition:all .2s}
-.auth-tab-on{background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff}
-.admin-table{width:100%;border-collapse:collapse;margin-top:20px;font-size:13px}
-.admin-table th{background:rgba(255,255,255,.05);padding:12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6); font-weight:700}
-.admin-table td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05);word-break:break-all}
-.kpi-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:16px; flex:1; text-align:center; min-width:120px}
-.kpi-num { font-size:28px; font-weight:900; color:#fff; margin:4px 0 0; }
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px;}
-.modal{background:#1a1a2e;border:1px solid rgba(255,255,255,.12);border-radius:15px;padding:24px 20px;width:100%;max-width:560px;max-height:85vh;overflow-y:auto; line-height:1.7}
-
-@media(max-width:560px){
-  .main-ttl{font-size:32px}
-  .tool-grid{grid-template-columns:1fr}
-  .app-ttl{font-size:13px}
-  .admin-table th, .admin-table td { padding:8px 4px; font-size:11px; }
-}
+.btn-sub{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;transition:all .2s}
+.btn-sub:hover{background:rgba(255,255,255,.1)}
+.flex-row{display:flex;gap:10px;flex-wrap:wrap}
+.flex-1{flex:1;min-width:200px}
+.err{background:rgba(2ef,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;padding:10px;border-radius:8px;font-size:12px;margin-bottom:12px}
+.tut-panel{background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.2);border-radius:10px;padding:12px;margin-bottom:16px}
+.tut-title{font-size:12px;font-weight:800;color:#38bdf8;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.tut-body{font-size:12px;color:rgba(255,255,255,.7);line-height:1.6;white-space:pre-wrap}
+.app-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:12px}
+.auth-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;width:100%;max-width:400px;backdrop-filter:blur(10px)}
+.admin-table{width:100%;border-collapse:collapse;font-size:12px}
+.admin-table th,.admin-table td{padding:10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#0d0d1a;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:20px;width:100%;max-width:600px;max-height:85vh;overflow-y:auto}
+.badge-limit{background:#f59e0b;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:800;margin-left:6px}
+.res-box{background:#111827;border:1px solid #334155;border-radius:8px;padding:12px;font-size:13px;white-space:pre-wrap;color:#e2e8f0;margin-bottom:10px}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script>
-// ===================================================
-// JSXなし・純粋なReact.createElement で記述 (v22: Web Builder搭載 究極SaaS)
-// ===================================================
 (function(){
 'use strict';
 var h = React.createElement;
-var useState = React.useState;
-var useEffect = React.useEffect;
+var useState = React.useState, useEffect = React.useEffect;
 
-// ── データベースとシステム変数 ──
-var DB_KEY_USERS = 'AICP_Users_v4';
-var DB_KEY_ADMIN = 'AICP_Admin_v4';
-var DB_KEY_CURRENT = 'AICP_Session_v4';
-var DRAFT_STORE = 'AICP_Draft_v4';
+// --- DB & Config ---
+var DB_KEY = 'AICP_v23_DB';
+function getDB() {
+  var d = localStorage.getItem(DB_KEY);
+  if(d) return JSON.parse(d);
+  return {
+    admin: { p: 'admin123' },
+    users: {}, // { username: { status, sns, usage: {date, count}, perms: {toolId: true}, brand: {}, projects: { id: {name, data} }, curProj: id } }
+  };
+}
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+var SESS_KEY = 'AICP_v23_Sess';
 
-function loadDraft(){ try{return JSON.parse(localStorage.getItem(DRAFT_STORE));}catch(e){return null;} }
-function saveDraft(data){ try{localStorage.setItem(DRAFT_STORE, JSON.stringify(data));}catch(e){} }
-function clearDraft(){ try{localStorage.removeItem(DRAFT_STORE);}catch(e){} }
+var DAILY_LIMIT = 3;
 
-// ── 設定データ群 ──
-var THEMES = [ {id:'money',label:'💰 お金・節約'}, {id:'health',label:'💪 健康・ダイエット'}, {id:'career',label:'🚀 キャリア・副業'}, {id:'mindset',label:'🧠 マインドセット'}, {id:'relationship',label:'❤️ 人間関係・恋愛'}, {id:'productivity',label:'⚡ 生産性・習慣'}, {id:'parenting',label:'👶 育児・子育て'}, {id:'other',label:'📝 その他'} ];
-var TONES = [ {id:'story',label:'📖 体験談・ストーリー'}, {id:'howto',label:'📋 ハウツー・解説'}, {id:'secret',label:'🔥 秘密・裏知識'}, {id:'contrast',label:'⚡ 比較・対比'}, {id:'warm',label:'💓 共感・寄り添い'}, {id:'custom',label:'✏️ カスタム'} ];
-var AGES = [ {id:'10s',label:'10代'},{id:'20s',label:'20代'},{id:'30s',label:'30代'}, {id:'40s',label:'40代'},{id:'50s',label:'50代以上'},{id:'all',label:'全年齢'} ];
-var SNS_PLATFORMS = [ {id:'both', label:'📱 X(単発) ＆ Threads (同時)'}, {id:'x_thread', label:'🧵 X (ツリー投稿)'}, {id:'x_single', label:'🐦 X (単発ポスト)'}, {id:'threads', label:'🌀 Threads (対話型)'} ];
-var SNS_TONES = [ {id:'value', label:'💡 ノウハウ共有 (有益・保存狙い)'}, {id:'story', label:'📖 ストーリー (共感・バズ狙い)'}, {id:'promo', label:'📣 直接宣伝 (クリック誘導優先)'} ];
-var IMG_TOOLS = [ {id:'chatgpt', label:'🟢 ChatGPT (DALL-E 3)'}, {id:'gemini', label:'🔵 Gemini (Nano Banana 2)'}, {id:'flux', label:'⚫ Grok / Flux.1'}, {id:'midjourney', label:'🎨 Midjourney (v6)'}, {id:'stablediffusion', label:'⚙️ Stable Diffusion 3'} ];
-var IMG_ASPECTS = [ {id:'16:9', label:'📺 16:9 (サムネイル)'}, {id:'1:1', label:'⬛ 1:1 (正方形)'}, {id:'3:1', label:'▭ 3:1 (ヘッダー)'}, {id:'9:16', label:'📱 9:16 (縦長)'} ];
-var IMG_LIGHTING = [ {id:'auto', label:'🤖 おまかせ'}, {id:'cinematic', label:'🎬 シネマティック'}, {id:'natural', label:'☀️ 自然光'}, {id:'neon', label:'🌃 サイバーパンク'}, {id:'studio', label:'📸 スタジオ照明'} ];
-var IMG_ANGLE = [ {id:'auto', label:'🤖 おまかせ'}, {id:'closeup', label:'👁️ クローズアップ'}, {id:'wide', label:'🌍 広角'}, {id:'bird', label:'🦅 俯瞰'}, {id:'low', label:'🐜 ローアングル'} ];
-var BONUS_THEMES = ['副業・お金','ダイエット・健康','節約・お金','育児・子育て','マインドセット','ビジネス・キャリア','人間関係','ライフスタイル','その他'];
-var BONUS_AGES   = ['10代','20代前半','20代後半','30代前半','30代後半','40代','50代以上','全年齢'];
-
-var FB = {
-  themes:{ money:['月5万円副業を3ヶ月で達成した完全ロードマップ','節約で年間100万円を貯めた実践記録','副業収入を2倍にした5つの秘訣','貯金ゼロから始める資産形成の教科書','お金の不安を消す家計管理の完全ガイド'], health:['1ヶ月-8kg達成したダイエット完全ガイド','リバウンドしない食事改善の科学的アプローチ','忙しい人のための10分筋トレ習慣術','在宅ワークで運動不足を解消する方法','年齢に負けない体を手に入れる習慣術'], career:['未経験からWebエンジニアに転職した全記録','副業で月収10万を稼ぐフリーランス入門','30代からでも遅くない市場価値の高め方','スキルゼロから高単価案件を取る戦略','転職面接で落ちない自己PR作成の極意'], mindset:['先延ばし癖を完全克服した行動心理学','自己肯定感を高める思考習慣の作り方','やる気が続く目標設定と達成習慣の法則','不安を力に変えるマインドセット完全版','挫折しない習慣化の科学的アプローチ'], relationship:['内向型男子の恋愛戦略','職場の人間関係を劇的に改善した会話術','好感度が上がる話し方と聞き方の極意','人間関係のストレスをゼロにする境界線術','信頼を勝ち取るコミュニケーション法則'], productivity:['タスク管理で残業ゼロになった仕事術','集中力を3倍にする環境づくりと習慣','スマホ依存を断ち切って生産性を上げた方法','週4日勤務を実現した仕事の効率化術','毎日2時間を生み出す時間管理の科学'], parenting:['イヤイヤ期を乗り越えた育児の実践メソッド','子どもの自己肯定感を育てる声かけ完全版','褒め方ひとつで子どもの才能が開花する','スマホ育児から脱却した親子時間の作り方','受験で後悔しない小学生からの学習習慣'], other:['人生が変わった本10冊の読み方と実践法','断捨離で部屋も心もスッキリした体験記','ストレスフリーな生活を手に入れた方法','副業から独立した自由な働き方の全記録','自分らしく生きるためのキャリア設計法'] },
-  sit:{ money:['{age}からの副業を始めたいが何から手をつけるか分からない','毎月赤字で貯金がまったくできていない{age}の現状'], health:['ダイエットを何度も挫折してきた{age}の体質','デスクワーク中心で体を動かす機会が極端に減った'], career:['今の仕事に将来性がなく、{age}からの転職を考えている','副業を始めたいが、自分に売れるスキルがない'], mindset:['やる気が続かず、目標を立てても達成できない{age}','ネガティブ思考が止まらず、毎日がしんどい'], relationship:['職場のコミュニケーションが苦手で孤立している','{age}になり、休日を一緒に過ごす友人が減った'], productivity:['仕事量が多くて残業が当たり前になっている{age}','集中できず、ついスマホやSNSを見てしまう'], parenting:['子供のイヤイヤ期や反抗期で毎日ストレスが溜まる','仕事と育児の両立で、自分の時間が全くない{age}'], other:['毎日同じことの繰り返しで、人生に変化がない{age}','何かを変えたいのに、最初の一歩が踏み出せない'] },
-  wry:{ money:['副業で詐欺に引っかかりそうで怖く、一歩踏み出せない','収入を上げたいのに、具体的なロードマップが分からない'], health:['運動を続けられない三日坊主の自分が嫌になる','健康的に痩せたいが、ネットの情報が多すぎて何が正解か分からない'], career:['{age}での転職活動をどこから始めればいいか全く分からない','副業で稼げるか自信がなく、時間だけを無駄にしそう'], mindset:['頭では「やらなきゃ」と分かっているのに体が動かない','失敗して他人に笑われるのが怖くて挑戦できない'], relationship:['会話が続かず、「つまらない人」と思われるのが怖い','好きな人や仲良くなりたい人にどうアプローチすればいいか分からない'], productivity:['集中力が続かず、ダラダラと作業を伸ばしてしまう','スマホの通知が気になって、深い思考作業に入り込めない'], parenting:['子供の気持ちが理解できず、どう寄り添えばいいか分からない','育児書通りにできず、親としての自信を失っている'], other:['行動しようとしても続かず、自己嫌悪になるパターンを繰り返す','自分の強みや好きなことが分からず、何者にもなれない焦りがある'] }
-};
-
-var TOOLS_CATEGORIES = [
-  { name: '💻 Webアプリ・ツール開発', tools: ['webdev'] },
-  { name: '📝 コンテンツ作成 ＆ マネタイズ', tools: ['note', 'lp', 'backend', 'affiliate', 'bonus'] },
-  { name: '🚀 SNS集客 ＆ アカウント設計', tools: ['profile', 'sns', 'video', 'image'] },
-  { name: '💬 顧客対応 ＆ ファン化', tools: ['line', 'reply', 'interview', 'journey'] }
+// --- Tools Meta Data (The Magic Engine) ---
+var T_CATS = [
+  { name: '📝 コンテンツ作成 ＆ リサーチ', tools: ['research', 'note', 'lp', 'backend'] },
+  { name: '🚀 集客 ＆ SNS展開', tools: ['sns', 'video', 'profile'] },
+  { name: '💬 ファン化 ＆ 自動化', tools: ['magnet', 'line', 'funnel', 'interview'] },
+  { name: '💻 開発 ＆ その他', tools: ['webdev'] }
 ];
 
-var TOOLS_INFO = {
-  webdev: {id:'webdev', icon:'💻',name:'爆速Webアプリ開発', desc:'Claude×Geminiでサイトを自動生成', badge:'神機能'},
-  note: {id:'note', icon:'📝',name:'note記事生成', desc:'高品質な記事プロンプトを作成', badge:'必須'},
-  lp: {id:'lp', icon:'📄',name:'爆売れLPジェネレータ', desc:'高単価を売るためのセールスレター', badge:''},
-  affiliate: {id:'affiliate', icon:'🔗',name:'アフィリエイト生成', desc:'爆売れする商品レビュー＆SNS', badge:''},
-  backend: {id:'backend', icon:'💎',name:'高単価バックエンド', desc:'noteから繋げる30万円の商材企画', badge:''},
-  bonus: {id:'bonus', icon:'🎁',name:'購入者特典生成', desc:'記事から特典アイデアを作成', badge:''},
-  profile: {id:'profile', icon:'👤',name:'アカウント設計', desc:'バズるプロフ・名前を自動生成', badge:''},
-  sns: {id:'sns', icon:'📱',name:'SNS集客ポスト生成', desc:'X/Threadsでバズる投稿を作成', badge:'連動'},
-  video: {id:'video', icon:'🎥',name:'ショート動画台本', desc:'無料動画AI用台本を作成', badge:''},
-  image: {id:'image', icon:'🖼️',name:'画像プロンプト', desc:'画像生成AI用呪文を作成', badge:''},
-  line: {id:'line', icon:'💌',name:'LINEステップ生成', desc:'自動で売れる5日間の教育シナリオ', badge:''},
-  reply: {id:'reply', icon:'💬',name:'LINE/DM 神返信', desc:'読者の心に刺さる完璧なセールス返信', badge:''},
-  interview: {id:'interview', icon:'🗣️',name:'AIインタビュー', desc:'自分だけのオリジナル体験談を抽出', badge:''},
-  journey: {id:'journey', icon:'🗺️',name:'カスタマージャーニー', desc:'認知〜購入までの戦略マップを作成', badge:''}
-};
-
-// ── ユーティリティ関数 ──
-function shuffleArray(array) { var a = array.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
-function parseJSON(text){ var clean=text.replace(/```(?:json)?\n?/gi,'').replace(/```/g,'').trim(); var m=clean.match(/\{[\s\S]*\}/); if(m){ try{return JSON.parse(m[0]);}catch(e){} } try { return JSON.parse(clean); } catch(e) { return null; } }
-function doCopy(text, st, setSt, k){ if(navigator.clipboard && navigator.clipboard.writeText){navigator.clipboard.writeText(text).catch(function(){});} var n=Object.assign({},st);n[k]=true;setSt(n); setTimeout(function(){var n2=Object.assign({},st);n2[k]=false;setSt(n2);},2000); }
-function formatDate(ts) { var d = new Date(ts); return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+('0'+d.getMinutes()).slice(-2); }
-
-// ── コンポーネント用ヘルパー ──
-function Card(props) { return h('div', {className:'card', style:props.style}, h('span', {className:'lbl'}, props.label), props.children); }
-function SelectField(props) { return h(Card, {label:props.label, style:props.style}, h('select', {className:'inp', value:props.value, onChange:function(e){props.onChange(e.target.value);}}, props.options.map(function(o){return h('option',{key:o.id||o, value:o.id||o},o.label||o);}) )); }
-function InputField(props) { return h(Card, {label:props.label, style:props.style}, h('input', {className:'inp', type:'text', value:props.value, onChange:function(e){props.onChange(e.target.value);}, placeholder:props.placeholder}) ); }
-function TextAreaField(props) { return h(Card, {label:props.label, style:props.style}, h('textarea', {className:'inp', style:{minHeight:props.h||100, resize:'vertical'}, value:props.value, onChange:function(e){props.onChange(e.target.value);}, placeholder:props.placeholder}), props.hint?h('p',{style:{fontSize:11,color:'rgba(255,255,255,.5)',marginTop:6}},props.hint):null ); }
-function PillsField(props) { return h(Card, {label:props.label}, h('div', {className:'pills'}, props.options.map(function(o){ return h('button', {key:o.id, className:'pill'+(props.value===o.id?' pill-on':''), onClick:function(){props.onChange(o.id);}}, o.label); })) ); }
-
-function Header(p) { return h('div',{className:'app-hd'}, h('div',{className:'app-hd-l'}, h('button',{className:'back-btn',onClick:p.onBack},'← 戻る'), h('div',null, h('div',{style:{display:'flex',alignItems:'center',gap:6}}, h('h1',{className:'app-ttl'},p.title)), h('p',{className:'app-sub'},p.sub||'🌐 Web版AIで完全無料・高速作成') ))); }
-function WebLinks(p) {
-  return h('div', {style:{padding:'14px', background:'rgba(255,255,255,.03)', border:'1px solid rgba(56,189,248,.4)', borderRadius:'10px', marginBottom:16}},
-    h('p',{style:{fontSize:12, fontWeight:700, color:'#38bdf8', marginBottom:8}}, '以下のリンクからWeb版AIを開いてプロンプトを送信してください'),
-    h('div',{style:{display:'flex', gap:'8px', flexWrap:'wrap', marginBottom:12}},
-      h('a', {href:'https://www.perplexity.ai/', target:'_blank', className:'ai-launcher-link'}, '🔍 Perplexity'),
-      h('a', {href:'https://chatgpt.com/', target:'_blank', className:'ai-launcher-link'}, '🟢 ChatGPT'),
-      h('a', {href:'https://claude.ai/', target:'_blank', className:'ai-launcher-link'}, '🟠 Claude')
-    ),
-    p.msg === false ? null : h('p',{style:{fontSize:11, color:'rgba(255,255,255,.5)', lineHeight:1.5}}, '回答が完了したら、出力された文章をすべてコピーして隣の「📥 AI回答読込」に貼り付けてください。')
-  );
-}
-function ManualModal(props){
-  return h('div',{className:'modal-bg',onClick:props.onClose}, h('div',{className:'modal',onClick:function(e){e.stopPropagation();}}, h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16, borderBottom:'1px solid rgba(255,255,255,.1)', paddingBottom:10}}, h('span',{style:{fontWeight:900,fontSize:16, color:'#38bdf8'}},'📖 はじめての方へ (完全無料の仕組み)'), h('button',{onClick:props.onClose,style:{background:'none',border:'none',color:'rgba(255,255,255,.5)',fontSize:24,cursor:'pointer',lineHeight:1}},'×') ), h('div', {style:{fontSize:13, color:'rgba(255,255,255,.8)', lineHeight:1.7}}, h('p', {style:{marginBottom:12}}, 'このツールは、APIの課金や制限に縛られず、', h('strong', {style:{color:'#4ade80'}},'「永久に無料」'), 'で最新AIを操作するプロンプトジェネレーターです。'), h('div', {style:{background:'rgba(255,255,255,.05)', padding:'12px', borderRadius:8, marginBottom:12}}, h('p', {style:{fontWeight:800, color:'#fbbf24', marginBottom:6}}, '🚀 基本的な使い方 (3ステップ)'), h('ol', {style:{paddingLeft:20, margin:0}}, h('li', {style:{marginBottom:4}}, '【⚙️ 条件設定】タブで設定を決め、プロンプトをコピー。'), h('li', {style:{marginBottom:4}}, 'ChatGPT等を開き、コピーした文章をそのまま送信。'), h('li', {style:{marginBottom:0}}, 'AIの回答をすべてコピーし、【📥 AI回答読込】に貼り付け！') ) ), h('p', {style:{marginBottom:12}}, 'これだけで、自動装飾や分析、SNS展開などがブラウザ上で完結します。') ), h('button', {onClick:props.onClose, className:'btn-primary', style:{width:'100%', marginTop:16}}, '理解してツールを使う') ));
-}
-
-// ── プロンプトビルダ群 ──
-var P = {
-  note: function(o) {
-    var searchCmd = '【重要: リサーチ指示】\nあなたはWeb検索機能を持っています。執筆前に「'+(o.topic||o.theme)+'」に関連する上位記事をリサーチし、競合にない独自の切り口を盛り込んでください。\n\n';
-    var bonusCmd = o.hasBonus ? '【重要: 特典の記載】\n有料パートの最後に、購入者限定特典があることと、その受け取り方法（公式LINE等）を魅力的に記載してください。\n\n' : '';
-    return 'あなたは売上1000万超のトップクリエイターです。以下の条件で飛ぶように売れるnote有料記事を作成してください。\n\n'+searchCmd+'## ターゲット読者\n- 年代: '+o.age+'\n- 状況: '+(o.situation||'未指定')+'\n- 悩み: '+(o.worry||'未指定')+'\n\n## 記事設定\n- テーマ: '+(o.topic||'未指定')+'\n- 文体: '+o.tone+'\n\n'+bonusCmd+'## 出力形式（以下のMarkdownフォーマットに厳密に従い、前置きは一切書かないでください）\n---TITLES---\n1. [タイトル]...\n---TAGS---\n#タグ...\n---PROMO---\n(SNS用)\n---CTA---\n(誘導文)\n---FREE_START---\n(無料本文。読者の痛みに共感し解決策のWhatを示す)\n---FREE_END---\n---PAID_START---\n(有料本文。具体的なHow、注意点、Q&A、アクションプランを記述)\n---PAID_END---';
+var TOOLS = {
+  note: { icon:'📝', name:'note記事生成', badge:'', desc:'売れる記事構成と本文を作成', 
+    tut:'【目的】読者の悩みに寄り添い、解決策を提示する有料記事を作成します。\n【コツ】ターゲットの悩みを具体的に書くほど精度の高い記事になります。',
+    fields: [ {id:'t1', t:'input', l:'テーマ(自由入力)'}, {id:'t2', t:'input', l:'ターゲット層・悩み'}, {id:'t3', t:'input', l:'価格・文字数目安'}, {id:'chk', t:'check', l:'購入者特典の案内を含める'} ],
+    build: function(v,b) { return b+'「'+v.t1+'」について「'+v.t2+'」向けにnote有料記事を作成。\n価格/文字数:'+v.t3+'\n'+(v.chk?'最後に特典案内を含める\n':'')+'【厳守】前置きなしで以下のMarkdownのみ出力。\n---TITLES---\n1.タイトル案...\n---FREE_START---\n無料本文...\n---FREE_END---\n---PAID_START---\n有料本文...\n---PAID_END---'; }
   },
-  sns: function(t, p, to, m) {
-    var mCmd = m ? '【超重要: モデリング】以下のバズ投稿の「構成・リズム・熱量」を完全にトレースし、型を憑依させてください。\n◆参考バズ投稿:\n' + m + '\n\n' : '';
-    var jFmt = p === 'both' ? '{"posts_x": ["X用"], "posts_threads": ["Threads用"], "tags": ["#タグ..."]}' : '{"posts": ["ポスト本文..."], "tags": ["#タグ..."]}';
-    return 'あなたはSNSマーケティングのプロです。以下の記事を元に'+p+'形式で'+to+'目的の投稿を作成してください。\n\n' + mCmd + '【ルール】\n- 最後にnote記事へのリンク導線を入れる。\n- 前置きなしで以下のJSONのみ出力。\n' + jFmt + '\n\n【元記事】\n' + t.slice(0,3000);
+  research: { icon:'⚔️', name:'競合リサーチ', badge:'神機能', desc:'ライバルの弱点とブルーオーシャンを発見', 
+    tut:'【目的】売れているライバルの教材から「欠けている要素」を見つけ、あなたの強みを活かした商品コンセプトを作ります。\n【使い方】ライバルのセールス文や目次をコピペしてください。',
+    fields: [ {id:'t1', t:'area', l:'ライバルの教材の目次・セールス文'}, {id:'t2', t:'input', l:'自分の強み(任意)'} ],
+    build: function(v,b) { return b+'以下のライバル教材を分析し、弱点と、私の強み「'+v.t2+'」を活かした勝てる商品コンセプト(ブルーオーシャン)を3つ提案して。\n【ライバル情報】\n'+v.t1+'\n\n【ルール】前置きなしでJSON出力:\n{"concepts":[{"title":"コンセプト名","weakness":"ライバルの弱点","strategy":"勝つための戦略"}]}'; }
   },
-  lp: function(t1, t2, t3, t4) {
-    return 'あなたはトップセールスコピーライターです。以下の商品を爆発的に売るための「ランディングページ（LP）の構成とセールスコピー」を作成してください。\n\n【商品情報】\n- 商品名: '+t1+'\n- ターゲット: '+t2+'\n- 解決できる悩み・ベネフィット: '+t3+'\n- 価格: '+t4+'\n\n【ルール】\n以下の構成（JSON）で出力してください。前置きは一切不要です。\n{"hero": {"catchcopy": "最強のキャッチコピー", "sub_catch": "サブコピー"}, "empathy": ["共感ポイント1", "共感ポイント2..."], "solution": "商品がなぜ解決できるのかの提示", "benefits": [{"title": "ベネフィット1", "desc": "説明"}...], "voice": ["お客様の声案1..."], "offer": "価格と強烈な行動喚起（CTA）", "faq": [{"q": "質問", "a": "回答"}...]}';
+  magnet: { icon:'🎁', name:'無料プレゼント量産', badge:'神機能', desc:'LINE登録率を爆上げする特典構成', 
+    tut:'【目的】リスト取り（LINE登録）のための強力な無料プレゼントの構成を作ります。\n【コツ】元記事や得意なノウハウを入力してください。',
+    fields: [ {id:'t1', t:'input', l:'ターゲットの最大の悩み'}, {id:'t2', t:'area', l:'提供できるノウハウ・元記事'} ],
+    build: function(v,b) { return b+'悩み「'+v.t1+'」を解決する、LINE登録特典(リードマグネット)のアイデアを5つと、最も強力な1つの「目次構成」を作成して。\n【ノウハウ】\n'+v.t2+'\n\n【ルール】前置きなしでJSON出力:\n{"ideas":["アイデア1..."], "best_magnet":{"title":"特典名","outline":["目次1..."]}}'; }
   },
-  line: function(t, a, pr) { return '以下の記事を販売する「公式LINE向け5日間ステップ配信シナリオ」を作成してください。ターゲット:'+a+' 価格:'+pr+'\n【構成】1日目:共感と問題提起 2日目:常識の破壊 3日目:新世界の提示 4日目:信頼構築 5日目:強烈なオファー\n【ルール】各800字程度。前置きなしでJSONのみ出力。\n{"days":[{"day":1,"title":"件名","body":"本文"}...]}\n\n【元記事】\n'+t.slice(0,3000); },
-  video: function(t, p) { return '以下の記事を要約し、'+p+'用の動画台本と無料動画AI用プロンプトを作成してください。\n【ルール】前置きなしでJSONのみ出力。\n{"title":"タイトル","scenes":[{"sec":"0-3秒","narration":"台本","telop":"テロップ","ai_prompt":"英語プロンプト"}...]}\n\n【元記事】\n'+t.slice(0,3000); },
-  backend: function(t, pr, st) { return '以下の記事の購入者へ提供する『高単価バックエンド商品』の企画案を3つ作成してください。想定価格:'+pr+' 強み:'+st+'\n【ルール】前置きなしでJSONのみ出力。\n{"concepts":[{"title":"商品名","price":"価格","format":"形式","detail":"詳細","sales_pitch":"セールス文"}]}\n\n【元記事】\n'+t.slice(0,3000); },
-  bonus: function(t) { return '以下のnote記事を分析し、購入者特典を8つ提案してください。\n【ルール】前置きなしでJSONのみ出力。\n{"suggestions":[{"id":"1","title":"タイトル","type":"種類","desc":"説明(30字)"}]}\n\n【元記事】\n'+t.slice(0,3000); },
-  img: function(s, t, a, k, l, an) { return '以下の条件で画像プロンプトを5パターン作成してください。\n対象AI:'+t+' 比率:'+a+' スタイル:'+s+' 照明:'+l+' アングル:'+an+' キーワード:'+k+'\n【ルール】英語ツールは英語で。前置きなしでJSONのみ出力。\n{"results":[{"title":"意図","prompt":"プロンプト","negative":"ネガティブ","command":"完全コマンド"}]}'; },
-  prof: function(g, p, st) { return '媒体:'+p+' ジャンル:'+g+' 強み:'+st+' の条件でバズるアカウント設計を提案してください。\n【ルール】前置きなしでJSONのみ出力。\n{"names":["名前候補1..."],"profile_short":"140字プロフ","profile_long":"500字プロフ","visual":"推奨イメージ"}'; },
-  rep: function(m, g) { return '読者からのDM「'+m+'」に対し、目的「'+g+'」を達成する神返信を作成してください。\n【ルール】前置きなしでJSONのみ出力。\n{"replies":[{"type":"親しみ","text":"本文"},{"type":"権威性","text":"本文"},{"type":"質問型","text":"本文"}]}'; },
-  aff: function(p, t, pt) { return '商品「'+p+'」をターゲット「'+t+'」に売るレビュー記事とSNSを作成してください。推し:'+pt+'\n【ルール】前置きなしでJSONのみ出力。\n{"article":{"title":"タイトル","sections":["見出し1..."]},"sns_posts":["ポスト1..."]}'; },
-  jou: function(t, tg) { return 'テーマ「'+t+'」ターゲット「'+tg+'」で【認知→興味→比較・検討→購入→リピート】のカスタマージャーニーを作成してください。\n【ルール】前置きなしでJSONのみ出力。\n{"phases":[{"name":"認知フェーズ","goal":"目的","tools":["X等"],"action":"戦略"}...]}'; }
-};
-
-// ── 究極の共通ツールコンポーネント ──
-function ToolUI(props) {
-  var [tab, setTab] = useState('settings'); var [c, setC] = useState({}); var [links, setLinks] = useState(false);
-  var [imp, setImp] = useState(''); var [res, setRes] = useState(null); var [err, setErr] = useState('');
-  var [t1, st1] = useState(props.i1||''); var [t2, st2] = useState(props.i2||''); var [t3, st3] = useState(props.i3||''); var [t4, st4] = useState('');
-  var [s1, ss1] = useState(props.is1||''); var [s2, ss2] = useState(props.is2||'');
-
-  function hGen() { doCopy(props.bP(t1,t2,t3,t4,s1,s2), c, setC, 'gen'); setLinks(true); }
-  function hImp() { setErr(''); try { var r = parseJSON(imp); if(r && props.chk(r)) { setRes(r); setTab('preview'); setImp(''); } else throw new Error(); } catch(e) { setErr('フォーマットが正しくありません。AIの出力をそのまま貼り付けてください。'); } }
-
-  var tDefs = [['settings','⚙️ 条件設定',false], ['import','📥 AI回答読込',false], ['preview','👁 結果',!res]];
-  return h('div', {className:'app'},
-    h(Header, {onBack:props.onBack, title:props.title}),
-    h('div', {className:'tabs'}, tDefs.map(function(x){ return h('button', {key:x[0],className:'tab'+(tab===x[0]?' tab-on':''),disabled:x[2],onClick:function(){if(!x[2])setTab(x[0]);}}, x[1]); })),
-    h('div', {className:'app-body'},
-      tab==='settings' ? h('div', null,
-        props.renS({t1:t1,st1:st1, t2:t2,st2:st2, t3:t3,st3:st3, t4:t4,st4:st4, s1:s1,ss1:ss1, s2:s2,ss2:ss2}),
-        h('div', {style:{marginTop:16}}, h('button',{className:'genbtn',onClick:hGen,disabled:!props.can({t1:t1,t2:t2,t3:t3,t4:t4,s1:s1,s2:s2})}, h('div',{className:'gen-in'}, h('span',{style:{fontSize:14,fontWeight:800}}, c['gen']?'✓ コピー完了！':'📋 プロンプトをコピー'))), links?h(WebLinks,{msg:props.noMsg?false:true}):null)
-      ) : null,
-      tab==='import' ? h('div', null, h(Card, {label:'📥 AIの回答（JSON）を貼り付け', style:{borderColor:'rgba(56,189,248,.4)'}}, h('textarea', {className:'inp', style:{minHeight:150}, value:imp, onChange:function(e){setImp(e.target.value);}}), err?h('div',{className:'err',style:{marginTop:10}},'❌ '+err):null, h('button', {className:'btn-primary', disabled:!imp.trim(), style:{width:'100%',marginTop:10}, onClick:hImp}, '反映して結果を見る') ) ) : null,
-      tab==='preview' && res ? props.renP(res, c, setC) : null
-    )
-  );
-}
-
-// ── ★ NEW 14. WebDevGen (Claude x Gemini リレー) ──
-function WebDevGen(p) {
-  var [idea, setIdea] = useState(''); var [code, setCode] = useState(''); var [req, setReq] = useState('');
-  var [c, setC] = useState({}); var [l1, setL1] = useState(false); var [l2, setL2] = useState(false);
-
-  function hS1() { var prompt = 'あなたは天才的なフロントエンドエンジニアです。\n以下のふわっとしたアイデアをもとに、HTML/CSS/JS(React等のCDN利用可)が1つのファイルにまとまった「モダンで美しいWebアプリ」のコードを作成してください。\nまた、初心者がこのコードをGitHub Pages等で無料公開するための簡単な手順も教えてください。\n\n【作りたいサイトのアイデア】\n' + idea; doCopy(prompt, c, setC, 's1'); setL1(true); }
-  function hS2() { var prompt = 'あなたは私専属の「天才エンジニア（Gemini）」です。\n以下のHTMLコードでWebツールのプロトタイプを作成しました。これに【追加要望】を実装してください。\nさらに、プロの目線から「ユーザーが熱狂する画期的な神機能」を独自に考えて追加し、古いコードの重複をなくして絶対にクラッシュしない完璧な状態（究極版）に書き直してください。\n\n【追加要望】\n' + req + '\n\n【現在のHTMLコード】\n' + code; doCopy(prompt, c, setC, 's2'); setL2(true); }
-
-  return h('div', {className:'app'},
-    h(Header, {onBack:p.onBack, title:'💻 爆速Webアプリ開発', sub:'Claude × Geminiの最強リレー'}),
-    h('div', {className:'app-body'},
-      h(Card, {label:'🚀 Step 1 : Claudeでゼロイチ作成＆公開', style:{borderColor:'rgba(224,123,57,.4)'}},
-        h('p', {style:{fontSize:12,color:'rgba(255,255,255,.6)',marginBottom:10}}, 'まずはフワッとしたアイデアをClaudeに投げて、土台となるサイト（HTML）とGitHubでの公開手順を作ってもらいます。'),
-        h('textarea', {className:'inp', style:{minHeight:100, marginBottom:10}, value:idea, onChange:function(e){setIdea(e.target.value);}, placeholder:'例: AIで日記を自動生成するツールを作りたい。'}),
-        h('button', {className:'btn-primary', style:{width:'100%', background:'linear-gradient(135deg,#e07b39,#c2185b)'}, onClick:hS1, disabled:!idea.trim()}, c['s1']?'✓ コピー完了':'📋 Claude用プロンプトをコピー'),
-        l1 ? h('div', {style:{marginTop:10}}, h('a', {href:'https://claude.ai/', target:'_blank', className:'ai-launcher-link', style:{background:'#e07b39'}}, '🟠 Claudeを開く')) : null
-      ),
-      h(Card, {label:'💎 Step 2 : Geminiで神アップデート', style:{borderColor:'rgba(56,189,248,.4)'}},
-        h('p', {style:{fontSize:12,color:'rgba(255,255,255,.6)',marginBottom:10}}, 'Claudeが作ったコードと「追加したいこと」をGemini（私）に投げてください。私が天才的な神機能を追加し、絶対にクラッシュしない究極のコードに書き直します！'),
-        h('textarea', {className:'inp', style:{minHeight:100, marginBottom:10}, value:code, onChange:function(e){setCode(e.target.value);}, placeholder:'Claudeが作ったHTMLコードをここに貼り付け'}),
-        h('textarea', {className:'inp', style:{minHeight:80, marginBottom:10}, value:req, onChange:function(e){setReq(e.target.value);}, placeholder:'追加要望 (例: スマホ対応にして、もっとデザインをカッコよくして)'}),
-        h('button', {className:'btn-primary', style:{width:'100%'}, onClick:hS2, disabled:!code.trim()}, c['s2']?'✓ コピー完了':'📋 Gemini用プロンプトをコピー'),
-        l2 ? h('div', {style:{marginTop:10}}, h('a', {href:'https://gemini.google.com/', target:'_blank', className:'ai-launcher-link'}, '🔵 Geminiを開く')) : null
-      )
-    )
-  );
-}
-
-// ── 各ツールの実装 ──
-function SnsGen(p) { return h(ToolUI, { onBack:p.onBack, title:'📱 SNS集客ポスト生成', i1:p.initText, is1:'both', is2:'value',
-  bP: function(t1,t2,t3,t4,s1,s2) { return P.sns(t1, s1, s2, t2); }, can: function(v) { return !!v.t1.trim(); }, chk: function(r) { return r.posts || r.posts_x; },
-  renS: function(v) { return h('div',null, h(PillsField,{label:'🎯 プラットフォーム', value:v.s1, onChange:v.ss1, options:SNS_PLATFORMS}), h(PillsField,{label:'🎭 トーン', value:v.s2, onChange:v.ss2, options:SNS_TONES}), h(TextAreaField,{label:'🔥 参考バズ投稿 (モデリング) ※任意', value:v.t2, onChange:v.st2, h:80}), h(TextAreaField,{label:'📄 宣伝したい元記事テキスト', value:v.t1, onChange:v.st1, h:120}) ); },
-  renP: function(r, c, sc) { 
-    var renders = [];
-    var renderPost = function(pArr, labelPrefix, idPrefix) {
-      if(!pArr) return; pArr.forEach(function(p, i){ if(!p) return; renders.push( h('div',{key:idPrefix+i,className:'post-card'}, h('div',{className:'post-hd'}, h('span',null,labelPrefix+' '+(i+1)), h('button',{className:'cpbtn',onClick:function(){doCopy(p,c,sc,idPrefix+i);}},c[idPrefix+i]?'✓':'📋 コピー') ), h('div',{className:'post-body'}, p) ) ); });
-    };
-    if (r.posts_x) renderPost(r.posts_x, '🐦 X用', 'px_'); if (r.posts_threads) renderPost(r.posts_threads, '🌀 Threads用', 'pt_'); if (r.posts) renderPost(r.posts, '投稿', 'p_');
-    return h('div',null, h('div',{style:{display:'flex',justifyContent:'flex-end',marginBottom:10}},h('button',{className:'cpbtn',style:{background:'#0ea5e9',color:'#fff',border:'none'},onClick:function(){
-      var txt = ''; if(r.posts_x) txt += '【X用】\n'+r.posts_x.join('\n\n')+'\n\n'; if(r.posts_threads) txt += '【Threads用】\n'+r.posts_threads.join('\n\n')+'\n\n'; if(r.posts) txt += r.posts.join('\n\n')+'\n\n'; txt += (r.tags||[]).join(' '); doCopy(txt,c,sc,'all');
-    }},c['all']?'✓':'🔗 全てコピー')), renders, r.tags?h(Card,{label:'🏷️ 関連ハッシュタグ'}, h('div',{style:{display:'flex',justifyContent:'space-between'}}, h('span',null,r.tags.join(' ')), h('button',{className:'cpbtn',onClick:function(){doCopy(r.tags.join(' '),c,sc,'tg');}},c['tg']?'✓':'📋') )):null );
+  funnel: { icon:'🩺', name:'ファネル穴抜け診断', badge:'NEW', desc:'売上が上がらない原因と改善策をAIコンサル', 
+    tut:'【目的】インプはあるのに売れない等の「数字のボトルネック」をAIに診断させます。\n【使い方】現状の各ステップの数字や状況を入力してください。',
+    fields: [ {id:'t1', t:'area', l:'現状の数字・悩み (例: Xのインプ1万、LINE登録10人、商品クリック2人、売上0)'} ],
+    build: function(v,b) { return b+'私はマーケターです。以下のファネルの数字を見て、どこに穴(ボトルネック)があるか診断し、具体的な改善策を3つ提示して。\n【現状】\n'+v.t1+'\n\n【ルール】前置きなしでJSON出力:\n{"bottleneck":"穴の原因分析","solutions":["改善策1..."]}'; }
+  },
+  lp: { icon:'📄', name:'爆売れLPジェネレータ', badge:'', desc:'高単価を売るセールスレター構成', 
+    tut:'【目的】商品を販売するためのランディングページの構成を作ります。',
+    fields: [ {id:'t1', t:'input', l:'商品名・価格'}, {id:'t2', t:'area', l:'商品のベネフィット・特徴'} ],
+    build: function(v,b) { return b+'商品「'+v.t1+'」を売るLPの構成を作成して。特徴: '+v.t2+'\n【ルール】前置きなしでJSON出力:\n{"hero":"キャッチコピー","empathy":["共感1..."],"benefits":["利点1..."],"offer":"オファー内容"}'; }
+  },
+  backend: { icon:'💎', name:'高単価バックエンド', badge:'', desc:'30万円〜の商材企画とセールス文', 
+    tut:'【目的】フロント商品購入者へ売る、高単価商品の企画を作ります。',
+    fields: [ {id:'t1', t:'input', l:'想定価格・形式'}, {id:'t2', t:'area', l:'ベースとなる知識・元記事'} ],
+    build: function(v,b) { return b+'以下の知識をベースに、価格「'+v.t1+'」のバックエンド商品企画を3つ作成して。\n【知識】\n'+v.t2+'\n\n【ルール】前置きなしでJSON出力:\n{"plans":[{"title":"商品名","detail":"詳細","pitch":"セールス文"}]}'; }
+  },
+  sns: { icon:'📱', name:'SNS集客ポスト生成', badge:'', desc:'X/Threadsでバズる投稿を作成', 
+    tut:'【目的】記事やノウハウからSNSの投稿文を作ります。\n【コツ】モデリングにバズった他人の投稿を入れると型を真似てくれます。',
+    fields: [ {id:'t1', t:'select', l:'プラットフォーム', opts:['X(単発)','X(ツリー)','Threads','両方']}, {id:'t2', t:'area', l:'参考バズ投稿(モデリング) ※任意'}, {id:'t3', t:'area', l:'発信内容・元記事'} ],
+    build: function(v,b) { return b+'以下の内容で「'+v.t1+'」向けのSNS投稿を作成して。\n'+(v.t2?'【モデリング】以下の型を完全トレースすること:\n'+v.t2+'\n':'')+'【内容】\n'+v.t3+'\n\n【ルール】前置きなしでJSON出力:\n{"posts":["本文1..."]}'; }
+  },
+  video: { icon:'🎥', name:'ショート動画台本', badge:'', desc:'TikTok/Shorts用の台本生成', 
+    tut:'【目的】60秒以内のショート動画の台本を作ります。',
+    fields: [ {id:'t1', t:'area', l:'動画で伝えたい内容・元記事'} ],
+    build: function(v,b) { return b+'以下の内容で60秒以内のショート動画台本を作成して。\n【内容】\n'+v.t1+'\n\n【ルール】前置きなしでJSON出力:\n{"title":"タイトル","scenes":[{"sec":"秒数","narration":"ナレーション","telop":"テロップ"}]}'; }
+  },
+  profile: { icon:'👤', name:'アカウント設計', badge:'', desc:'バズるプロフ・名前を自動生成', 
+    tut:'【目的】SNSアカウントのコンセプトとプロフィール文を作ります。',
+    fields: [ {id:'t1', t:'input', l:'発信ジャンル'}, {id:'t2', t:'area', l:'自分の経歴・強み'} ],
+    build: function(v,b) { return b+'ジャンル「'+v.t1+'」、経歴「'+v.t2+'」でバズるアカウント設計をして。\n【ルール】前置きなしでJSON出力:\n{"names":["名前候補1..."],"profile_short":"140字プロフ","profile_long":"長文プロフ"}'; }
+  },
+  line: { icon:'💌', name:'LINEステップ生成', badge:'', desc:'自動で売れる5日間の教育シナリオ', 
+    tut:'【目的】LINE登録者に5日間で商品を売るための自動配信シナリオを作ります。',
+    fields: [ {id:'t1', t:'input', l:'販売する商品・価格'}, {id:'t2', t:'area', l:'商品の詳細・解決できる悩み'} ],
+    build: function(v,b) { return b+'商品「'+v.t1+'」を売るための公式LINE用5日間ステップ配信を作成して。詳細: '+v.t2+'\n【ルール】前置きなしでJSON出力:\n{"days":[{"day":1,"title":"件名","body":"本文"}...]}'; }
+  },
+  interview: { icon:'🗣️', name:'AIインタビュー', badge:'', desc:'自分だけの体験談を引き出す', 
+    tut:'【目的】AIを編集者にし、チャットで質問してもらうことで体験談を引き出します。',
+    fields: [ {id:'t1', t:'input', l:'引き出してほしいテーマ'} ],
+    build: function(v,b) { return b+'あなたは凄腕編集者です。テーマ「'+v.t1+'」について私にインタビューし、最高の記事構成を作ります。\n【ルール】1ターンに1問だけ質問し、私が答えたら深掘りして。5問終わったら記事構成を出力。では最初の質問をどうぞ。'; },
+    noJson: true
+  },
+  webdev: { icon:'💻', name:'Webアプリ開発', badge:'', desc:'アイデアからHTMLツールを生成', 
+    tut:'【目的】プログラミング知識ゼロでWebツールを作ります。\n【使い方】これをコピーしてClaudeに投げてください。',
+    fields: [ {id:'t1', t:'area', l:'作りたいツールのアイデア'} ],
+    build: function(v,b) { return 'あなたは天才エンジニアです。以下のアイデアから、HTML/CSS/JSが1枚にまとまったWebアプリのコードを作成してください。\n【アイデア】\n'+v.t1; },
+    noJson: true
   }
-});}
+};
 
-function LpGen(p) { return h(ToolUI, { onBack:p.onBack, title:'📄 爆売れLPジェネレータ', i1:p.initText,
-  bP: function(t1,t2,t3,t4) { return P.lp(t1, t2, t3, t4); }, can: function(v) { return !!v.t1.trim() && !!v.t2.trim(); }, chk: function(r) { return r.hero; },
-  renS: function(v) { return h('div',null, h(InputField,{label:'📦 商品・サービス名', value:v.t1, onChange:v.st1}), h(InputField,{label:'👥 ターゲット', value:v.t2, onChange:v.st2}), h(TextAreaField,{label:'✨ 解決できる悩み・提供価値', value:v.t3, onChange:v.st3, h:80}), h(InputField,{label:'💰 価格・オファー内容', value:v.t4, onChange:v.st4, placeholder:'例: 特別価格 30万円（分割可）'}) ); },
-  renP: function(r, c, sc) { 
-    return h('div',null, 
-      h('div',{style:{display:'flex',justifyContent:'flex-end',marginBottom:10}},h('button',{className:'cpbtn',style:{background:'#0ea5e9',color:'#fff',border:'none'},onClick:function(){doCopy(JSON.stringify(r,null,2),c,sc,'all');}},c['all']?'✓':'🔗 JSONで全てコピー')),
-      h(Card,{label:'🔥 ヒーローエリア (一番上)'}, h('h2',{style:{color:'#f43f5e',fontSize:18,marginBottom:8}},r.hero.catchcopy), h('p',{style:{fontWeight:700}},r.hero.sub_catch)),
-      h(Card,{label:'😢 共感・問題提起'}, h('ul',{style:{paddingLeft:20}}, r.empathy.map(function(e,i){return h('li',{key:i,style:{marginBottom:6}},e);}))),
-      h(Card,{label:'💡 解決策の提示'}, h('p',null,r.solution)),
-      h(Card,{label:'✨ ベネフィット (得られる未来)'}, r.benefits.map(function(b,i){return h('div',{key:i,style:{marginBottom:10}}, h('p',{style:{color:'#38bdf8',fontWeight:700}},'✓ '+b.title), h('p',{style:{fontSize:12,color:'rgba(255,255,255,.7)'}},b.desc));})),
-      h(Card,{label:'🗣️ お客様の声 (イメージ案)'}, h('ul',{style:{paddingLeft:20}}, r.voice.map(function(e,i){return h('li',{key:i,style:{marginBottom:6,fontSize:12}},e);}))),
-      h(Card,{label:'💰 強烈なオファー'}, h('p',{style:{fontWeight:800,color:'#fbbf24',fontSize:16,textAlign:'center',padding:10,background:'rgba(251,191,36,.1)',borderRadius:8}},r.offer)),
-      h(Card,{label:'❓ よくある質問'}, r.faq.map(function(f,i){return h('div',{key:i,style:{marginBottom:10}}, h('p',{style:{fontWeight:700}},'Q: '+f.q), h('p',{style:{fontSize:12,color:'rgba(255,255,255,.7)'}},'A: '+f.a));}))
+// ── 共通コンポーネント ──
+function UI_Field(p) {
+  if(p.f.t === 'input') return h('div',{className:'card'}, h('span',{className:'lbl'},p.f.l), h('input',{className:'inp',value:p.v,onChange:function(e){p.onChange(e.target.value)}}));
+  if(p.f.t === 'area') return h('div',{className:'card'}, h('span',{className:'lbl'},p.f.l), h('textarea',{className:'inp',style:{minHeight:100,resize:'vertical'},value:p.v,onChange:function(e){p.onChange(e.target.value)}}));
+  if(p.f.t === 'select') return h('div',{className:'card'}, h('span',{className:'lbl'},p.f.l), h('select',{className:'inp',value:p.v,onChange:function(e){p.onChange(e.target.value)}}, p.f.opts.map(function(o){return h('option',{key:o,value:o},o)})));
+  if(p.f.t === 'check') return h('div',{className:'card', style:{display:'flex',gap:10,alignItems:'center'}}, h('input',{type:'checkbox',checked:p.v,onChange:function(e){p.onChange(e.target.checked)},style:{width:18,height:18}}), h('span',null,p.f.l));
+  return null;
+}
+
+function RenderJSON(obj) {
+  if(typeof obj === 'string') return h('p',{className:'res-box'}, obj);
+  if(Array.isArray(obj)) return h('div',null, obj.map(function(item, i){ return h('div',{key:i, style:{marginBottom:10, paddingBottom:10, borderBottom:'1px dashed #334155'}}, RenderJSON(item)); }));
+  if(typeof obj === 'object' && obj !== null) {
+    return h('div',null, Object.keys(obj).map(function(k){
+      return h('div',{key:k, style:{marginBottom:8}}, h('span',{style:{color:'#38bdf8',fontSize:11,fontWeight:700}}, k), RenderJSON(obj[k]));
+    }));
+  }
+  return h('span',null, String(obj));
+}
+
+// ── 魔法の共通ツールエンジン ──
+function ToolEngine(props) {
+  var tid = props.toolId; var tConf = TOOLS[tid];
+  var db = getDB(); var u = props.user; var uData = db.users[u];
+  var pid = uData.curProj; var pData = uData.projects[pid].data[tid] || {};
+  
+  var [tab, setTab] = useState('settings');
+  var [vals, setVals] = useState(pData);
+  var [c, setC] = useState({}); var [links, setLinks] = useState(false);
+  var [imp, setImp] = useState(''); var [res, setRes] = useState(null); var [err, setErr] = useState('');
+
+  // 保存処理
+  function updateVal(fid, val) {
+    var n = Object.assign({}, vals); n[fid] = val; setVals(n);
+    var ndb = getDB(); ndb.users[u].projects[pid].data[tid] = n; saveDB(ndb);
+  }
+
+  // 権限チェック
+  function checkAuth() {
+    if(props.role === 'admin') return true;
+    if(uData.perms && uData.perms[tid]) return true;
+    var today = new Date().toDateString();
+    if(uData.usage.date !== today) return true;
+    return uData.usage.count < DAILY_LIMIT;
+  }
+
+  function handleGen() {
+    if(!checkAuth()) { alert('本日の無料枠('+DAILY_LIMIT+'回)を終了しました。\n無制限利用は管理者にお問い合わせください。'); return; }
+    
+    // 利用回数消費
+    if(props.role !== 'admin' && !(uData.perms && uData.perms[tid])) {
+      var ndb = getDB(); var today = new Date().toDateString();
+      if(ndb.users[u].usage.date !== today) ndb.users[u].usage = {date:today, count:0};
+      ndb.users[u].usage.count++; saveDB(ndb);
+    }
+
+    var brandStr = '';
+    if(uData.brand && uData.brand.name) {
+      brandStr = '【発信者情報(これらを文体に反映)】名前:'+uData.brand.name+' ターゲット:'+(uData.brand.target||'')+' 文体:'+(uData.brand.tone||'')+'\n\n';
+    }
+    
+    var prompt = tConf.build(vals, brandStr);
+    doCopy(prompt, c, setC, 'gen'); setLinks(true);
+  }
+
+  function handleImp() {
+    if(tConf.noJson) { setRes(imp); setTab('preview'); setImp(''); return; }
+    setErr(''); try { var r = parseJSON(imp); if(r) { setRes(r); setTab('preview'); setImp(''); } else throw new Error(); } catch(e) { setErr('JSONフォーマットエラー。AIの出力をそのまま貼り付けてください。'); }
+  }
+
+  var isNote = tid === 'note'; // noteは特別UI(1画面完結)
+
+  if (isNote) {
+    return h('div', {className:'z1'},
+      h('div',{className:'app-hd', style:{marginBottom:0}}, h('div',{className:'app-hd-l'}, h('button',{className:'back-btn',onClick:props.onBack},'← 戻る'), h('h1',{className:'app-ttl'},tConf.name))),
+      h('div',{className:'tut-panel', style:{marginTop:16}}, h('p',{className:'tut-title'},'💡 このツールの使い方'), h('p',{className:'tut-body'},tConf.tut)),
+      tConf.fields.map(function(f){ return h(UI_Field, {key:f.id, f:f, v:vals[f.id]||'', onChange:function(v){updateVal(f.id,v)}}) }),
+      h('button',{className:'btn-primary',onClick:handleGen, style:{marginTop:10, marginBottom:16}}, c['gen']?'✓ プロンプトコピー完了':'📋 プロンプトを生成してコピー'),
+      links ? h(WebLinks, {msg:!tConf.noJson}) : null,
+      h(Card, {label:'📥 AIの回答を貼り付け'}, h('textarea',{className:'inp',style:{minHeight:200},value:res||'',onChange:function(e){setRes(e.target.value)}}), h('button',{className:'btn-sub',style:{marginTop:10,width:'100%'},onClick:function(){doCopy(res||'',c,setC,'cpAll');}},c['cpAll']?'✓':'📋 全文コピー') )
     );
   }
-});}
 
-function LineGen(p) { return h(ToolUI, { onBack:p.onBack, title:'💌 LINEステップ生成', i1:p.initText, i2:'この記事のテーマに興味がある人',
-  bP: function(t1,t2,t3) { return P.line(t1, t2, t3); }, can: function(v) { return !!v.t1.trim(); }, chk: function(r) { return r.days; },
-  renS: function(v) { return h('div',null, h(InputField,{label:'🎯 ターゲット層', value:v.t2, onChange:v.st2}), h(InputField,{label:'💰 商品価格(任意)', value:v.t3, onChange:v.st3}), h(TextAreaField,{label:'📄 元記事テキスト', value:v.t1, onChange:v.st1}) ); },
-  renP: function(r, c, sc) { return h('div',null, r.days.map(function(d, i){ return h('div',{key:i,className:'post-card',style:{borderLeft:'3px solid #4ade80'}}, h('div',{className:'post-hd'}, h('span',{style:{color:'#4ade80',fontWeight:800}},d.day+'日目: '+d.title), h('button',{className:'cpbtn',onClick:function(){doCopy(d.body,c,sc,'l'+i);}},c['l'+i]?'✓':'📋')), h('div',{className:'post-body'},d.body)); })) }
-});}
-
-function VideoGen(p) { return h(ToolUI, { onBack:p.onBack, title:'🎥 ショート動画台本', i1:p.initText, is1:'tiktok',
-  bP: function(t1,t2,t3,t4,s1) { return P.video(t1, s1); }, can: function(v) { return !!v.t1.trim(); }, chk: function(r) { return r.scenes; },
-  renS: function(v) { return h('div',null, h(SelectField,{label:'🎯 プラットフォーム', value:v.s1, onChange:v.ss1, options:[{id:'tiktok',label:'TikTok / Shorts'},{id:'youtube',label:'YouTube(長尺)'}]}), h(TextAreaField,{label:'📄 元記事テキスト', value:v.t1, onChange:v.st1}) ); },
-  renP: function(r, c, sc) { return h('div',null, h('h3',{style:{color:'#a855f7',marginBottom:10}},r.title), r.scenes.map(function(s,i){ return h('div',{key:i,className:'post-card',style:{borderLeft:'3px solid #a855f7'}}, h('div',{className:'post-hd'}, h('span',null,'⏱️ '+s.sec), h('button',{className:'cpbtn',onClick:function(){doCopy('ナレ:\n'+s.narration+'\nテロ:\n'+s.telop,c,sc,'v'+i);}},c['v'+i]?'✓':'📋')), h('div',{className:'post-body'}, h('p',null,'🗣️ '+s.narration), h('p',{style:{color:'rgba(255,255,255,.5)',fontSize:12}},'🔤 '+s.telop), h('div',{style:{background:'rgba(0,0,0,.3)',padding:8,marginTop:10,borderRadius:6}}, h('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:4}}, h('span',{style:{color:'#fbbf24',fontSize:11}},'映像AI用プロンプト'), h('button',{className:'cpbtn',onClick:function(){doCopy(s.ai_prompt,c,sc,'vp'+i);}},c['vp'+i]?'✓':'📋')), h('p',{style:{fontSize:11,margin:0}},s.ai_prompt) ) )); })) }
-});}
-
-function BackendGen(p) { return h(ToolUI, { onBack:p.onBack, title:'💎 高単価バックエンド企画', i1:p.initText, i2:'30万円',
-  bP: function(t1,t2,t3) { return P.backend(t1, t2, t3||'直接指導'); }, can: function(v) { return !!v.t1.trim(); }, chk: function(r) { return r.concepts; },
-  renS: function(v) { return h('div',null, h(InputField,{label:'💰 想定価格帯', value:v.t2, onChange:v.st2}), h(InputField,{label:'💪 提供価値', value:v.t3, onChange:v.st3, placeholder:'例: 直接指導'}), h(TextAreaField,{label:'📄 元記事テキスト', value:v.t1, onChange:v.st1}) ); },
-  renP: function(r, c, sc) { return h('div',null, r.concepts.map(function(d,i){ return h('div',{key:i,className:'post-card'}, h('div',{className:'post-hd'}, h('span',null,'企画案 '+(i+1)+': '+d.title), h('button',{className:'cpbtn',onClick:function(){doCopy(d.sales_pitch,c,sc,'b'+i);}},c['b'+i]?'✓':'📋 セールス文コピー')), h('div',{className:'post-body'}, h('p',null,'💰 '+d.price+' / 📋 '+d.format), h('p',{style:{color:'rgba(255,255,255,.7)',fontSize:12}},d.detail), h('div',{style:{background:'rgba(0,0,0,.3)',padding:8,marginTop:10,borderRadius:6}}, h('span',{style:{color:'#fff',fontSize:11}},'📣 セールス文'), h('p',{style:{margin:0,fontSize:12}},d.sales_pitch)) )); })) }
-});}
-
-function BonusGen(p) { return h(ToolUI, { onBack:p.onBack, title:'🎁 購入者特典生成', i1:p.initText, is1:BONUS_THEMES[0], is2:BONUS_AGES[4],
-  bP: function(t1) { return P.bonus(t1); }, can: function(v) { return !!v.t1.trim(); }, chk: function(r) { return r.suggestions; },
-  renS: function(v) { return h('div',null, h('div',{className:'flex-row-gap'}, h(SelectField,{label:'📂 ジャンル',value:v.s1,onChange:v.ss1,options:BONUS_THEMES,style:{flex:1}}), h(SelectField,{label:'👤 年齢',value:v.s2,onChange:v.ss2,options:BONUS_AGES,style:{flex:1}})), h(TextAreaField,{label:'📄 元記事テキスト', value:v.t1, onChange:v.st1}) ); },
-  renP: function(r, c, sc) { return h('div',null, r.suggestions.map(function(s,i){ return h('div',{key:i,className:'post-card'}, h('div',{className:'post-hd'}, h('span',{style:{color:'#fb7185',fontWeight:800}},s.title), h('button',{className:'cpbtn',onClick:function(){doCopy('以下の特典を作成してください。\nタイトル: '+s.title+'\n元記事:\n'+(p.initText||'').slice(0,1000),c,sc,'bo'+i);alert('作成プロンプトをコピーしました');}},'📋 作成指示をコピー')), h('div',{className:'post-body'}, h('p',null,'['+s.type+'] '+s.desc))); })) }
-});}
-
-function ImageGen(p) { return h(ToolUI, { onBack:p.onBack, title:'🖼️ 画像プロンプト', i1:p.initKeyword, is1:IMG_TOOLS[0].id, is2:IMG_ASPECTS[0].id,
-  bP: function(t1,t2,t3,t4,s1,s2) { return P.img('高品質', s1, s2, t1, '自然光', 'おまかせ'); }, can: function(v) { return true; }, chk: function(r) { return r.results; },
-  renS: function(v) { return h('div',null, h('div',{className:'flex-row-gap'}, h(SelectField,{label:'🛠 AI',value:v.s1,onChange:v.ss1,options:IMG_TOOLS,style:{flex:1}}), h(SelectField,{label:'📐 比率',value:v.s2,onChange:v.ss2,options:IMG_ASPECTS,style:{flex:1}})), h(InputField,{label:'🔑 キーワード (任意)', value:v.t1, onChange:v.st1}) ); },
-  renP: function(r, c, sc) { return h('div',null, r.results.map(function(s,i){ return h('div',{key:i,className:'post-card'}, h('div',{className:'post-hd'}, h('span',{style:{color:'#fbbf24',fontWeight:800}},'🎯 '+s.title), h('button',{className:'cpbtn',onClick:function(){doCopy(s.command,c,sc,'im'+i);}},c['im'+i]?'✓':'📋 コマンドコピー')), h('div',{className:'post-body'}, h('p',{style:{background:'rgba(0,0,0,.3)',padding:8,borderRadius:4,wordBreak:'break-all'}},s.command), h('p',{style:{color:'rgba(255,255,255,.5)',fontSize:11,marginTop:8}},'Prompt: '+s.prompt) )); })) }
-});}
-
-function ProfileGen(p) { return h(ToolUI, { onBack:p.onBack, title:'👤 アカウント設計', is1:'X (Twitter)', is2:THEMES[0].label,
-  bP: function(t1,t2,t3,t4,s1,s2) { return P.prof(s2, s1, t1); }, can: function(v) { return true; }, chk: function(r) { return r.names; },
-  renS: function(v) { return h('div',null, h('div',{className:'flex-row-gap'}, h(SelectField,{label:'📱 媒体',value:v.s1,onChange:v.ss1,options:['X (Twitter)','Threads','Instagram','note'],style:{flex:1}}), h(SelectField,{label:'📂 ジャンル',value:v.s2,onChange:v.ss2,options:THEMES.map(function(t){return t.label;}),style:{flex:1}})), h(InputField,{label:'💪 強み・実績', value:v.t1, onChange:v.st1}) ); },
-  renP: function(r, c, sc) { return h('div',null, h(Card,{label:'📛 名前候補'}, h('div',{style:{padding:'0 10px'}}, r.names.map(function(n,i){return h('p',{key:i,style:{marginBottom:6}},'・'+n);}))), h(Card,{label:'📝 プロフィール'}, h('div',{style:{marginBottom:10}}, h('p',{style:{fontSize:11,color:'#38bdf8'}},'【短文】'),h('p',null,r.profile_short)), h('div',null, h('p',{style:{fontSize:11,color:'#38bdf8'}},'【長文】'),h('p',{style:{whiteSpace:'pre-wrap'}},r.profile_long))), h(Card,{label:'🎨 推奨ビジュアル'}, h('p',null,r.visual)) ); }
-});}
-
-function ReplyGen(p) { return h(ToolUI, { onBack:p.onBack, title:'💬 LINE / DM 神返信', is1:'信頼構築とヒアリング',
-  bP: function(t1,t2,t3,t4,s1) { return P.rep(t1, s1); }, can: function(v) { return !!v.t1.trim(); }, chk: function(r) { return r.replies; },
-  renS: function(v) { return h('div',null, h(SelectField,{label:'🎯 目的',value:v.s1,onChange:v.ss1,options:['信頼構築とヒアリング','商品への自然な誘導','不安の解消','誠実な対応']}), h(TextAreaField,{label:'📩 相手のメッセージ', value:v.t1, onChange:v.st1, h:100}) ); },
-  renP: function(r, c, sc) { return h('div',null, r.replies.map(function(s,i){ return h('div',{key:i,className:'post-card'}, h('div',{className:'post-hd'}, h('span',{style:{color:'#10b981',fontWeight:800}},'パターン: '+s.type), h('button',{className:'cpbtn',onClick:function(){doCopy(s.text,c,sc,'rp'+i);}},c['rp'+i]?'✓':'📋 コピー')), h('div',{className:'post-body'}, h('p',{style:{whiteSpace:'pre-wrap'}},s.text) )); })) }
-});}
-
-function AffiliateGen(p) { return h(ToolUI, { onBack:p.onBack, title:'🔗 アフィリエイト生成',
-  bP: function(t1,t2,t3) { return P.aff(t1, t2, t3); }, can: function(v) { return !!v.t1.trim(); }, chk: function(r) { return r.article; },
-  renS: function(v) { return h('div',null, h(InputField,{label:'📦 商品名・URL', value:v.t1, onChange:v.st1}), h(InputField,{label:'👥 ターゲット', value:v.t2, onChange:v.st2}), h(TextAreaField,{label:'✨ 推しポイント', value:v.t3, onChange:v.st3, h:80}) ); },
-  renP: function(r, c, sc) { return h('div',null, h(Card,{label:'📝 記事構成案'}, h('h3',{style:{color:'#f43f5e',marginBottom:10,fontSize:14}},r.article.title), h('ul',{style:{paddingLeft:20}}, r.article.sections.map(function(s,i){return h('li',{key:i,style:{marginBottom:6}},s);})) ), h(Card,{label:'📱 SNS誘導ポスト'}, r.sns_posts.map(function(s,i){return h('div',{key:i,style:{background:'rgba(0,0,0,.2)',padding:10,borderRadius:8,marginBottom:10}}, h('button',{className:'cpbtn',style:{marginBottom:8},onClick:function(){doCopy(s,c,sc,'as'+i);}},c['as'+i]?'✓':'📋 コピー'), h('p',{style:{whiteSpace:'pre-wrap'}},s));})) ); }
-});}
-
-function JourneyGen(p) { return h(ToolUI, { onBack:p.onBack, title:'🗺️ カスタマージャーニー生成',
-  bP: function(t1,t2) { return P.jou(t1, t2); }, can: function(v) { return !!v.t1.trim() && !!v.t2.trim(); }, chk: function(r) { return r.phases; },
-  renS: function(v) { return h('div',null, h(InputField,{label:'💡 テーマ・商品', value:v.t1, onChange:v.st1}), h(InputField,{label:'👥 ターゲット', value:v.t2, onChange:v.st2}) ); },
-  renP: function(r, c, sc) { return h('div',null, r.phases.map(function(d,i){ return h('div',{key:i,className:'post-card',style:{borderLeft:'3px solid #0ea5e9'}}, h('div',{className:'post-hd'}, h('span',{style:{fontWeight:800,color:'#38bdf8'}},(i+1)+'. '+d.name), h('button',{className:'cpbtn',onClick:function(){doCopy(d.action,c,sc,'j'+i);}},c['j'+i]?'✓':'📋 戦略コピー')), h('div',{className:'post-body'}, h('p',{style:{color:'#fbbf24',marginBottom:6,fontWeight:700}},'🎯 目的: '+d.goal), h('p',{style:{marginBottom:6}},'🛠️ ツール: '+(d.tools||[]).join(', ')), h('p',null,'📝 具体的なアクション: '+d.action) )); })) }
-});}
-
-function InterviewGen(p) {
-  var [topic, setTopic] = useState(''); var [c, setC] = useState({}); var [links, setLinks] = useState(false);
-  return h('div',{className:'app'}, h(Header, {onBack:p.onBack, title:'🗣️ AIインタビュー'}), h('div',{className:'app-body'}, h('div', {style:{textAlign:'center', padding:'10px 0 20px'}}, h('p', {style:{fontSize:14, fontWeight:800, marginBottom:8}}, '「自分にしか書けない記事」を引き出す'), h('p', {style:{fontSize:12, color:'rgba(255,255,255,.6)', lineHeight:1.6}}, 'AIを凄腕編集者に変身させます。チャットで答えるだけで最高の構成が完成。') ), h(InputField,{label:'💡 体験のテーマ', value:topic, onChange:setTopic, placeholder:'例: 借金200万から副業で立ち直った話'}), h('div', null, h('button',{className:'genbtn',onClick:function(){doCopy('【重要設定】\nあなたは「凄腕の天才編集者・インタビュアー」です。目的は私から「他の誰にも書けない一次情報」を引き出し、最強のnote記事構成を作ることです。\n\n【テーマ】\n'+topic+'\n\n【行動ルール】\n1. 挨拶し、1つ目の質問を投げる。\n2. **絶対に「1ターンに1問」だけ**\n3. 私の答えに共感し、さらに深掘りする次の質問を投げる。\n4. 5ターン終わったら『note有料記事の構成案』を出力し終了する。\n\nでは1つ目の質問から始めてください！',c,setC,'gen');setLinks(true);},disabled:!topic.trim(), style:{background:'linear-gradient(135deg,#f59e0b,#d97706)'}}, h('div',{className:'gen-in'}, h('span',{style:{fontSize:14,fontWeight:800}}, c['gen'] ? '✓ コピー完了' : '📋 開始プロンプトをコピー')) ), links ? h(WebLinks, {msg:false}) : null ) ));
+  // 通常ツールのUI
+  var tDefs = [['settings','⚙️ 設定',false], ['import','📥 読込',false], ['preview','👁 結果',!res]];
+  return h('div', {className:'z1'},
+    h('div',{className:'app-hd'}, h('div',{className:'app-hd-l'}, h('button',{className:'back-btn',onClick:props.onBack},'← 戻る'), h('h1',{className:'app-ttl'},tConf.name))),
+    h('div', {className:'tabs'}, tDefs.map(function(x){ return h('button', {key:x[0],className:'tab'+(tab===x[0]?' tab-on':''),disabled:x[2],onClick:function(){if(!x[2])setTab(x[0]);}}, x[1]); })),
+    h('div', {style:{marginTop:16}},
+      tab==='settings' ? h('div', null,
+        h('div',{className:'tut-panel'}, h('p',{className:'tut-title'},'💡 使い方'), h('p',{className:'tut-body'},tConf.tut)),
+        tConf.fields.map(function(f){ return h(UI_Field, {key:f.id, f:f, v:vals[f.id]||'', onChange:function(v){updateVal(f.id,v)}}) }),
+        h('button',{className:'btn-primary',onClick:handleGen, style:{marginTop:10, marginBottom:16}}, c['gen']?'✓ プロンプトコピー完了':'📋 プロンプト生成'),
+        links ? h(WebLinks, {msg:!tConf.noJson}) : null
+      ) : null,
+      tab==='import' ? h('div', null, h(Card, {label:'📥 AIの出力を貼り付け'}, h('textarea', {className:'inp', style:{minHeight:150}, value:imp, onChange:function(e){setImp(e.target.value);}}), err?h('div',{className:'err',style:{marginTop:10}},'❌ '+err):null, h('button', {className:'btn-primary', disabled:!imp.trim(), style:{marginTop:10}, onClick:handleImp}, '反映して結果を見る') ) ) : null,
+      tab==='preview' && res ? h('div',null, h('div',{style:{background:'rgba(255,255,255,.03)',padding:16,borderRadius:12}}, RenderJSON(res))) : null
+    )
+  );
 }
 
-// ── 本格認証システム (Login / Register 分離 ＆ SNS必須化) ──
-function getAdmin() { var d = localStorage.getItem(DB_KEY_ADMIN); if(d) return JSON.parse(d); var init = {u:'admin', p:'admin123'}; localStorage.setItem(DB_KEY_ADMIN, JSON.stringify(init)); return init; }
+// ── ブランド設定 ＆ プロジェクト管理UI ──
+function BrandSettings(props) {
+  var db = getDB(); var b = db.users[props.user].brand || {};
+  var [name, setName] = useState(b.name||''); var [target, setTarget] = useState(b.target||''); var [tone, setTone] = useState(b.tone||'');
+  function save() { var ndb=getDB(); ndb.users[props.user].brand={name:name,target:target,tone:tone}; saveDB(ndb); alert('保存しました'); props.onBack(); }
+  return h('div',{className:'z1'}, h(Header,{title:'👤 マイ・ブランド設定', onBack:props.onBack}), h('div',{className:'tut-panel'}, h('p',{className:'tut-body'},'ここで登録した情報は、全ツールのプロンプトに自動で埋め込まれ、AIがあなたの文体や属性を学習します。')), h(Card,{label:'発信者名・肩書き'},h('input',{className:'inp',value:name,onChange:function(e){setName(e.target.value)}})), h(Card,{label:'メインのターゲット層'},h('input',{className:'inp',value:target,onChange:function(e){setTarget(e.target.value)}})), h(Card,{label:'文体のクセ・ルール (例:絵文字多め、語尾は「〜ですよね！」)'},h('textarea',{className:'inp',style:{minHeight:80},value:tone,onChange:function(e){setTone(e.target.value)}})), h('button',{className:'btn-primary',onClick:save},'保存する') );
+}
 
+function ProjectManager(props) {
+  var [db, setDb] = useState(getDB()); var uData = db.users[props.user];
+  var [newP, setNewP] = useState('');
+  function create() { if(!newP.trim()) return; var id='p_'+Date.now(); var ndb=getDB(); ndb.users[props.user].projects[id]={name:newP,data:{}}; ndb.users[props.user].curProj=id; saveDB(ndb); setDb(ndb); setNewP(''); }
+  function switchP(id) { var ndb=getDB(); ndb.users[props.user].curProj=id; saveDB(ndb); setDb(ndb); props.onBack(); }
+  return h('div',{className:'z1'}, h(Header,{title:'📁 プロジェクト管理', onBack:props.onBack}), h('div',{className:'tut-panel'}, h('p',{className:'tut-body'},'案件ごとにデータを分けて保存できます。')), h('div',{className:'flex-row',style:{marginBottom:20}}, h('input',{className:'inp flex-1',placeholder:'新プロジェクト名',value:newP,onChange:function(e){setNewP(e.target.value)}}), h('button',{className:'btn-primary',style:{width:'auto'},onClick:create},'作成')), Object.keys(uData.projects).map(function(k){ var p=uData.projects[k]; var isCur=k===uData.curProj; return h('div',{key:k,className:'card',style:{display:'flex',justifyContent:'space-between',alignItems:'center',borderColor:isCur?'#38bdf8':'rgba(255,255,255,.08)'}}, h('span',{style:{fontWeight:700,color:isCur?'#38bdf8':'#fff'}},p.name+(isCur?' (選択中)':'')), !isCur?h('button',{className:'btn-sub',onClick:function(){switchP(k)}},'切り替え'):null ); }) );
+}
+
+// ── 認証・管理者システム ──
 function AuthScreen(props) {
-  var [mode, setMode] = useState('user'); // 'user' or 'admin'
-  var [isLogin, setIsLogin] = useState(true); // true = Login, false = Register
-  var [un, setUn] = useState(''); var [pw, setPw] = useState(''); var [sns, setSns] = useState(''); var [err, setErr] = useState('');
-  
+  var [isLogin, setIsLogin] = useState(true); var [un, setUn] = useState(''); var [pw, setPw] = useState(''); var [sns, setSns] = useState(''); var [err, setErr] = useState('');
   function handleSubmit() {
     setErr(''); var u = un.trim(); if (!u) { setErr('ユーザー名を入力してください'); return; }
-    var db = JSON.parse(localStorage.getItem(DB_KEY_USERS) || '{}');
-    var admin = getAdmin();
-
-    if (mode === 'admin') {
-      if (u === admin.u && pw === admin.p) { localStorage.setItem(DB_KEY_CURRENT, JSON.stringify({u:u, r:'admin'})); props.onLogin(u, 'admin'); } else { setErr('認証に失敗しました'); }
+    var db = getDB();
+    if(u === 'admin') { if(pw === db.admin.p) { localStorage.setItem(SESS_KEY, JSON.stringify({u:u,r:'admin'})); props.onLogin(u,'admin'); } else setErr('パスワードが違います'); return; }
+    if(isLogin) {
+      if(!db.users[u]) { setErr('未登録です。新規申請してください。'); return; }
+      localStorage.setItem(SESS_KEY, JSON.stringify({u:u, r:db.users[u].status})); props.onLogin(u, db.users[u].status);
     } else {
-      if (u === admin.u) { setErr('この名前は使用できません'); return; }
-      
-      if (isLogin) {
-        // ログイン処理
-        if (!db[u]) { setErr('登録されていないユーザー名です。新規申請を行ってください。'); return; }
-        localStorage.setItem(DB_KEY_CURRENT, JSON.stringify({u:u, r:db[u].status})); props.onLogin(u, db[u].status);
-      } else {
-        // 新規登録処理
-        if (db[u]) { setErr('既に登録されているユーザー名です。ログインしてください。'); return; }
-        var s = sns.trim();
-        if (!s || s.indexOf('@') === -1) { setErr('SNSアカウントは @ を含めて正確に入力してください'); return; }
-        db[u] = { status: 'pending', date: Date.now(), sns: s }; 
-        localStorage.setItem(DB_KEY_USERS, JSON.stringify(db));
-        localStorage.setItem(DB_KEY_CURRENT, JSON.stringify({u:u, r:'pending'})); props.onLogin(u, 'pending');
-      }
+      if(db.users[u]) { setErr('登録済みの名前です'); return; }
+      var s = sns.trim(); if(!s || s.indexOf('@')===-1) { setErr('SNSアカウントは @ を含めてください'); return; }
+      db.users[u] = { status:'pending', sns:s, date:Date.now(), usage:{date:'',count:0}, perms:{}, brand:{}, projects:{'default':{name:'デフォルト',data:{}}}, curProj:'default' };
+      saveDB(db); localStorage.setItem(SESS_KEY, JSON.stringify({u:u, r:'pending'})); props.onLogin(u, 'pending');
     }
   }
-
-  return h('div', {className:'pg'}, h('div',{className:'grid-bg'}), 
-    h('div', {className:'z1 auth-box'}, 
-      h('h2', null, 'AI Content Pro'), h('p', null, '会員専用プラットフォーム'), 
-      h('div', {style:{display:'flex', gap:10, marginBottom:20}}, 
-        h('button', {onClick:function(){setMode('user');setErr('');}, style:{flex:1, padding:'8px', borderRadius:8, border:'none', background:mode==='user'?'#38bdf8':'rgba(255,255,255,.1)', color:'#fff', fontWeight:700, cursor:'pointer'}}, '一般ユーザー'), 
-        h('button', {onClick:function(){setMode('admin');setErr('');}, style:{flex:1, padding:'8px', borderRadius:8, border:'none', background:mode==='admin'?'#e94560':'rgba(255,255,255,.1)', color:'#fff', fontWeight:700, cursor:'pointer'}}, '管理者ログイン') 
-      ), 
-      mode === 'user' ? h('div', {className:'auth-tabs'}, 
-        h('button', {className:'auth-tab ' + (isLogin?'auth-tab-on':''), onClick:function(){setIsLogin(true);setErr('');}}, 'ログイン'),
-        h('button', {className:'auth-tab ' + (!isLogin?'auth-tab-on':''), onClick:function(){setIsLogin(false);setErr('');}}, '新規利用申請')
-      ) : null,
-      h('input', {className:'inp', style:{marginBottom:12}, type:'text', placeholder:'ユーザー名', value:un, onChange:function(e){setUn(e.target.value);}}), 
-      (mode === 'user' && !isLogin) ? h('input', {className:'inp', style:{marginBottom:12}, type:'text', placeholder:'SNSアカウント (例: @note_ai_pro)', value:sns, onChange:function(e){setSns(e.target.value);}}) : null,
-      mode === 'admin' ? h('input', {className:'inp', style:{marginBottom:12}, type:'password', placeholder:'パスワード', value:pw, onChange:function(e){setPw(e.target.value);}}) : null, 
-      err ? h('div', {className:'err'}, err) : null, 
-      h('button', {className:'btn-primary', style:{width:'100%', marginTop:10}, onClick:handleSubmit}, mode==='admin'?'ログイン':isLogin?'ログイン':'申請して待機画面へ') 
-    )
-  );
+  return h('div', {className:'pg'}, h('div',{className:'grid-bg'}), h('div', {className:'z1 auth-box'}, h('h2', {style:{marginBottom:4}}, 'AI Content Pro'), h('p', {style:{marginBottom:16,color:'#38bdf8',fontWeight:700}}, 'SaaS Edition v23'), h('div', {style:{display:'flex', gap:10, marginBottom:20, background:'rgba(0,0,0,.3)', padding:4, borderRadius:8}}, h('button', {onClick:function(){setIsLogin(true);setErr('');}, style:{flex:1, padding:'8px', borderRadius:6, border:'none', background:isLogin?'#38bdf8':'transparent', color:isLogin?'#fff':'rgba(255,255,255,.5)', fontWeight:700}}, 'ログイン'), h('button', {onClick:function(){setIsLogin(false);setErr('');}, style:{flex:1, padding:'8px', borderRadius:6, border:'none', background:!isLogin?'#38bdf8':'transparent', color:!isLogin?'#fff':'rgba(255,255,255,.5)', fontWeight:700}}, '新規申請') ), h('input', {className:'inp', style:{marginBottom:12}, placeholder:'ユーザー名 (adminで管理者)', value:un, onChange:function(e){setUn(e.target.value);}}), (!isLogin && un!=='admin') ? h('input', {className:'inp', style:{marginBottom:12}, placeholder:'SNSアカウント (@必須)', value:sns, onChange:function(e){setSns(e.target.value);}}) : null, un==='admin' ? h('input', {className:'inp', style:{marginBottom:12}, type:'password', placeholder:'管理者パスワード', value:pw, onChange:function(e){setPw(e.target.value);}}) : null, err ? h('div', {className:'err'}, err) : null, h('button', {className:'btn-primary', style:{marginTop:10}}, {onClick:handleSubmit}, isLogin?'ログイン':'申請して待機画面へ') ));
 }
 
-function PendingScreen(props) {
-  return h('div', {className:'pg'}, h('div',{className:'grid-bg'}), h('div', {className:'z1 auth-box'}, h('h2', null, props.rejected?'🚫 アクセス拒否':'⏳ 承認待ち'), h('p', null, props.rejected?'管理者にアクセスを制限されています。':'管理者の許可をお待ちください。'), h('button', {className:'btn-primary', style:{width:'100%', marginBottom:12}, onClick:props.onCheck}, 'ステータスを更新'), h('button', {className:'btn-rl', style:{width:'100%'}, onClick:props.onLogout}, 'ログアウト') ));
-}
+function PendingScreen(p) { return h('div', {className:'pg'}, h('div',{className:'grid-bg'}), h('div', {className:'z1 auth-box'}, h('h2', null, p.rejected?'🚫 アクセス拒否':'⏳ 承認待ち'), h('p', null, p.rejected?'管理者に制限されています。':'管理者の許可をお待ちください。'), h('button', {className:'btn-primary', style:{marginBottom:12}, onClick:p.onCheck}, 'ステータス更新'), h('button', {className:'btn-sub', style:{width:'100%'}, onClick:p.onLogout}, 'ログアウト') )); }
 
 function AdminDashboard(props) {
-  var [users, setUsers] = useState({}); var [tab, setTab] = useState('users'); var [adminU, setAdminU] = useState(''); var [adminP, setAdminP] = useState(''); var [msg, setMsg] = useState('');
-  useEffect(function(){ setUsers(JSON.parse(localStorage.getItem(DB_KEY_USERS) || '{}')); var a = getAdmin(); setAdminU(a.u); setAdminP(a.p); }, []);
-  function updateStatus(u, st) { var db = Object.assign({}, users); db[u].status = st; setUsers(db); localStorage.setItem(DB_KEY_USERS, JSON.stringify(db)); }
-  function saveAdmin() { localStorage.setItem(DB_KEY_ADMIN, JSON.stringify({u:adminU, p:adminP})); localStorage.setItem(DB_KEY_CURRENT, JSON.stringify({u:adminU, r:'admin'})); setMsg('保存しました'); setTimeout(function(){setMsg('');},2000); }
-  
-  var uKeys = Object.keys(users); var total = uKeys.length; var approved = uKeys.filter(function(k){return users[k].status==='approved';}).length; var pending = uKeys.filter(function(k){return users[k].status==='pending';}).length;
-
-  return h('div', {className:'app'},
-    h('div', {className:'app-hd'}, h('div',{className:'app-hd-l'}, h('h1',{className:'app-ttl'},'🎛️ 管理者ダッシュボード')), h('div',{style:{display:'flex',gap:10}}, h('button',{className:'btn-primary', style:{padding:'6px 12px', fontSize:12, background:'linear-gradient(135deg,#f59e0b,#d97706)'}, onClick:props.onGoApp},'🚀 ツール本体へ'), h('button',{className:'back-btn',onClick:props.onLogout},'ログアウト') ) ),
-    h('div',{className:'tabs'}, h('button',{className:'tab'+(tab==='users'?' tab-on':''),onClick:function(){setTab('users')}},'👥 ユーザー管理'), h('button',{className:'tab'+(tab==='sys'?' tab-on':''),onClick:function(){setTab('sys')}},'⚙️ システム設定') ),
-    h('div', {className:'app-body'},
-      tab === 'users' ? h('div', null,
-        h('div', {className:'flex-row-gap', style:{marginBottom:20}}, h('div',{className:'kpi-card'}, h('span',{className:'lbl'},'総ユーザー数'), h('p',{className:'kpi-num'},total)), h('div',{className:'kpi-card'}, h('span',{className:'lbl'},'承認済み (稼働中)'), h('p',{className:'kpi-num', style:{color:'#4ade80'}},approved)), h('div',{className:'kpi-card'}, h('span',{className:'lbl'},'承認待ち'), h('p',{className:'kpi-num', style:{color:'#fbbf24'}},pending)) ),
-        h('div', {className:'card', style:{overflowX:'auto', padding:'10px'}}, h('table', {className:'admin-table'}, h('thead', null, h('tr', null, h('th',null,'ユーザー名'), h('th',null,'SNSアカウント'), h('th',null,'申請日時'), h('th',null,'ステータス'), h('th',null,'操作'))), h('tbody', null, uKeys.sort(function(a,b){return users[b].date-users[a].date;}).map(function(k){ var u = users[k]; return h('tr', {key:k}, h('td', {style:{fontWeight:700}}, k), h('td', {style:{color:'#38bdf8'}}, h('a',{href:'https://twitter.com/'+u.sns.replace('@',''), target:'_blank', style:{color:'inherit', textDecoration:'underline'}}, u.sns||'-')), h('td', {style:{color:'rgba(255,255,255,.4)'}}, formatDate(u.date)), h('td', {style:{color:u.status==='approved'?'#4ade80':u.status==='pending'?'#fbbf24':'#f87171', fontWeight:700}}, u.status==='approved'?'許可済':u.status==='pending'?'待機中':'拒否/Ban'), h('td', {style:{whiteSpace:'nowrap'}}, u.status!=='approved'?h('button',{onClick:function(){updateStatus(k,'approved')},style:{background:'#16a34a',color:'#fff',border:'none',padding:'6px 10px',borderRadius:4,marginRight:6,cursor:'pointer',fontSize:12,fontWeight:700}},'許可'):null, u.status!=='rejected'?h('button',{onClick:function(){updateStatus(k,'rejected')},style:{background:'#e11d48',color:'#fff',border:'none',padding:'6px 10px',borderRadius:4,cursor:'pointer',fontSize:12,fontWeight:700}},'拒否/Ban'):null ) ); })) ))
-      ) : h('div', null,
-        h(InputField, {label:'管理者 ユーザー名', value:adminU, onChange:setAdminU}), h(InputField, {label:'管理者 パスワード', value:adminP, onChange:setAdminP}),
-        h('button', {className:'btn-primary', style:{width:'100%', marginTop:10}, onClick:saveAdmin}, '設定を保存'),
-        msg ? h('p', {style:{color:'#4ade80', textAlign:'center', marginTop:10, fontWeight:700}}, msg) : null
-      )
-    )
-  );
+  var [db, setDb] = useState(getDB()); var [exp, setExp] = useState(null);
+  function upSt(u, st) { var ndb=getDB(); ndb.users[u].status=st; saveDB(ndb); setDb(ndb); }
+  function togglePerm(u, tid) { var ndb=getDB(); if(!ndb.users[u].perms) ndb.users[u].perms={}; ndb.users[u].perms[tid] = !ndb.users[u].perms[tid]; saveDB(ndb); setDb(ndb); }
+  var uKeys = Object.keys(db.users);
+  return h('div', {className:'pg'}, h('div',{className:'grid-bg'}), h('div', {className:'z1'}, h('div', {className:'app-hd'}, h('h1',{className:'app-ttl'},'🎛️ 管理者ダッシュボード'), h('div',{style:{display:'flex',gap:10}}, h('button',{className:'btn-primary', style:{padding:'6px 12px', fontSize:12}, onClick:props.onGoApp},'🚀 ツールへ'), h('button',{className:'back-btn',onClick:props.onLogout},'ログアウト') ) ), h('div', {className:'card', style:{overflowX:'auto'}}, h('table', {className:'admin-table'}, h('thead', null, h('tr', null, h('th',null,'ユーザー'), h('th',null,'SNS'), h('th',null,'ステータス'), h('th',null,'権限/操作'))), h('tbody', null, uKeys.sort(function(a,b){return db.users[b].date-db.users[a].date;}).map(function(k){ var u = db.users[k]; var isExp=exp===k; return h(React.Fragment, {key:k}, h('tr', null, h('td', {style:{fontWeight:700}}, k), h('td', null, u.sns), h('td', {style:{color:u.status==='approved'?'#4ade80':'#f87171'}}, u.status), h('td', null, u.status!=='approved'?h('button',{className:'btn-sub',style:{background:'#16a34a',color:'#fff',marginRight:6},onClick:function(){upSt(k,'approved')}},'許可'):null, u.status==='approved'?h('button',{className:'btn-sub',style:{marginRight:6},onClick:function(){setExp(isExp?null:k)}},'🔑権限'):null, u.status!=='rejected'?h('button',{className:'btn-sub',style:{background:'#e11d48',color:'#fff'},onClick:function(){upSt(k,'rejected')}},'Ban'):null ) ), isExp?h('tr',null, h('td',{colSpan:4,style:{background:'rgba(0,0,0,.3)'}}, h('p',{style:{fontSize:11,color:'#fbbf24',marginBottom:6}},'チェックしたツールは無制限利用可能になります'), h('div',{className:'flex-row'}, Object.keys(TOOLS).map(function(tid){ return h('label',{key:tid,style:{fontSize:11,display:'flex',alignItems:'center',gap:4}}, h('input',{type:'checkbox',checked:!!(u.perms&&u.perms[tid]),onChange:function(){togglePerm(k,tid)}}),TOOLS[tid].name) }) ) )):null ); })) )) ) );
 }
 
-// ── メインアプリ＆ルーティング ──
-function NoteGenWrapper(p) {
-  var npS=useState({theme:'money',topic:'',age:'30s',sit:'',wry:''}); var noteProps=npS[0]; var setNoteProps=npS[1];
-  var s6=useState('genre'); var step=s6[0]; var setStep=s6[1]; var s7=useState('money'); var genre=s7[0]; var setGenre=s7[1];
-  var s8=useState([]); var themes=s8[0]; var setThemes=s8[1]; var sA=useState(-1); var thIdx=sA[0]; var setThIdx=sA[1];
-  var sC=useState('30s'); var selAge=sC[0]; var setSelAge=sC[1]; var sD=useState([]); var sugSit=sD[0]; var setSugSit=sD[1];
-  var sE=useState([]); var sugWry=sE[0]; var setSugWry=sE[1]; var sG=useState(-1); var selSit=sG[0]; var setSelSit=sG[1]; var sH=useState(-1); var selWry=sH[0]; var setSelWry=sH[1];
-  var [showNote, setShowNote] = useState(false);
-  function genThemes(gid){ setThIdx(-1); setThemes(shuffleArray(FB.themes[gid] || FB.themes.other).slice(0, 10)); }
-  function extractSituations(aid){ var al=(AGES.find(function(a){return a.id===(aid||selAge);})||{}).label||''; setSugSit(shuffleArray(FB.sit[genre]||FB.sit.other).slice(0,5).map(function(s){return s.replace(/\{age\}/g, al);})); setSelSit(-1); }
-  function extractWorries(aid){ var al=(AGES.find(function(a){return a.id===(aid||selAge);})||{}).label||''; setSugWry(shuffleArray(FB.wry[genre]||FB.wry.other).slice(0,5).map(function(w){return w.replace(/\{age\}/g, al);})); setSelWry(-1); }
-
-  if(showNote) return h(NoteGenerator, {onBack:function(){setShowNote(false);}, initTheme:noteProps.theme, initTopic:noteProps.topic, initAge:noteProps.age, initSit:noteProps.sit, initWry:noteProps.wry, onGoTool:p.onGoTool});
-
-  return h('div',{className:'pg'}, h('div',{className:'grid-bg'}),
-    h('div',{className:'app-hd',style:{width:'100%',maxWidth:920,background:'transparent',border:'none'}}, h('button',{className:'back-btn',onClick:p.onBack},'← トップへ戻る')),
-    step==='genre'?h('div',{className:'z1 tbox', style:{marginTop:20}}, h('p',{className:'blbl'},'✨ ワンクリックでテーマ提案'), h('p',{style:{fontSize:12,color:'rgba(255,255,255,.4)',marginBottom:9,fontWeight:700}},'① ジャンルを選択'), h('div',{className:'chips'}, THEMES.map(function(g){return h('button',{key:g.id,className:'chip'+(genre===g.id?' chip-on':''),onClick:function(){setGenre(g.id);}},g.label);})), h('div',{className:'brow'}, h('button',{className:'btn-primary',onClick:function(){setNoteProps(function(p){return Object.assign({},p,{theme:genre});});setStep('themes');genThemes(genre);}}, 'テーマを生成 →')) ):null,
-    step==='themes'?h('div',{className:'z1 tbox', style:{marginTop:20}}, h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:11,flexWrap:'wrap'}}, h('button',{className:'btn-back',onClick:function(){setStep('genre');}},'← 戻る'), h('p',{className:'blbl',style:{margin:0}},(THEMES.find(function(g){return g.id===genre;})||{}).label+' のテーマ候補')), h('div',{className:'tgrid'}, themes.map(function(t,i){return h('div',{key:i,className:'titem'+(thIdx===i?' titem-on':''),onClick:function(){setThIdx(i);}}, h('span',{className:'tnum'},i+1), h('span',{style:{flex:1}},t), thIdx===i?h('span',{style:{color:'#e94560'}},'✓'):null);})), h('div',{className:'brow'}, h('button',{className:'btn-rl',onClick:function(){genThemes(genre);}}, '🔄 別のテーマを抽出'), h('button',{className:'btn-primary',disabled:thIdx<0,onClick:function(){ setNoteProps(function(p){return Object.assign({},p,{topic:themes[thIdx]});}); setStep('target'); setSelAge('30s'); setTimeout(function(){extractSituations('30s'); extractWorries('30s');}, 10); }}, 'これで決定 →') ) ):null,
-    step==='target'?h('div',{className:'z1 tbox', style:{marginTop:20}}, h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:11,flexWrap:'wrap'}}, h('button',{className:'btn-back',onClick:function(){setStep('themes');}},'← 戻る'), h('p',{style:{fontSize:13,color:'rgba(255,255,255,.7)',fontWeight:700,margin:0}},'📝 '+noteProps.topic)), h('p',{style:{fontSize:12,color:'rgba(255,255,255,.4)',marginBottom:8,fontWeight:700}},'② ターゲット読者の年齢'), h('div',{className:'chips',style:{marginBottom:18}}, AGES.map(function(a){ return h('button',{key:a.id,className:'chip'+(selAge===a.id?' chip-age-on':''), onClick:function(){ setSelAge(a.id); setTimeout(function(){extractSituations(a.id); extractWorries(a.id);}, 10); }},a.label); }) ), selAge?h('div',{style:{marginBottom: 18}}, h('p',{className:'sw-lbl', style:{marginBottom:12}},'③ 読者の「状況」と「悩み」'), h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginBottom:6}}, h('p',{style:{fontSize:11, color:'rgba(255,255,255,.4)', margin:0}},'▼ 状況を選択（必須）'), h('button',{className:'btn-rl',style:{padding:'4px 8px', fontSize:11}, onClick:function(){extractSituations();}}, '🔄 抽出') ), h('div',{className:'sw-grid', style:{marginBottom:16}}, sugSit.map(function(s,i){ return h('div',{key:i,className:'sw-item'+(selSit===i?' sw-sit':''), onClick:function(){ setSelSit(i); }}, (selSit===i?'✓ ':'')+s); })), h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginBottom:6}}, h('p',{style:{fontSize:11, color:'rgba(255,255,255,.4)', margin:0}},'▼ 悩みを選択（必須）'), h('button',{className:'btn-rl',style:{padding:'4px 8px', fontSize:11}, onClick:function(){extractWorries();}}, '🔄 抽出') ), h('div',{className:'sw-grid'}, sugWry.map(function(w,i){ return h('div',{key:i,className:'sw-item'+(selWry===i?' sw-wry':''), onClick:function(){ setSelWry(i); }}, (selWry===i?'✓ ':'')+w); })) ):null, h('button',{className:'btn-go', disabled:selSit<0 || selWry<0, onClick:function(){ setNoteProps(function(p){return Object.assign({}, p, {age:selAge, sit:sugSit[selSit], wry:sugWry[selWry]});}); setShowNote(true); }},'📝 プロンプト生成画面へ →') ):null
-  );
-}
-
+// ── メインダッシュボード ──
 function MainApp(props){
-  var [screen, setScreen] = useState('landing');
-  var [sharedText, setSharedText] = useState(''); var [sharedTitle, setSharedTitle] = useState('');
-  var [showManual, setShowManual] = useState(false); var draft = loadDraft();
+  var [screen, setScreen] = useState('landing'); var [man, setMan] = useState(false);
+  var db = getDB(); var uData = props.role==='admin' ? null : db.users[props.user];
 
   useEffect(function(){
     if (props.role === 'admin') return;
-    var timer = setInterval(function(){
-      var sStr = localStorage.getItem(DB_KEY_CURRENT);
-      if(!sStr) { props.onLogout(); return; }
-      var s = JSON.parse(sStr);
-      var db = JSON.parse(localStorage.getItem(DB_KEY_USERS) || '{}');
-      if(!db[s.u] || db[s.u].status !== 'approved') { props.onLogout(); }
-    }, 3000);
-    return function(){ clearInterval(timer); };
+    var t = setInterval(function(){ var s = JSON.parse(localStorage.getItem(SESS_KEY) || '{}'); if(!s.u) { props.onLogout(); return; } var curDb = getDB(); if(!curDb.users[s.u] || curDb.users[s.u].status !== 'approved') { props.onLogout(); } }, 3000);
+    return function(){ clearInterval(t); };
   }, [props.role]);
 
-  if(screen==='note') return h(NoteGenWrapper,{ onBack:function(){setScreen('landing');}, onGoTool: function(tid, txt){ setSharedText(txt); setSharedTitle(txt); setScreen(tid); } });
-  if(screen==='sns') return h(SnsGen,{onBack:function(){setScreen('landing');}, initText:sharedText});
-  if(screen==='line') return h(LineGen,{onBack:function(){setScreen('landing');}, initText:sharedText});
-  if(screen==='video') return h(VideoGen,{onBack:function(){setScreen('landing');}, initText:sharedText});
-  if(screen==='backend') return h(BackendGen,{onBack:function(){setScreen('landing');}, initText:sharedText});
-  if(screen==='journey') return h(JourneyGen,{onBack:function(){setScreen('landing');}});
-  if(screen==='bonus') return h(BonusGen,{onBack:function(){setScreen('landing');}, initText:sharedText});
-  if(screen==='image') return h(ImageGen,{onBack:function(){setScreen('landing');}, initKeyword:sharedTitle});
-  if(screen==='profile') return h(ProfileGen,{onBack:function(){setScreen('landing');}});
-  if(screen==='reply') return h(ReplyGen,{onBack:function(){setScreen('landing');}});
-  if(screen==='lp') return h(LpGen,{onBack:function(){setScreen('landing');}, initText:sharedText});
-  if(screen==='affiliate') return h(AffiliateGen,{onBack:function(){setScreen('landing');}});
-  if(screen==='interview') return h(InterviewGen,{onBack:function(){setScreen('landing');}});
-  if(screen==='webdev') return h(WebDevGen,{onBack:function(){setScreen('landing');}});
+  if(screen==='brand') return h(BrandSettings, {user:props.user, onBack:function(){setScreen('landing')}});
+  if(screen==='proj') return h(ProjectManager, {user:props.user, onBack:function(){setScreen('landing')}});
+  if(TOOLS[screen]) return h(ToolEngine, {toolId:screen, user:props.user, role:props.role, onBack:function(){setScreen('landing')}});
+
+  var projName = uData ? uData.projects[uData.curProj].name : '管理者モード';
+  var usageStr = uData ? (uData.usage.date===new Date().toDateString()?uData.usage.count:0) + '/' + DAILY_LIMIT : '∞';
 
   return h('div',{className:'pg'},
-    showManual ? h(ManualModal, {onClose: function(){setShowManual(false);}}) : null,
-    h('div', {style:{position:'absolute', top:16, right:16, zIndex:100, display:'flex', gap:10, alignItems:'center'}}, 
-      props.role === 'admin' ? h('button', {onClick:props.onGoAdmin, style:{background:'linear-gradient(135deg,#f59e0b,#d97706)', border:'none', color:'#fff', padding:'6px 12px', borderRadius:'50px', fontSize:12, fontWeight:800, cursor:'pointer'}}, '🎛️ 管理画面') : null,
-      h('button', {onClick:function(){setShowManual(true);}, style:{background:'rgba(255,255,255,.1)', border:'1px solid rgba(255,255,255,.2)', color:'#fff', padding:'6px 12px', borderRadius:'50px', fontSize:12, fontWeight:700, cursor:'pointer'}}, '📖 マニュアル'),
-      h('button', {onClick:props.onLogout, style:{background:'transparent', border:'none', color:'rgba(255,255,255,.5)', fontSize:12, fontWeight:700, cursor:'pointer'}}, 'ログアウト')
+    man ? h(ManualModal, {onClose: function(){setMan(false);}}) : null,
+    h('div', {style:{position:'absolute', top:16, right:16, zIndex:100, display:'flex', gap:8, alignItems:'center', flexWrap:'wrap', justifyContent:'flex-end'}}, 
+      props.role === 'admin' ? h('button', {className:'btn-sub', onClick:props.onGoAdmin, style:{background:'linear-gradient(135deg,#f59e0b,#d97706)',border:'none'}}, '🎛️ 管理') : null,
+      props.role !== 'admin' ? h('div',{style:{fontSize:11, background:'rgba(255,255,255,.05)', padding:'4px 10px', borderRadius:20}}, '📂 '+projName) : null,
+      props.role !== 'admin' ? h('div',{style:{fontSize:11, background:'rgba(255,255,255,.05)', padding:'4px 10px', borderRadius:20}}, '本日: '+usageStr+'回') : null,
+      h('button', {className:'btn-sub', onClick:function(){setMan(true);}}, '📖'),
+      h('button', {className:'btn-sub', style:{border:'none',background:'transparent'}, onClick:props.onLogout}, 'ログアウト')
     ),
-    h('div',{className:'grid-bg'}), h('div',{className:'z1 badge-sm'},'✦ AI Content Pro (SaaS Edition)'), h('h1',{className:'z1 main-ttl'}, 'AI Content',h('br'),h('span',null,'Platform')), h('p',{className:'z1 main-sub'},'コンテンツ作成からSNS集客、ファン化まで',h('br'),'すべてを完全無料で自動化する最強の指令塔'),
+    h('div',{className:'grid-bg'}), h('div',{className:'z1 badge-sm', style:{marginTop:40}},'✦ AI Content Pro (v23)'), h('h1',{className:'z1 main-ttl'}, 'AI Content',h('br'),h('span',null,'Platform')), h('p',{className:'z1 main-sub'},'コンテンツ作成からSNS集客、ファン化まで',h('br'),'すべてを完全無料で自動化する最強の指令塔'),
     
-    draft ? h('div', {className:'z1', style:{background:'rgba(74,222,128,.15)', border:'1px solid rgba(74,222,128,.4)', borderRadius:12, padding:'16px', marginBottom:24, width:'100%', maxWidth:560}},
-      h('p',{style:{color:'#4ade80', fontWeight:800, fontSize:13, marginBottom:4}}, '📝 前回作成した記事のデータがあります'),
-      h('p',{style:{color:'rgba(255,255,255,.7)', fontSize:12, marginBottom:12}}, draft.topic || '無題のnote記事'),
-      h('div',{style:{display:'flex', gap:8}},
-        h('button',{onClick:function(){ setScreen('note'); }, style:{flex:1, padding:'10px', background:'#16a34a', color:'#fff', border:'none', borderRadius:8, fontWeight:700, cursor:'pointer'}}, '続きから編集する'),
-        h('button',{onClick:function(){ clearDraft(); setScreen('landing'); }, style:{padding:'10px 14px', background:'rgba(255,255,255,.1)', color:'rgba(255,255,255,.6)', border:'none', borderRadius:8, fontWeight:700, cursor:'pointer'}}, '削除')
-      )
+    props.role !== 'admin' ? h('div', {className:'z1 flex-row', style:{marginBottom:30, justifyContent:'center'}},
+      h('button', {className:'btn-rl', onClick:function(){setScreen('proj')}}, '📂 プロジェクト切替'),
+      h('button', {className:'btn-rl', onClick:function(){setScreen('brand')}}, '👤 マイ・ブランド設定')
     ) : null,
 
-    h('div',{className:'z1', style:{width:'100%', maxWidth:920, marginBottom:30}}, 
-      TOOLS_CATEGORIES.map(function(cat) {
-        return h('div', {key:cat.name, style:{marginBottom: 24}},
-          h('h2', {className:'cat-ttl'}, cat.name),
-          h('div', {className:'tool-grid', style:{marginBottom:0}},
-            cat.tools.map(function(toolId) {
-              var t = TOOLS_INFO[toolId];
-              return h('div',{key:t.id,className:'tool-card',onClick:function(){setScreen(t.id);}}, t.badge==='NEW'||t.badge==='神機能'?h('div',{className:'tc-badge tc-badge-new'},t.badge):t.badge?h('div',{className:'tc-badge'},t.badge):null, h('div',{className:'tc-icon'},t.icon), h('div',{className:'tc-name'},t.name), h('div',{className:'tc-desc'},t.desc));
-            })
-          )
-        );
+    h('div',{className:'z1'}, 
+      T_CATS.map(function(cat) {
+        return h('div', {key:cat.name, style:{marginBottom: 24}}, h('h2', {className:'cat-ttl'}, cat.name), h('div', {className:'tool-grid'}, cat.tools.map(function(tid) {
+          var t = TOOLS[tid]; var isUnl = props.role==='admin' || (uData&&uData.perms&&uData.perms[tid]);
+          return h('div',{key:tid,className:'tool-card',onClick:function(){setScreen(tid);}}, h('div',{style:{display:'flex',gap:6}}, t.badge?h('div',{className:'tc-badge '+(t.badge==='NEW'||t.badge==='神機能'?'new':'')},t.badge):null, isUnl?h('div',{className:'badge-limit',style:{background:'#4ade80'}},'無制限'):null ), h('div',{className:'tc-icon'},t.icon), h('div',{className:'tc-name'},t.name), h('div',{className:'tc-desc'},t.desc));
+        }) ) );
       })
     )
   );
 }
 
-// ── ルート管理 (認証ラッピング) ──
+// ── ルート管理 ──
 function Root() {
-  var [user, setUser] = useState(null);
-  var [role, setRole] = useState(null); // 'pending', 'approved', 'rejected', 'admin'
-  var [forceAdminDash, setForceAdminDash] = useState(false);
-
+  var [user, setUser] = useState(null); var [role, setRole] = useState(null); var [goAdmin, setGoAdmin] = useState(false);
   useEffect(function() {
-    var sessionStr = localStorage.getItem(DB_KEY_CURRENT);
-    if (sessionStr) {
-      var session = JSON.parse(sessionStr);
-      if (session.r === 'admin') { 
-        setUser(session.u); setRole('admin'); setForceAdminDash(true);
-      } else {
-        var db = JSON.parse(localStorage.getItem(DB_KEY_USERS) || '{}');
-        if (db[session.u]) { setUser(session.u); setRole(db[session.u].status); } 
-        else { localStorage.removeItem(DB_KEY_CURRENT); }
-      }
-    }
+    var s = localStorage.getItem(SESS_KEY);
+    if (s) { s = JSON.parse(s); if (s.r === 'admin') { setUser(s.u); setRole('admin'); setGoAdmin(true); } else { var db = getDB(); if (db.users[s.u]) { setUser(s.u); setRole(db.users[s.u].status); } else localStorage.removeItem(SESS_KEY); } }
   }, []);
-
-  function handleLogout() { localStorage.removeItem(DB_KEY_CURRENT); setUser(null); setRole(null); setForceAdminDash(false); }
-
-  if (!user) return h(AuthScreen, { onLogin: function(u, r) { setUser(u); setRole(r); if(r==='admin') setForceAdminDash(true); } });
-  if (role === 'admin' && forceAdminDash) return h(AdminDashboard, { onLogout: handleLogout, onGoApp: function(){setForceAdminDash(false);} });
-  if (role === 'pending' || role === 'rejected') return h(PendingScreen, { 
-    rejected: role === 'rejected',
-    onCheck: function() { var db = JSON.parse(localStorage.getItem(DB_KEY_USERS) || '{}'); setRole(db[user].status); }, 
-    onLogout: handleLogout 
-  });
-  if (role === 'approved' || (role === 'admin' && !forceAdminDash)) return h(MainApp, { role: role, onLogout: handleLogout, onGoAdmin: function(){setForceAdminDash(true);} });
+  function handleLogout() { localStorage.removeItem(SESS_KEY); setUser(null); setRole(null); setGoAdmin(false); }
+  if (!user) return h(AuthScreen, { onLogin: function(u, r) { setUser(u); setRole(r); if(r==='admin') setGoAdmin(true); } });
+  if (role === 'admin' && goAdmin) return h(AdminDashboard, { onLogout: handleLogout, onGoApp: function(){setGoAdmin(false);} });
+  if (role === 'pending' || role === 'rejected') return h(PendingScreen, { rejected: role === 'rejected', onCheck: function() { setRole(getDB().users[user].status); }, onLogout: handleLogout });
+  if (role === 'approved' || (role === 'admin' && !goAdmin)) return h(MainApp, { user:user, role: role, onLogout: handleLogout, onGoAdmin: function(){setGoAdmin(true);} });
   return null;
 }
 
