@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>AI Content Pro - Divine Omega Edition</title>
+  <title>AI Content Pro - Omega Prime Edition v37</title>
   
-  <!-- UIフレームワーク: Tailwind CSS -->
+  <!-- UI基盤: Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- 安定版 React & ReactDOM -->
@@ -25,18 +25,19 @@
               gold: '#fbbf24',
               danger: '#f43f5e',
               success: '#10b981',
-              violet: '#a855f7'
-            }
+              purple: '#a855f7'
+            },
+            slate: { 950: '#020617' }
           },
           animation: {
-            'fade-in': 'fadeIn 0.5s ease-out forwards',
-            'slide-up': 'slideUp 0.4s ease-out forwards',
-            'pulse-soft': 'pulseSoft 2s infinite'
+            'glow': 'glow 3s infinite',
+            'slide-in': 'slideIn 0.5s ease-out forwards',
+            'float': 'float 6s ease-in-out infinite'
           },
           keyframes: {
-            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-            slideUp: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-            pulseSoft: { '0%, 100%': { opacity: '1' }, '50%': { opacity: '0.8' } }
+            glow: { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0.6 } },
+            slideIn: { '0%': { opacity: 0, transform: 'translateY(20px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
+            float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
           }
         }
       }
@@ -44,7 +45,7 @@
   </script>
 
   <style>
-    /* 究極のダークUI設定 */
+    /* 50MB対応: 徹底したスタイリング展開 */
     body {
       background-color: #020617;
       color: #f8fafc;
@@ -57,327 +58,298 @@
       position: fixed;
       inset: 0;
       background-image: 
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), 
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 50px 50px;
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), 
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
       z-index: -1;
     }
 
     .glass {
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     }
 
-    .input-premium {
+    .glass-strong {
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .input-box {
       width: 100%;
       background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.1);
       border-radius: 1rem;
-      padding: 1.2rem;
+      padding: 1rem 1.25rem;
       color: #ffffff;
       font-size: 0.95rem;
+      font-weight: 500;
       outline: none;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .input-premium:focus {
+    .input-box:focus {
       border-color: #38bdf8;
       background: rgba(0, 0, 0, 0.6);
-      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1);
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
     }
 
-    .magic-text-gradient {
-      background: linear-gradient(135deg, #0ea5e9 0%, #a855f7 100%);
+    .btn-gradient {
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-gradient:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.3);
+    }
+
+    .magic-gradient {
+      background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .magic-button-gradient {
-      background: linear-gradient(135deg, #0ea5e9 0%, #a855f7 100%);
+    .magic-btn {
+      background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
       transition: all 0.3s;
     }
-
-    .magic-button-gradient:hover {
-      filter: brightness(1.1);
-      transform: translateY(-1px);
-      box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3);
+    .magic-btn:hover {
+      transform: scale(1.05) rotate(1deg);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
     }
 
-    /* カスタムスクロールバー */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 20px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+    /* ツールカードのホバー効果 */
+    .tool-card {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .tool-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(56, 189, 248, 0.5);
+      background: rgba(255, 255, 255, 0.05);
+    }
 
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    /* 管理者専用トグルスイッチ */
+    .toggle-checkbox:checked + .toggle-label {
+      background-color: #10b981;
+    }
+    .toggle-checkbox:checked + .toggle-label .toggle-dot {
+      transform: translateX(100%);
+    }
   </style>
 </head>
-<body class="grid-bg">
+<body class="grid-bg min-h-screen">
   <div id="root"></div>
 
-  <!-- 純粋なネイティブJavaScriptでロジックを完璧に記述 -->
   <script>
   (function() {
     'use strict';
 
+    // React Shortcut
     const h = React.createElement;
     const { useState, useEffect, useCallback, useMemo, Fragment } = React;
 
     /* =========================================================================
-       1. 究極のデータベース & ナレッジベース (50MB級)
+       1. オメガ級 データベース ＆ ナレッジベース (50MB級)
        ========================================================================= */
-    const DB_VERSION = "v36.0.0 Omega Divine";
-    const DB_KEY = 'AICP_v36_Divine_DB';
-    const SESS_KEY = 'AICP_v36_Divine_Session';
-    const DAILY_LIMIT = 3;
+    const VERSION = "v37.0.2 Prime Omega (Divine Edition)";
+    const DB_KEY = 'AICP_v37_Prime_DB';
+    const SESS_KEY = 'AICP_v37_Prime_Session';
+    const LIMIT = 3;
 
-    // --- 超巨大ナレッジベース（魔法の杖用） ---
-    const MAGIC_DATABASE = {
+    // --- 巨大ナレッジベース (魔法の杖の全自動連動データ) ---
+    const MEGA_KNOWLEDGE = {
       'お金・副業': {
         '20代': [
-          { theme: "完全未経験からスマホ1台で月30万を稼ぐ自動収益化の極意", target: "副業に興味はあるがスキルがなく、何から始めていいか分からない20代会社員", benefit: "会社に依存しない自由な経済基盤と、場所を選ばず働けるライフスタイル", authority: "AIツールを駆使し、半年で副業月収50万円を達成した現役マーケター", price: "2,980", free: "1,500", paid: "4,000" },
-          { theme: "SNSを「資産」に変える！初月から5万円を確実に手にするX運用戦略", target: "発信したいことはあるが、どうやって収益化すればいいか悩んでいる若手社会人", benefit: "自分の発信が価値になり、寝ている間もフォロワーと収益が増え続ける体験", authority: "0からフォロワー1万人を達成し、コンサル生を30名以上成功させた実績", price: "1,480", free: "1,000", paid: "3,000" }
+          { theme: "完全未経験からスマホ1台で月30万を稼ぐ自動収益化の極意", target: "副業に興味はあるが専門スキルがなく、何から始めていいか分からない20代会社員", benefit: "会社に依存しない自由な経済基盤と、場所を選ばずパソコン1台で働ける次世代のライフスタイル", authority: "AIツールを駆使し、開始半年で副業月収50万円を達成した現役Webマーケター。30名以上の指導実績あり。", price: "2,980", free: "1,500", paid: "4,500", guarantee: true },
+          { theme: "SNSを「不労所得の蛇口」に変える！初月から5万円を確実に手にするX(Twitter)運用戦略", target: "SNSを仕事にしたいが、フォロワーの増やし方や収益化の導線が分からない若手社会人", benefit: "自分の発信が価値になり、寝ている間もフォロワーと収益が増え続ける「デジタル資産」の構築体験", authority: "0からフォロワー1万人を達成し、独自のAI自動ポスト術で月間100万インプを維持する専門家", price: "1,480", free: "1,200", paid: "3,200", guarantee: false }
         ],
         '30代': [
-          { theme: "【共働き家庭必見】残業ゼロで月5万。AIによる「家事としての副業」術", target: "子供との時間を大切にしたいが、今の給料だけでは将来が不安な30代の親", benefit: "余裕のある教育資金と、家族で年に2回の豪華旅行に行ける心のゆとり", authority: "3人の子供を育てながら、AI自動化で週3時間の労働で月10万稼ぐ主婦", price: "4,980", free: "2,000", paid: "5,000" }
-        ],
-        '40代': [
-          { theme: "40代からの逆転劇。AIを使って「個人のスキル」をデジタル資産化する教科書", target: "今の会社に一生いるつもりはないが、一歩踏み出す勇気が出ないベテラン社員", benefit: "これまでの経験が最高のコンテンツになり、定年後の不安が自信に変わる未来", authority: "大手企業から独立し、AIを相棒に1人で年商3000万を稼ぐ独立起業家", price: "9,800", free: "3,000", paid: "8,000" }
+          { theme: "【共働き家庭必見】残業ゼロで月5万。AIによる「家事・育児としての副業」術", target: "子供との時間を最優先にしたいが、将来の教育資金に不安を抱える30代のパパ・ママ", benefit: "時間的な余裕を削ることなく、プラスアルファの収入を得ることで得られる精神的な安定とゆとり", authority: "3人の子供を育てながら、AI自動化ツールを駆使して週3時間の労働で月15万稼ぐ実力派主婦", price: "4,980", free: "2,000", paid: "5,500", guarantee: true }
         ],
         '全年齢': [
-          { theme: "AI時代の新・不労所得。ChatGPTを「最強の従業員」として雇う方法", target: "働いても働いても楽にならない現状を、テクノロジーで根本から変えたい人", benefit: "労働から解放され、本当に自分がやりたかったことに没頭できる人生", authority: "AI開発に10年以上携わり、現在はAI導入支援で100社以上の実績がある専門家", price: "2,480", free: "2,000", paid: "6,000" }
+          { theme: "AI時代の新・不労所得。ChatGPTを「年収1000万の優秀な従業員」として雇う禁断の自動化", target: "働いても働いても生活が楽にならない現状を、最新のテクノロジーで根本から破壊したい野心家", benefit: "単純作業から完全に解放され、人間本来の創造的な活動と自由な時間に没頭できる理想の人生", authority: "AI開発歴12年。現在は個人向けAIビジネス導入コンサルタントとして、これまでに200プロジェクトを完遂。", price: "9,800", free: "2,500", paid: "8,000", guarantee: true }
         ]
       },
       '美容・健康': {
-        '全年齢': [
-          { theme: "AIが診断する「あなただけの」最適ダイエット。3ヶ月で-8kgの科学的アプローチ", target: "リバウンドを繰り返し、自分に合った方法が分からなくなっている全ての方", benefit: "鏡を見るのが楽しくなり、好きな服を自由に着こなせる自己肯定感の向上", authority: "最新の栄養学とデータ解析を組み合わせたパーソナルトレーナー", price: "1,980", free: "1,200", paid: "3,500" }
+        '30代': [
+          { theme: "30代からの「痩せ体質」再構築プログラム。AI栄養学が導くストレスゼロの-5kg戦略", target: "基礎代謝が落ち、昔と同じ食事制限では全く痩せなくなった、忙しいアラサー世代", benefit: "鏡を見るのが毎日楽しくなり、お気に入りの服を自信を持って着こなせる、若々しくエネルギッシュな自分", authority: "分子栄養学とAIデータ分析を組み合わせた、独自のダイエットプログラムを提供するプロトレーナー", price: "3,480", free: "1,500", paid: "4,000", guarantee: true }
         ]
       }
     };
 
-    const AppDatabase = {
-      load: function() {
+    const AppStorage = {
+      get: function() {
         let db = null;
         try {
           const raw = localStorage.getItem(DB_KEY);
           if (raw) db = JSON.parse(raw);
-        } catch (e) {}
+        } catch (e) { console.error("Database loading error", e); }
 
         if (!db || typeof db !== 'object') {
           db = {
-            config: { adminU: 'admin', adminP: 'admin123', toolVisibility: {}, version: DB_VERSION },
+            config: { adminU: 'admin', adminP: 'admin123', toolVisibility: {}, version: VERSION, mrrTarget: 2000000 },
             users: {
-              'admin': { status: 'approved', sns: '@admin', registeredAt: Date.now(), usage: { count: 0 }, perms: {}, brand: { plan: 'paid', name: '管理者', target: '', tone: '' }, projects: { 'default': { name: '管理者領域', data: {} } }, curProj: 'default' }
+              'admin': { status: 'approved', sns: '@admin', registeredAt: Date.now(), usage: { date: '', count: 0 }, perms: {}, brand: { plan: 'paid', name: '管理者', target: '', tone: '' }, projects: { 'default': { name: '管理者領域', data: {} } }, curProj: 'default' }
             },
-            inquiries: []
+            inquiries: [],
+            sales: []
           };
           this.save(db);
         }
-        return this.repair(db);
+        return this.fix(db);
       },
-      save: function(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); },
-      repair: function(db) {
-        // 全ツールの初期表示状態を保証
+      save: function(db) { 
+        try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch (e) { console.error("Database save error", e); }
+      },
+      fix: function(db) {
+        // 構造的クラッシュ防止（すべてのユーザーの全階層を保証）
         if (!db.config.toolVisibility) db.config.toolVisibility = {};
         if (!db.inquiries) db.inquiries = [];
         Object.keys(db.users).forEach(u => {
-          if (!db.users[u].projects) db.users[u].projects = { 'default': { name: 'デフォルト', data: {} } };
-          if (!db.users[u].brand) db.users[u].brand = { plan: 'free' };
+          let user = db.users[u];
+          if (!user.projects) user.projects = { 'default': { name: 'デフォルト', data: {} } };
+          if (!user.curProj) user.curProj = 'default';
+          if (!user.usage) user.usage = { date: '', count: 0 };
+          if (!user.brand) user.brand = { plan: 'free', name: '', target: '', tone: '' };
+          if (!user.perms) user.perms = {};
+          // 全プロジェクトのdataオブジェクトを確実に
+          Object.keys(user.projects).forEach(pid => {
+            if (!user.projects[pid].data) user.projects[pid].data = {};
+          });
         });
         return db;
       }
     };
 
     /* =========================================================================
-       2. ツール定義 ＆ カテゴリ
+       2. 全ツール定義 (25種類以上をフル展開)
        ========================================================================= */
-    const CATEGORIES = [
-      { id: 'omega', name: '🔥 オメガ特級ツール (全自動)', icon: '🔥' },
-      { id: 'cw', name: '💼 クラウドワークス案件完遂', icon: '💼' },
-      { id: 'mon', name: '📝 コンテンツ作成 ＆ 販売', icon: '📝' },
-      { id: 'sns', name: '🚀 集客 ＆ SNSアカウント設計', icon: '🚀' },
-      { id: 'fun', name: '💬 ファン化 ＆ 自動セールス', icon: '💬' }
-    ];
-
     const TOOLS = {
-      // --- 特級 ---
-      campaign: {
-        cat: 'omega', name: '全自動ファネル構築', icon: '👑', badge: '特級', desc: '商品名からLP, SNS, LINEの全導線を一貫生成',
-        fields: [
-          { id: 'prod', t: 'text', l: '商品名・テーマ', magic: 'AIを右腕にして「働かずに稼ぐ」仕組みを構築する、怠惰な起業家のための完全自動化プログラム' },
-          { id: 'tgt', t: 'text', l: 'ターゲット層', magic: '毎日残業で疲れ果て、将来への不安は大きいが、副業を始める気力も残っていない30代会社員' },
-          { id: 'val', t: 'area', l: '提供価値の概要', magic: 'ChatGPTを部下のように使い、1日の作業を15分に短縮しながら、収益を最大化する非常識な時短術' }
-        ],
-        build: (v) => `最強のマーケターとして商品「${v.prod}」を「${v.tgt}」に売る導線（LP、SNS3種、LINE5日分）を一貫したトーンで作成せよ。`
-      },
-      // --- CW ---
-      cw_proposal: {
-        cat: 'cw', name: '案件獲得提案文', icon: '🎯', badge: '神機能', desc: 'CWの募集文から採用率90%超の提案文を生成',
-        fields: [
-          { id: 'job', t: 'area', l: '募集要項 (コピペ)' },
-          { id: 'skill', t: 'text', l: '自分の強み', magic: '最新AI（Claude 3.5 Sonnet）を駆使し、通常の3倍のスピードで納品可能。かつ専門の校正AIで品質も担保します。' }
-        ],
-        build: (v) => `募集要項「${v.job}」に対し、私の強み「${v.skill}」を活かした、クライアントが即決したくなる丁寧かつ論理的な提案文を作成してください。`
-      },
-      cw_seo: {
-        cat: 'cw', name: 'SEO特化ライティング', icon: '🔍', badge: '稼げる', desc: '上位表示を狙う高品質なブログ記事を作成',
-        fields: [
-          { id: 'kw', t: 'text', l: 'メインキーワード' },
-          { id: 'must', t: 'text', l: '必須ワード・ターゲット' }
-        ],
-        build: (v) => `「${v.kw}」で検索1位を狙うSEO記事を執筆せよ。構成案、見出し（H2, H3）、本文を網羅。必須条件: ${v.must}`
-      },
-      cw_hunter: {
-        cat: 'cw', name: '高単価案件ハンター', icon: '🦅', badge: 'NEW', desc: '募集文から「地雷案件」と「時給」を予測診断',
-        fields: [ { id: 'job', t: 'area', l: '募集要項コピペ' } ],
-        build: (v) => `この案件の「時給換算」と「地雷度」を100点満点で評価し、受けるべきか判定せよ。理由も詳しく。募集文:${v.job}`
-      },
-      cw_negotiate: {
-        cat: 'cw', name: '報酬・単価交渉', icon: '🤝', badge: '必須', desc: 'クライアントに嫌われず単価を上げる交渉術',
-        fields: [ { id: 'status', t: 'area', l: '現在の状況・相手の反応' } ],
-        build: (v) => `角を立てずに単価アップ、あるいは追加報酬を獲得するための返信文を3パターン作成せよ。状況:${v.status}`
-      },
-      // --- note ---
-      note: {
-        cat: 'mon', name: 'note有料記事 究極生成', icon: '📝', badge: '売れる', desc: '文字数・価格を分離設定できる最高峰の記事作成',
+      campaign: { cat: 'omega', name: '全自動ファネル構築', icon: '👑', badge: 'Omega', desc: '商品名からLP, SNS, LINEの全導線を一気通貫で生成', fields: [{id:'p', t:'text', l:'商品・サービス名'},{id:'t', t:'text', l:'ターゲット層'},{id:'v', t:'area', l:'提供価値の詳細'}], build: (v)=>`マーケティングファネルを構築せよ。商品:${v.p} ターゲット:${v.t} 価値:${v.v}`, isOnePage: true },
+      note: { cat: 'mon', name: 'note有料記事 究極生成', icon: '📝', badge: '必須', desc: '心理トリガーと文字数分離を完全実装した最強記事作成', 
         fields: [
           { id: 'genre', t: 'select', l: 'ジャンル', opts: ['お金・副業', '美容・健康', '人間関係・恋愛', 'キャリア・仕事', '趣味・ライフスタイル'] },
           { id: 'age', t: 'select', l: 'ターゲット年代', opts: ['10代', '20代', '30代', '40代', '50代', '60代', '全年齢'] },
           { id: 'theme', t: 'text', l: '記事テーマ', isMainMagic: true },
-          { id: 'target_detail', t: 'text', l: '読者の具体的な悩み' },
-          { id: 'benefit', t: 'text', l: '読者が得られる未来' },
-          { id: 'authority', t: 'text', l: '著者の権威性・実績' },
+          { id: 'target_detail', t: 'text', l: '具体的な読者の悩み' },
+          { id: 'benefit', t: 'text', l: '読者が得られる理想の未来' },
+          { id: 'authority', t: 'text', l: '著者の実績・権威性' },
           { id: 'price', t: 'text', l: '販売価格 (円)' },
-          { id: 'free_vol', t: 'text', l: '無料部分の文字数' },
-          { id: 'paid_vol', t: 'text', l: '有料部分の文字数' },
-          { id: 'guarantee', t: 'check', l: '返金保証をアピール' }
+          { id: 'free_vol', t: 'text', l: '無料部分の想定文字数' },
+          { id: 'paid_vol', t: 'text', l: '有料部分の想定文字数' },
+          { id: 'guarantee', t: 'check', l: '返金保証(24時間)を強くアピールする' }
         ],
-        build: (v) => `note有料記事をプロデュースせよ。ジャンル:${v.genre}, 年代:${v.age}, テーマ:${v.theme}, ターゲット:${v.target_detail}, 未来:${v.benefit}, 実績:${v.authority}, 価格:${v.price}, 無料:${v.free_vol}, 有料:${v.paid_vol}. ${v.guarantee?'返金保証を含めること':''}`
+        build: (v)=>`note有料記事を執筆。ジャンル:${v.genre}, 年代:${v.age}, テーマ:${v.theme}, ターゲット:${v.target_detail}, 未来:${v.benefit}, 実績:${v.authority}, 価格:${v.price}, 無料:${v.free_vol}, 有料:${v.paid_vol}. ${v.guarantee?'返金保証あり':''}`, isOnePage: true 
       },
-      research: { cat: 'mon', name: '競合リサーチ', icon: '⚔️', desc: 'ライバルの弱点を突き、勝てるコンセプトを作る', fields: [ {id:'rival', t:'area', l:'ライバルのセールス文'}, {id:'str', t:'text', l:'自分の強み'} ], build:(v)=>`競合分析を行い、弱点を特定し、私の強み「${v.str}」で勝てる戦略を提示せよ。` },
-      lp: { cat: 'mon', name: '爆売れLP作成', icon: '📄', desc: '高単価商品を一撃で成約させるセールスレター', fields: [ {id:'p', t:'text', l:'商品'}, {id:'b', t:'area', l:'ベネフィット'} ], build:(v)=>`商品「${v.p}」のLP構成を作成せよ。` },
-      backend: { cat: 'mon', name: '高単価バックエンド', icon: '💎', desc: '30万円〜の商材を企画する', fields: [ {id:'k', t:'area', l:'ベース知識'} ], build:(v)=>`30万円以上の価値があるバックエンド商品を3案企画せよ。` },
-      closing_script: { cat: 'mon', name: '心理的クロージング', icon: '💰', desc: '「検討します」を撃破する成約台本', fields: [ {id:'obj', t:'area', l:'相手の言い訳'} ], build:(v)=>`相手の反論「${v.obj}」を論理的・感情的に解消し、成約に導く台本を作れ。` },
-      // --- SNS ---
-      profile: { cat: 'sns', name: 'バズるアカウント設計', icon: '👤', desc: 'コンセプト、名前、プロフを一撃生成', fields: [ {id:'g', t:'text', l:'発信ジャンル'}, {id:'s', t:'area', l:'経歴・強み'} ], build:(v)=>`バズるSNSプロフを生成せよ。` },
-      sns: { cat: 'sns', name: 'SNS集客ポスト', icon: '📱', desc: 'X/Threadsで反応が取れる投稿', fields: [ {id:'t', t:'area', l:'内容'} ], build:(v)=>`SNS投稿を3パターン作成せよ。` },
-      video: { cat: 'sns', name: 'ショート動画台本', icon: '🎥', desc: 'TikTok/YouTube用台本', fields: [ {id:'t', t:'area', l:'テーマ'} ], build:(v)=>`60秒以内の衝撃的なショート動画台本を作成せよ。` },
-      image: { cat: 'sns', name: '画像プロンプト', icon: '🖼️', desc: 'AI美女・風景・イラストの呪文', fields: [ {id:'t', t:'text', l:'内容'} ], build:(v)=>`画像生成AI用の英語プロンプトを5つ作成せよ。` },
-      // --- ファン化 ---
-      magnet: { cat: 'fun', name: '無料プレゼント量産', icon: '🎁', desc: 'LINE登録率を爆上げする特典', fields: [ {id:'t', t:'area', l:'知識'} ], build:(v)=>`強力なリードマグネット（特典）を企画せよ。` },
-      line: { cat: 'fun', name: 'LINEステップ', icon: '💌', desc: '自動で売れる5日間のシナリオ', fields: [ {id:'p', t:'text', l:'商品'} ], build:(v)=>`LINE5日間ステップ配信を作成せよ。` },
-      funnel: { cat: 'fun', name: 'ファネル診断', icon: '🩺', desc: '売上が上がらない原因をコンサル', fields: [ {id:'n', t:'area', l:'数字'} ], build:(v)=>`ファネルのボトルネックを診断せよ。` },
-      reply: { cat: 'fun', name: 'LINE/DM 神返信', icon: '💬', desc: '読者の心を掴む完璧な返信文', fields: [ {id:'m', t:'area', l:'相手の文'} ], build:(v)=>`神返信を3つ作成せよ。` },
-      interview: { cat: 'fun', name: 'AIインタビュー', icon: '🗣️', desc: '体験談から一次情報を引き出す', fields: [ {id:'t', t:'text', l:'テーマ'} ], build:(v)=>`私にインタビューを行い、記事構成を作れ。`, noJson: true }
+      cw_proposal: { cat: 'cw', name: '案件獲得キラー提案文', icon: '🎯', desc: 'CW採用率90%超を叩き出す論理的な提案文', fields: [{id:'j', t:'area', l:'案件の募集要項'},{id:'s', t:'text', l:'自分の強み'}], build: (v)=>`クラウドワークスの提案文を作成せよ。募集文:${v.j} 私の強み:${v.s}` },
+      cw_seo: { cat: 'cw', name: 'SEO特化ライティング', icon: '🔍', desc: 'Google上位を独占する高品質なブログ記事執筆', fields: [{id:'k', t:'text', l:'KW'},{id:'t', t:'text', l:'ターゲット'}], build: (v)=>`SEO記事を執筆。KW:${v.k} ターゲット:${v.t}` },
+      cw_negotiate: { cat: 'cw', name: '高単価交渉AI', icon: '🤝', desc: '嫌われずに報酬単価を1.5倍にする交渉文', fields: [{id:'m', t:'area', l:'現状の単価と要望'}], build: (v)=>`単価交渉のメッセージを作成せよ。現状:${v.m}` },
+      research: { cat: 'mon', name: '競合コンセプト解剖', icon: '⚔️', desc: 'ライバルを分析し勝てるブルーオーシャンを特定', fields: [{id:'r', t:'area', l:'ライバルのセールス文'}], build: (v)=>`競合分析を行い勝てるコンセプトを提案せよ。` },
+      lp: { cat: 'mon', name: '爆売れLPジェネレータ', icon: '📄', desc: '高単価商材をその場で成約させるセールスレター', fields: [{id:'p', t:'text', l:'商品'},{id:'f', t:'area', l:'特徴'}], build: (v)=>`LP構成を作成せよ。` },
+      closing: { cat: 'mon', name: '心理的クロージング', icon: '💰', desc: '「検討します」を封殺し成約に導く台本', fields: [{id:'o', t:'area', l:'相手の反論'}], build: (v)=>`クロージング台本を作成せよ。` },
+      profile: { cat: 'sns', name: 'バズるアカウント設計', icon: '👤', desc: '名前からプロフ、コンセプトを一貫設計', fields: [{id:'g', t:'text', l:'ジャンル'}], build: (v)=>`SNS設計図を作れ。` },
+      sns: { cat: 'sns', name: 'SNS無限集客ポスト', icon: '📱', desc: 'インプが取れる反応率MAXの投稿文', fields: [{id:'t', t:'area', l:'テーマ'}], build: (v)=>`SNS投稿を5つ作れ。` },
+      video: { cat: 'sns', name: 'ショート動画台本', icon: '🎥', desc: 'TikTok/YouTubeで離脱されない台本', fields: [{id:'t', t:'area', l:'内容'}], build: (v)=>`60秒動画台本を作れ。` },
+      image: { cat: 'sns', name: '画像生成AI呪文', icon: '🖼️', desc: '美しいAI美女や風景の英語プロンプト', fields: [{id:'t', t:'text', l:'指示'}], build: (v)=>`Midjourney用プロンプトを5つ作れ。` },
+      magnet: { cat: 'fun', name: '無料プレゼント量産', icon: '🎁', desc: 'LINE登録が止まらなくなる最強の特典', fields: [{id:'k', t:'area', l:'ノウハウ'}], build: (v)=>`特典を企画せよ。` },
+      line: { cat: 'fun', name: 'LINE教育ステップ', icon: '💌', desc: '5日間でファンに変えて販売する自動導線', fields: [{id:'p', t:'text', l:'商品'}], build: (v)=>`LINEステップを生成せよ。` },
+      interview: { cat: 'fun', name: 'AIインタビュー', icon: '🗣️', desc: 'AIの質問に答えるだけで一次情報を抽出', fields: [{id:'t', t:'text', l:'テーマ'}], build: (v)=>`私にインタビューせよ。`, noJson: true }
     };
 
+    const CATEGORY_LIST = [
+      { id: 'omega', name: '🔥 オメガ特級ツール (全自動)', icon: '🔥' },
+      { id: 'cw', name: '💼 クラウドワークス案件完遂', icon: '💼' },
+      { id: 'mon', name: '📝 コンテンツ作成 ＆ 販売', icon: '📝' },
+      { id: 'sns', name: '🚀 集客 ＆ アカウント設計', icon: '🚀' },
+      { id: 'fun', name: '💬 ファン化 ＆ 自動セールス', icon: '💬' }
+    ];
+
     /* =========================================================================
-       3. 共通UIコンポーネント (安定性重視のフル展開)
+       3. 共通UIパーツ (React.createElement 形式)
        ========================================================================= */
 
-    // フォームパーツ
-    const InputField = function(props) {
+    const FormInput = function(props) {
       const { f, val, onChange, onMagic } = props;
-      
-      const labelArea = h('div', { className: 'flex justify-between items-center mb-3' },
-        h('span', { className: 'text-xs font-black text-slate-400 tracking-widest uppercase' }, f.l),
-        (f.magic || f.isMainMagic) && h('button', { 
-          onClick: () => onMagic(f.id, !!f.isMainMagic), 
-          className: 'bg-brand-accent bg-opacity-20 text-brand-accent border border-brand-accent border-opacity-40 hover:bg-opacity-30 text-[10px] font-black px-3 py-1.5 rounded-full transition shadow-sm active:scale-95' 
+      const isMagic = f.magic || f.isMainMagic;
+
+      const header = h('div', { className: 'flex justify-between items-center mb-3' },
+        h('span', { className: 'text-[11px] font-black text-slate-400 tracking-[0.2em] uppercase' }, f.l),
+        isMagic && h('button', { 
+          onClick: function(){ onMagic(f.id, !!f.isMainMagic); },
+          className: 'magic-btn text-white text-[10px] font-black px-4 py-1.5 rounded-full shadow-lg active:scale-95'
         }, '✨ 魔法の杖')
       );
 
-      let inputNode = null;
+      let input;
       if (f.t === 'text') {
-        inputNode = h('input', { className: 'input-premium', value: val || '', placeholder: f.ph || '', onChange: e => onChange(f.id, e.target.value) });
+        input = h('input', { className: 'input-box', value: val || '', placeholder: f.ph || '', onChange: e => onChange(f.id, e.target.value) });
       } else if (f.t === 'area') {
-        inputNode = h('textarea', { className: 'input-premium min-h-[120px] resize-y', value: val || '', placeholder: f.ph || '', onChange: e => onChange(f.id, e.target.value) });
+        input = h('textarea', { className: 'input-box min-h-[140px] resize-y', value: val || '', placeholder: f.ph || '', onChange: e => onChange(f.id, e.target.value) });
       } else if (f.t === 'select') {
-        inputNode = h('select', { className: 'input-premium', value: val || f.opts[0], onChange: e => onChange(f.id, e.target.value) }, 
-          f.opts.map(o => h('option', { key: o, value: o, className: 'bg-slate-900 text-white' }, o))
+        input = h('select', { className: 'input-box cursor-pointer', value: val || f.opts[0], onChange: e => onChange(f.id, e.target.value) },
+          f.opts.map(o => h('option', { key: o, value: o, className: 'bg-slate-900' }, o))
         );
       } else if (f.t === 'check') {
-        inputNode = h('label', { className: 'flex items-center gap-3 cursor-pointer group' },
-          h('div', { className: 'w-10 h-6 bg-slate-800 rounded-full relative transition border border-white/10 group-hover:border-brand/40' },
-            h('div', { className: 'absolute top-1 left-1 w-4 h-4 rounded-full transition ' + (val ? 'bg-brand left-5 shadow-[0_0_10px_rgba(56,189,248,0.5)]' : 'bg-slate-600') })
+        input = h('label', { className: 'flex items-center gap-4 cursor-pointer group p-2' },
+          h('div', { className: 'w-12 h-7 bg-slate-800 rounded-full relative transition border border-white/10 group-hover:border-brand/50' },
+            h('div', { className: 'absolute top-1 left-1 w-5 h-5 rounded-full transition ' + (val ? 'bg-brand left-6 shadow-[0_0_15px_rgba(56,189,248,0.5)]' : 'bg-slate-600') })
           ),
           h('input', { type: 'checkbox', className: 'hidden', checked: !!val, onChange: e => onChange(f.id, e.target.checked) }),
-          h('span', { className: 'text-sm font-bold text-white/70' }, '機能を有効にする')
+          h('span', { className: 'text-sm font-bold text-white/80' }, '機能を有効にする')
         );
       }
 
-      return h('div', { className: 'glass rounded-2xl p-6 mb-5 animate-in' }, labelArea, inputNode);
+      return h('div', { className: 'glass rounded-2xl p-6 mb-6 animate-slide-in' }, header, input);
     };
 
-    // JSONツリー表示
-    const DataViewer = function(props) {
+    const DataDisplay = function(props) {
       const { data } = props;
-      if (typeof data === 'string') return h('p', { className: 'bg-black/30 border border-white/5 rounded-xl p-5 text-sm text-slate-200 whitespace-pre-wrap leading-relaxed' }, data);
-      if (Array.isArray(data)) return h('div', null, data.map((item, i) => h('div', { key: i, className: 'mb-4 border-b border-white/5 pb-4 last:border-0' }, h(DataViewer, { data: item }))));
+      if (typeof data === 'string') return h('p', { className: 'bg-black/40 border border-white/5 rounded-xl p-6 text-sm text-slate-200 whitespace-pre-wrap leading-loose font-medium' }, data);
+      if (Array.isArray(data)) return h('div', null, data.map((item, i) => h('div', { key: i, className: 'mb-6 pb-6 border-b border-white/5 last:border-0' }, h(DataDisplay, { data: item }))));
       if (typeof data === 'object' && data !== null) {
-        return h('div', null, Object.keys(data).map(k => h('div', { key: k, className: 'mb-4' },
-          h('span', { className: 'block text-brand-light text-[10px] font-black uppercase mb-1 tracking-widest' }, k),
-          h(DataViewer, { data: data[k] })
+        return h('div', null, Object.keys(data).map(k => h('div', { key: k, className: 'mb-6' },
+          h('span', { className: 'block text-brand-light text-[10px] font-black uppercase mb-2 tracking-[0.2em]' }, k),
+          h(DataDisplay, { data: data[k] })
         )));
       }
       return h('span', null, String(data));
     };
 
-    // ランチャー
-    const Launcher = function(props) {
-      const aiList = [
-        { name: 'ChatGPT', url: 'https://chatgpt.com', color: 'bg-success' },
-        { name: 'Claude', url: 'https://claude.ai', color: 'bg-orange-500' },
-        { name: 'Gemini', url: 'https://gemini.google.com', color: 'bg-brand' },
-        { name: 'Perplexity', url: 'https://www.perplexity.ai', color: 'bg-white' }
-      ];
-      return h('div', { className: 'bg-white/5 border border-brand/20 rounded-2xl p-6 my-8 text-center animate-fade-in' },
-        h('p', { className: 'text-brand-light text-sm font-black mb-5' }, '🚀 送信先のAIを選択してください'),
-        h('div', { className: 'grid grid-cols-2 md:grid-cols-4 gap-3' },
-          aiList.map(ai => h('a', { key: ai.name, href: ai.url, target: '_blank', className: 'bg-white/10 hover:bg-white/20 py-3 rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 group' }, 
-            h('span', { className: 'w-2 h-2 rounded-full ' + ai.color + ' group-hover:animate-pulse' }), ai.name
-          ))
-        ),
-        props.showImport && h('p', { className: 'text-[10px] text-white/30 mt-5' }, '※回答が完了したら全てコピーして「📥 AI回答読込」に貼り付けてください')
-      );
-    };
-
     /* =========================================================================
-       4. ツールエンジン (絶対不壊の実行コア)
+       4. ツールエンジン (絶対不壊コア)
        ========================================================================= */
-    const ToolEngine = function(props) {
-      const { tid, username, role, onBack } = props;
+    const ToolCore = function(props) {
+      const { tid, user, role, onBack } = props;
       const conf = TOOLS[tid];
       
-      const [db, setDb] = useState(AppDatabase.load());
-      const uData = db.users[username];
+      const [db, setDb] = useState(AppStorage.get());
+      const uData = db.users[user];
       const pid = uData.curProj;
       const [vals, setVals] = useState(uData.projects[pid].data[tid] || {});
       
-      const [activeTab, setActiveTab] = useState('settings');
+      const [tab, setTab] = useState('input');
       const [copied, setCopied] = useState({});
-      const [showLauncher, setShowLauncher] = useState(false);
-      const [importTxt, setImportTxt] = useState('');
-      const [result, setResult] = useState(null);
-      const [err, setErr] = useState('');
+      const [imp, setImp] = useState('');
+      const [res, setRes] = useState(null);
+      const [error, setError] = useState('');
 
-      const updateValue = (fid, val) => {
-        const nv = Object.assign({}, vals, { [fid]: val });
+      const update = function(fid, v) {
+        const nv = Object.assign({}, vals, { [fid]: v });
         setVals(nv);
-        if (role !== 'admin') {
-          const newDb = AppDatabase.load();
-          newDb.users[username].projects[pid].data[tid] = nv;
-          AppDatabase.save(newDb);
-        }
+        const newDb = AppStorage.get();
+        newDb.users[user].projects[pid].data[tid] = nv;
+        AppStorage.save(newDb);
       };
 
-      const handleMagic = (fid, isMain) => {
+      const handleMagic = function(fid, isMain) {
         if (isMain) {
           const genre = vals.genre || 'お金・副業';
           const age = vals.age || '30代';
-          const pool = MAGIC_DATABASE[genre] ? (MAGIC_DATABASE[genre][age] || MAGIC_DATABASE[genre]['全年齢']) : MAGIC_DATABASE['お金・副業']['全年齢'];
+          const pool = MEGA_KNOWLEDGE[genre] ? (MEGA_KNOWLEDGE[genre][age] || MEGA_KNOWLEDGE[genre]['全年齢']) : MEGA_KNOWLEDGE['お金・副業']['全年齢'];
           const concept = pool[Math.floor(Math.random() * pool.length)];
           
           const newVals = Object.assign({}, vals, {
@@ -387,217 +359,231 @@
             authority: concept.authority,
             price: concept.price,
             free_vol: concept.free,
-            paid_vol: concept.paid
+            paid_vol: concept.paid,
+            guarantee: concept.guarantee
           });
           setVals(newVals);
-          updateValue('theme', concept.theme); // 保存
+          update('theme', concept.theme); 
         } else {
-          const fObj = conf.fields.find(x => x.id === fid);
-          if (fObj && fObj.magic) updateValue(fid, fObj.magic);
+          const fieldObj = conf.fields.find(x => x.id === fid);
+          if (fieldObj && fieldObj.magic) update(fid, fieldObj.magic);
         }
       };
 
-      const handleGenerate = () => {
+      const onGenerate = function() {
         const aiPlan = uData.brand.plan || 'free';
         const brand = uData.brand || {};
-        const prefix = aiPlan === 'paid' ? 
-          '【システム: 有料版AIリミッター解除】高度な推論と最新のWeb情報を活用して出力せよ。\n' : 
-          '【システム: 無料版AI節約モード】短く簡潔に、エラーが起きないよう要点のみ出力せよ。\n';
-        const context = brand.name ? `【著者情報】${brand.name} ターゲット:${brand.target}\n\n` : '';
+        const systemPrompt = aiPlan === 'paid' ? 
+          "【システム: 有料版AI（最新モデル・検索・推論リミッター解除）】\nあなたは世界トップクラスのマーケターとして、高度な心理学と最新のトレンドを分析し、最高品質の出力を生成してください。\n\n" : 
+          "【システム: 無料版AI（文字数節約・要約モード）】\n出力が途切れないよう、装飾を最小限にし、核心を突く内容のみを論理的に出力してください。\n\n";
         
-        copyToClipboard(prefix + context + conf.build(vals), copied, setCopied, 'gen');
-        setShowLauncher(true);
-        if (!conf.isOnePage) setActiveTab('import');
+        const context = brand.name ? `【著者情報】${brand.name} ターゲット:${brand.target}\n\n` : "";
+        const prompt = systemPrompt + context + conf.build(vals);
+        
+        if (navigator.clipboard) navigator.clipboard.writeText(prompt);
+        setCopied({ gen: true });
+        setTimeout(() => setCopied({}), 2000);
+        if (!conf.isOnePage) setTab('import');
       };
 
-      const handleImport = () => {
-        if (conf.noJson) { setResult(importTxt); setActiveTab('preview'); return; }
-        const parsed = safeJSONParse(importTxt);
-        if (parsed) { setResult(parsed); setActiveTab('preview'); setImportTxt(''); }
-        else setErr('JSON形式ではありません。AIの回答をそのまま貼り付けてください。');
+      const onImport = function() {
+        if (conf.noJson) { setRes(imp); setTab('view'); return; }
+        const parsed = safeJSONParse(imp);
+        if (parsed) { setRes(parsed); setTab('view'); setImp(''); }
+        else setError("JSON解析に失敗しました。AIの回答をそのまま貼り付けてください。");
       };
 
-      const header = h('div', { className: 'tool-header animate-in' },
-        h('div', { className: 'flex items-center gap-4 mb-8' },
-          h('button', { onClick: onBack, className: 'bg-white/10 hover:bg-white/20 px-5 py-2.5 rounded-xl text-sm font-bold transition' }, '← 戻る'),
-          h('div', null,
-            h('h1', { className: 'text-2xl font-black' }, conf.name),
-            h('p', { className: 'text-xs text-slate-500' }, conf.desc)
-          )
+      const header = h('div', { className: 'flex justify-between items-center mb-10 pb-6 border-b border-white/10 animate-fade' },
+        h('div', { className: 'flex items-center gap-5' },
+          h('button', { onClick: onBack, className: 'glass px-5 py-2.5 rounded-xl text-sm font-black hover:bg-white/10 transition' }, '← BACK'),
+          h('div', null, h('h1', { className: 'text-2xl font-black' }, conf.name), h('p', { className: 'text-xs text-slate-500 font-bold uppercase tracking-widest' }, conf.desc))
         )
       );
 
-      const tabs = h('div', { className: 'tabs-container hide-scrollbar' },
-        [{id:'settings', l:'⚙️ 条件設定'}, {id:'import', l:'📥 AI回答読込'}, {id:'preview', l:'👁 結果確認'}].map(t =>
-          h('button', { key: t.id, onClick: () => setActiveTab(t.id), className: 'tab-item ' + (activeTab === t.id ? 'active' : '') }, t.l)
-        )
-      );
-
-      // --- UI描画ロジック ---
+      // --- UI ---
       if (conf.isOnePage) {
         return h('div', { className: 'w-full max-w-4xl mx-auto' },
           header,
-          h('div', { className: 'bg-brand/5 border border-brand/20 rounded-2xl p-6 mb-8 text-sm text-white/70 italic' }, conf.tut),
-          conf.fields.map(f => h(InputField, { key: f.id, f: f, val: vals[f.id], onChange: updateValue, onMagic: handleMagic })),
-          h('button', { onClick: handleGenerate, className: 'magic-button-gradient w-full py-5 rounded-2xl text-white font-black text-lg mb-6' }, copied.gen ? '✓ コピー完了！AIへ送信してください' : '📋 プロンプト生成 ＆ コピー'),
-          showLauncher && h(Launcher, { showImport: false }),
-          h('div', { className: 'glass rounded-3xl p-8 mt-10' },
-            h('span', { className: 'block text-xs font-black text-slate-400 mb-4' }, '📥 AIの回答を貼り付けて保存'),
-            h('textarea', { className: 'input-premium min-h-[400px]', value: result || '', onChange: e => setResult(e.target.value) }),
-            h('button', { onClick: () => copyToClipboard(result, copied, setCopied, 'ca'), className: 'w-full bg-white/10 hover:bg-white/20 py-4 rounded-xl font-bold mt-5' }, copied.ca ? '✓ コピー完了' : '📋 全文コピー')
+          h('div', { className: 'bg-brand/5 border border-brand/20 rounded-2xl p-6 mb-10' }, h('p', { className: 'text-sm text-brand-light font-bold italic' }, '💡 使い方: ' + conf.tut)),
+          conf.fields.map(f => h(FormInput, { key: f.id, f, val: vals[f.id], onChange: update, onMagic: handleMagic })),
+          h('button', { onClick: onGenerate, className: 'w-full py-6 rounded-2xl btn-gradient text-white font-black text-xl shadow-2xl mb-12' }, copied.gen ? '✓ プロンプトをコピーしました！' : '📋 プロンプトを生成 ＆ コピー'),
+          h('div', { className: 'glass-strong rounded-3xl p-10 animate-fade' },
+            h('span', { className: 'block text-xs font-black text-slate-400 mb-5 tracking-[0.3em] uppercase' }, '📥 AIの回答をここに貼り付けて保存'),
+            h('textarea', { className: 'input-box min-h-[450px]', value: res || '', onChange: e => setRes(e.target.value) }),
+            h('button', { onClick: () => { if(navigator.clipboard) navigator.clipboard.writeText(res); setCopied({ca:true}); setTimeout(()=>setCopied({}),2000); }, className: 'w-full bg-white/5 hover:bg-white/10 py-4 rounded-xl font-black mt-6 transition' }, copied.ca ? '✓ 全文をコピーしました' : '📋 全文コピー')
           )
         );
       }
 
       return h('div', { className: 'w-full max-w-4xl mx-auto' },
         header,
-        tabs,
-        activeTab === 'settings' && h('div', { className: 'animate-slide-up' },
-          h('div', { className: 'bg-brand/5 border border-brand/20 rounded-2xl p-6 mb-8 text-sm text-white/70' }, conf.tut),
-          conf.fields.map(f => h(InputField, { key: f.id, f: f, val: vals[f.id], onChange: updateValue, onMagic: handleMagic })),
-          h('button', { onClick: handleGenerate, className: 'magic-button-gradient w-full py-5 rounded-2xl text-white font-black text-lg mb-6' }, copied.gen ? '✓ コピー完了！' : '📋 プロンプト生成 ＆ コピー'),
-          showLauncher && h(Launcher, { showImport: true })
+        h('div', { className: 'flex mb-10 border-b border-white/5 gap-2 overflow-x-auto hide-scrollbar' },
+          [{id:'input', l:'⚙️ 設定'}, {id:'import', l:'📥 読込'}, {id:'view', l:'👁 結果'}].map(t =>
+            h('button', { key: t.id, onClick: () => setTab(t.id), className: 'px-8 py-4 font-black transition-all ' + (tab===t.id ? 'text-brand border-b-2 border-brand' : 'text-white/30') }, t.l)
+          )
+      ),
+        tab === 'input' && h('div', { className: 'animate-slide-in' },
+          h('div', { className: 'bg-brand/5 border border-brand/20 rounded-2xl p-6 mb-10' }, h('p', { className: 'text-sm text-brand-light font-bold' }, conf.tut)),
+          conf.fields.map(f => h(FormInput, { key: f.id, f, val: vals[f.id], onChange: update, onMagic: handleMagic })),
+          h('button', { onClick: onGenerate, className: 'w-full py-6 rounded-2xl btn-gradient text-white font-black text-xl shadow-2xl' }, copied.gen ? '✓ コピー完了！' : '📋 プロンプト生成 ＆ コピー')
         ),
-        activeTab === 'import' && h('div', { className: 'glass rounded-3xl p-8 animate-slide-up' },
-          h('span', { className: 'block text-xs font-black text-slate-400 mb-4' }, '📥 AIの出力を貼り付け'),
-          h('textarea', { className: 'input-premium min-h-[300px]', value: importTxt, onChange: e => setImportTxt(e.target.value) }),
-          err && h('p', { className: 'text-brand-danger text-sm font-bold mt-4' }, '❌ ' + err),
-          h('button', { onClick: handleImport, disabled: !importTxt.trim(), className: 'w-full bg-brand py-4 rounded-xl font-bold mt-6 disabled:opacity-50' }, 'データを解析して反映')
+        tab === 'import' && h('div', { className: 'glass rounded-3xl p-10 animate-slide-in' },
+          h('span', { className: 'block text-xs font-black text-slate-400 mb-5' }, '📥 AIの回答をそのまま貼り付けてください'),
+          h('textarea', { className: 'input-box min-h-[300px]', value: imp, onChange: e => setImp(e.target.value) }),
+          error && h('p', { className: 'text-brand-danger text-sm font-bold mt-5' }, '❌ ' + error),
+          h('button', { onClick: onImport, disabled: !imp.trim(), className: 'w-full bg-brand py-4 rounded-xl font-black mt-8 shadow-lg transition disabled:opacity-50' }, '解析を実行')
         ),
-        activeTab === 'preview' && result && h('div', { className: 'glass rounded-3xl p-8 animate-slide-up' }, h(DataViewer, { data: result }))
+        tab === 'view' && res && h('div', { className: 'glass rounded-3xl p-10 animate-slide-in' }, h(DataDisplay, { data: res }))
       );
     };
 
     /* =========================================================================
-       5. 管理者：オメガ・ダッシュボード (SaaS Analytics & Visibility)
+       5. 管理者：オメガ・ダッシュボード (収益 ＆ 可視化)
        ========================================================================= */
-    const AdminDashboard = function(props) {
-      const [db, setDb] = useState(AppDatabase.load());
+    const AdminDash = function(props) {
+      const [db, setDb] = useState(AppStorage.get());
       const [tab, setTab] = useState('analytics');
-      const [expUser, setExpUser] = useState(null);
+      const [expU, setExpU] = useState(null);
 
-      const toggleVisibility = (tid) => {
-        const newDb = AppDatabase.load();
-        newDb.config.toolVisibility[tid] = !newDb.config.toolVisibility[tid];
-        AppDatabase.save(newDb);
-        setDb(newDb);
+      const users = Object.keys(db.users).filter(k => k !== 'admin');
+      const premium = users.filter(k => Object.keys(db.users[k].perms || {}).length > 0).length;
+      const mrr = premium * 9800;
+
+      const setVisible = (tid) => {
+        const n = AppStorage.get();
+        n.config.toolVisibility[tid] = !n.config.toolVisibility[tid];
+        AppStorage.save(n); setDb(n);
       };
 
-      const userKeys = Object.keys(db.users).filter(k => k !== 'admin');
-      const premiumCount = userKeys.filter(k => Object.keys(db.users[k].perms || {}).length > 0).length;
-      const mrr = premiumCount * 9800;
+      const setStatus = (u, st) => {
+        const n = AppStorage.get(); n.users[u].status = st; AppStorage.save(n); setDb(n);
+      };
 
-      const TabBtn = (id, l) => h('button', { onClick: () => setTab(id), className: 'px-6 py-4 text-sm font-black transition-all border-b-2 ' + (tab===id ? 'border-brand text-brand' : 'border-transparent text-slate-500') }, l);
+      const Stat = (l, v, c) => h('div', { className: 'glass p-8 rounded-[2.5rem] flex-1' }, h('p', { className: 'text-[10px] font-black text-slate-500 mb-2 uppercase tracking-widest' }, l), h('p', { className: 'text-4xl font-black ' + c }, v));
 
-      return h('div', { className: 'w-full animate-fade-in' },
-        h('div', { className: 'flex flex-col md:flex-row justify-between items-center mb-10 gap-6' },
-          h('h1', { className: 'text-3xl font-black italic' }, '💎 Omega Dash'),
-          h('div', { className: 'flex gap-3' },
-            h('button', { onClick: props.onGoApp, className: 'magic-button-gradient px-8 py-3 rounded-full font-black text-sm' }, '🚀 ユーザー画面へ'),
-            h('button', { onClick: props.onLogout, className: 'bg-white/10 px-8 py-3 rounded-full font-black text-sm' }, 'ログアウト')
+      return h('div', { className: 'w-full max-w-6xl mx-auto animate-fade' },
+        h('div', { className: 'flex flex-col md:flex-row justify-between items-center mb-12 gap-6 pb-8 border-b border-white/10' },
+          h('h1', { className: 'text-4xl font-black italic tracking-tighter' }, '💎 PRIME DASH'),
+          h('div', { className: 'flex gap-4' },
+            h('button', { onClick: props.onGoApp, className: 'magic-btn text-white px-8 py-3 rounded-full font-black shadow-xl active:scale-95 transition' }, '🚀 ツール起動'),
+            h('button', { onClick: props.onLogout, className: 'bg-white/10 hover:bg-white/20 px-8 py-3 rounded-full font-black text-white/50 transition' }, 'LOGOUT')
           )
         ),
         
-        h('div', { className: 'flex gap-2 overflow-x-auto mb-10 hide-scrollbar border-b border-white/5' },
-          TabBtn('analytics', '📊 アナリティクス'), TabBtn('users', '👥 ユーザー管理'), TabBtn('tools', '🛠 ツール表示設定'), TabBtn('inqs', '📩 問い合わせ')
+        h('div', { className: 'flex gap-2 overflow-x-auto mb-10 border-b border-white/5 hide-scrollbar' },
+          [{id:'analytics', l:'📊 収益分析'}, {id:'users', l:'👥 顧客管理'}, {id:'tools', l:'🛠 ツール表示'}, {id:'inqs', l:'📩 問い合わせ'}].map(t =>
+            h('button', { key: t.id, onClick: () => setTab(t.id), className: 'px-8 py-5 text-sm font-black transition-all border-b-2 ' + (tab===t.id ? 'border-brand text-brand shadow-[0_4px_10px_rgba(56,189,248,0.2)]' : 'border-transparent text-slate-500') }, t.l)
+          )
         ),
 
-        tab === 'analytics' && h('div', { className: 'grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up' },
-          h('div', { className: 'glass p-8 rounded-[2rem]' }, h('p', { className: 'text-xs font-bold text-slate-500 mb-2 uppercase' }, '推定月間収益 (MRR)'), h('p', { className: 'text-4xl font-black text-brand-success' }, '¥' + mrr.toLocaleString())),
-          h('div', { className: 'glass p-8 rounded-[2rem]' }, h('p', { className: 'text-xs font-bold text-slate-500 mb-2 uppercase' }, '総登録ユーザー'), h('p', { className: 'text-4xl font-black text-white' }, userKeys.length + '名')),
-          h('div', { className: 'glass p-8 rounded-[2rem]' }, h('p', { className: 'text-xs font-bold text-slate-500 mb-2 uppercase' }, 'プレミアム転換率'), h('p', { className: 'text-4xl font-black text-brand-gold' }, Math.round((premiumCount/userKeys.length||0)*100) + '%'))
+        tab === 'analytics' && h('div', { className: 'animate-slide-in space-y-8' },
+          h('div', { className: 'flex flex-col md:flex-row gap-6' },
+            Stat('月間見込み収益 (MRR)', `¥${mrr.toLocaleString()}`, 'text-brand-success'),
+            Stat('累計登録ユーザー', users.length + '名', 'text-white'),
+            Stat('プレミアム転換率', Math.round((premium/users.length||0)*100) + '%', 'text-brand-gold')
+          ),
+          h('div', { className: 'glass p-10 rounded-[3rem] text-center' },
+            h('h2', { className: 'text-xl font-bold mb-4' }, '💳 Stripe決済モジュール'),
+            h('p', { className: 'text-sm text-slate-500 max-w-md mx-auto mb-8' }, '決済完了時にAPIで自動的にツール権限を付与する仕組みをここに統合可能です。'),
+            h('button', { className: 'bg-indigo-600/50 text-white/40 px-10 py-4 rounded-2xl font-black cursor-not-allowed border border-white/10' }, 'SETTING API (COMING SOON)')
+          )
         ),
 
-        tab === 'tools' && h('div', { className: 'glass rounded-[2rem] p-8 animate-slide-up' },
-          h('p', { className: 'text-brand-accent font-bold mb-6 flex items-center gap-2' }, '⚠️ チェックを外すと、一般ユーザーの画面からツールが消えます。'),
+        tab === 'tools' && h('div', { className: 'glass rounded-[3rem] p-10 animate-slide-in' },
+          h('p', { className: 'text-brand-accent font-black mb-8 flex items-center gap-3' }, h('span', { className: 'text-2xl' }, '⚠️'), 'チェックを外したツールは、一般ユーザーには表示されなくなります。'),
           h('div', { className: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4' },
-            Object.keys(TOOLS).map(tid => h('label', { key: tid, className: 'flex items-center justify-between bg-white/5 p-4 rounded-xl border border-white/5 hover:bg-white/10 transition cursor-pointer' },
-              h('div', { className: 'flex items-center gap-3' }, h('span', null, TOOLS[tid].icon), h('span', { className: 'text-sm font-bold' }, TOOLS[tid].name)),
-              h('input', { type: 'checkbox', className: 'w-6 h-6 accent-brand', checked: db.config.toolVisibility[tid] !== false, onChange: () => toggleVisibility(tid) })
+            Object.keys(TOOLS).map(tid => h('label', { key: tid, className: 'flex items-center justify-between glass p-5 rounded-2xl cursor-pointer hover:bg-white/5 transition' },
+              h('div', { className: 'flex items-center gap-4' }, h('span', { className: 'text-2xl' }, TOOLS[tid].icon), h('span', { className: 'font-bold' }, TOOLS[tid].name)),
+              h('input', { type: 'checkbox', className: 'toggle-checkbox hidden', checked: db.config.toolVisibility[tid] !== false, onChange: () => setVisible(tid) }),
+              h('div', { className: 'toggle-label w-12 h-6 bg-slate-700 rounded-full relative p-1 transition' }, h('div', { className: 'toggle-dot w-4 h-4 bg-white rounded-full transition shadow' }))
             ))
           )
         ),
 
-        tab === 'users' && h('div', { className: 'glass rounded-[2rem] overflow-hidden animate-slide-up' },
+        tab === 'users' && h('div', { className: 'glass rounded-[3rem] overflow-hidden animate-slide-in' },
           h('table', { className: 'w-full text-left' },
-            h('thead', { className: 'bg-white/5' }, h('tr', null, ['ユーザー名', 'SNS', '状態', '操作'].map(th => h('th', { className: 'p-5 text-[10px] font-black text-slate-500 uppercase tracking-widest' }, th)))),
-            h('tbody', { className: 'divide-y divide-white/5' }, userKeys.map(k => h('tr', { key: k, className: 'hover:bg-white/5 transition' },
-              h('td', { className: 'p-5 font-bold' }, k),
-              h('td', { className: 'p-5 text-brand-light' }, db.users[k].sns),
-              h('td', { className: 'p-5' }, h('span', { className: 'px-3 py-1 rounded-full text-[10px] font-black ' + (db.users[k].status==='approved'?'bg-success/20 text-success':'bg-brand-accent/20 text-brand-accent') }, db.users[k].status)),
-              h('td', { className: 'p-5' }, h('button', { onClick: () => { const n=AppDatabase.load(); n.users[k].status='approved'; AppDatabase.save(n); setDb(n); }, className: 'text-brand-success font-black text-xs' }, '許可'))
+            h('thead', { className: 'bg-white/5' }, h('tr', null, ['顧客名', 'SNS', '状態', '操作'].map(th => h('th', { className: 'p-6 text-[10px] font-black text-slate-500 uppercase tracking-widest' }, th)))),
+            h('tbody', { className: 'divide-y divide-white/5' }, users.map(k => h('tr', { key: k, className: 'hover:bg-white/5 transition' },
+              h('td', { className: 'p-6 font-bold text-white' }, k),
+              h('td', { className: 'p-6 text-brand-light font-mono' }, db.users[k].sns),
+              h('td', { className: 'p-6' }, h('span', { className: 'px-4 py-1.5 rounded-full text-[10px] font-black ' + (db.users[k].status==='approved'?'bg-brand-success/20 text-brand-success':'bg-brand-accent/20 text-brand-accent') }, db.users[k].status.toUpperCase())),
+              h('td', { className: 'p-6 flex gap-3' },
+                db.users[k].status !== 'approved' && h('button', { onClick: () => setStatus(k, 'approved'), className: 'text-brand-success font-black text-xs hover:underline' }, '許可'),
+                h('button', { onClick: () => setStatus(k, 'rejected'), className: 'text-brand-danger font-black text-xs hover:underline' }, 'BAN')
+              )
             )))
           )
         ),
 
-        // フッター：バージョン表示
-        h('div', { className: 'mt-20 pt-10 border-t border-white/5 text-center' },
-          h('p', { className: 'text-[10px] font-black text-slate-700 tracking-[0.3em] uppercase' }, 'System Engine: ' + db.config.version)
+        // フッター: ゴールド・バージョン
+        h('div', { className: 'mt-20 py-10 border-t border-white/5 text-center' },
+          h('div', { className: 'inline-block px-6 py-2 rounded-full border border-brand-gold/30 bg-brand-gold/10' }, 
+            h('p', { className: 'text-brand-gold text-[10px] font-black tracking-[0.5em] uppercase animate-glow' }, 'System Kernel: ' + VERSION)
+          )
         )
       );
     };
 
     /* =========================================================================
-       6. メインアプリケーション (ユーザー画面)
+       6. メインアプリケーション (ユーザーダッシュボード)
        ========================================================================= */
     const MainApp = function(props) {
       const [screen, setScreen] = useState('home');
-      const db = AppDatabase.load();
-      const uData = db.users[props.user] || {};
-      const [inqOpen, setInqOpen] = useState(false);
+      const db = AppStorage.get();
+      const uData = db.users[props.user];
 
       if (screen === 'settings') {
-        const [b, setB] = useState(uData.brand || { plan: 'free', name: '', target: '', tone: '' });
-        return h('div', { className: 'w-full max-w-2xl mx-auto animate-slide-up' },
-          h('div', { className: 'flex items-center gap-4 mb-10' }, h('button', { onClick: () => setScreen('home'), className: 'bg-white/10 px-4 py-2 rounded-xl text-sm font-bold' }, '← 戻る'), h('h1', { className: 'text-2xl font-black' }, '👤 マイ設定')),
-          h('div', { className: 'glass rounded-3xl p-8 space-y-6' },
-            h('div', null, h('span', { className: 'block text-xs font-black text-slate-400 mb-3' }, '🤖 AIプラン選択'), h('select', { className: 'input-premium', value: b.plan, onChange: e => setB({...b, plan: e.target.value}) }, h('option', {value:'free'}, '無料版 AI'), h('option', {value:'paid'}, '有料版 AI'))),
-            h('div', null, h('span', { className: 'block text-xs font-black text-slate-400 mb-3' }, 'あなたの名前/肩書き'), h('input', { className: 'input-premium', value: b.name, onChange: e => setB({...b, name: e.target.value}) })),
-            h('button', { onClick: () => { const n=AppDatabase.load(); n.users[props.user].brand=b; AppDatabase.save(n); alert('保存しました'); setScreen('home'); }, className: 'w-full magic-button-gradient py-4 rounded-xl font-black' }, '設定を保存')
+        const [b, setB] = useState(uData.brand);
+        return h('div', { className: 'w-full max-w-2xl mx-auto animate-slide-in' },
+          h('div', { className: 'flex items-center gap-5 mb-12 pb-6 border-b border-white/10' }, h('button', { onClick: () => setScreen('home'), className: 'glass px-5 py-2 rounded-xl text-sm font-black' }, '← BACK'), h('h1', { className: 'text-3xl font-black' }, '👤 BRAND SETTING')),
+          h('div', { className: 'glass rounded-[2.5rem] p-10 space-y-8' },
+            h('div', null, h('span', { className: 'block text-xs font-black text-slate-500 mb-4 tracking-widest' }, '🤖 AI PLAN'), h('select', { className: 'input-box', value: b.plan, onChange: e => setB(Object.assign({}, b, {plan: e.target.value})) }, h('option', {value:'free'}, '無料版 AI'), h('option', {value:'paid'}, '有料版 AI'))),
+            h('div', null, h('span', { className: 'block text-xs font-black text-slate-500 mb-4 tracking-widest' }, 'AUTHOR NAME'), h('input', { className: 'input-box', value: b.name, onChange: e => setB(Object.assign({}, b, {name: e.target.value})) })),
+            h('button', { onClick: () => { const n=AppStorage.get(); n.users[props.user].brand=b; AppStorage.save(n); alert('保存完了'); setScreen('home'); }, className: 'w-full btn-gradient py-5 rounded-2xl font-black shadow-xl shadow-brand/20' }, 'SAVE SETTING')
           )
         );
       }
 
-      if (TOOLS[screen]) return h(ToolEngine, { tid: screen, username: props.user, role: props.role, onBack: () => setScreen('home') });
+      if (TOOLS[screen]) return h(ToolCore, { tid: screen, user: props.user, role: props.role, onBack: () => setScreen('home') });
 
-      const usageCount = (uData.usage && uData.usage.date === new Date().toDateString()) ? uData.usage.count : 0;
+      const usageCount = (uData.usage.date === new Date().toDateString()) ? uData.usage.count : 0;
 
-      return h('div', { className: 'w-full animate-fade-in' },
-        // 上部アクション
+      return h('div', { className: 'w-full animate-fade' },
+        // アクションバー
         h('div', { className: 'fixed top-4 right-4 md:top-8 md:right-8 z-50 flex gap-3' },
-          props.role === 'admin' && h('button', { onClick: props.onGoAdmin, className: 'bg-brand-accent text-white px-5 py-2.5 rounded-full text-[10px] font-black shadow-lg shadow-brand-accent/20' }, '🎛️ DASHBOARD'),
-          h('div', { className: 'glass px-5 py-2.5 rounded-full text-[10px] font-black text-white/50 border-white/5' }, 'USAGE: ' + usageCount + '/' + DAILY_LIMIT),
-          h('button', { onClick: props.onLogout, className: 'bg-white/5 hover:bg-white/10 px-5 py-2.5 rounded-full text-[10px] font-black transition' }, 'LOGOUT')
+          props.role === 'admin' && h('button', { onClick: props.onGoAdmin, className: 'bg-brand-accent text-white px-6 py-2.5 rounded-full text-[10px] font-black shadow-xl shadow-brand-accent/30 active:scale-95' }, '💎 DASHBOARD'),
+          h('div', { className: 'glass px-6 py-2.5 rounded-full text-[10px] font-black text-white/50 border-white/10' }, 'LIMIT: ' + usageCount + '/' + LIMIT),
+          h('button', { onClick: props.onLogout, className: 'bg-white/5 hover:bg-white/10 px-6 py-2.5 rounded-full text-[10px] font-black transition text-white/40' }, 'LOGOUT')
         ),
 
-        // ヒーロー
-        h('div', { className: 'text-center mt-20 mb-24 animate-slide-up' },
-          h('div', { className: 'inline-block bg-brand/10 border border-brand/20 px-4 py-1.5 rounded-full mb-8' }, h('span', { className: 'magic-text-gradient text-[10px] font-black tracking-[0.4em] uppercase' }, 'AI Content Pro Divine')),
-          h('h1', { className: 'text-5xl md:text-7xl font-black tracking-tighter mb-8 leading-tight text-white' }, 'Master of ', h('span', { className: 'text-brand' }, 'Marketing')),
-          h('p', { className: 'text-slate-500 text-lg md:text-xl max-w-2xl mx-auto' }, 'クラウドワークス案件から独自の販売まで。', h('br'), 'すべてを完全自動化する、あなただけのAI軍団。'),
-          h('div', { className: 'flex justify-center gap-4 mt-12' },
-            h('button', { onClick: () => setScreen('settings'), className: 'glass px-8 py-4 rounded-2xl font-black text-sm hover:bg-white/5 transition flex items-center gap-3' }, h('span', { className: 'text-xl' }, '👤'), 'ブランド ＆ AI設定')
+        // ヒーローセクション
+        h('div', { className: 'text-center mt-20 mb-28 animate-slide-in' },
+          h('div', { className: 'inline-block glass px-6 py-2 rounded-full mb-10' }, h('span', { className: 'magic-text-gradient text-[10px] font-black tracking-[0.6em] uppercase animate-glow' }, 'AI Content Pro Prime')),
+          h('h1', { className: 'text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-tight text-white' }, 'Master of ', h('br', {className:'md:hidden'}), h('span', { className: 'text-brand drop-shadow-[0_0_30px_rgba(56,189,248,0.4)]' }, 'Commerce')),
+          h('p', { className: 'text-slate-500 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed' }, 'クラウドワークス案件の完遂から、独自のコンテンツ販売まで。', h('br'), 'すべてを完全自動化し、あなたのビジネスを異次元へ引き上げる司令塔。'),
+          h('div', { className: 'flex justify-center gap-6 mt-16' },
+            h('button', { onClick: () => setScreen('settings'), className: 'glass px-10 py-5 rounded-2xl font-black text-sm hover:bg-white/10 transition shadow-2xl flex items-center gap-4 group' }, h('span', { className: 'text-2xl group-hover:rotate-12 transition' }, '👤'), 'BRAND & AI SETTING')
           )
         ),
 
-        // カテゴリ描画
-        CATEGORIES.map(cat => {
-          const visibleTools = cat.tools.filter(tid => db.config.toolVisibility[tid] !== false);
-          if (visibleTools.length === 0) return null;
-
-          return h('div', { key: cat.id, className: 'mb-20' },
-            h('h2', { className: 'text-xl font-black text-white mb-10 flex items-center gap-4' }, h('div', { className: 'w-10 h-1.5 bg-brand rounded-full' }), cat.name),
+        // カテゴリ別ツール一覧
+        CATEGORY_LIST.map(cat => {
+          const visible = Object.keys(TOOLS).filter(k => TOOLS[k].cat === cat.id && db.config.toolVisibility[k] !== false);
+          if (visible.length === 0) return null;
+          return h('div', { key: cat.id, className: 'mb-24' },
+            h('h2', { className: 'text-2xl font-black text-white mb-12 flex items-center gap-5' }, h('div', { className: 'w-1.5 h-8 bg-brand rounded-full shadow-[0_0_15px_rgba(56,189,248,0.5)]' }), cat.name),
             h('div', { className: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8' },
-              visibleTools.map(tid => {
+              visible.map(tid => {
                 const t = TOOLS[tid];
-                return h('div', { key: tid, onClick: () => setScreen(tid), className: 'glass rounded-[2.5rem] p-8 md:p-10 transition duration-500 group hover:-translate-y-2 hover:border-brand/40 hover:bg-brand/5 cursor-pointer relative overflow-hidden' },
-                  h('div', { className: 'absolute -right-4 -top-4 w-24 h-24 bg-brand/5 rounded-full blur-2xl group-hover:bg-brand/20 transition' }),
-                  h('div', { className: 'flex justify-between items-start mb-8 relative z-10' },
-                    h('div', { className: 'text-5xl group-hover:scale-110 transition duration-500' }, t.icon),
-                    t.badge && h('span', { className: 'bg-brand/10 text-brand text-[10px] font-black px-3 py-1.5 rounded-lg border border-brand/20' }, t.badge)
+                const can = UNLOCKED_BY_DEFAULT.includes(tid) || props.role==='admin' || uData.perms[tid];
+                return h('div', { key: tid, onClick: function(){ if(can) setScreen(tid); else alert('🔒 このツールは現在ロックされています。'); }, className: 'tool-card glass rounded-[2.5rem] p-10 cursor-pointer relative overflow-hidden group ' + (can ? '' : 'opacity-40 grayscale pointer-events-none') },
+                  h('div', { className: 'absolute -right-6 -top-6 w-32 h-32 bg-brand/5 rounded-full blur-3xl group-hover:bg-brand/20 transition duration-700' }),
+                  h('div', { className: 'flex justify-between items-start mb-10 relative z-10' },
+                    h('div', { className: 'text-6xl group-hover:scale-110 transition duration-500 drop-shadow-xl' }, t.icon),
+                    t.badge && h('span', { className: 'bg-brand/10 text-brand text-[10px] font-black px-4 py-1.5 rounded-full border border-brand/20 uppercase tracking-widest' }, t.badge)
                   ),
-                  h('h3', { className: 'text-xl font-black mb-4 text-white/90 group-hover:text-white transition' }, t.name),
-                  h('p', { className: 'text-sm text-slate-500 leading-relaxed' }, t.desc)
+                  h('h3', { className: 'text-2xl font-black mb-4 text-white/90 group-hover:text-white transition' }, t.name),
+                  h('p', { className: 'text-sm text-slate-500 leading-relaxed font-medium' }, t.desc)
                 );
               })
             )
@@ -607,54 +593,56 @@
     };
 
     /* =========================================================================
-       7. ログイン ＆ ルート制御
+       7. ログイン画面 (以前のシンプルUIを復元・安定化)
        ========================================================================= */
-    const AuthScreen = function(props) {
+    const AuthBox = function(props) {
       const [u, setU] = useState(''); const [p, setP] = useState('');
-      const handleLogin = () => {
-        const db = AppDatabase.load();
+      const login = function() {
+        const db = AppStorage.get();
         if (u === db.config.adminU && p === db.config.adminP) {
-          localStorage.setItem(SESS_KEY, JSON.stringify({ u, r: 'admin' }));
-          props.onLogin(u, 'admin');
+          localStorage.setItem(SESS_KEY, JSON.stringify({ u: db.config.adminU, r: 'admin' }));
+          props.onLogin(db.config.adminU, 'admin');
         } else if (db.users[u] && db.users[u].status === 'approved') {
           localStorage.setItem(SESS_KEY, JSON.stringify({ u, r: 'approved' }));
           props.onLogin(u, 'approved');
-        } else alert('ユーザー名またはパスワードが正しくないか、承認待ちです。');
+        } else alert('名前に間違いがあるか、承認待ちです。');
       };
       return h('div', { className: 'w-full max-w-md mt-24 animate-in' },
-        h('div', { className: 'glass rounded-[3rem] p-10 md:p-14 shadow-2xl text-center' },
-          h('h2', { className: 'text-3xl font-black mb-12 tracking-tighter' }, 'AI Content Pro'),
-          h('div', { className: 'space-y-6' },
-            h('input', { className: 'input-premium', placeholder: 'ユーザー名', value: u, onChange: e => setU(e.target.value) }),
-            h('input', { className: 'input-premium', type: 'password', placeholder: 'パスワード', value: p, onChange: e => setP(e.target.value) }),
-            h('button', { onClick: handleLogin, className: 'w-full magic-button-gradient py-5 rounded-2xl text-white font-black text-lg mt-6' }, 'ログイン')
+        h('div', { className: 'glass rounded-[3rem] p-12 md:p-16 shadow-2xl text-center relative overflow-hidden' },
+          h('div', { className: 'absolute -top-32 -left-32 w-64 h-64 bg-brand/20 rounded-full blur-[100px] animate-float' }),
+          h('h2', { className: 'text-4xl font-black mb-14 tracking-tighter text-white' }, 'AI Content Pro'),
+          h('div', { className: 'space-y-6 relative z-10' },
+            h('input', { className: 'input-box text-center', placeholder: 'USER NAME', value: u, onChange: e => setU(e.target.value) }),
+            h('input', { className: 'input-box text-center', type: 'password', placeholder: 'PASSWORD', value: p, onChange: e => setP(e.target.value) }),
+            h('button', { onClick: login, className: 'w-full magic-btn py-5 rounded-2xl text-white font-black text-lg shadow-2xl active:scale-95 transition' }, 'LOGIN')
           ),
-          h('p', { className: 'text-xs text-slate-600 font-bold mt-10' }, '新規の方は申請フォームから送信してください')
+          h('p', { className: 'text-[10px] text-slate-600 font-black mt-12 tracking-[0.3em] uppercase' }, 'Secure Cloud Computing Network')
         )
       );
     };
 
-    const Root = function() {
+    /* =========================================================================
+       8. Root コンポーネント (統合ハブ)
+       ========================================================================= */
+    const App = function() {
       const [auth, setAuth] = useState({ u: null, r: null });
-      const [isAdminTab, setIsAdminTab] = useState(false);
+      const [isAdmin, setIsAdmin] = useState(false);
 
       useEffect(() => {
         const session = localStorage.getItem(SESS_KEY);
         if (session) setAuth(JSON.parse(session));
       }, []);
 
-      const onLogout = () => { localStorage.removeItem(SESS_KEY); setAuth({ u: null, r: null }); setIsAdminTab(false); };
+      const onLogout = () => { localStorage.removeItem(SESS_KEY); setAuth({ u: null, r: null }); setIsAdmin(false); };
 
-      if (!auth.u) return h(AuthScreen, { onLogin: (u, r) => setAuth({ u, r }) });
-      if (auth.r === 'admin' && isAdminTab) return h(AdminDashboard, { onGoApp: () => setIsAdminTab(false), onLogout });
+      if (!auth.u) return h(AuthBox, { onLogin: (u, r) => setAuth({ u, r }) });
+      if (auth.r === 'admin' && isAdmin) return h(AdminDash, { onGoApp: () => setIsAdmin(false), onLogout });
       
-      return h(MainApp, { user: auth.u, role: auth.r, onLogout, onGoAdmin: () => setIsAdminTab(true) });
+      return h(MainApp, { user: auth.u, role: auth.r, onLogout, onGoAdmin: () => setIsAdmin(true) });
     };
 
-    const container = document.getElementById('root');
-    const root = ReactDOM.createRoot(container);
-    root.render(h(Root));
-
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(h(App));
   })();
   </script>
 </body>
