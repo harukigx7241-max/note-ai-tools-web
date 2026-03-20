@@ -202,21 +202,10 @@
       gap: 6px;
     }
     .btn-sub:hover { background: rgba(255, 255, 255, 0.12); }
-    
-    .btn-copy {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 6px;
-      padding: 6px 14px;
-      font-size: 12px;
-      font-weight: 700;
-      transition: all 0.15s;
-    }
-    .btn-copy:hover { background: rgba(255, 255, 255, 0.15); }
 
-    /* Layout Helpers */
+    /* Flex Layouts */
     .flex-row { display: flex; gap: 12px; flex-wrap: wrap; }
-    .flex-1 { flex: 1; min-width: 200px; }
+    .flex-1 { flex: 1; min-width: 220px; }
     .error-box {
       background: rgba(239, 68, 68, 0.1);
       border: 1px solid rgba(239, 68, 68, 0.3);
@@ -238,7 +227,7 @@
       padding: 16px 20px;
       margin-bottom: 20px;
     }
-    .tutorial-title { font-size: 14px; font-weight: 800; color: #38bdf8; margin-bottom: 8px; }
+    .tutorial-title { font-size: 14px; font-weight: 800; color: #38bdf8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
     .tutorial-body { font-size: 13px; color: rgba(255, 255, 255, 0.8); line-height: 1.7; white-space: pre-wrap; }
 
     .tool-header {
@@ -270,21 +259,10 @@
     .tab-item.active { color: #38bdf8; border-bottom-color: #38bdf8; }
 
     /* AI Web Links Panel */
-    .weblinks-panel {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-      text-align: center;
+    .ai-launcher-link {
+      display: flex; align-items: center; justify-content: center; gap: 6px; flex: 1; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 800; background: rgba(255, 255, 255, 0.1); transition: all 0.2s; white-space: nowrap;
     }
-    .weblinks-title { font-size: 13px; font-weight: 800; color: #38bdf8; margin-bottom: 14px; }
-    .weblinks-buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 14px; }
-    .ai-btn {
-      flex: 1; min-width: 120px; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 800;
-      background: rgba(255, 255, 255, 0.1); transition: all 0.2s; text-align: center;
-    }
-    .ai-btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
+    .ai-launcher-link:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
 
     /* Results UI */
     .json-result-box {
@@ -336,8 +314,16 @@
       backdrop-filter: blur(12px);
     }
     
-    .admin-table-wrapper { width: 100%; overflow-x: auto; }
-    .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    /* Admin Table */
+    .admin-table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
     .admin-table th, .admin-table td {
       padding: 14px 12px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -360,15 +346,14 @@
   (function(){
     'use strict';
     
-    // React Shortcuts (Explicit & Safe)
     const el = React.createElement;
     const { useState, useEffect, Fragment } = React;
 
     /* =========================================================================
-       1. 自己修復型データベース (Error Boundary)
+       1. システム定数 ＆ データベース初期化 (絶対安全仕様 v31)
        ========================================================================= */
-    const DB_KEY = 'AICP_v30_DB'; // 完全リセット用の新キー
-    const SESS_KEY = 'AICP_v30_Sess';
+    const DB_KEY = 'AICP_v31_DB'; 
+    const SESS_KEY = 'AICP_v31_Sess';
     const DAILY_LIMIT = 3;
 
     const DEFAULT_UNLOCKED_TOOLS = ['note', 'research', 'lp', 'affiliate', 'backend', 'bonus'];
@@ -383,42 +368,29 @@
           console.error("DB Read Error:", error);
         }
 
-        // DBが存在しない場合は初期化
         if (!db || typeof db !== 'object') {
           db = this.createInitialDB();
           this.save(db);
         }
-
-        // 自己修復（データ欠落によるNull参照エラーを完全に防ぐ）
         return this.repair(db);
       },
       save: function(db) {
-        try {
-          localStorage.setItem(DB_KEY, JSON.stringify(db));
-        } catch (error) {
-          console.error("DB Save Error:", error);
-        }
+        try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } 
+        catch (error) { console.error("DB Save Error:", error); }
       },
       createInitialDB: function() {
         return {
-          admin: { password: 'admin123' },
-          users: {
-            'admin': { 
-              status: 'approved', 
-              sns: '@admin', 
-              registeredAt: Date.now(), 
-              usage: { date: '', count: 0 }, 
-              perms: {}, 
-              brand: { plan: 'paid', name: '管理者', target: '', tone: '' }, 
-              projects: { 'default': { name: '管理者領域', data: {} } }, 
-              curProj: 'default' 
-            }
-          },
+          admin: { u: 'admin', p: 'admin123' },
+          users: {},
           inquiries: []
         };
       },
       repair: function(db) {
-        if (!db.admin) db.admin = { password: 'admin123' };
+        // 管理者アカウントの修復・移行
+        if (!db.admin) db.admin = { u: 'admin', p: 'admin123' };
+        if (!db.admin.u) db.admin.u = 'admin';
+        if (db.admin.password) { db.admin.p = db.admin.password; delete db.admin.password; }
+
         if (!db.users) db.users = {};
         if (!db.inquiries) db.inquiries = [];
 
@@ -432,8 +404,11 @@
           }
           if (!user.curProj || !user.projects[user.curProj]) {
             user.curProj = Object.keys(user.projects)[0] || 'default';
+            if (!user.projects[user.curProj]) {
+               user.projects['default'] = { name: 'デフォルト', data: {} };
+               user.curProj = 'default';
+            }
           }
-          // 全プロジェクトのdataオブジェクトを保証（これがクラッシュの最大の原因だった）
           Object.keys(user.projects).forEach(pid => {
             if (!user.projects[pid].data) user.projects[pid].data = {};
           });
@@ -442,8 +417,8 @@
       }
     };
 
-    // クリップボード安全コピー
-    const copyToClipboard = (text, stateObj, setStateFunc, key) => {
+    // 安全なクリップボード操作
+    const doCopy = (text, stateObj, setStateFunc, key) => {
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(text).catch(() => {});
@@ -453,7 +428,7 @@
           setStateFunc(prevState => ({ ...prevState, [key]: false }));
         }, 2000);
       } catch (err) {
-        console.error("Clipboard Error:", err);
+        console.error(err);
       }
     };
 
@@ -472,7 +447,6 @@
       }
     };
 
-    // 日付フォーマット
     const formatDateTime = (timestamp) => {
       if (!timestamp) return '-';
       const d = new Date(timestamp);
@@ -490,6 +464,7 @@
     ];
 
     const JSON_RULE = '\n\n【ルール】前置きや挨拶は一切不要です。以下のJSONフォーマットのみを出力してください:\n';
+    const INQ_TYPES = ['機能追加の要望', '不具合・バグの報告', 'プロンプト修正依頼', 'その他のお問い合わせ'];
 
     const TOOLS = {
       note: { 
@@ -638,12 +613,10 @@
       }
     };
 
-
     /* =========================================================================
        3. 共通UIコンポーネント (安全性・独立性確保)
        ========================================================================= */
 
-    // フォーム入力の安全な生成
     const FormField = ({field, value, onChange}) => {
       const val = value !== undefined ? value : (field.type === 'checkbox' ? false : (field.options ? field.options[0] : ''));
       
@@ -676,30 +649,13 @@
       return null;
     };
 
-    // JSONツリーの安全な描画（再帰）
     const JSONViewer = ({data}) => {
-      if (typeof data === 'string') {
-        return el('p', {className: 'res-box'}, data);
-      }
-      if (Array.isArray(data)) {
-        return el('div', null, 
-          data.map((item, index) => el('div', {key: index, style: {marginBottom: 16, paddingBottom: 16, borderBottom: '1px dashed #334155'}}, 
-            el(JSONViewer, {data: item})
-          ))
-        );
-      }
-      if (typeof data === 'object' && data !== null) {
-        return el('div', null, 
-          Object.keys(data).map(key => el('div', {key: key, style: {marginBottom: 10}}, 
-            el('span', {style: {color: '#38bdf8', fontSize: 12, fontWeight: 800, display: 'block', marginBottom: 4}}, key), 
-            el(JSONViewer, {data: data[key]})
-          ))
-        );
-      }
+      if (typeof data === 'string') return el('p', {className: 'res-box'}, data);
+      if (Array.isArray(data)) return el('div', null, data.map((item, i) => el('div', {key: i, style: {marginBottom: 16, paddingBottom: 16, borderBottom: '1px dashed #334155'}}, el(JSONViewer, {data: item}))));
+      if (typeof data === 'object' && data !== null) return el('div', null, Object.keys(data).map(key => el('div', {key: key, style: {marginBottom: 10}}, el('span', {style: {color: '#38bdf8', fontSize: 12, fontWeight: 800, display: 'block', marginBottom: 4}}, key), el(JSONViewer, {data: data[key]}))));
       return el('span', null, String(data));
     };
 
-    // Webランチャーリンク
     const LauncherLinks = ({showImportMessage}) => {
       return el('div', {style: {padding: 16, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(56,189,248,0.4)', borderRadius: 12, margin: '20px 0'}}, 
         el('p', {style: {fontSize: 13, fontWeight: 800, color: '#38bdf8', marginBottom: 12}}, '👇 下のリンクからWeb版AIを開いて送信してください'), 
@@ -719,7 +675,6 @@
       const conf = TOOLS[toolId];
       if (!conf) return el('div', {className: 'z1'}, el('p', null, 'Error: Tool not found.'));
 
-      // データベースから安全に初期値を取得
       const db = AppDB.get();
       const userObj = db.users[username];
       const projId = userObj.curProj;
@@ -757,7 +712,6 @@
           return;
         }
 
-        // 使用回数を記録
         if (role !== 'admin' && !(userObj.perms && userObj.perms[toolId])) {
           const newDb = AppDB.get();
           const today = new Date().toDateString();
@@ -768,7 +722,6 @@
           AppDB.save(newDb);
         }
 
-        // ブランド・AIプラン情報を付与
         let brandContext = '';
         const aiPlan = (userObj.brand && userObj.brand.plan) ? userObj.brand.plan : 'free';
         if (userObj.brand && userObj.brand.name) {
@@ -807,7 +760,6 @@
         }
       };
 
-      // --- 1画面完結UI (note用) ---
       if (conf.isOnePageUI) {
         return el('div', {className: 'z1'},
           el('div', {className: 'tool-header'}, 
@@ -831,7 +783,6 @@
         );
       }
 
-      // --- 通常ツール UI (タブ切り替え) ---
       return el('div', {className: 'z1'},
         el('div', {className: 'tool-header'}, 
           el('div', {className: 'flex-row', style: {alignItems: 'center'}}, 
@@ -866,21 +817,19 @@
             el('span', {className: 'form-label'}, '📥 AIの出力を貼り付け'), 
             el('textarea', {className: 'form-input', style: {minHeight: 180}, value: importText, onChange: (e) => setImportText(e.target.value)}), 
             errorMessage && el('div', {className: 'error-box'}, '❌ ' + errorMessage), 
-            el('button', {className: 'btn-primary', disabled: !importText.trim(), onClick: handleImport}, 'システムに反映して結果を見る')
+            el('button', {className: 'btn-primary', style: {marginTop: 10}, disabled: !importText.trim(), onClick: handleImport}, 'システムに反映して結果を見る')
           )
         ),
-        activeTab === 'preview' && resultData && el('div', {className: 'form-card'}, 
-          el(JSONViewer, {data: resultData})
-        )
+        activeTab === 'preview' && resultData && el('div', {className: 'form-card'}, el(JSONViewer, {data: resultData}))
       );
     };
 
     /* =========================================================================
-       5. ユーザー設定・プロジェクト・問い合わせ
+       5. 設定・プロジェクト・問い合わせ
        ========================================================================= */
     const SettingsScreen = ({user, onBack}) => {
       const db = AppDB.get();
-      const b = db.users[user].brand;
+      const b = db.users[user].brand || {plan: 'free', name: '', target: '', tone: ''};
       const [name, setName] = useState(b.name);
       const [target, setTarget] = useState(b.target);
       const [tone, setTone] = useState(b.tone);
@@ -898,11 +847,11 @@
 
       return el('div', {className: 'z1'}, 
         el('div', {className: 'tool-header'}, el('div', {className: 'flex-row', style: {alignItems: 'center'}}, el('button', {className: 'btn-sub', onClick: onBack}, '← 戻る'), el('h1', {className: 'tool-header-title'}, '👤 マイ・ブランド ＆ AI設定'))),
-        el('div', {className: 'tutorial-panel'}, el('div', {className: 'tutorial-body'}, '登録した情報は全ツールのプロンプトに自動反映されます。使用しているAIプランに応じてプロンプトも最適化されます。')),
+        el('div', {className: 'tutorial-panel'}, el('div', {className: 'tutorial-body'}, '登録した情報は全ツールのプロンプトに自動で埋め込まれます。\n使用しているAIのプランに合わせてプロンプトが最適化されます。')),
         el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, '🤖 使用しているAIプラン'), el('select', {className: 'form-input', value: plan, onChange: (e) => setPlan(e.target.value)}, el('option', {value: 'free'}, '無料版 (ChatGPT Free 等)'), el('option', {value: 'paid'}, '有料版 (ChatGPT Plus 等)'))),
         el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, '発信者名・肩書き'), el('input', {className: 'form-input', value: name, onChange: (e) => setName(e.target.value)})),
         el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, 'メインのターゲット層'), el('input', {className: 'form-input', value: target, onChange: (e) => setTarget(e.target.value)})),
-        el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, '文体のクセ・ルール (例: 絵文字多め)'), el('textarea', {className: 'form-input', style: {minHeight: 100}, value: tone, onChange: (e) => setTone(e.target.value)})),
+        el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, '文体のクセ・ルール (例:絵文字多め)'), el('textarea', {className: 'form-input', style: {minHeight: 100}, value: tone, onChange: (e) => setTone(e.target.value)})),
         el('button', {className: 'btn-primary', onClick: save}, '設定を保存する')
       );
     };
@@ -949,9 +898,9 @@
 
       const handleSend = () => {
         if (!content.trim()) return;
-        const db = AppDB.get();
-        db.inquiries.push({ id: Date.now(), user, type, content, date: Date.now(), status: 'unread' });
-        AppDB.save(db);
+        const newDb = AppDB.get();
+        newDb.inquiries.push({ id: Date.now(), user: user, type: type, content: content, date: Date.now(), status: 'unread' });
+        AppDB.save(newDb);
         setSent(true); setTimeout(onClose, 2000);
       };
 
@@ -980,14 +929,8 @@
           ),
           el('div', {style: {fontSize: 13, lineHeight: 1.7}}, 
             el('p', {style: {marginBottom: 16}}, '本ツールは、最新AIを操作してビジネスを自動化するプロンプトジェネレーターです。'), 
-            el('div', {className: 'tutorial-panel'}, 
-              el('strong', {style: {color: '#fbbf24', display: 'block', marginBottom: 8}}, '🚀 基本的な使い方 (3ステップ)'), 
-              '1. ツールの【⚙️ 条件設定】で情報を入力し、プロンプトを生成してコピー。\n2. 別タブでChatGPT等を開き、コピーした文章をそのまま送信。\n3. AIの回答をすべてコピーし、ツールの【📥 AI回答読込】に貼り付ける！'
-            ), 
-            el('div', {className: 'tutorial-panel', style: {borderColor: 'rgba(56, 189, 248, 0.4)'}}, 
-              el('strong', {style: {color: '#38bdf8', display: 'block', marginBottom: 8}}, '🤖 無料版・有料版どちらを使うべき？'), 
-              '本格的にマネタイズするなら', el('strong', {style: {color: '#f43f5e'}}, '「有料版一択」'), 'です。無料版は長文で途切れやすく、Web検索も弱いためです。\n※「マイ・ブランド設定」で有料版を選ぶと、AIの能力を引き出す専用プロンプトに自動で切り替わります。'
-            ), 
+            el('div', {className: 'tutorial-panel'}, el('strong', {style: {color: '#fbbf24', display: 'block', marginBottom: 8}}, '🚀 基本的な使い方 (3ステップ)'), '1. ツールの【⚙️ 条件設定】で情報を入力し、プロンプトを生成してコピー。\n2. 別タブでChatGPT等を開き、コピーした文章をそのまま送信。\n3. AIの回答をすべてコピーし、ツールの【📥 AI回答読込】に貼り付ける！'), 
+            el('div', {className: 'tutorial-panel', style: {borderColor: 'rgba(56, 189, 248, 0.4)'}}, el('strong', {style: {color: '#38bdf8', display: 'block', marginBottom: 8}}, '🤖 無料版・有料版どちらを使うべき？'), '本格的にマネタイズするなら', el('strong', {style: {color: '#f43f5e'}}, '「有料版一択」'), 'です。無料版は長文で途切れやすく、Web検索も弱いためです。\n※「マイ・ブランド設定」で有料版を選ぶと、AIの能力を引き出す専用プロンプトに自動で切り替わります。'), 
             el('button', {className: 'btn-primary', onClick: onClose}, '理解してツールを使う')
           )
         )
@@ -1003,18 +946,29 @@
       const [pw, setPw] = useState('');
       const [sns, setSns] = useState('');
       const [err, setErr] = useState('');
+      const [isAdmin, setIsAdmin] = useState(false);
+
+      const handleUnChange = (e) => {
+        const val = e.target.value;
+        setUn(val);
+        const db = AppDB.get();
+        setIsAdmin(val === db.admin.u);
+      };
 
       const handleSubmit = () => {
-        setErr(''); const u = un.trim();
+        setErr('');
+        const u = un.trim();
         if (!u) return setErr('ユーザー名を入力してください');
         
         const db = AppDB.get();
 
-        if (u === 'admin') {
+        if (isAdmin) {
           if (pw === db.admin.p) {
             localStorage.setItem(SESS_KEY, JSON.stringify({u: u, r: 'admin'}));
             onLogin(u, 'admin');
-          } else { setErr('パスワードが違います'); }
+          } else {
+            setErr('パスワードが違います');
+          }
           return;
         }
 
@@ -1044,16 +998,19 @@
         el('div', {className: 'grid-bg'}), 
         el('div', {className: 'content-wrapper auth-container'}, 
           el('h2', {style: {fontSize: 26, fontWeight: 900, marginBottom: 8}}, 'AI Content Pro'), 
-          el('p', {style: {color: '#38bdf8', fontWeight: 800, marginBottom: 30}}, 'SaaS Edition v29'), 
-          el('div', {className: 'flex-row', style: {background: 'rgba(0,0,0,0.3)', padding: 6, borderRadius: 10, marginBottom: 24}}, 
+          el('p', {style: {color: '#38bdf8', fontWeight: 800, marginBottom: 30}}, 'SaaS Edition v31'), 
+          
+          !isAdmin && el('div', {className: 'flex-row', style: {background: 'rgba(0,0,0,0.3)', padding: 6, borderRadius: 10, marginBottom: 24}}, 
             el('button', {onClick: () => {setIsLogin(true); setErr('');}, style: {flex: 1, padding: '12px', borderRadius: 8, background: isLogin ? '#38bdf8' : 'transparent', color: isLogin ? '#fff' : '#888', fontWeight: 800}}, 'ログイン'), 
             el('button', {onClick: () => {setIsLogin(false); setErr('');}, style: {flex: 1, padding: '12px', borderRadius: 8, background: !isLogin ? '#38bdf8' : 'transparent', color: !isLogin ? '#fff' : '#888', fontWeight: 800}}, '新規申請')
           ), 
-          el('input', {className: 'form-input', style: {marginBottom: 16}, placeholder: 'ユーザー名', value: un, onChange: (e) => setUn(e.target.value)}), 
-          (!isLogin && un !== 'admin') && el('input', {className: 'form-input', style: {marginBottom: 16}, placeholder: 'SNSアカウント (@必須)', value: sns, onChange: (e) => setSns(e.target.value)}), 
-          un === 'admin' && el('input', {className: 'form-input', style: {marginBottom: 16}, type: 'password', placeholder: '管理者パスワード', value: pw, onChange: (e) => setPw(e.target.value)}), 
+          
+          el('input', {className: 'form-input', style: {marginBottom: 14}, placeholder: 'ユーザー名', value: un, onChange: handleUnChange}), 
+          (!isLogin && !isAdmin) && el('input', {className: 'form-input', style: {marginBottom: 14}, placeholder: 'SNSアカウント (@必須)', value: sns, onChange: (ev) => setSns(ev.target.value)}), 
+          isAdmin && el('input', {className: 'form-input', style: {marginBottom: 14}, type: 'password', placeholder: '管理者パスワード', value: pw, onChange: (ev) => setPw(ev.target.value)}), 
+          
           err && el('div', {className: 'error-box'}, err), 
-          el('button', {className: 'btn-primary', style: {marginTop: 10}, onClick: handleSubmit}, isLogin ? 'ログイン' : '申請して待機画面へ')
+          el('button', {className: 'btn-primary', style: {marginTop: 10}, onClick: handleSubmit}, isAdmin ? '管理者としてログイン' : isLogin ? 'ログイン' : '申請して待機画面へ')
         )
       );
     };
@@ -1063,11 +1020,35 @@
       const [tab, setTab] = useState('users');
       const [expUser, setExpUser] = useState(null);
 
+      // 管理者設定用State
+      const [adminU, setAdminU] = useState(db.admin.u);
+      const [adminP, setAdminP] = useState(db.admin.p);
+      const [sysMsg, setSysMsg] = useState('');
+
       const updateStatus = (u, st) => { const newDb = AppDB.get(); newDb.users[u].status = st; AppDB.save(newDb); setDb(newDb); };
       const togglePerm = (u, tid) => { const newDb = AppDB.get(); newDb.users[u].perms[tid] = !newDb.users[u].perms[tid]; AppDB.save(newDb); setDb(newDb); };
       const markRead = (id) => { const newDb = AppDB.get(); const iq = newDb.inquiries.find(x => x.id === id); if(iq) { iq.status = 'read'; AppDB.save(newDb); setDb(newDb); } };
 
-      const userKeys = Object.keys(db.users).filter(k => k !== 'admin');
+      const saveAdmin = () => {
+        if (!adminU.trim() || !adminP.trim()) return;
+        const newDb = AppDB.get();
+        const oldU = newDb.admin.u;
+        newDb.admin = { u: adminU, p: adminP };
+        
+        // ツールの利用のためにadmin権限のダミーユーザーもリネームしておく
+        if (oldU !== adminU) {
+          newDb.users[adminU] = newDb.users[oldU];
+          delete newDb.users[oldU];
+          localStorage.setItem(SESS_KEY, JSON.stringify({u: adminU, r: 'admin'}));
+        }
+        
+        AppDB.save(newDb);
+        setDb(newDb);
+        setSysMsg('管理者の設定を保存しました');
+        setTimeout(() => setSysMsg(''), 2000);
+      };
+
+      const userKeys = Object.keys(db.users).filter(k => k !== db.admin.u);
       const inqs = db.inquiries || [];
 
       return el('div', {className: 'page-container'}, 
@@ -1076,17 +1057,19 @@
           el('div', {className: 'tool-header'}, 
             el('h1', {className: 'main-title', style: {fontSize: 24, margin: 0}}, '🎛️ 管理画面'), 
             el('div', {className: 'flex-row'}, 
-              el('button', {className: 'btn-primary', style: {padding: '10px 20px', fontSize: 13, width: 'auto', margin: 0}, onClick: onGoApp}, '🚀 ツールへ'), 
+              el('button', {className: 'btn-primary', style: {padding: '8px 16px', fontSize: 13, width: 'auto', margin: 0}, onClick: onGoApp}, '🚀 ツールへ'), 
               el('button', {className: 'btn-sub', onClick: onLogout}, 'ログアウト')
             )
           ), 
           el('div', {className: 'tabs-container'}, 
             el('button', {className: `tab-item ${tab === 'users' ? 'active' : ''}`, onClick: () => setTab('users')}, '👥 ユーザー管理'), 
-            el('button', {className: `tab-item ${tab === 'inqs' ? 'active' : ''}`, onClick: () => setTab('inqs')}, `📩 問い合わせ (${inqs.filter(x => x.status === 'unread').length})`)
+            el('button', {className: `tab-item ${tab === 'inqs' ? 'active' : ''}`, onClick: () => setTab('inqs')}, `📩 問い合わせ (${inqs.filter(x => x.status === 'unread').length})`),
+            el('button', {className: `tab-item ${tab === 'sys' ? 'active' : ''}`, onClick: () => setTab('sys')}, '⚙️ システム設定')
           ), 
-          tab === 'users' ? el('div', {className: 'form-card admin-table-wrapper'}, 
+          
+          tab === 'users' && el('div', {className: 'form-card admin-table-wrapper'}, 
             el('table', {className: 'admin-table'}, 
-              el('thead', null, el('tr', null, el('th', null, 'ユーザー'), el('th', null, 'SNS'), el('th', null, 'ステータス'), el('th', null, '権限/操作'))), 
+              el('thead', null, el('tr', null, el('th', null, 'User'), el('th', null, 'SNS'), el('th', null, 'Status'), el('th', null, 'Action'))), 
               el('tbody', null, 
                 userKeys.sort((a,b) => db.users[b].registeredAt - db.users[a].registeredAt).map(k => {
                   const u = db.users[k];
@@ -1119,10 +1102,12 @@
                 })
               )
             )
-          ) : el('div', null, 
+          ),
+          
+          tab === 'inqs' && el('div', null, 
             inqs.sort((a,b) => b.date - a.date).map(iq => 
               el('div', {key: iq.id, className: 'form-card', style: {borderLeft: iq.status === 'unread' ? '4px solid #f59e0b' : '1px solid rgba(255,255,255,0.08)'}}, 
-                el('div', {className: 'flex-row', style: {justifyContent: 'space-between', marginBottom: 12}}, 
+                el('div', {className: 'flex-row', style: {justifyContent: 'space-between', marginBottom: 8}}, 
                   el('span', {style: {fontWeight: 800, color: '#38bdf8', fontSize: 15}}, `${iq.user} (${iq.type})`), 
                   el('span', {style: {fontSize: 12, color: '#888'}}, formatDateTime(iq.date))
                 ), 
@@ -1130,6 +1115,15 @@
                 iq.status === 'unread' && el('button', {className: 'btn-sub', style: {marginTop: 14}, onClick: () => markRead(iq.id)}, '既読にする')
               )
             )
+          ),
+
+          tab === 'sys' && el('div', {className: 'form-card'}, 
+            el('span', {className: 'form-label'}, '管理者 ユーザー名'),
+            el('input', {className: 'form-input', style: {marginBottom: 16}, value: adminU, onChange: e => setAdminU(e.target.value)}),
+            el('span', {className: 'form-label'}, '管理者 パスワード'),
+            el('input', {className: 'form-input', style: {marginBottom: 16}, type: 'password', value: adminP, onChange: e => setAdminP(e.target.value)}),
+            el('button', {className: 'btn-primary', onClick: saveAdmin}, '設定を保存'),
+            sysMsg && el('p', {style: {color: '#4ade80', textAlign: 'center', marginTop: 10, fontWeight: 800}}, sysMsg)
           )
         )
       );
@@ -1148,7 +1142,7 @@
 
       if (screen === 'settings') return el(SettingsScreen, {user, onBack: () => setScreen('home')});
       if (screen === 'projects') return el(ProjectScreen, {user, onBack: () => setScreen('home')});
-      if (TOOLS[screen]) return el(ToolEngine, {toolId: screen, user, role, onBack: () => setScreen('home')});
+      if (TOOLS[screen]) return el(ToolRunner, {toolId: screen, username: user, role: role, onBack: () => setScreen('home')});
 
       const projName = uData.projects[uData.curProj] ? uData.projects[uData.curProj].name : 'プロジェクト';
       const today = new Date().toDateString();
@@ -1169,13 +1163,13 @@
         ),
         
         el('div', {className: 'grid-bg'}), 
-        el('div', {className: 'badge-main', style: {marginTop: 60, marginBottom: 16}}, 'AI Content Pro v29'), 
+        el('div', {className: 'badge-main', style: {marginTop: 60, marginBottom: 16}}, 'AI Content Pro v31'), 
         el('h1', {className: 'main-title'}, 'AI Content', el('br'), el('span', null, 'Platform')), 
         el('p', {className: 'main-subtitle'}, 'コンテンツ作成からSNS集客、ファン化まで', el('br'), 'すべてを完全無料で自動化する最強の指令塔'), 
         
-        role !== 'admin' && el('div', {className: 'flex-row', style: {justifyContent: 'center', marginBottom: 50}}, 
+        role !== 'admin' && el('div', {className: 'flex-row', style: {justifyContent: 'center', marginBottom: 40}}, 
           el('button', {className: 'btn-sub', style: {padding: '12px 24px', fontSize: 14}, onClick: () => setScreen('projects')}, '📂 プロジェクト切替'), 
-          el('button', {className: 'btn-sub', style: {padding: '12px 24px', fontSize: 14}, onClick: () => setScreen('settings')}, '👤 マイ・ブランド ＆ AI設定')
+          el('button', {className: 'btn-sub', style: {padding: '12px 24px', fontSize: 14}, onClick: () => setScreen('settings')}, '👤 マイ・ブランド設定')
         ),
         
         el('div', {className: 'content-wrapper'}, 
@@ -1201,9 +1195,9 @@
                       el('div', {className: 'status-badge free'}, '無料枠対象'), 
                       t.badge && el('div', {className: `badge-main ${t.badge === '神機能' ? 'red' : ''}`, style: {margin: 0}}, t.badge)
                     ), 
-                    el('div', {className: 'tool-icon'}, t.icon), 
-                    el('div', {className: 'tool-name'}, t.name), 
-                    el('div', {className: 'tool-desc'}, t.desc)
+                    el('div', {className: 'tc-icon'}, t.icon), 
+                    el('div', {className: 'tc-name'}, t.name), 
+                    el('div', {className: 'tc-desc'}, t.desc)
                   );
                 })
               )
@@ -1222,7 +1216,6 @@
       const [goAdmin, setGoAdmin] = useState(false);
       const [showManual, setShowManual] = useState(false);
 
-      // 安全なセッション復元
       useEffect(() => {
         try {
           const sStr = localStorage.getItem(SESS_KEY);
