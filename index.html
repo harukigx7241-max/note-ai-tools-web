@@ -7,123 +7,258 @@
 <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{font-size:16px;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+/* Reset & Base */
+*,::after,::before{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-text-size-adjust:100%}
 body{font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;background:#0d0d1a;color:#fff;min-height:100vh;overflow-x:hidden;line-height:1.6}
-button,input,textarea,select{font-family:inherit;font-size:14px;color:#fff;outline:none}
-button{-webkit-tap-highlight-color:transparent;cursor:pointer}
+button,input,textarea,select{font-family:inherit;font-size:14px;color:#fff;outline:none;border:none}
+button{cursor:pointer;background:transparent}
 a{text-decoration:none;color:inherit}
-
-/* 全体レイアウト */
 .pg{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:30px 16px 80px;position:relative;background:linear-gradient(135deg,#0d0d1a,#1a0a2e 50%,#0a1628)}
 .grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03)1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
 .z1{position:relative;z-index:1;width:100%;max-width:920px}
-
-/* タイトル周り */
-.main-ttl{font-size:clamp(32px,8vw,56px);font-weight:900;line-height:1.1;text-align:center;margin-bottom:10px}
-.main-ttl span{color:#38bdf8}
-.main-sub{font-size:13px;color:rgba(255,255,255,.5);text-align:center;margin-bottom:24px}
-
-/* ダッシュボード・カード */
-.cat-ttl{font-size:16px;font-weight:800;margin-bottom:12px;color:#38bdf8;border-bottom:2px solid rgba(56,189,248,.2);padding-bottom:6px}
-.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:30px}
-.tool-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;position:relative;overflow:hidden}
-.tool-card:hover{background:rgba(255,255,255,.06);border-color:rgba(56,189,248,.4);transform:translateY(-2px)}
-.tool-card.locked{opacity:0.6;filter:grayscale(100%)}
-.tool-card.locked:hover{border-color:rgba(255,255,255,.2);transform:none}
-.tc-icon{font-size:24px;margin-bottom:6px}
-.tc-name{font-size:14px;font-weight:800;margin-bottom:4px}
-.tc-desc{font-size:11px;color:rgba(255,255,255,.5);line-height:1.4}
-.tc-badge{background:rgba(56,189,248,.2);border:1px solid rgba(56,189,248,.4);border-radius:50px;padding:2px 8px;font-size:10px;color:#38bdf8;font-weight:800}
-.badge-limit{background:#f59e0b;color:#fff;font-size:10px;padding:2px 8px;border-radius:50px;font-weight:800}
-
-/* UIパーツ共通 */
+/* Typography */
+.m-ttl{font-size:clamp(28px,8vw,50px);font-weight:900;line-height:1.1;text-align:center;margin-bottom:10px}
+.m-ttl span{color:#38bdf8}
+.m-sub{font-size:13px;color:rgba(255,255,255,.5);text-align:center;margin-bottom:24px}
+.c-ttl{font-size:15px;font-weight:800;margin-bottom:12px;color:#38bdf8;border-bottom:2px solid rgba(56,189,248,.2);padding-bottom:6px}
+/* UI Components */
 .card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px;margin-bottom:12px}
-.lbl{font-size:11px;font-weight:800;color:rgba(255,255,255,.6);display:block;margin-bottom:6px;letter-spacing:0.05em}
+.lbl{font-size:11px;font-weight:800;color:rgba(255,255,255,.6);display:block;margin-bottom:6px}
 .inp{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;transition:all .2s}
 .inp:focus{border-color:#38bdf8;background:rgba(255,255,255,.08)}
-.btn-primary{background:linear-gradient(135deg,#0ea5e9,#2563eb);border:none;border-radius:8px;padding:12px 20px;font-weight:800;box-shadow:0 4px 12px rgba(14,165,233,.3);transition:all .2s;width:100%}
-.btn-primary:active{transform:scale(0.98)}
-.btn-primary:disabled{opacity:0.5;cursor:not-allowed}
-.btn-sub{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;transition:all .2s}
-.btn-sub:hover{background:rgba(255,255,255,.1)}
-.flex-row{display:flex;gap:10px;flex-wrap:wrap}
-.flex-1{flex:1;min-width:200px}
+.btn-p{background:linear-gradient(135deg,#0ea5e9,#2563eb);border-radius:8px;padding:12px 20px;font-weight:800;box-shadow:0 4px 12px rgba(14,165,233,.3);transition:all .2s;width:100%}
+.btn-p:active{transform:scale(0.98)} .btn-p:disabled{opacity:0.5;cursor:not-allowed}
+.btn-s{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700}
+.btn-s:hover{background:rgba(255,255,255,.1)}
+.flex{display:flex;gap:10px;flex-wrap:wrap} .f1{flex:1;min-width:200px}
 .err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;padding:10px;border-radius:8px;font-size:12px;margin-bottom:12px}
-
-/* チュートリアルパネル */
-.tut-panel{background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.2);border-radius:10px;padding:12px 16px;margin-bottom:16px}
-.tut-title{font-size:12px;font-weight:800;color:#38bdf8;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.tut-body{font-size:12px;color:rgba(255,255,255,.7);line-height:1.6;white-space:pre-wrap}
-
-/* アプリヘッダー＆タブ */
-.app-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:12px}
-.app-ttl{font-size:16px;font-weight:900;margin:0}
-.tabs{display:flex;overflow-x:auto;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:16px;gap:8px}
-.tab{background:transparent;border:none;color:rgba(255,255,255,.5);padding:8px 12px;font-weight:700;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
-.tab-on{color:#38bdf8;border-bottom-color:#38bdf8}
-.back-btn{padding:6px 12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:6px;color:rgba(255,255,255,.6);font-size:12px;font-weight:700}
-
-/* 結果表示系 */
-.post-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;overflow:hidden;margin-bottom:12px}
-.post-hd{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;font-weight:700}
-.post-body{padding:14px;max-height:400px;overflow-y:auto;font-size:13px;color:rgba(255,255,255,.8);white-space:pre-wrap;line-height:1.7}
-.cpbtn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#fff}
-.cpbtn:hover{background:rgba(255,255,255,.1)}
+/* Dashboard Grid */
+.t-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:30px}
+.t-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column}
+.t-card:hover{background:rgba(255,255,255,.06);border-color:rgba(56,189,248,.4);transform:translateY(-2px)}
+.t-card.lck{opacity:0.6;filter:grayscale(100%)} .t-card.lck:hover{transform:none;border-color:rgba(255,255,255,.08)}
+.t-icon{font-size:24px;margin-bottom:6px} .t-name{font-size:14px;font-weight:800;margin-bottom:4px} .t-desc{font-size:11px;color:rgba(255,255,255,.5);line-height:1.4}
+.bdg{background:rgba(56,189,248,.2);border:1px solid rgba(56,189,248,.4);border-radius:50px;padding:2px 8px;font-size:9px;color:#38bdf8;font-weight:800;align-self:flex-start;margin-bottom:6px}
+.bdg.red{background:rgba(233,69,96,.2);border-color:rgba(233,69,96,.4);color:#e94560}
+.bdg.lck{background:#64748b;color:#fff;border:none} .bdg.unl{background:#4ade80;color:#fff;border:none}
+/* Modal & Panels */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99;display:flex;align-items:center;justify-content:center;padding:16px}
+.m-cont{background:#0d0d1a;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:20px;width:100%;max-width:500px;max-height:85vh;overflow-y:auto}
+.tut{background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.2);border-radius:8px;padding:12px;margin-bottom:16px;font-size:12px;color:rgba(255,255,255,.8);white-space:pre-wrap}
 .res-box{background:#111827;border:1px solid #334155;border-radius:8px;padding:12px;font-size:13px;white-space:pre-wrap;color:#e2e8f0;margin-bottom:10px}
-.ai-launcher-link{display:flex;align-items:center;justify-content:center;gap:6px;flex:1;padding:10px;border-radius:8px;font-size:12px;font-weight:800;background:rgba(255,255,255,.1);transition:all 0.2s;white-space:nowrap}
-.ai-launcher-link:hover{background:rgba(255,255,255,.2);transform:translateY(-2px)}
-
-/* 認証・管理者画面 */
-.auth-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;width:100%;max-width:400px;backdrop-filter:blur(10px)}
-.auth-tabs{display:flex;gap:10px;margin-bottom:20px;background:rgba(0,0,0,.3);padding:4px;border-radius:10px}
-.auth-tab{flex:1;padding:8px;border-radius:8px;border:none;background:transparent;color:rgba(255,255,255,.5);font-weight:700;transition:all .2s}
-.auth-tab-on{background:#38bdf8;color:#fff}
-.admin-table{width:100%;border-collapse:collapse;font-size:12px}
-.admin-table th,.admin-table td{padding:10px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left;word-break:break-word}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px}
-.modal{background:#0d0d1a;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:20px;width:100%;max-width:600px;max-height:85vh;overflow-y:auto}
-
-@media(max-width:560px){
-  .main-ttl{font-size:28px}
-  .tool-grid{grid-template-columns:1fr}
-  .admin-table th,.admin-table td{padding:8px 4px;font-size:11px}
-}
+/* Tabs & App Header */
+.hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:12px}
+.tabs{display:flex;overflow-x:auto;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:16px;gap:8px}
+.tab{padding:8px 12px;font-weight:700;color:rgba(255,255,255,.5);border-bottom:2px solid transparent;white-space:nowrap}
+.tab.on{color:#38bdf8;border-bottom-color:#38bdf8}
+.auth-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;width:100%;max-width:400px;text-align:center}
+table{width:100%;border-collapse:collapse;font-size:12px} th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left;word-break:break-word}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script>
-// ===================================================
-// JSXなし・純粋なReact.createElement で記述 (v27: 究極安定・クラッシュ防止版)
-// ===================================================
 (function(){
 'use strict';
-var h = React.createElement;
-var useState = React.useState, useEffect = React.useEffect, Fragment = React.Fragment;
+const e = React.createElement;
+const {useState, useEffect, Fragment} = React;
 
-// ── データベースとシステム定数 ──
-// 過去のバグで汚染されたDBを回避するため、キーをv27に刷新
-var DB_KEY = 'AICP_v27_DB';
-var SESS_KEY = 'AICP_v27_Sess';
-var DAILY_LIMIT = 3;
+// ── データベース ──
+const DB_KEY = 'AICP_v28_DB';
+const SESS_KEY = 'AICP_v28_Sess';
+const DAILY_LIMIT = 3;
+const DEF_UNLOCKED = ['note', 'research', 'lp', 'affiliate', 'backend', 'bonus'];
 
-// 新規登録者にデフォルトで解放するツール（これ以外はロック）
-var DEFAULT_UNLOCKED = ['note', 'research', 'lp', 'affiliate', 'backend', 'bonus'];
-
-// DB初期化
 function getDB() {
-  var d = localStorage.getItem(DB_KEY);
-  if(d) return JSON.parse(d);
+  try {
+    const d = localStorage.getItem(DB_KEY);
+    if(d) return JSON.parse(d);
+  } catch(err){}
   return {
     admin: { p: 'admin123' },
-    users: {
-      'admin': { status: 'approved', sns: '@admin', date: Date.now(), usage: {date:'', count:0}, perms: {}, brand: {plan:'paid'}, projects: {'default': {name:'管理者領域', data:{}}}, curProj: 'default' }
-    },
-    inquiries: []
+    users: { 'admin': { status: 'approved', sns: '@admin', date: Date.now(), usage: {date:'', count:0}, perms: {}, brand: {plan:'paid'}, projects: {'default': {name:'管理者領域', data:{}}}, curProj: 'default' } },
+    inqs: []
   };
 }
 function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
-function doCopy(t, cObj, setC, key){ if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).catch(function(){}); var n=Object.assign({},cObj); n[key]=true; setC(n); setTimeout(function(){var n2=Object.assign({},cObj); n2[key]=false; setC(n2);},2000); }
-function parseJSON(t){ var c=t.replace(/
-http://googleusercontent.com/immersive_entry_chip/0
+function doCopy(t, c, setC, k){ if(navigator.clipboard) navigator.clipboard.writeText(t).catch(()=>{}); const n={...c}; n[k]=true; setC(n); setTimeout(()=>{ const n2={...c}; n2[k]=false; setC(n2); },2000); }
+function parseJ(t){ const c=t.replace(/```(?:json)?\n?/gi,'').replace(/```/g,'').trim(); const m=c.match(/\{[\s\S]*\}/); if(m) try{return JSON.parse(m[0]);}catch(er){} try{return JSON.parse(c);}catch(er){return null;} }
+function fmtD(ts) { const d=new Date(ts); return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }
+
+// ── ツール定義 (極限圧縮版) ──
+const CATS = [
+  { n: '📝 コンテンツ作成 ＆ マネタイズ', t: ['note', 'research', 'lp', 'affiliate', 'backend', 'bonus'] },
+  { n: '🚀 SNS集客 ＆ アカウント設計', t: ['profile', 'sns', 'video', 'image'] },
+  { n: '💬 ファン化 ＆ 自動化', t: ['magnet', 'line', 'funnel', 'reply', 'interview', 'journey'] },
+  { n: '💻 開発 ＆ その他', t: ['webdev'] }
+];
+
+const rJ = '\n【ルール】前置きなしでJSON出力:\n';
+const TOOLS = {
+  note: { i:'📝', n:'note記事生成', b:'必須', d:'売れる記事構成と本文を作成', tut:'読者の悩みに寄り添い、解決策を提示する有料記事を作成します。', f:[{id:'t1',t:'in',l:'テーマ'},{id:'t2',t:'in',l:'ターゲット層・悩み'},{id:'t3',t:'in',l:'価格・文字数目安'},{id:'chk',t:'chk',l:'購入者特典の案内を含める'}], bld:(v,b)=>b+'テーマ「'+v.t1+'」悩み「'+v.t2+'」向けnote記事作成。価格/文字数:'+v.t3+'\n'+(v.chk?'※最後に特典案内を含める\n':'')+'【厳守】前置きなしでMarkdown出力。\n---TITLES---\n1.タイトル案...\n---FREE_START---\n無料本文...\n---FREE_END---\n---PAID_START---\n有料本文...\n---PAID_END---', isNote:true },
+  research: { i:'⚔️', n:'競合リサーチ', b:'神機能', d:'弱点とブルーオーシャンを発見', tut:'ライバルのセールス文をコピペし弱点を見つけます。', f:[{id:'t1',t:'ar',l:'ライバルの目次・セールス文'},{id:'t2',t:'in',l:'自分の強み(任意)'}], bld:(v,b)=>b+'以下の教材を分析し、弱点と私の強み「'+v.t2+'」を活かした勝てるコンセプトを3つ提案して。\n'+v.t1+rJ+'{"concepts":[{"title":"名","weakness":"弱点","strategy":"戦略"}]}' },
+  lp: { i:'📄', n:'爆売れLP作成', b:'必須', d:'高単価を売るセールスレター', tut:'商品を売るLPの構成を作ります。', f:[{id:'t1',t:'in',l:'商品名・価格'},{id:'t2',t:'ar',l:'ベネフィット・特徴'}], bld:(v,b)=>b+'商品「'+v.t1+'」を売るLP構成を作成して。特徴: '+v.t2+rJ+'{"hero":"コピー","empathy":["共感..."],"benefits":["利点..."],"offer":"オファー"}' },
+  affiliate: { i:'🔗', n:'アフィリエイト', b:'', d:'商品レビュー＆SNS誘導', tut:'他人の商品を売る記事とポストを作ります。', f:[{id:'t1',t:'in',l:'商品名・URL'},{id:'t2',t:'in',l:'ターゲット'},{id:'t3',t:'ar',l:'推しポイント・体験談'}], bld:(v,b)=>b+'商品「'+v.t1+'」をターゲット「'+v.t2+'」に売るレビューとSNS。推し: '+v.t3+rJ+'{"article":{"title":"題","sections":["見出し..."]},"sns_posts":["ポスト..."]}' },
+  backend: { i:'💎', n:'高単価バックエンド', b:'', d:'30万円〜の商材企画', tut:'フロント商品購入者へ売る高単価企画を作ります。', f:[{id:'t1',t:'in',l:'価格・形式'},{id:'t2',t:'ar',l:'ベース知識・元記事'}], bld:(v,b)=>b+'知識をベースに価格「'+v.t1+'」の高額商品企画を3つ作成。\n'+v.t2+rJ+'{"plans":[{"title":"名","detail":"詳細","pitch":"セールス文"}]}' },
+  bonus: { i:'🎁', n:'購入者特典生成', b:'', d:'記事から特典アイデア作成', tut:'商品の購入率を上げる「おまけ」を提案します。', f:[{id:'t1',t:'ar',l:'元記事'}], bld:(v,b)=>b+'記事を分析し購入者特典を8つ提案。\n'+v.t1+rJ+'{"suggestions":[{"title":"題","type":"種類","desc":"説明"}]}' },
+  profile: { i:'👤', n:'アカウント設計', b:'', d:'バズるプロフ・名前生成', tut:'SNSのコンセプトとプロフ文を作ります。', f:[{id:'t1',t:'in',l:'ジャンル'},{id:'s1',t:'sel',l:'媒体',o:['X','Threads','IG']},{id:'t2',t:'ar',l:'経歴・強み'}], bld:(v,b)=>b+'媒体「'+v.s1+'」ジャンル「'+v.t1+'」経歴「'+v.t2+'」でバズるアカウント設計をして。'+rJ+'{"names":["候補..."],"profile_short":"140字","profile_long":"長文"}' },
+  sns: { i:'📱', n:'SNS集客ポスト', b:'', d:'X/Threadsでバズる投稿', tut:'記事からSNS投稿を作ります。参考投稿を入れると型を真似ます。', f:[{id:'s1',t:'sel',l:'媒体',o:['X(単発)','X(ツリー)','Threads','両方']},{id:'s2',t:'sel',l:'目的',o:['価値提供','ストーリー','宣伝']},{id:'t2',t:'ar',l:'参考バズ投稿(任意)'},{id:'t1',t:'ar',l:'発信内容'}], bld:(v,b)=>b+'媒体「'+v.s1+'」目的「'+v.s2+'」で投稿を作成。\n'+(v.t2?'【モデリング】型を完全トレース:\n'+v.t2+'\n':'')+'【内容】\n'+v.t1+rJ+'{"posts":["本文..."]}' },
+  video: { i:'🎥', n:'ショート動画台本', b:'', d:'TikTok/Shorts用台本', tut:'60秒以内のショート動画台本を作ります。', f:[{id:'t1',t:'ar',l:'内容・元記事'}], bld:(v,b)=>b+'内容から60秒動画台本と映像AI用プロンプトを作成。\n'+v.t1+rJ+'{"title":"題","scenes":[{"sec":"秒","narration":"ナレ","telop":"テロ","ai_prompt":"英語"}]}' },
+  image: { i:'🖼️', n:'画像プロンプト', b:'', d:'画像生成AI用呪文', tut:'AIに美しい画像を描かせる指示文を作ります。', f:[{id:'t1',t:'in',l:'キーワード'}], bld:(v,b)=>b+'「'+v.t1+'」の画像生成プロンプトを5パターン作成(英語)。'+rJ+'{"results":[{"title":"意図","prompt":"プロンプト","negative":"ネガ"}]}' },
+  magnet: { i:'🎁', n:'無料プレゼント', b:'', d:'LINE登録率を上げる特典', tut:'リスト取り用の特典構成を作ります。', f:[{id:'t1',t:'in',l:'悩み'},{id:'t2',t:'ar',l:'ノウハウ'}], bld:(v,b)=>b+'悩み「'+v.t1+'」を解決するLINE登録特典アイデア5つと最強の目次構成を作成。\n'+v.t2+rJ+'{"ideas":["案..."],"best_magnet":{"title":"題","outline":["目次..."]}}' },
+  line: { i:'💌', n:'LINEステップ', b:'', d:'自動で売れる5日間シナリオ', tut:'5日間で商品を売る自動配信シナリオを作ります。', f:[{id:'t1',t:'in',l:'商品名・価格'},{id:'t2',t:'ar',l:'詳細'}], bld:(v,b)=>b+'商品「'+v.t1+'」を売るLINE5日間ステップ配信を作成。詳細: '+v.t2+rJ+'{"days":[{"day":1,"title":"件名","body":"本文"}...]}' },
+  funnel: { i:'🩺', n:'ファネル診断', b:'', d:'売れない原因をAIコンサル', tut:'数字のボトルネックをAIに診断させます。', f:[{id:'t1',t:'ar',l:'現状の数字 (例: Xインプ1万, 売上0)'}], bld:(v,b)=>b+'数字を見てボトルネックを診断し改善策を3つ提示して。\n'+v.t1+rJ+'{"bottleneck":"原因","solutions":["策..."]}' },
+  reply: { i:'💬', n:'LINE/DM 神返信', b:'', d:'完璧なセールス返信', tut:'問い合わせに対し、信頼を築き商品へ誘導する返信を作ります。', f:[{id:'s1',t:'sel',l:'目的',o:['信頼構築','商品誘導','不安解消','誠実対応']},{id:'t1',t:'ar',l:'相手のメッセージ'}], bld:(v,b)=>b+'DM「'+v.t1+'」に目的「'+v.s1+'」で神返信を作成。'+rJ+'{"replies":[{"type":"親しみ","text":"本文"},{"type":"権威","text":"本文"},{"type":"質問","text":"本文"}]}' },
+  interview: { i:'🗣️', n:'AIインタビュー', b:'', d:'体験談を引き出す', tut:'AIとチャットして一次情報を引き出します。', f:[{id:'t1',t:'in',l:'テーマ'}], bld:(v,b)=>b+'あなたは編集者です。テーマ「'+v.t1+'」で私にインタビューし記事構成を作ります。【ルール】1ターン1問。私が答えたら深掘り。5問で構成出力。最初の質問をどうぞ。', noJson:true },
+  journey: { i:'🗺️', n:'カスタマージャーニー', b:'', d:'戦略マップを作成', tut:'どんなSNSで何を発信して売るかの全体設計図を作ります。', f:[{id:'t1',t:'in',l:'テーマ'},{id:'t2',t:'in',l:'ターゲット'}], bld:(v,b)=>b+'テーマ「'+v.t1+'」ターゲット「'+v.t2+'」で【認知→興味→比較・検討→購入→リピート】の戦略を作成。'+rJ+'{"phases":[{"name":"フェーズ","goal":"目的","tools":["X等"],"action":"戦略"}...]}' },
+  webdev: { i:'💻', n:'Webアプリ開発', b:'神機能', d:'アイデアからHTML生成', tut:'プログラミング知識ゼロでWebツールを作ります。Claudeへ投げます。', f:[{id:'t1',t:'ar',l:'アイデア'}], bld:(v,b)=>'あなたは天才エンジニアです。アイデアからHTML/CSS/JSが1枚にまとまったWebアプリを作成してください。GitHub公開手順も案内し、Geminiへ引き継ぐ仕様書を出力してください。\n【アイデア】\n'+v.t1, noJson:true }
+};
+
+// ── UI部品 ──
+const InputF = ({f, v, onChange}) => {
+  if(f.t==='in') return e('div',{className:'card'}, e('span',{className:'lbl'},f.l), e('input',{className:'inp',value:v,onChange:x=>onChange(x.target.value)}));
+  if(f.t==='ar') return e('div',{className:'card'}, e('span',{className:'lbl'},f.l), e('textarea',{className:'inp',style:{minHeight:100},value:v,onChange:x=>onChange(x.target.value)}));
+  if(f.t==='sel') return e('div',{className:'card'}, e('span',{className:'lbl'},f.l), e('select',{className:'inp',value:v,onChange:x=>onChange(x.target.value)}, f.o.map(o=>e('option',{key:o,value:o},o))));
+  if(f.t==='chk') return e('div',{className:'card flex',style:{alignItems:'center'}}, e('input',{type:'checkbox',checked:v,onChange:x=>onChange(x.target.checked),style:{width:18,height:18}}), e('span',{style:{fontWeight:700}},f.l));
+  return null;
+};
+
+const RJson = ({obj}) => {
+  if(typeof obj === 'string') return e('p',{className:'res-box'}, obj);
+  if(Array.isArray(obj)) return e('div',null, obj.map((x,i)=>e('div',{key:i,style:{marginBottom:10,borderBottom:'1px dashed #334155',paddingBottom:10}}, e(RJson,{obj:x}))));
+  if(typeof obj === 'object' && obj) return e('div',null, Object.keys(obj).map(k=>e('div',{key:k,style:{marginBottom:8}}, e('span',{style:{color:'#38bdf8',fontSize:11,fontWeight:700}},k), e(RJson,{obj:obj[k]}))));
+  return e('span',null, String(obj));
+};
+
+const wrapP = (p, b) => (p==='paid' ? '【システム: 有料AIモード】\n高度な推論とWeb検索が可能な状態です。複雑な指示にも完璧に従ってください。\n\n' : '【システム: 無料AIモード】\n出力制限がある環境です。途切れないよう簡潔に要点を絞って出力してください。\n\n') + b;
+
+const WebLinks = ({msg}) => e('div',{style:{padding:14,background:'rgba(255,255,255,.03)',border:'1px solid rgba(56,189,248,.4)',borderRadius:10,marginBottom:16}}, e('p',{style:{fontSize:12,fontWeight:700,color:'#38bdf8',marginBottom:8}},'👇 AIを開いてプロンプトを送信'), e('div',{className:'flex',style:{marginBottom:12}}, ['Perplexity','ChatGPT','Claude'].map(x=>e('a',{key:x,href:'https://'+(x==='ChatGPT'?'chatgpt.com':x==='Claude'?'claude.ai':'www.perplexity.ai'),target:'_blank',className:'btn-s',style:{flex:1,textAlign:'center',background:'rgba(255,255,255,.1)'}},x))), msg===false?null:e('p',{style:{fontSize:11,color:'rgba(255,255,255,.5)'}},'回答完了後、すべてコピーして「📥 AI回答読込」に貼り付けてください。'));
+
+// ── 共通ツールエンジン ──
+const ToolEngine = ({tid, user, role, onBack}) => {
+  const tC = TOOLS[tid];
+  const [tab, setTab] = useState('set'); const [c, setC] = useState({}); const [links, setLinks] = useState(false);
+  const [imp, setImp] = useState(''); const [res, setRes] = useState(null); const [err, setErr] = useState('');
+  
+  const db = getDB(); const uD = db.users[user]; const pid = uD.curProj || 'default';
+  const [v, setV] = useState((uD.projects[pid].data[tid]) || {});
+
+  const updV = (id, val) => { const n={...v, [id]:val}; setV(n); if(role!=='admin'){const d=getDB(); d.users[user].projects[pid].data[tid]=n; saveDB(d);} };
+  const canUse = () => { if(role==='admin'||(uD.perms&&uD.perms[tid]))return true; const t=new Date().toDateString(); return (uD.usage.date!==t) || (uD.usage.count<DAILY_LIMIT); };
+
+  const hGen = () => {
+    if(!canUse()) return alert('本日の無料枠('+DAILY_LIMIT+'回)終了。無制限利用は管理者へ。');
+    if(role!=='admin' && !(uD.perms&&uD.perms[tid])) { const d=getDB(); const t=new Date().toDateString(); if(d.users[user].usage.date!==t) d.users[user].usage={date:t,count:0}; d.users[user].usage.count++; saveDB(d); }
+    let bs=''; if(uD.brand&&uD.brand.name) bs='【発信者(文体反映)】名前:'+uD.brand.name+' ターゲット:'+(uD.brand.target||'')+' 文体:'+(uD.brand.tone||'')+'\n\n';
+    const pr = wrapP((uD.brand&&uD.brand.plan)||'free', tC.bld(v, bs));
+    doCopy(pr, c, setC, 'g'); setLinks(true); if(!tC.noJson && !tC.isNote) setTab('imp');
+  };
+
+  const hImp = () => { if(tC.noJson){setRes(imp);setTab('res');setImp('');return;} setErr(''); const r=parseJ(imp); if(r){setRes(r);setTab('res');setImp('');}else setErr('JSONフォーマットエラー。'); };
+
+  if(tC.isNote) {
+    return e('div',{className:'z1'},
+      e('div',{className:'hd'}, e('div',{className:'flex',style:{alignItems:'center'}}, e('button',{className:'btn-s',onClick:onBack},'← 戻る'), e('h1',{style:{fontSize:16}},tC.n))),
+      e('div',{className:'tut'}, e('strong',{style:{color:'#38bdf8'}},'💡 使い方: '), tC.tut),
+      tC.f.map(f=>e(InputF,{key:f.id,f:f,v:v[f.id]||(f.t==='chk'?false:f.o?f.o[0]:''),onChange:val=>updV(f.id,val)})),
+      e('button',{className:'btn-p',onClick:hGen,style:{marginTop:10,marginBottom:16}}, c['g']?'✓ コピー完了':'📋 プロンプト生成＆コピー'),
+      links && e(WebLinks,{msg:false}),
+      e('div',{className:'card'}, e('span',{className:'lbl'},'📥 AIの回答を貼り付け'), e('textarea',{className:'inp',style:{minHeight:200},value:res||'',onChange:x=>setRes(x.target.value)}), e('button',{className:'btn-s',style:{width:'100%',marginTop:10},onClick:()=>doCopy(res||'',c,setC,'ca')},c['ca']?'✓':'📋 全文コピー'))
+    );
+  }
+
+  return e('div',{className:'z1'},
+    e('div',{className:'hd'}, e('div',{className:'flex',style:{alignItems:'center'}}, e('button',{className:'btn-s',onClick:onBack},'← 戻る'), e('h1',{style:{fontSize:16}},tC.n))),
+    e('div',{className:'tabs'}, [['set','⚙️ 設定',false],['imp','📥 読込',false],['res','👁 結果',!res]].map(x=>e('button',{key:x[0],className:'tab '+(tab===x[0]?'on':''),disabled:x[2],onClick:()=>!x[2]&&setTab(x[0])},x[1]))),
+    tab==='set' && e('div',null, e('div',{className:'tut'}, e('strong',{style:{color:'#38bdf8'}},'💡 使い方: '), tC.tut), tC.f.map(f=>e(InputF,{key:f.id,f:f,v:v[f.id]||(f.t==='chk'?false:f.o?f.o[0]:''),onChange:val=>updV(f.id,val)})), e('button',{className:'btn-p',onClick:hGen,style:{marginTop:10,marginBottom:16}}, c['g']?'✓ コピー完了':'📋 プロンプト生成'), links && e(WebLinks,{msg:!tC.noJson})),
+    tab==='imp' && e('div',null, e('div',{className:'card'}, e('span',{className:'lbl'},'📥 出力を貼り付け'), e('textarea',{className:'inp',style:{minHeight:150},value:imp,onChange:x=>setImp(x.target.value)}), err&&e('div',{className:'err',style:{marginTop:10}},'❌ '+err), e('button',{className:'btn-p',style:{marginTop:10},disabled:!imp.trim(),onClick:hImp},'反映して結果を見る'))),
+    tab==='res' && res && e('div',{className:'card'}, e(RJson,{obj:res}))
+  );
+};
+
+// ── モーダル・設定系 ──
+const Manual = ({close}) => e('div',{className:'modal',onClick:close}, e('div',{className:'m-cont',onClick:x=>x.stopPropagation()}, e('div',{className:'hd'}, e('h2',{style:{color:'#38bdf8',fontSize:16}},'📖 マニュアル'), e('button',{onClick:close,style:{fontSize:24}},'×')), e('div',{style:{fontSize:13,lineHeight:1.7}}, e('p',{style:{marginBottom:12}},'最新AIを操作する「完全無料」のプロンプト生成ツールです。'), e('div',{className:'tut'}, e('strong',{style:{color:'#fbbf24'}},'🚀 使い方 (3ステップ)\n'), '1. ツールの【⚙️ 設定】で条件を入れプロンプトをコピー。\n2. ChatGPT等を開き、そのまま送信。\n3. 回答をすべてコピーし、【📥 読込】に貼り付け！'), e('div',{className:'tut',style:{borderColor:'rgba(56,189,248,.4)'}}, e('strong',{style:{color:'#38bdf8'}},'🤖 無料版・有料版どちらを使うべき？\n'), '本格的に稼ぐなら',e('strong',{style:{color:'#f43f5e'}},'有料版一択'),'です。無料版は長文で途切れやすく、Web検索も弱いためです。\n※「マイ・ブランド設定」で有料版を選ぶと、AIの能力を引き出す専用プロンプトに自動で切り替わります。'), e('button',{className:'btn-p',onClick:close},'理解して使う'))));
+
+const Inquiry = ({u, close}) => {
+  const [t, setT] = useState(INQ_TYPES[0]); const [c, setC] = useState(''); const [s, setS] = useState(false);
+  const send = () => { if(!c.trim())return; const d=getDB(); d.inqs.push({id:Date.now(),user:u,type:t,content:c,date:Date.now(),status:'unread'}); saveDB(d); setS(true); setTimeout(close,2000); };
+  return e('div',{className:'modal',onClick:close}, e('div',{className:'m-cont',onClick:x=>x.stopPropagation()}, e('div',{className:'hd'}, e('h2',{style:{color:'#f59e0b',fontSize:16}},'💬 管理者へ問合せ'), e('button',{onClick:close,style:{fontSize:24}},'×')), s?e('div',{style:{textAlign:'center',color:'#4ade80',fontWeight:800,padding:'30px 0'}},'送信完了！'):e('div',null, e('div',{className:'card'}, e('span',{className:'lbl'},'種別'), e('select',{className:'inp',value:t,onChange:x=>setT(x.target.value)},INQ_TYPES.map(o=>e('option',{key:o,value:o},o)))), e('div',{className:'card'}, e('span',{className:'lbl'},'内容'), e('textarea',{className:'inp',style:{minHeight:120},value:c,onChange:x=>setC(x.target.value)})), e('button',{className:'btn-p',style:{background:'linear-gradient(135deg,#f59e0b,#d97706)'},disabled:!c.trim(),onClick:send},'送信'))));
+};
+
+const BrandSet = ({u, back}) => {
+  const [b, setB] = useState((getDB().users[u]||{}).brand||{plan:'free'});
+  const save = () => { if(u!=='admin'){const d=getDB(); d.users[u].brand=b; saveDB(d);} alert('保存しました'); back(); };
+  return e('div',{className:'z1'}, e('div',{className:'hd'}, e('div',{className:'flex',style:{alignItems:'center'}}, e('button',{className:'btn-s',onClick:back},'← 戻る'), e('h1',{style:{fontSize:16}},'👤 マイブランド＆AI設定'))), e('div',{className:'tut'},'登録した情報は全ツールのプロンプトに自動反映されます。'), e('div',{className:'card'}, e('span',{className:'lbl'},'🤖 AIプラン'), e('select',{className:'inp',value:b.plan||'free',onChange:x=>setB({...b,plan:x.target.value})}, e('option',{value:'free'},'無料版 (ChatGPT Free等)'), e('option',{value:'paid'},'有料版 (ChatGPT Plus等)'))), e('div',{className:'card'}, e('span',{className:'lbl'},'名前・肩書き'), e('input',{className:'inp',value:b.name||'',onChange:x=>setB({...b,name:x.target.value})})), e('div',{className:'card'}, e('span',{className:'lbl'},'ターゲット層'), e('input',{className:'inp',value:b.target||'',onChange:x=>setB({...b,target:x.target.value})})), e('div',{className:'card'}, e('span',{className:'lbl'},'文体のクセ'), e('textarea',{className:'inp',style:{minHeight:80},value:b.tone||'',onChange:x=>setB({...b,tone:x.target.value})})), e('button',{className:'btn-p',onClick:save},'保存') );
+};
+
+const ProjMgr = ({u, back}) => {
+  const [db, setDb] = useState(getDB()); const uD = db.users[u]; const [np, setNp] = useState('');
+  const cr = () => { if(!np.trim()||u==='admin')return; const id='p_'+Date.now(); const d=getDB(); d.users[u].projects[id]={name:np,data:{}}; d.users[u].curProj=id; saveDB(d); setDb(d); setNp(''); };
+  const sw = (id) => { if(u==='admin')return; const d=getDB(); d.users[u].curProj=id; saveDB(d); setDb(d); back(); };
+  return e('div',{className:'z1'}, e('div',{className:'hd'}, e('div',{className:'flex',style:{alignItems:'center'}}, e('button',{className:'btn-s',onClick:back},'← 戻る'), e('h1',{style:{fontSize:16}},'📁 プロジェクト管理'))), e('div',{className:'tut'},'案件ごとにデータを分けて保存できます。'), e('div',{className:'flex',style:{marginBottom:20}}, e('input',{className:'inp f1',placeholder:'新プロジェクト名',value:np,onChange:x=>setNp(x.target.value)}), e('button',{className:'btn-p',style:{width:'auto'},onClick:cr,disabled:u==='admin'},'作成')), Object.keys(uD.projects).map(k=>{ const p=uD.projects[k]; const ic=k===uD.curProj; return e('div',{key:k,className:'card flex',style:{justifyContent:'space-between',alignItems:'center',borderColor:ic?'#38bdf8':'rgba(255,255,255,.08)'}}, e('span',{style:{fontWeight:700,color:ic?'#38bdf8':'#fff'}}, p.name+(ic?' (選択中)':'')), !ic&&e('button',{className:'btn-s',onClick:()=>sw(k)},'切替') ); }) );
+};
+
+// ── 認証 ＆ 管理 ──
+const Auth = ({onLogin}) => {
+  const [isL, setIsL] = useState(true); const [un, setUn] = useState(''); const [pw, setPw] = useState(''); const [sns, setSns] = useState(''); const [err, setErr] = useState('');
+  const hSub = () => {
+    setErr(''); const u=un.trim(); if(!u) return setErr('名前を入力'); const d=getDB();
+    if(u==='admin'){ if(pw===d.admin.p){ localStorage.setItem(SESS_KEY, JSON.stringify({u:u,r:'admin'})); onLogin(u,'admin'); } else setErr('パスワード違い'); return; }
+    if(isL) { if(!d.users[u]) return setErr('未登録です'); localStorage.setItem(SESS_KEY, JSON.stringify({u:u,r:d.users[u].status})); onLogin(u,d.users[u].status); }
+    else { if(d.users[u]) return setErr('登録済です'); const s=sns.trim(); if(!s||!s.includes('@')) return setErr('SNSは@必須'); d.users[u]={status:'pending',sns:s,date:Date.now(),usage:{date:'',count:0},perms:{},brand:{plan:'free'},projects:{'default':{name:'デフォルト',data:{}}},curProj:'default'}; saveDB(d); localStorage.setItem(SESS_KEY, JSON.stringify({u:u,r:'pending'})); onLogin(u,'pending'); }
+  };
+  return e('div',{className:'pg'}, e('div',{className:'grid-bg'}), e('div',{className:'z1 auth-box'}, e('h2',{style:{marginBottom:4}},'AI Content Pro'), e('p',{style:{color:'#38bdf8',fontWeight:700,marginBottom:20}},'SaaS Edition v28'), e('div',{className:'flex',style:{background:'rgba(0,0,0,.3)',padding:4,borderRadius:8,marginBottom:20}}, e('button',{onClick:()=>setIsL(true),style:{flex:1,padding:8,borderRadius:6,background:isL?'#38bdf8':'transparent',color:isL?'#fff':'#888',fontWeight:700}},'ログイン'), e('button',{onClick:()=>setIsL(false),style:{flex:1,padding:8,borderRadius:6,background:!isL?'#38bdf8':'transparent',color:!isL?'#fff':'#888',fontWeight:700}},'新規申請')), e('input',{className:'inp',style:{marginBottom:12},placeholder:'ユーザー名 (adminで管理者)',value:un,onChange:x=>setUn(x.target.value)}), (!isL&&un!=='admin')&&e('input',{className:'inp',style:{marginBottom:12},placeholder:'SNSアカウント (@必須)',value:sns,onChange:x=>setSns(x.target.value)}), un==='admin'&&e('input',{className:'inp',style:{marginBottom:12},type:'password',placeholder:'パスワード',value:pw,onChange:x=>setPw(x.target.value)}), err&&e('div',{className:'err'},err), e('button',{className:'btn-p',style:{marginTop:10},onClick:hSub},isL?'ログイン':'申請して待機へ') ));
+};
+
+const AdminDash = ({onGo, onLog}) => {
+  const [db, setDb] = useState(getDB()); const [t, setT] = useState('u'); const [ex, setEx] = useState(null);
+  const upS = (u, st) => { const d=getDB(); d.users[u].status=st; saveDB(d); setDb(d); };
+  const tP = (u, tid) => { const d=getDB(); d.users[u].perms[tid] = !d.users[u].perms[tid]; saveDB(d); setDb(d); };
+  const mR = (id) => { const d=getDB(); const i=d.inqs.find(x=>x.id===id); if(i){i.status='read';saveDB(d);setDb(d);} };
+  const uK = Object.keys(db.users).filter(k=>k!=='admin');
+  return e('div',{className:'pg'}, e('div',{className:'grid-bg'}), e('div',{className:'z1'}, e('div',{className:'hd'}, e('h1',{className:'app-ttl'},'🎛️ 管理画面'), e('div',{className:'flex'}, e('button',{className:'btn-p',style:{padding:'6px 12px'},onClick:onGo},'🚀 ツールへ'), e('button',{className:'btn-s',onClick:onLog},'ログアウト'))), e('div',{className:'tabs'}, e('button',{className:'tab '+(t==='u'?'on':''),onClick:()=>setT('u')},'👥 ユーザー'), e('button',{className:'tab '+(t==='i'?'on':''),onClick:()=>setT('i')},'📩 問い合わせ ('+(db.inqs||[]).filter(x=>x.status==='unread').length+')') ), t==='u'?e('div',{className:'card',style:{overflowX:'auto'}}, e('table',null, e('thead',null, e('tr',null, e('th',null,'User'), e('th',null,'SNS'), e('th',null,'Status'), e('th',null,'Action'))), e('tbody',null, uK.map(k=>{ const u=db.users[k]; const isE=ex===k; return e(Fragment,{key:k}, e('tr',null, e('td',{style:{fontWeight:700}},k), e('td',{style:{color:'#38bdf8'}},u.sns), e('td',{style:{color:u.status==='approved'?'#4ade80':'#f87171'}},u.status), e('td',null, u.status!=='approved'&&e('button',{className:'btn-s',style:{background:'#16a34a',marginRight:6},onClick:()=>upS(k,'approved')},'許可'), u.status==='approved'&&e('button',{className:'btn-s',style:{marginRight:6},onClick:()=>setEx(isE?null:k)},'🔑権限'), u.status!=='rejected'&&e('button',{className:'btn-s',style:{background:'#e11d48'},onClick:()=>upS(k,'rejected')},'Ban') ) ), isE&&e('tr',null, e('td',{colSpan:4,style:{background:'rgba(0,0,0,.3)'}}, e('p',{style:{fontSize:11,color:'#fbbf24',marginBottom:6}},'チェックしたツールは無制限になります'), e('div',{className:'flex'}, Object.keys(TOOLS).map(tid=>e('label',{key:tid,style:{fontSize:11,display:'flex',alignItems:'center',gap:4}}, e('input',{type:'checkbox',checked:!!u.perms[tid],onChange:()=>tP(k,tid)}), TOOLS[tid].n))) ))); })) )):e('div',null, (db.inqs||[]).sort((a,b)=>b.date-a.date).map(iq=>e('div',{key:iq.id,className:'card',style:{borderLeft:iq.status==='unread'?'3px solid #f59e0b':''}}, e('div',{className:'flex',style:{justifyContent:'space-between',marginBottom:8}}, e('span',{style:{fontWeight:800,color:'#38bdf8'}},iq.user+' ('+iq.type+')'), e('span',{style:{fontSize:11,color:'#888'}},fmtD(iq.date))), e('p',{style:{whiteSpace:'pre-wrap',fontSize:13}},iq.content), iq.status==='unread'&&e('button',{className:'btn-s',style:{marginTop:10},onClick:()=>mR(iq.id)},'既読にする') ))) ));
+};
+
+// ── メインアプリ ──
+const MainApp = ({user, role, onLog, onGoAd}) => {
+  const [sc, setSc] = useState('home'); const [man, setMan] = useState(false); const [inq, setInq] = useState(false);
+  const db = getDB(); const uD = db.users[user] || {projects:{'default':{name:'管理者'}}, usage:{}};
+
+  if(sc==='brand') return e(BrandSet, {user, back:()=>setSc('home')});
+  if(sc==='proj') return e(ProjMgr, {user, back:()=>setSc('home')});
+  if(TOOLS[sc]) return e(ToolEngine, {toolId:sc, user, role, onBack:()=>setSc('home')});
+
+  const pName = uD.projects[uD.curProj||'default']?.name || 'Proj';
+  const uStr = (uD.usage.date===new Date().toDateString()?uD.usage.count:0)+'/'+DAILY_LIMIT;
+
+  return e('div',{className:'pg'},
+    man && e(Manual,{close:()=>setMan(false)}), inq && e(Inquiry,{u:user, close:()=>setInq(false)}),
+    e('div',{style:{position:'absolute',top:16,right:16,zIndex:100,display:'flex',gap:8,flexWrap:'wrap',justifyContent:'flex-end'}}, role==='admin'&&e('button',{className:'btn-s',style:{background:'#f59e0b',border:'none'},onClick:onGoAd},'🎛️管理'), role!=='admin'&&e('div',{className:'btn-s'},'📂 '+pName), role!=='admin'&&e('div',{className:'btn-s'},'本日:'+uStr+'回'), role!=='admin'&&e('button',{className:'btn-s',style:{color:'#f59e0b',borderColor:'#f59e0b'},onClick:()=>setInq(true)},'💬 問合せ'), e('button',{className:'btn-s',onClick:()=>setMan(true)},'📖'), e('button',{className:'btn-s',onClick:onLog},'ログアウト')),
+    e('div',{className:'grid-bg'}), e('div',{className:'z1 bdg',style:{marginTop:40}},'AI Content Pro v28'), e('h1',{className:'z1 m-ttl'},'AI Content',e('br'),e('span',null,'Platform')), e('p',{className:'z1 m-sub'},'コンテンツ作成からSNS集客まで完全自動化'),
+    role!=='admin' && e('div',{className:'z1 flex',style:{justifyContent:'center',marginBottom:30}}, e('button',{className:'btn-s',onClick:()=>setSc('proj')},'📂 プロジェクト切替'), e('button',{className:'btn-s',onClick:()=>setSc('brand')},'👤 マイ・ブランド設定')),
+    e('div',{className:'z1'}, CATS.map(c=>e('div',{key:c.n,style:{marginBottom:24}}, e('h2',{className:'c-ttl'},c.n), e('div',{className:'t-grid'}, c.t.map(tid=>{ const t=TOOLS[tid]; const cAcc = DEF_UNLOCKED.includes(tid) || role==='admin' || (uD.perms&&uD.perms[tid]); return e('div',{key:tid,className:'t-card '+(cAcc?'':'lck'),onClick:()=>{if(cAcc)setSc(tid);else alert('🔒 この機能はロックされています。');}}, e('div',{className:'flex',style:{gap:6}}, !cAcc?e('div',{className:'bdg lck'},'🔒 ロック'):(role==='admin'||(uD.perms&&uD.perms[tid]))?e('div',{className:'bdg unl'},'✨ 無制限'):e('div',{className:'bdg',style:{background:'#64748b',color:'#fff',border:'none'}},'無料枠対象'), t.b&&e('div',{className:'bdg '+(t.b==='神機能'?'red':'')},t.b) ), e('div',{className:'t-icon'},t.i), e('div',{className:'t-name'},t.n), e('div',{className:'t-desc'},t.d)); }))))))
+  );
+};
+
+// ── Root ──
+const Root = () => {
+  const [u, setU] = useState(null); const [r, setR] = useState(null); const [goAd, setGoAd] = useState(false); const [man, setMan] = useState(false);
+  useEffect(()=>{ try{const s=JSON.parse(localStorage.getItem(SESS_KEY)); if(s&&s.u){if(s.r==='admin'){setU(s.u);setR('admin');setGoAd(true);}else{const d=getDB();if(d.users[s.u]){setU(s.u);setR(d.users[s.u].status);}else localStorage.removeItem(SESS_KEY);}}}catch(e){} },[]);
+  const hLog = () => { localStorage.removeItem(SESS_KEY); setU(null); setR(null); setGoAd(false); };
+  const cSt = () => { try{const s=JSON.parse(localStorage.getItem(SESS_KEY)); if(s&&s.u){const d=getDB();if(d.users[s.u])setR(d.users[s.u].status);}}catch(e){} };
+  
+  if(!u) return e(Auth, {onLogin:(usr,rol)=>{setU(usr);setR(rol);if(rol==='admin')setGoAd(true);}});
+  if(r==='admin'&&goAd) return e(AdminDash, {onLog:hLog, onGo:()=>setGoAd(false)});
+  if(r==='pending'||r==='rejected') return e('div',null, man&&e(Manual,{close:()=>setMan(false)}), e('div',{className:'pg'}, e('div',{className:'grid-bg'}), e('div',{className:'z1 auth-box'}, e('h2',null,r==='rejected'?'🚫 拒否':'⏳ 承認待ち'), e('button',{className:'btn-s',style:{width:'100%',marginBottom:16,borderColor:'#38bdf8',color:'#38bdf8'},onClick:()=>setMan(true)},'📖 承認待ちの間にマニュアルを読む'), e('button',{className:'btn-p',style:{marginBottom:12},onClick:cSt},'ステータス更新'), e('button',{className:'btn-s',style:{width:'100%'},onClick:hLog},'ログアウト'))));
+  if(r==='approved'||(r==='admin'&&!goAd)) return e(MainApp, {user:u, role:r, onLog:hLog, onGoAd:()=>setGoAd(true)});
+  return null;
+};
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(e(Root, null));
+
+})();
+</script>
+</body>
+</html>
