@@ -4,12 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>AI Content Pro (SaaS Edition)</title>
+  <!-- React ライブラリの読み込み -->
   <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  
   <style>
-    /* =========================================
+    /* =========================================================================
        Base Reset & Typography
-       ========================================= */
+       ========================================================================= */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 16px; -webkit-text-size-adjust: 100%; }
     body {
@@ -30,9 +32,9 @@
     button { cursor: pointer; background: transparent; }
     a { text-decoration: none; color: inherit; }
 
-    /* =========================================
-       Layout & Background
-       ========================================= */
+    /* =========================================================================
+       Layouts
+       ========================================================================= */
     .page-container {
       min-height: 100vh;
       display: flex;
@@ -58,9 +60,9 @@
       max-width: 920px;
     }
 
-    /* =========================================
-       Headers & Text
-       ========================================= */
+    /* =========================================================================
+       Typography & Titles
+       ========================================================================= */
     .main-title {
       font-size: clamp(32px, 8vw, 56px);
       font-weight: 900;
@@ -73,31 +75,31 @@
       font-size: 13px;
       color: rgba(255, 255, 255, 0.5);
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 30px;
     }
     .category-title {
       font-size: 16px;
       font-weight: 800;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
       color: #38bdf8;
       border-bottom: 2px solid rgba(56, 189, 248, 0.2);
-      padding-bottom: 6px;
+      padding-bottom: 8px;
     }
 
-    /* =========================================
-       Cards & Dashboard Grid
-       ========================================= */
+    /* =========================================================================
+       Dashboard Grid & Tool Cards
+       ========================================================================= */
     .tool-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 14px;
-      margin-bottom: 30px;
+      gap: 16px;
+      margin-bottom: 40px;
     }
     .tool-card {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 12px;
-      padding: 16px;
+      padding: 20px 16px;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
@@ -110,76 +112,78 @@
       transform: translateY(-2px);
     }
     .tool-card.locked {
-      opacity: 0.6;
+      opacity: 0.5;
       filter: grayscale(100%);
     }
     .tool-card.locked:hover {
       transform: none;
       border-color: rgba(255, 255, 255, 0.08);
     }
-    .tc-icon { font-size: 24px; margin-bottom: 6px; }
-    .tc-name { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
-    .tc-desc { font-size: 12px; color: rgba(255, 255, 255, 0.5); line-height: 1.4; }
+    .tool-icon { font-size: 26px; margin-bottom: 8px; }
+    .tool-name { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+    .tool-desc { font-size: 12px; color: rgba(255, 255, 255, 0.5); line-height: 1.5; }
 
     /* Badges */
-    .badge-container { display: flex; gap: 6px; margin-bottom: 8px; }
-    .badge-main {
+    .badge-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; flex-wrap: wrap; }
+    .badge {
       background: rgba(56, 189, 248, 0.15);
       border: 1px solid rgba(56, 189, 248, 0.3);
       border-radius: 50px;
-      padding: 3px 10px;
+      padding: 4px 10px;
       font-size: 10px;
       color: #38bdf8;
       font-weight: 800;
     }
-    .badge-main.red { background: rgba(233, 69, 96, 0.15); border-color: rgba(233, 69, 96, 0.3); color: #e94560; }
-    .badge-status { font-size: 10px; padding: 3px 10px; border-radius: 50px; font-weight: 800; }
-    .badge-status.locked { background: #64748b; color: #ffffff; }
-    .badge-status.unlimited { background: #10b981; color: #ffffff; }
-    .badge-status.free { background: #6366f1; color: #ffffff; }
+    .badge.red { background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.3); color: #f43f5e; }
+    .status-badge { font-size: 10px; padding: 4px 10px; border-radius: 50px; font-weight: 800; }
+    .status-badge.locked { background: #64748b; color: #ffffff; }
+    .status-badge.unlimited { background: #10b981; color: #ffffff; }
+    .status-badge.free { background: #6366f1; color: #ffffff; }
 
-    /* =========================================
-       Form UI Components
-       ========================================= */
+    /* =========================================================================
+       UI Forms & Inputs
+       ========================================================================= */
     .form-card {
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
     }
     .form-label {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 800;
-      color: rgba(255, 255, 255, 0.7);
+      color: #94a3b8;
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       letter-spacing: 0.05em;
     }
     .form-input {
       width: 100%;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
-      padding: 12px;
+      padding: 14px;
       transition: all 0.2s;
     }
     .form-input:focus {
       border-color: #38bdf8;
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.06);
     }
     
     /* Buttons */
     .btn-primary {
       background: linear-gradient(135deg, #0ea5e9, #2563eb);
       border-radius: 8px;
-      padding: 14px 20px;
+      padding: 16px 24px;
       font-size: 15px;
       font-weight: 800;
-      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+      box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
       transition: all 0.2s;
       width: 100%;
       text-align: center;
+      margin-top: 10px;
+      margin-bottom: 20px;
     }
     .btn-primary:active { transform: scale(0.98); }
     .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -188,7 +192,7 @@
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 8px;
-      padding: 8px 16px;
+      padding: 10px 18px;
       font-size: 12px;
       font-weight: 700;
       transition: all 0.2s;
@@ -200,110 +204,105 @@
     .btn-sub:hover { background: rgba(255, 255, 255, 0.12); }
     
     .btn-copy {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 6px;
-      padding: 6px 12px;
-      font-size: 11px;
+      padding: 6px 14px;
+      font-size: 12px;
       font-weight: 700;
       transition: all 0.15s;
     }
     .btn-copy:hover { background: rgba(255, 255, 255, 0.15); }
-    .btn-copy.success { background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4); color: #4ade80; }
 
-    /* Flex Layouts */
+    /* Layout Helpers */
     .flex-row { display: flex; gap: 12px; flex-wrap: wrap; }
-    .flex-1 { flex: 1; min-width: 220px; }
+    .flex-1 { flex: 1; min-width: 200px; }
     .error-box {
       background: rgba(239, 68, 68, 0.1);
       border: 1px solid rgba(239, 68, 68, 0.3);
       color: #fca5a5;
-      padding: 12px;
+      padding: 16px;
       border-radius: 8px;
       font-size: 13px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
+      font-weight: 700;
     }
 
-    /* =========================================
-       Tool UI specifics
-       ========================================= */
+    /* =========================================================================
+       Tool UI specifics & Panels
+       ========================================================================= */
     .tutorial-panel {
       background: rgba(56, 189, 248, 0.05);
       border: 1px solid rgba(56, 189, 248, 0.2);
-      border-radius: 10px;
-      padding: 14px 18px;
-      margin-bottom: 18px;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
     }
-    .tutorial-title { font-size: 13px; font-weight: 800; color: #38bdf8; margin-bottom: 8px; display: flex; alignItems: center; gap: 6px; }
-    .tutorial-body { font-size: 12px; color: rgba(255, 255, 255, 0.7); line-height: 1.6; white-space: pre-wrap; }
+    .tutorial-title { font-size: 14px; font-weight: 800; color: #38bdf8; margin-bottom: 8px; }
+    .tutorial-body { font-size: 13px; color: rgba(255, 255, 255, 0.8); line-height: 1.7; white-space: pre-wrap; }
 
     .tool-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       padding-bottom: 16px;
     }
+    .tool-header-title { font-size: 18px; font-weight: 900; margin: 0; }
+
     .tabs-container {
       display: flex;
       overflow-x: auto;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      margin-bottom: 20px;
-      gap: 8px;
+      margin-bottom: 24px;
+      gap: 12px;
     }
     .tab-item {
-      padding: 10px 16px;
-      font-size: 13px;
+      padding: 12px 20px;
+      font-size: 14px;
       font-weight: 700;
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(255, 255, 255, 0.4);
       border-bottom: 2px solid transparent;
       white-space: nowrap;
       transition: all 0.2s;
     }
     .tab-item.active { color: #38bdf8; border-bottom-color: #38bdf8; }
 
-    .result-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: 14px;
+    /* AI Web Links Panel */
+    .weblinks-panel {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: center;
     }
-    .result-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 16px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 13px;
-      font-weight: 700;
-      background: rgba(0, 0, 0, 0.2);
+    .weblinks-title { font-size: 13px; font-weight: 800; color: #38bdf8; margin-bottom: 14px; }
+    .weblinks-buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 14px; }
+    .ai-btn {
+      flex: 1; min-width: 120px; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 800;
+      background: rgba(255, 255, 255, 0.1); transition: all 0.2s; text-align: center;
     }
-    .result-body {
-      padding: 16px;
-      max-height: 500px;
-      overflow-y: auto;
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.85);
-      white-space: pre-wrap;
-      line-height: 1.8;
-    }
-    .json-box {
+    .ai-btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
+
+    /* Results UI */
+    .json-result-box {
       background: #0f172a;
       border: 1px solid #334155;
       border-radius: 8px;
-      padding: 14px;
-      font-size: 13px;
+      padding: 16px;
+      font-size: 14px;
       white-space: pre-wrap;
       color: #e2e8f0;
       margin-bottom: 12px;
       font-family: monospace;
+      line-height: 1.6;
     }
 
-    /* =========================================
-       Modals & Auth
-       ========================================= */
+    /* =========================================================================
+       Modals & Auth & Admin
+       ========================================================================= */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -313,50 +312,44 @@
       align-items: center;
       justify-content: center;
       padding: 16px;
+      backdrop-filter: blur(4px);
     }
     .modal-content {
       background: #0f172a;
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 16px;
-      padding: 24px;
+      padding: 30px;
       width: 100%;
-      max-width: 540px;
+      max-width: 560px;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      box-shadow: 0 24px 48px rgba(0,0,0,0.6);
     }
     .auth-container {
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 30px 24px;
+      border-radius: 20px;
+      padding: 40px 30px;
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       text-align: center;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
     }
     
-    /* Admin Table */
-    .admin-table-wrapper {
-      width: 100%;
-      overflow-x: auto;
-    }
-    .admin-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
+    .admin-table-wrapper { width: 100%; overflow-x: auto; }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .admin-table th, .admin-table td {
-      padding: 12px;
+      padding: 14px 12px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       text-align: left;
     }
     .admin-table th { font-weight: 800; color: #94a3b8; }
 
-    @media(max-width: 560px) {
+    @media(max-width: 600px) {
       .main-title { font-size: 28px; }
       .tool-grid { grid-template-columns: 1fr; }
-      .admin-table th, .admin-table td { padding: 8px 6px; font-size: 12px; }
+      .admin-table th, .admin-table td { padding: 10px 8px; font-size: 12px; }
+      .auth-container { padding: 30px 20px; }
     }
   </style>
 </head>
@@ -366,38 +359,54 @@
   <script>
   (function(){
     'use strict';
-    const e = React.createElement;
-    const { useState, useEffect, useCallback, Fragment } = React;
+    
+    // React Shortcuts (Explicit & Safe)
+    const el = React.createElement;
+    const { useState, useEffect, Fragment } = React;
 
     /* =========================================================================
-       1. システム定数 ＆ データベース初期化 (絶対安全仕様)
+       1. 自己修復型データベース (Error Boundary)
        ========================================================================= */
-    const DB_KEY = 'AICP_v29_DB'; // 完全クリーンな環境にするための新しいキー
-    const SESS_KEY = 'AICP_v29_Sess';
+    const DB_KEY = 'AICP_v30_DB'; // 完全リセット用の新キー
+    const SESS_KEY = 'AICP_v30_Sess';
     const DAILY_LIMIT = 3;
 
-    // デフォルトでアンロックされているツールのID
-    const DEF_UNLOCKED = ['note', 'research', 'lp', 'affiliate', 'backend', 'bonus'];
+    const DEFAULT_UNLOCKED_TOOLS = ['note', 'research', 'lp', 'affiliate', 'backend', 'bonus'];
 
-    // データベースの取得と完全な構造保証
-    function getDB() {
-      let db = null;
-      try {
-        const stored = localStorage.getItem(DB_KEY);
-        if(stored) db = JSON.parse(stored);
-      } catch(err) {
-        console.error("DB Parse Error", err);
-      }
+    const AppDB = {
+      get: function() {
+        let db = null;
+        try {
+          const raw = localStorage.getItem(DB_KEY);
+          if (raw) db = JSON.parse(raw);
+        } catch (error) {
+          console.error("DB Read Error:", error);
+        }
 
-      // DBが存在しない、または構造が壊れている場合は初期化
-      if (!db || typeof db !== 'object') {
-        db = {
-          admin: { p: 'admin123' },
+        // DBが存在しない場合は初期化
+        if (!db || typeof db !== 'object') {
+          db = this.createInitialDB();
+          this.save(db);
+        }
+
+        // 自己修復（データ欠落によるNull参照エラーを完全に防ぐ）
+        return this.repair(db);
+      },
+      save: function(db) {
+        try {
+          localStorage.setItem(DB_KEY, JSON.stringify(db));
+        } catch (error) {
+          console.error("DB Save Error:", error);
+        }
+      },
+      createInitialDB: function() {
+        return {
+          admin: { password: 'admin123' },
           users: {
             'admin': { 
               status: 'approved', 
               sns: '@admin', 
-              date: Date.now(), 
+              registeredAt: Date.now(), 
               usage: { date: '', count: 0 }, 
               perms: {}, 
               brand: { plan: 'paid', name: '管理者', target: '', tone: '' }, 
@@ -405,626 +414,531 @@
               curProj: 'default' 
             }
           },
-          inqs: []
+          inquiries: []
         };
-        localStorage.setItem(DB_KEY, JSON.stringify(db));
+      },
+      repair: function(db) {
+        if (!db.admin) db.admin = { password: 'admin123' };
+        if (!db.users) db.users = {};
+        if (!db.inquiries) db.inquiries = [];
+
+        Object.keys(db.users).forEach(username => {
+          const user = db.users[username];
+          if (!user.usage) user.usage = { date: '', count: 0 };
+          if (!user.perms) user.perms = {};
+          if (!user.brand) user.brand = { plan: 'free', name: '', target: '', tone: '' };
+          if (!user.projects || typeof user.projects !== 'object') {
+            user.projects = { 'default': { name: 'デフォルト', data: {} } };
+          }
+          if (!user.curProj || !user.projects[user.curProj]) {
+            user.curProj = Object.keys(user.projects)[0] || 'default';
+          }
+          // 全プロジェクトのdataオブジェクトを保証（これがクラッシュの最大の原因だった）
+          Object.keys(user.projects).forEach(pid => {
+            if (!user.projects[pid].data) user.projects[pid].data = {};
+          });
+        });
         return db;
       }
+    };
 
-      // 【安全装置】各ユーザーのデータ構造の欠落を完全に補完する
-      if (!db.admin) db.admin = { p: 'admin123' };
-      if (!db.users) db.users = {};
-      if (!db.inqs) db.inqs = [];
-
-      Object.keys(db.users).forEach(u => {
-        const user = db.users[u];
-        if (!user.usage) user.usage = { date: '', count: 0 };
-        if (!user.perms) user.perms = {};
-        if (!user.brand) user.brand = { plan: 'free', name: '', target: '', tone: '' };
-        if (!user.projects) user.projects = { 'default': { name: 'デフォルト', data: {} } };
-        if (!user.curProj || !user.projects[user.curProj]) {
-          user.curProj = Object.keys(user.projects)[0] || 'default';
-          if (!user.projects[user.curProj]) {
-            user.projects['default'] = { name: 'デフォルト', data: {} };
-            user.curProj = 'default';
-          }
-        }
-      });
-      return db;
-    }
-
-    function saveDB(db) {
-      try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } 
-      catch(e) { console.error("DB Save Error", e); }
-    }
-
-    // コピー機能（安全なクリップボードAPI呼び出し）
-    function doCopy(text, stateObj, setStateFunc, key) {
+    // クリップボード安全コピー
+    const copyToClipboard = (text, stateObj, setStateFunc, key) => {
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text).catch(()=>{});
+          navigator.clipboard.writeText(text).catch(() => {});
         }
-        const newState = { ...stateObj, [key]: true };
-        setStateFunc(newState);
+        setStateFunc({ ...stateObj, [key]: true });
         setTimeout(() => {
-          const revertState = { ...stateObj, [key]: false };
-          setStateFunc(revertState);
+          setStateFunc(prevState => ({ ...prevState, [key]: false }));
         }, 2000);
       } catch (err) {
-        console.error(err);
+        console.error("Clipboard Error:", err);
       }
-    }
+    };
 
-    // JSONパーサー（堅牢化）
-    function parseJ(text) {
-      if (!text) return null;
+    // 安全なJSONパース
+    const safeParseJSON = (text) => {
+      if (!text || typeof text !== 'string') return null;
       try {
         const clean = text.replace(/```(?:json)?\n?/gi, '').replace(/```/g, '').trim();
         const match = clean.match(/\{[\s\S]*\}/);
         if (match) {
-          try { return JSON.parse(match[0]); } catch(err) {}
+          try { return JSON.parse(match[0]); } catch(e) {}
         }
         return JSON.parse(clean);
       } catch (err) {
         return null;
       }
-    }
+    };
 
     // 日付フォーマット
-    function fmtD(ts) {
-      const d = new Date(ts);
+    const formatDateTime = (timestamp) => {
+      if (!timestamp) return '-';
+      const d = new Date(timestamp);
       return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${('0'+d.getHours()).slice(-2)}:${('0'+d.getMinutes()).slice(-2)}`;
-    }
-
-    /* =========================================================================
-       2. ツール定義 ＆ プロンプト設計
-       ========================================================================= */
-    const T_CATS = [
-      { n: '📝 コンテンツ作成 ＆ マネタイズ', t: ['note', 'research', 'lp', 'affiliate', 'backend', 'bonus'] },
-      { n: '🚀 SNS集客 ＆ アカウント設計', t: ['profile', 'sns', 'video', 'image'] },
-      { n: '💬 ファン化 ＆ 自動化', t: ['magnet', 'line', 'funnel', 'reply', 'interview', 'journey'] },
-      { n: '💻 開発 ＆ その他', t: ['webdev'] }
-    ];
-
-    const rJ = '\n\n【ルール】前置きなしで以下のJSONフォーマットのみ出力してください:\n';
-    const TOOLS = {
-      note: { 
-        i: '📝', n: 'note記事生成', b: '必須', d: '売れる記事構成と本文を作成', 
-        tut: '読者の悩みに寄り添い、解決策を提示する有料記事を作成します。\n【提案】「30代向け」などターゲットを絞り、文字数は無料1000字・有料3000字程度に設定すると読みやすくなります。',
-        f: [
-          {id: 't1', t: 'input', l: 'テーマ (自由入力)', ph: '例: 副業で月5万稼ぐ方法'},
-          {id: 't2', t: 'input', l: 'ターゲット層・悩み', ph: '例: 忙しくて時間がない会社員'},
-          {id: 't3', t: 'input', l: '価格・文字数目安', ph: '例: 980円・3000字'},
-          {id: 'chk', t: 'check', l: '有料パートの最後に、購入者特典の案内を含める'}
-        ],
-        build: (v, b) => `${b}テーマ「${v.t1}」、悩み「${v.t2}」向けにnote有料記事を作成してください。価格/文字数目安:${v.t3}\n${v.chk ? '※有料パートの最後に特典の受け取り案内を魅力的に含めること\n' : ''}【厳守】前置きなしで以下のMarkdownフォーマットのみ出力。\n---TITLES---\n1.タイトル案...\n---FREE_START---\n無料本文...\n---FREE_END---\n---PAID_START---\n有料本文...\n---PAID_END---`,
-        isNote: true // UIを1画面完結にするフラグ
-      },
-      research: { 
-        i: '⚔️', n: '競合リサーチ', b: '神機能', d: '弱点とブルーオーシャンを発見', 
-        tut: '売れているライバルの教材から「欠けている要素」を見つけます。\n【提案】自分の強みに「未経験から1ヶ月で達成」などを入れると強烈な差別化になります。',
-        f: [
-          {id: 't1', t: 'area', l: 'ライバルの教材の目次・セールス文'},
-          {id: 't2', t: 'input', l: '自分の強み(任意)'}
-        ],
-        build: (v, b) => `${b}以下のライバル教材を分析し、弱点と私の強み「${v.t2}」を活かした勝てる商品コンセプト(ブルーオーシャン)を3つ提案してください。\n【ライバル情報】\n${v.t1}${rJ}{"concepts":[{"title":"コンセプト名","weakness":"ライバルの弱点","strategy":"勝つための戦略"}]}`
-      },
-      lp: { 
-        i: '📄', n: '爆売れLP作成', b: '必須', d: '高単価を売るセールスレター', 
-        tut: '商品を販売するためのランディングページ（LP）の構成を作ります。\n【提案】ベネフィットには「月5万稼げる」だけでなく「週末に外食に行ける」のように感情的な未来を書くと売れます。',
-        f: [
-          {id: 't1', t: 'input', l: '商品名・価格'},
-          {id: 't2', t: 'area', l: '商品のベネフィット・特徴'}
-        ],
-        build: (v, b) => `${b}商品「${v.t1}」を売るLP構成を作成してください。特徴: ${v.t2}${rJ}{"hero":"キャッチコピー","empathy":["共感1..."],"benefits":["利点1..."],"offer":"オファー内容"}`
-      },
-      affiliate: { 
-        i: '🔗', n: 'アフィリエイト', b: '', d: '商品レビュー＆SNS誘導', 
-        tut: '他人の商品を売るためのレビュー記事と誘導ポストを作ります。\n【提案】推しポイントには「実際に使ってどう変わったか」という自分の体験談を必ず入れてください。',
-        f: [
-          {id: 't1', t: 'input', l: '商品名・URL'},
-          {id: 't2', t: 'input', l: 'ターゲット層'},
-          {id: 't3', t: 'area', l: '推しポイント・体験談'}
-        ],
-        build: (v, b) => `${b}商品「${v.t1}」をターゲット「${v.t2}」に売るレビュー記事構成とSNS誘導文を作成してください。推し: ${v.t3}${rJ}{"article":{"title":"タイトル","sections":["見出し1..."]},"sns_posts":["ポスト1..."]}`
-      },
-      backend: { 
-        i: '💎', n: '高単価バックエンド', b: '', d: '30万円〜の商材企画', 
-        tut: 'フロント商品購入者へ売る高単価企画を作ります。\n【提案】価格は「30万円・6ヶ月間」など具体的にし、提供価値に「通話サポート無制限」などを入れると成約率が上がります。',
-        f: [
-          {id: 't1', t: 'input', l: '想定価格・形式'},
-          {id: 't2', t: 'area', l: 'ベースとなる知識・元記事'}
-        ],
-        build: (v, b) => `${b}以下の知識をベースに、価格「${v.t1}」の高額商品企画を3つ作成してください。\n${v.t2}${rJ}{"plans":[{"title":"商品名","detail":"詳細","pitch":"セールス文"}]}`
-      },
-      bonus: { 
-        i: '🎁', n: '購入者特典生成', b: '', d: '記事から特典アイデア作成', 
-        tut: '商品の購入率を上げる「おまけ」を提案します。\n【提案】チェックリスト、テンプレートなど、すぐに使える形式の特典が喜ばれます。',
-        f: [ {id: 't1', t: 'area', l: '元記事テキスト'} ],
-        build: (v, b) => `${b}以下の記事を分析し、購入者特典を8つ提案してください。\n${v.t1}${rJ}{"suggestions":[{"title":"特典タイトル","type":"種類","desc":"説明"}]}`
-      },
-      profile: { 
-        i: '👤', n: 'アカウント設計', b: '', d: 'バズるプロフ・名前生成', 
-        tut: 'SNSのコンセプトとプロフ文を作ります。\n【提案】「実績ゼロ」であっても「これから挑戦する過程を発信」と書けば共感を生むアカウントになります。',
-        f: [
-          {id: 't1', t: 'input', l: '発信ジャンル'},
-          {id: 's1', t: 'select', l: '媒体', opts: ['X(Twitter)', 'Threads', 'Instagram']},
-          {id: 't2', t: 'area', l: '経歴・強み'}
-        ],
-        build: (v, b) => `${b}媒体「${v.s1}」ジャンル「${v.t1}」経歴「${v.t2}」でバズるアカウント設計をしてください。${rJ}{"names":["候補1..."],"profile_short":"140字プロフ","profile_long":"長文プロフ"}`
-      },
-      sns: { 
-        i: '📱', n: 'SNS集客ポスト', b: '', d: 'X/Threadsでバズる投稿', 
-        tut: '記事からSNS投稿を作ります。\n【提案】「参考バズ投稿(モデリング)」に他人がバズっていた投稿を入れると、AIがその型を完全に真似てくれます。',
-        f: [
-          {id: 's1', t: 'select', l: 'プラットフォーム', opts: ['X (単発)', 'X (ツリー)', 'Threads', '両方']},
-          {id: 's2', t: 'select', l: '目的', opts: ['価値提供', 'ストーリー', '宣伝']},
-          {id: 't2', t: 'area', l: '参考バズ投稿(モデリング) ※任意'},
-          {id: 't1', t: 'area', l: '発信内容・元記事'}
-        ],
-        build: (v, b) => `${b}以下の内容で「${v.s1}」向けの「${v.s2}」目的の投稿を作成してください。\n${v.t2 ? '【モデリング】以下の型を完全トレースすること:\n' + v.t2 + '\n' : ''}【内容】\n${v.t1}${rJ}{"posts":["本文1..."]}`
-      },
-      video: { 
-        i: '🎥', n: 'ショート動画台本', b: '', d: 'TikTok/Shorts用台本', 
-        tut: '60秒以内のショート動画台本を作ります。\n【提案】冒頭3秒のフックが命です。AIに「衝撃的な事実から始めて」と指示を追加するのも効果的です。',
-        f: [ {id: 't1', t: 'area', l: '動画で伝えたい内容・元記事'} ],
-        build: (v, b) => `${b}以下の内容で60秒以内のショート動画台本と、映像生成AI用プロンプトを作成してください。\n${v.t1}${rJ}{"title":"タイトル","scenes":[{"sec":"0-3秒","narration":"ナレ","telop":"テロ","ai_prompt":"英語"}]}`
-      },
-      image: { 
-        i: '🖼️', n: '画像プロンプト', b: '', d: '画像生成AI用呪文', 
-        tut: 'AIに美しい画像を描かせる指示文を作ります。\n【提案】キーワードに「サイバーパンク」や「水彩画風」など具体的なスタイルを入れると精度が上がります。',
-        f: [ {id: 't1', t: 'input', l: 'キーワード'} ],
-        build: (v, b) => `${b}「${v.t1}」の画像生成プロンプトを5パターン作成してください(英語)。${rJ}{"results":[{"title":"意図","prompt":"プロンプト","negative":"ネガティブ"}]}`
-      },
-      magnet: { 
-        i: '🎁', n: '無料プレゼント量産', b: '', d: 'LINE登録率を上げる特典', 
-        tut: 'リスト取り用の特典構成を作ります。\n【提案】「明日からすぐ使えるチェックシート」のような即効性のあるものが好まれます。',
-        f: [
-          {id: 't1', t: 'input', l: 'ターゲットの悩み'},
-          {id: 't2', t: 'area', l: '提供できるノウハウ'}
-        ],
-        build: (v, b) => `${b}悩み「${v.t1}」を解決するLINE登録特典アイデア5つと最強の目次構成を作成してください。\n${v.t2}${rJ}{"ideas":["案1..."],"best_magnet":{"title":"特典名","outline":["目次1..."]}}`
-      },
-      line: { 
-        i: '💌', n: 'LINEステップ', b: '', d: '自動で売れる5日間シナリオ', 
-        tut: '5日間で商品を売る自動配信シナリオを作ります。\n【提案】3日目に「常識の破壊」を入れると、読者はあなたを専門家として信頼します。',
-        f: [
-          {id: 't1', t: 'input', l: '商品名・価格'},
-          {id: 't2', t: 'area', l: '詳細・解決できる悩み'}
-        ],
-        build: (v, b) => `${b}商品「${v.t1}」を売るためのLINE5日間ステップ配信を作成してください。詳細: ${v.t2}${rJ}{"days":[{"day":1,"title":"件名","body":"本文"}...]}\n各800字程度で。`
-      },
-      funnel: { 
-        i: '🩺', n: 'ファネル診断', b: '', d: '売れない原因をAIコンサル', 
-        tut: '数字のボトルネックをAIに診断させます。\n【提案】Xのインプレッション、プロフクリック率、LINE登録者数など分かる数字をすべて入力してください。',
-        f: [ {id: 't1', t: 'area', l: '現状の数字 (例: Xインプ1万, 売上0)'} ],
-        build: (v, b) => `${b}私はマーケターです。以下の数字を見てボトルネックを診断し改善策を3つ提示してください。\n${v.t1}${rJ}{"bottleneck":"原因","solutions":["改善策..."]}`
-      },
-      reply: { 
-        i: '💬', n: 'LINE/DM 神返信', b: '', d: '完璧なセールス返信', 
-        tut: '問い合わせに対し、信頼を築き商品へ誘導する返信を作ります。\n【提案】目的を「質問で返す」にすると、読者とのキャッチボールが続きやすくなります。',
-        f: [
-          {id: 's1', t: 'select', l: '目的', opts: ['信頼構築', '商品誘導', '不安解消', '誠実対応']},
-          {id: 't1', t: 'area', l: '相手のメッセージ'}
-        ],
-        build: (v, b) => `${b}DM「${v.t1}」に対し目的「${v.s1}」で神返信を作成してください。${rJ}{"replies":[{"type":"親しみ","text":"本文"},{"type":"権威","text":"本文"},{"type":"質問","text":"本文"}]}`
-      },
-      interview: { 
-        i: '🗣️', n: 'AIインタビュー', b: '', d: '体験談を引き出す', 
-        tut: 'AIとチャットして一次情報を引き出します。\n【提案】「どん底からどう這い上がったか」をテーマにすると心を打つ記事になります。',
-        f: [ {id: 't1', t: 'input', l: 'テーマ'} ],
-        build: (v, b) => `${b}あなたは編集者です。テーマ「${v.t1}」で私にインタビューし記事構成を作ります。【ルール】1ターン1問。私が答えたら深掘り。5問で構成出力。最初の質問をどうぞ。`, 
-        noJson: true 
-      },
-      journey: { 
-        i: '🗺️', n: 'カスタマージャーニー', b: '', d: '戦略マップを作成', 
-        tut: 'どんなSNSで何を発信して売るかの全体設計図を作ります。',
-        f: [
-          {id: 't1', t: 'input', l: 'テーマ'},
-          {id: 't2', t: 'input', l: 'ターゲット'}
-        ],
-        build: (v, b) => `${b}テーマ「${v.t1}」ターゲット「${v.t2}」で【認知→興味→比較・検討→購入→リピート】の戦略を作成してください。${rJ}{"phases":[{"name":"フェーズ名","goal":"目的","tools":["X等"],"action":"戦略"}...]}`
-      },
-      webdev: { 
-        i: '💻', n: 'Webアプリ開発', b: '神機能', d: 'アイデアからHTML生成', 
-        tut: 'プログラミング知識ゼロでWebツールを作ります。Claudeへ投げます。',
-        f: [ {id: 't1', t: 'area', l: 'アイデア'} ],
-        build: (v, b) => `あなたは天才エンジニアです。以下のアイデアから、HTML/CSS/JSが1枚にまとまったWebアプリのコードを作成してください。GitHub公開手順も案内し、Geminiへ引き継ぐ仕様書を出力してください。\n【アイデア】\n${v.t1}`, 
-        noJson: true 
-      }
     };
 
     /* =========================================================================
-       3. 共通UIコンポーネント (エラーを防ぐ安全な展開)
+       2. ツール設定データ ＆ プロンプトジェネレータ
+       ========================================================================= */
+    const CATEGORIES = [
+      { name: '📝 コンテンツ作成 ＆ マネタイズ', tools: ['note', 'research', 'lp', 'affiliate', 'backend', 'bonus'] },
+      { name: '🚀 SNS集客 ＆ アカウント設計', tools: ['profile', 'sns', 'video', 'image'] },
+      { name: '💬 ファン化 ＆ 自動化', tools: ['magnet', 'line', 'funnel', 'reply', 'interview', 'journey'] },
+      { name: '💻 開発 ＆ その他', tools: ['webdev'] }
+    ];
+
+    const JSON_RULE = '\n\n【ルール】前置きや挨拶は一切不要です。以下のJSONフォーマットのみを出力してください:\n';
+
+    const TOOLS = {
+      note: { 
+        icon: '📝', name: 'note記事生成', badge: '必須', desc: '売れる記事構成と本文を作成', 
+        tutorial: '読者の悩みに寄り添い、解決策を提示する有料記事を作成します。\n【提案】「30代向け」などターゲットを絞り、文字数は無料1000字・有料3000字程度に設定すると読みやすくなります。',
+        fields: [
+          {id: 'theme', type: 'text', label: 'テーマ (自由入力)', placeholder: '例: 副業で月5万稼ぐ方法'},
+          {id: 'target', type: 'text', label: 'ターゲット層・悩み', placeholder: '例: 忙しくて時間がない会社員'},
+          {id: 'price_vol', type: 'text', label: '価格・文字数目安', placeholder: '例: 980円・3000字'},
+          {id: 'use_bonus', type: 'checkbox', label: '有料パートの最後に、購入者特典の案内を含める'}
+        ],
+        buildPrompt: (v, b) => `${b}テーマ「${v.theme || '未指定'}」、悩み「${v.target || '未指定'}」向けにnote有料記事を作成してください。価格/文字数目安:${v.price_vol || '未指定'}\n${v.use_bonus ? '※有料パートの最後に特典の受け取り案内を魅力的に含めること\n' : ''}【厳守】前置きなしで以下のMarkdownフォーマットのみ出力してください。\n---TITLES---\n1.タイトル案...\n---FREE_START---\n無料本文...\n---FREE_END---\n---PAID_START---\n有料本文...\n---PAID_END---`,
+        isOnePageUI: true
+      },
+      research: { 
+        icon: '⚔️', name: '競合リサーチ', badge: '神機能', desc: '弱点とブルーオーシャンを発見', 
+        tutorial: '売れているライバルの教材から「欠けている要素」を見つけます。\n【提案】自分の強みに「未経験から1ヶ月で達成」などを入れると強烈な差別化になります。',
+        fields: [
+          {id: 'rival', type: 'textarea', label: 'ライバルの教材の目次・セールス文'},
+          {id: 'strength', type: 'text', label: '自分の強み(任意)'}
+        ],
+        buildPrompt: (v, b) => `${b}以下のライバル教材を分析し、弱点と私の強み「${v.strength}」を活かした勝てる商品コンセプト(ブルーオーシャン)を3つ提案してください。\n【ライバル情報】\n${v.rival}${JSON_RULE}{"concepts":[{"title":"コンセプト名","weakness":"ライバルの弱点","strategy":"勝つための戦略"}]}`
+      },
+      lp: { 
+        icon: '📄', name: '爆売れLP作成', badge: '必須', desc: '高単価を売るセールスレター', 
+        tutorial: '商品を販売するためのランディングページ（LP）の構成を作ります。\n【提案】ベネフィットには「月5万稼げる」だけでなく「週末に外食に行ける」のように感情的な未来を書くと売れます。',
+        fields: [
+          {id: 'product', type: 'text', label: '商品名・価格'},
+          {id: 'benefits', type: 'textarea', label: '商品のベネフィット・特徴'}
+        ],
+        buildPrompt: (v, b) => `${b}商品「${v.product}」を売るためのLPの構成とセールスコピーを作成してください。商品の特徴: ${v.benefits}${JSON_RULE}{"hero":"強烈なキャッチコピー","empathy":["共感ポイント1..."],"benefits":["利点1..."],"offer":"オファー内容"}`
+      },
+      affiliate: { 
+        icon: '🔗', name: 'アフィリエイト', badge: '', desc: '商品レビュー＆SNS誘導', 
+        tutorial: '他人の商品を売るためのレビュー記事と誘導ポストを作ります。\n【提案】推しポイントには「実際に使ってどう変わったか」という自分の体験談を必ず入れてください。',
+        fields: [
+          {id: 'product', type: 'text', label: '商品名・URL'},
+          {id: 'target', type: 'text', label: '売りたいターゲット層'},
+          {id: 'points', type: 'textarea', label: '推しポイント・体験談'}
+        ],
+        buildPrompt: (v, b) => `${b}商品「${v.product}」をターゲット「${v.target}」に売るためのレビュー記事の構成と、SNS誘導文を作成してください。推しポイント: ${v.points}${JSON_RULE}{"article":{"title":"タイトル","sections":["見出し1..."]},"sns_posts":["ポスト1..."]}`
+      },
+      backend: { 
+        icon: '💎', name: '高単価バックエンド', badge: '', desc: '30万円〜の商材企画', 
+        tutorial: 'フロント商品購入者へ売る高単価企画を作ります。\n【提案】価格は「30万円・6ヶ月間」など具体的にし、提供価値に「通話サポート無制限」などを入れると成約率が上がります。',
+        fields: [
+          {id: 'price_format', type: 'text', label: '想定価格・形式'},
+          {id: 'knowledge', type: 'textarea', label: 'ベースとなる知識・元記事'}
+        ],
+        buildPrompt: (v, b) => `${b}以下の知識をベースに、価格・形式「${v.price_format}」の高額バックエンド商品企画を3つ作成してください。\n${v.knowledge}${JSON_RULE}{"plans":[{"title":"商品名","detail":"詳細","pitch":"セールス文"}]}`
+      },
+      bonus: { 
+        icon: '🎁', name: '購入者特典生成', badge: '', desc: '記事から特典アイデア作成', 
+        tutorial: '商品の購入率を上げる「おまけ」を提案します。\n【提案】チェックリスト、テンプレートなど、すぐに使える形式の特典が喜ばれます。',
+        fields: [ {id: 'article', type: 'textarea', label: '元記事テキスト'} ],
+        buildPrompt: (v, b) => `${b}以下の記事を分析し、購入者特典を8つ提案してください。\n${v.article}${JSON_RULE}{"suggestions":[{"title":"特典タイトル","type":"種類","desc":"説明"}]}`
+      },
+      profile: { 
+        icon: '👤', name: 'アカウント設計', badge: '', desc: 'バズるプロフ・名前生成', 
+        tutorial: 'SNSのコンセプトとプロフ文を作ります。\n【提案】「実績ゼロ」であっても「これから挑戦する過程を発信」と書けば共感を生むアカウントになります。',
+        fields: [
+          {id: 'genre', type: 'text', label: '発信ジャンル'},
+          {id: 'platform', type: 'select', label: '媒体', options: ['X(Twitter)', 'Threads', 'Instagram']},
+          {id: 'background', type: 'textarea', label: '経歴・強み'}
+        ],
+        buildPrompt: (v, b) => `${b}媒体「${v.platform}」ジャンル「${v.genre}」経歴「${v.background}」の条件で、バズるアカウント設計を提案してください。${JSON_RULE}{"names":["名前候補1..."],"profile_short":"140字プロフ","profile_long":"長文プロフ"}`
+      },
+      sns: { 
+        icon: '📱', name: 'SNS集客ポスト', badge: '', desc: 'X/Threadsでバズる投稿', 
+        tutorial: '記事からSNS投稿を作ります。\n【提案】「参考バズ投稿(モデリング)」に他人がバズっていた投稿を入れると、AIがその型を完全に真似てくれます。',
+        fields: [
+          {id: 'platform', type: 'select', label: 'プラットフォーム', options: ['X (単発)', 'X (ツリー)', 'Threads', '両方']},
+          {id: 'purpose', type: 'select', label: '目的', options: ['価値提供', 'ストーリー', '宣伝']},
+          {id: 'modeling', type: 'textarea', label: '参考バズ投稿(モデリング) ※任意'},
+          {id: 'content', type: 'textarea', label: '発信内容・元記事'}
+        ],
+        buildPrompt: (v, b) => `${b}以下の内容で「${v.platform}」向けの「${v.purpose}」目的の投稿を作成してください。\n${v.modeling ? '【モデリング】以下の型を完全トレースすること:\n' + v.modeling + '\n' : ''}【発信内容】\n${v.content}${JSON_RULE}{"posts":["本文1..."]}`
+      },
+      video: { 
+        icon: '🎥', name: 'ショート動画台本', badge: '', desc: 'TikTok/Shorts用台本', 
+        tutorial: '60秒以内のショート動画台本を作ります。\n【提案】冒頭3秒のフックが命です。AIに「衝撃的な事実から始めて」と指示を追加するのも効果的です。',
+        fields: [ {id: 'content', type: 'textarea', label: '動画で伝えたい内容・元記事'} ],
+        buildPrompt: (v, b) => `${b}以下の内容で60秒以内のショート動画台本と、映像生成AI用プロンプトを作成してください。\n${v.content}${JSON_RULE}{"title":"タイトル","scenes":[{"sec":"0-3秒","narration":"ナレ","telop":"テロ","ai_prompt":"英語"}]}`
+      },
+      image: { 
+        icon: '🖼️', name: '画像プロンプト', badge: '', desc: '画像生成AI用呪文', 
+        tutorial: 'AIに美しい画像を描かせる指示文を作ります。\n【提案】キーワードに「サイバーパンク」や「水彩画風」など具体的なスタイルを入れると精度が上がります。',
+        fields: [ {id: 'keyword', type: 'text', label: 'キーワード'} ],
+        buildPrompt: (v, b) => `${b}「${v.keyword}」を描くための画像生成AI用プロンプトを5パターン作成してください(必ず英語で)。${JSON_RULE}{"results":[{"title":"意図","prompt":"プロンプト","negative":"ネガティブ"}]}`
+      },
+      magnet: { 
+        icon: '🎁', name: '無料プレゼント量産', badge: '', desc: 'LINE登録率を上げる特典', 
+        tutorial: 'リスト取り用の特典構成を作ります。\n【提案】「明日からすぐ使えるチェックシート」のような即効性のあるものが好まれます。',
+        fields: [
+          {id: 'problem', type: 'text', label: 'ターゲットの悩み'},
+          {id: 'knowhow', type: 'textarea', label: '提供できるノウハウ'}
+        ],
+        buildPrompt: (v, b) => `${b}悩み「${v.problem}」を解決するLINE登録特典アイデア5つと最強の目次構成を作成してください。\n${v.knowhow}${JSON_RULE}{"ideas":["案1..."],"best_magnet":{"title":"特典名","outline":["目次1..."]}}`
+      },
+      line: { 
+        icon: '💌', name: 'LINEステップ', badge: '', desc: '自動で売れる5日間シナリオ', 
+        tutorial: '5日間で商品を売る自動配信シナリオを作ります。\n【提案】3日目に「常識の破壊」を入れると、読者はあなたを専門家として信頼します。',
+        fields: [
+          {id: 'product', type: 'text', label: '商品名・価格'},
+          {id: 'detail', type: 'textarea', label: '詳細・解決できる悩み'}
+        ],
+        buildPrompt: (v, b) => `${b}商品「${v.product}」を売るためのLINE5日間ステップ配信を作成してください。詳細: ${v.detail}${JSON_RULE}{"days":[{"day":1,"title":"件名","body":"本文"}...]}\n各メッセージは800字程度で作成してください。`
+      },
+      funnel: { 
+        icon: '🩺', name: 'ファネル診断', badge: '', desc: '売れない原因をAIコンサル', 
+        tutorial: '数字のボトルネックをAIに診断させます。\n【提案】Xのインプレッション、プロフクリック率、LINE登録者数など分かる数字をすべて入力してください。',
+        fields: [ {id: 'numbers', type: 'textarea', label: '現状の数字 (例: Xインプ1万, 売上0)'} ],
+        buildPrompt: (v, b) => `${b}私はマーケターです。以下の数字を見てボトルネックを診断し改善策を3つ提示してください。\n${v.numbers}${JSON_RULE}{"bottleneck":"原因","solutions":["改善策..."]}`
+      },
+      reply: { 
+        icon: '💬', name: 'LINE/DM 神返信', badge: '', desc: '完璧なセールス返信', 
+        tutorial: '問い合わせに対し、信頼を築き商品へ誘導する返信を作ります。\n【提案】目的を「質問で返す」にすると、読者とのキャッチボールが続きやすくなります。',
+        fields: [
+          {id: 'goal', type: 'select', label: '目的', options: ['信頼構築', '商品誘導', '不安解消', '誠実対応']},
+          {id: 'message', type: 'textarea', label: '相手のメッセージ'}
+        ],
+        buildPrompt: (v, b) => `${b}読者からのDM「${v.message}」に対し、目的「${v.goal}」を達成する神返信を作成してください。${JSON_RULE}{"replies":[{"type":"親しみ","text":"本文"},{"type":"権威","text":"本文"},{"type":"質問","text":"本文"}]}`
+      },
+      interview: { 
+        icon: '🗣️', name: 'AIインタビュー', badge: '', desc: '体験談を引き出す', 
+        tutorial: 'AIとチャットして一次情報を引き出します。\n【提案】「どん底からどう這い上がったか」をテーマにすると心を打つ記事になります。',
+        fields: [ {id: 'theme', type: 'text', label: 'テーマ'} ],
+        buildPrompt: (v, b) => `${b}あなたは凄腕編集者です。テーマ「${v.theme}」について私にインタビューし記事構成を作ります。\n【ルール】1ターンに1問だけ質問し、私が答えたら深掘りしてください。5回のやり取りが終わったら記事構成を出力してください。では最初の質問をどうぞ。`, 
+        noJsonParse: true 
+      },
+      journey: { 
+        icon: '🗺️', name: 'カスタマージャーニー', badge: '', desc: '戦略マップを作成', 
+        tutorial: 'どんなSNSで何を発信して売るかの全体設計図を作ります。',
+        fields: [
+          {id: 'theme', type: 'text', label: 'テーマ'},
+          {id: 'target', type: 'text', label: 'ターゲット'}
+        ],
+        buildPrompt: (v, b) => `${b}テーマ「${v.theme}」ターゲット「${v.target}」で【認知→興味→比較・検討→購入→リピート】のカスタマージャーニーを作成してください。${JSON_RULE}{"phases":[{"name":"フェーズ名","goal":"目的","tools":["X等"],"action":"戦略"}...]}`
+      },
+      webdev: { 
+        icon: '💻', name: 'Webアプリ開発', badge: '神機能', desc: 'アイデアからHTML生成', 
+        tutorial: 'プログラミング知識ゼロでWebツールを作ります。\n【使い方】作成したプロンプトをClaudeに投げてコードを生成してもらいます。',
+        fields: [ {id: 'idea', type: 'textarea', label: '作りたいツールのアイデア'} ],
+        buildPrompt: (v, b) => `あなたは天才エンジニアです。以下のアイデアから、HTML/CSS/JSが1枚にまとまったWebアプリのコードを作成してください。もし私がGitHubへの公開手順が分からなければ、Chromeと連携して自動で公開を手伝う手順も案内してください。最後にGeminiへ引き継ぐための仕様書を出力してください。\n【アイデア】\n${v.idea}`, 
+        noJsonParse: true 
+      }
+    };
+
+
+    /* =========================================================================
+       3. 共通UIコンポーネント (安全性・独立性確保)
        ========================================================================= */
 
-    // フォーム入力部品
-    const InputField = ({f, v, onChange}) => {
-      if (f.t === 'input') {
-        return e('div', {className: 'form-card'}, 
-          e('span', {className: 'form-label'}, f.l), 
-          e('input', {className: 'form-input', value: v, placeholder: f.ph||'', onChange: (ev) => onChange(ev.target.value)})
+    // フォーム入力の安全な生成
+    const FormField = ({field, value, onChange}) => {
+      const val = value !== undefined ? value : (field.type === 'checkbox' ? false : (field.options ? field.options[0] : ''));
+      
+      if (field.type === 'text') {
+        return el('div', {className: 'form-card'}, 
+          el('span', {className: 'form-label'}, field.label), 
+          el('input', {className: 'form-input', value: val, placeholder: field.placeholder || '', onChange: (e) => onChange(e.target.value)})
         );
       }
-      if (f.t === 'area') {
-        return e('div', {className: 'form-card'}, 
-          e('span', {className: 'form-label'}, f.l), 
-          e('textarea', {className: 'form-input', style: {minHeight: 100, resize: 'vertical'}, value: v, placeholder: f.ph||'', onChange: (ev) => onChange(ev.target.value)})
+      if (field.type === 'textarea') {
+        return el('div', {className: 'form-card'}, 
+          el('span', {className: 'form-label'}, field.label), 
+          el('textarea', {className: 'form-input', style: {minHeight: 100, resize: 'vertical'}, value: val, placeholder: field.placeholder || '', onChange: (e) => onChange(e.target.value)})
         );
       }
-      if (f.t === 'select') {
-        return e('div', {className: 'form-card'}, 
-          e('span', {className: 'form-label'}, f.l), 
-          e('select', {className: 'form-input', value: v, onChange: (ev) => onChange(ev.target.value)}, 
-            f.opts.map(o => e('option', {key: o, value: o}, o))
+      if (field.type === 'select') {
+        return el('div', {className: 'form-card'}, 
+          el('span', {className: 'form-label'}, field.label), 
+          el('select', {className: 'form-input', value: val, onChange: (e) => onChange(e.target.value)}, 
+            field.options.map(opt => el('option', {key: opt, value: opt}, opt))
           )
         );
       }
-      if (f.t === 'check') {
-        return e('div', {className: 'form-card flex-row', style: {alignItems: 'center'}}, 
-          e('input', {type: 'checkbox', checked: v, onChange: (ev) => onChange(ev.target.checked), style: {width: 18, height: 18}}), 
-          e('span', {style: {fontWeight: 700}}, f.l)
+      if (field.type === 'checkbox') {
+        return el('div', {className: 'form-card flex-row', style: {alignItems: 'center'}}, 
+          el('input', {type: 'checkbox', checked: val, onChange: (e) => onChange(e.target.checked), style: {width: 18, height: 18}}), 
+          el('span', {style: {fontWeight: 800}}, field.label)
         );
       }
       return null;
     };
 
-    // JSON結果の再帰的描画
-    const RenderJSON = ({obj}) => {
-      if (typeof obj === 'string') {
-        return e('p', {className: 'res-box'}, obj);
+    // JSONツリーの安全な描画（再帰）
+    const JSONViewer = ({data}) => {
+      if (typeof data === 'string') {
+        return el('p', {className: 'res-box'}, data);
       }
-      if (Array.isArray(obj)) {
-        return e('div', null, 
-          obj.map((item, index) => e('div', {key: index, style: {marginBottom: 12, paddingBottom: 12, borderBottom: '1px dashed #334155'}}, 
-            e(RenderJSON, {obj: item})
+      if (Array.isArray(data)) {
+        return el('div', null, 
+          data.map((item, index) => el('div', {key: index, style: {marginBottom: 16, paddingBottom: 16, borderBottom: '1px dashed #334155'}}, 
+            el(JSONViewer, {data: item})
           ))
         );
       }
-      if (typeof obj === 'object' && obj !== null) {
-        return e('div', null, 
-          Object.keys(obj).map(key => e('div', {key: key, style: {marginBottom: 10}}, 
-            e('span', {style: {color: '#38bdf8', fontSize: 12, fontWeight: 800, display: 'block', marginBottom: 4}}, key), 
-            e(RenderJSON, {obj: obj[key]})
+      if (typeof data === 'object' && data !== null) {
+        return el('div', null, 
+          Object.keys(data).map(key => el('div', {key: key, style: {marginBottom: 10}}, 
+            el('span', {style: {color: '#38bdf8', fontSize: 12, fontWeight: 800, display: 'block', marginBottom: 4}}, key), 
+            el(JSONViewer, {data: data[key]})
           ))
         );
       }
-      return e('span', null, String(obj));
+      return el('span', null, String(data));
     };
 
-    // プロンプトをAIプランでラップ
-    const wrapPrompt = (plan, basePrompt) => {
-      const prefix = plan === 'paid' 
-        ? '【システム設定: 有料AIモード】\nあなたは高度な推論とWeb検索が可能な状態です。複雑な指示にも完璧に従い最高品質の出力をしてください。\n\n' 
-        : '【システム設定: 無料AIモード】\nあなたは出力制限がある環境です。途切れないように簡潔に要点を絞って出力してください。\n\n';
-      return prefix + basePrompt;
-    };
-
-    // Web AIへのランチャーリンク
-    const WebLauncherLinks = ({msg}) => {
-      return e('div', {style: {padding: 16, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(56,189,248,0.4)', borderRadius: 12, marginBottom: 16}}, 
-        e('p', {style: {fontSize: 13, fontWeight: 800, color: '#38bdf8', marginBottom: 10}}, '👇 AIを開いてプロンプトを送信'), 
-        e('div', {className: 'flex-row', style: {marginBottom: 12}}, 
-          e('a', {href: 'https://www.perplexity.ai/', target: '_blank', className: 'btn-sub', style: {flex: 1, textAlign: 'center', background: 'rgba(255,255,255,0.1)'}}, '🔍 Perplexity'),
-          e('a', {href: 'https://chatgpt.com/', target: '_blank', className: 'btn-sub', style: {flex: 1, textAlign: 'center', background: 'rgba(255,255,255,0.1)'}}, '🟢 ChatGPT'),
-          e('a', {href: 'https://claude.ai/', target: '_blank', className: 'btn-sub', style: {flex: 1, textAlign: 'center', background: 'rgba(255,255,255,0.1)'}}, '🟠 Claude')
+    // Webランチャーリンク
+    const LauncherLinks = ({showImportMessage}) => {
+      return el('div', {style: {padding: 16, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(56,189,248,0.4)', borderRadius: 12, margin: '20px 0'}}, 
+        el('p', {style: {fontSize: 13, fontWeight: 800, color: '#38bdf8', marginBottom: 12}}, '👇 下のリンクからWeb版AIを開いて送信してください'), 
+        el('div', {className: 'flex-row', style: {marginBottom: showImportMessage ? 12 : 0}}, 
+          el('a', {href: 'https://www.perplexity.ai/', target: '_blank', className: 'btn-sub flex-1'}, '🔍 Perplexity'),
+          el('a', {href: 'https://chatgpt.com/', target: '_blank', className: 'btn-sub flex-1'}, '🟢 ChatGPT'),
+          el('a', {href: 'https://claude.ai/', target: '_blank', className: 'btn-sub flex-1'}, '🟠 Claude')
         ), 
-        msg !== false && e('p', {style: {fontSize: 11, color: 'rgba(255,255,255,0.5)'}}, '回答が完了したら、すべてコピーして「📥 読込」に貼り付けてください。')
+        showImportMessage && el('p', {style: {fontSize: 12, color: 'rgba(255,255,255,0.6)'}}, '回答が完了したら、すべてコピーして「📥 読込」に貼り付けてください。')
       );
     };
 
-
     /* =========================================================================
-       4. メインツールエンジン (全機能をここで安全に処理)
+       4. 汎用ツール実行エンジン (クラッシュ回避の中核)
        ========================================================================= */
-    const ToolEngine = ({tid, user, role, onBack}) => {
-      const tConf = TOOLS[tid];
-      if (!tConf) {
-        return e('div', {className: 'z1'}, e('p', null, 'ツールの読み込みエラー'));
-      }
+    const ToolRunner = ({toolId, username, role, onBack}) => {
+      const conf = TOOLS[toolId];
+      if (!conf) return el('div', {className: 'z1'}, el('p', null, 'Error: Tool not found.'));
 
-      const [tab, setTab] = useState('settings');
-      const [copied, setCopied] = useState({});
+      // データベースから安全に初期値を取得
+      const db = AppDB.get();
+      const userObj = db.users[username];
+      const projId = userObj.curProj;
+      const initialData = (userObj.projects[projId] && userObj.projects[projId].data[toolId]) ? userObj.projects[projId].data[toolId] : {};
+
+      const [inputs, setInputs] = useState(initialData);
+      const [activeTab, setActiveTab] = useState('settings');
+      const [copyState, setCopyState] = useState({});
       const [showLinks, setShowLinks] = useState(false);
-      const [impText, setImpText] = useState('');
-      const [resData, setResData] = useState(null);
-      const [errorMsg, setErrorMsg] = useState('');
+      const [importText, setImportText] = useState('');
+      const [resultData, setResultData] = useState(null);
+      const [errorMessage, setErrorMessage] = useState('');
 
-      // ユーザーのプロジェクトデータの安全な取得
-      const db = getDB();
-      const uData = db.users[user];
-      const pid = uData.curProj;
-      const initialVals = (uData.projects[pid] && uData.projects[pid].data[tid]) ? uData.projects[pid].data[tid] : {};
-      const [vals, setVals] = useState(initialVals);
-
-      const updateVal = (id, val) => {
-        const newVals = { ...vals, [id]: val };
-        setVals(newVals);
+      const handleInputChange = (fieldId, val) => {
+        const newInputs = { ...inputs, [fieldId]: val };
+        setInputs(newInputs);
         if (role !== 'admin') {
-          const newDb = getDB();
-          if (!newDb.users[user].projects[pid].data) newDb.users[user].projects[pid].data = {};
-          newDb.users[user].projects[pid].data[tid] = newVals;
-          saveDB(newDb);
+          const newDb = AppDB.get();
+          newDb.users[username].projects[projId].data[toolId] = newInputs;
+          AppDB.save(newDb);
         }
       };
 
-      const checkAuth = () => {
+      const checkPermission = () => {
         if (role === 'admin') return true;
-        if (uData.perms && uData.perms[tid]) return true;
+        if (userObj.perms && userObj.perms[toolId]) return true;
         const today = new Date().toDateString();
-        if (uData.usage.date !== today) return true;
-        return uData.usage.count < DAILY_LIMIT;
+        if (userObj.usage.date !== today) return true;
+        return userObj.usage.count < DAILY_LIMIT;
       };
 
       const handleGenerate = () => {
-        if (!checkAuth()) {
-          alert(`本日の無料枠(${DAILY_LIMIT}回)を終了しました。\n無制限利用は管理者にお問い合わせください。`);
+        if (!checkPermission()) {
+          alert(`本日の無料枠(${DAILY_LIMIT}回)を終了しました。\n無制限利用をご希望の場合は管理者へお問い合わせください。`);
           return;
         }
 
-        // 回数消費処理
-        if (role !== 'admin' && !(uData.perms && uData.perms[tid])) {
-          const newDb = getDB();
+        // 使用回数を記録
+        if (role !== 'admin' && !(userObj.perms && userObj.perms[toolId])) {
+          const newDb = AppDB.get();
           const today = new Date().toDateString();
-          if (newDb.users[user].usage.date !== today) {
-            newDb.users[user].usage = { date: today, count: 0 };
+          if (newDb.users[username].usage.date !== today) {
+            newDb.users[username].usage = { date: today, count: 0 };
           }
-          newDb.users[user].usage.count++;
-          saveDB(newDb);
+          newDb.users[username].usage.count++;
+          AppDB.save(newDb);
         }
 
-        let brandStr = '';
-        const plan = (uData.brand && uData.brand.plan) ? uData.brand.plan : 'free';
-        if (uData.brand && uData.brand.name) {
-          brandStr = `【発信者情報(文体反映)】名前:${uData.brand.name} ターゲット:${uData.brand.target||''} 文体:${uData.brand.tone||''}\n\n`;
+        // ブランド・AIプラン情報を付与
+        let brandContext = '';
+        const aiPlan = (userObj.brand && userObj.brand.plan) ? userObj.brand.plan : 'free';
+        if (userObj.brand && userObj.brand.name) {
+          brandContext = `【発信者情報(文体やターゲットに反映)】名前:${userObj.brand.name} ターゲット:${userObj.brand.target || ''} 文体:${userObj.brand.tone || ''}\n\n`;
         }
 
-        const rawPrompt = tConf.build(vals, brandStr);
-        const finalPrompt = wrapPrompt(plan, rawPrompt);
+        const basePrompt = conf.buildPrompt(inputs, brandContext);
+        const systemPrefix = aiPlan === 'paid' 
+          ? '【システム設定: 有料AIモード】\nあなたは高度な推論とWeb検索が可能な状態です。複雑な指示にも完璧に従い最高品質の出力をしてください。\n\n'
+          : '【システム設定: 無料AIモード】\nあなたは出力制限がある環境です。回答が途切れないよう簡潔に要点を絞って出力してください。\n\n';
+        
+        const finalPrompt = systemPrefix + basePrompt;
 
-        doCopy(finalPrompt, copied, setCopied, 'gen');
+        doCopy(finalPrompt, copyState, setCopyState, 'generate');
         setShowLinks(true);
-        if (!tConf.noJson && !tConf.isNote) {
-          setTab('import');
+        if (!conf.noJsonParse && !conf.isOnePageUI) {
+          setActiveTab('import');
         }
       };
 
       const handleImport = () => {
-        if (tConf.noJson) {
-          setResData(impText);
-          setTab('preview');
-          setImpText('');
+        if (conf.noJsonParse) {
+          setResultData(importText);
+          setActiveTab('preview');
+          setImportText('');
           return;
         }
-        setErrorMsg('');
-        const parsed = parseJ(impText);
+        setErrorMessage('');
+        const parsed = safeParseJSON(importText);
         if (parsed) {
-          setResData(parsed);
-          setTab('preview');
-          setImpText('');
+          setResultData(parsed);
+          setActiveTab('preview');
+          setImportText('');
         } else {
-          setErrorMsg('JSONフォーマットエラー。AIの出力をそのまま貼り付けてください。');
+          setErrorMessage('JSONフォーマットエラーです。AIの出力をそのまま（余計な文字を含めず）貼り付けてください。');
         }
       };
 
-      // Note用の1画面完結UI
-      if (tConf.isNote) {
-        return e('div', {className: 'z1'},
-          e('div', {className: 'tool-header'}, 
-            e('div', {className: 'flex-row', style:{alignItems:'center'}}, 
-              e('button', {className: 'btn-sub', onClick: onBack}, '← 戻る'), 
-              e('h1', {className: 'app-ttl'}, tConf.n)
+      // --- 1画面完結UI (note用) ---
+      if (conf.isOnePageUI) {
+        return el('div', {className: 'z1'},
+          el('div', {className: 'tool-header'}, 
+            el('div', {className: 'flex-row', style: {alignItems: 'center'}}, 
+              el('button', {className: 'btn-sub', onClick: onBack}, '← 戻る'), 
+              el('h1', {className: 'tool-header-title'}, conf.name)
             )
           ),
-          e('div', {className: 'tutorial-panel'}, 
-            e('div', {className: 'tutorial-title'}, '💡 使い方'), 
-            e('div', {className: 'tutorial-body'}, tConf.tut)
+          el('div', {className: 'tutorial-panel'}, 
+            el('div', {className: 'tutorial-title'}, '💡 使い方と目的'), 
+            el('div', {className: 'tutorial-body'}, conf.tutorial)
           ),
-          tConf.f.map(field => {
-            let val = vals[field.id];
-            if (val === undefined) {
-              if (field.t === 'check') val = false;
-              else if (field.opts) val = field.opts[0];
-              else val = '';
-            }
-            return e(InputField, { key: field.id, f: field, v: val, onChange: (v) => updateVal(field.id, v) });
-          }),
-          e('button', {className: 'btn-primary', style: {marginTop: 10, marginBottom: 20}, onClick: handleGenerate}, 
-            copied['gen'] ? '✓ コピー完了' : '📋 プロンプト生成＆コピー'
-          ),
-          showLinks && e(WebLinks, {msg: false}),
-          e('div', {className: 'form-card'}, 
-            e('span', {className: 'form-label'}, '📥 AIの回答を貼り付け'), 
-            e('textarea', {className: 'form-input', style: {minHeight: 200}, value: resData||'', onChange: (ev) => setResData(ev.target.value)}), 
-            e('button', {className: 'btn-sub', style: {width: '100%', marginTop: 10}, onClick: () => doCopy(resData||'', copied, setCopied, 'cpAll')}, 
-              copied['cpAll'] ? '✓ コピー済み' : '📋 全文コピー'
-            )
+          conf.fields.map(f => el(FormField, { key: f.id, field: f, value: inputs[f.id], onChange: (val) => handleInputChange(f.id, val) })),
+          el('button', {className: 'btn-primary', onClick: handleGenerate}, copyState['generate'] ? '✓ コピー完了！AIへ送信してください' : '📋 プロンプト生成 ＆ コピー'),
+          showLinks && el(LauncherLinks, {showImportMessage: false}),
+          el('div', {className: 'form-card', style: {marginTop: 20}}, 
+            el('span', {className: 'form-label'}, '📥 AIの回答を貼り付けて保管・編集'), 
+            el('textarea', {className: 'form-input', style: {minHeight: 250}, value: resultData || '', onChange: (e) => setResultData(e.target.value)}), 
+            el('button', {className: 'btn-sub', style: {width: '100%', marginTop: 14}, onClick: () => doCopy(resultData || '', copyState, setCopyState, 'copyAll')}, copyState['copyAll'] ? '✓ コピー完了' : '📋 全文コピー')
           )
         );
       }
 
-      // 通常ツールのタブUI
-      return e('div', {className: 'z1'},
-        e('div', {className: 'tool-header'}, 
-          e('div', {className: 'flex-row', style:{alignItems:'center'}}, 
-            e('button', {className: 'btn-sub', onClick: onBack}, '← 戻る'), 
-            e('h1', {className: 'app-ttl'}, tConf.n)
+      // --- 通常ツール UI (タブ切り替え) ---
+      return el('div', {className: 'z1'},
+        el('div', {className: 'tool-header'}, 
+          el('div', {className: 'flex-row', style: {alignItems: 'center'}}, 
+            el('button', {className: 'btn-sub', onClick: onBack}, '← 戻る'), 
+            el('h1', {className: 'tool-header-title'}, conf.name)
           )
         ),
-        e('div', {className: 'tabs-container'}, 
-          [
-            {id: 'settings', label: '⚙️ 設定', disabled: false},
-            {id: 'import', label: '📥 読込', disabled: false},
-            {id: 'preview', label: '👁 結果', disabled: !resData}
+        el('div', {className: 'tabs-container'}, 
+          [ {id: 'settings', label: '⚙️ 条件設定', disabled: false},
+            {id: 'import', label: '📥 AI回答読込', disabled: false},
+            {id: 'preview', label: '👁 結果確認', disabled: !resultData}
           ].map(t => 
-            e('button', {
+            el('button', {
               key: t.id, 
-              className: `tab-item ${tab === t.id ? 'active' : ''}`, 
+              className: `tab-item ${activeTab === t.id ? 'active' : ''}`, 
               disabled: t.disabled,
-              onClick: () => { if (!t.disabled) setTab(t.id); }
+              onClick: () => { if (!t.disabled) setActiveTab(t.id); }
             }, t.label)
           )
         ),
-        tab === 'settings' && e('div', null,
-          e('div', {className: 'tutorial-panel'}, 
-            e('div', {className: 'tutorial-title'}, '💡 使い方'), 
-            e('div', {className: 'tutorial-body'}, tConf.tut)
+        activeTab === 'settings' && el('div', null,
+          el('div', {className: 'tutorial-panel'}, 
+            el('div', {className: 'tutorial-title'}, '💡 使い方と目的'), 
+            el('div', {className: 'tutorial-body'}, conf.tutorial)
           ),
-          tConf.f.map(field => {
-            let val = vals[field.id];
-            if (val === undefined) {
-              if (field.t === 'check') val = false;
-              else if (field.opts) val = field.opts[0];
-              else val = '';
-            }
-            return e(InputField, { key: field.id, f: field, v: val, onChange: (v) => updateVal(field.id, v) });
-          }),
-          e('button', {className: 'btn-primary', style: {marginTop: 10, marginBottom: 20}, onClick: handleGenerate}, 
-            copied['gen'] ? '✓ コピー完了' : '📋 プロンプト生成'
-          ),
-          showLinks && e(WebLinks, {msg: !tConf.noJson})
+          conf.fields.map(f => el(FormField, { key: f.id, field: f, value: inputs[f.id], onChange: (val) => handleInputChange(f.id, val) })),
+          el('button', {className: 'btn-primary', onClick: handleGenerate}, copyState['generate'] ? '✓ コピー完了！' : '📋 プロンプト生成 ＆ コピー'),
+          showLinks && el(LauncherLinks, {showImportMessage: !conf.noJsonParse})
         ),
-        tab === 'import' && e('div', null, 
-          e('div', {className: 'form-card'}, 
-            e('span', {className: 'form-label'}, '📥 AIの出力を貼り付け'), 
-            e('textarea', {className: 'form-input', style: {minHeight: 150}, value: impText, onChange: (ev) => setImpText(ev.target.value)}), 
-            errorMsg && e('div', {className: 'error-box', style: {marginTop: 10}}, '❌ ' + errorMsg), 
-            e('button', {className: 'btn-primary', style: {marginTop: 10}, disabled: !impText.trim(), onClick: handleImport}, '反映して結果を見る')
+        activeTab === 'import' && el('div', null, 
+          el('div', {className: 'form-card'}, 
+            el('span', {className: 'form-label'}, '📥 AIの出力を貼り付け'), 
+            el('textarea', {className: 'form-input', style: {minHeight: 180}, value: importText, onChange: (e) => setImportText(e.target.value)}), 
+            errorMessage && el('div', {className: 'error-box'}, '❌ ' + errorMessage), 
+            el('button', {className: 'btn-primary', disabled: !importText.trim(), onClick: handleImport}, 'システムに反映して結果を見る')
           )
         ),
-        tab === 'preview' && resData && e('div', {className: 'form-card'}, e(RenderJSON, {obj: resData}))
+        activeTab === 'preview' && resultData && el('div', {className: 'form-card'}, 
+          el(JSONViewer, {data: resultData})
+        )
       );
     };
 
-
     /* =========================================================================
-       5. 設定・管理系コンポーネント
+       5. ユーザー設定・プロジェクト・問い合わせ
        ========================================================================= */
-    const BrandSettings = ({user, onBack}) => {
-      const db = getDB();
-      const b = (db.users[user] || {}).brand || {plan: 'free'};
-      const [name, setName] = useState(b.name || '');
-      const [target, setTarget] = useState(b.target || '');
-      const [tone, setTone] = useState(b.tone || '');
-      const [plan, setPlan] = useState(b.plan || 'free');
+    const SettingsScreen = ({user, onBack}) => {
+      const db = AppDB.get();
+      const b = db.users[user].brand;
+      const [name, setName] = useState(b.name);
+      const [target, setTarget] = useState(b.target);
+      const [tone, setTone] = useState(b.tone);
+      const [plan, setPlan] = useState(b.plan);
 
-      const handleSave = () => {
+      const save = () => {
         if (user !== 'admin') {
-          const newDb = getDB();
+          const newDb = AppDB.get();
           newDb.users[user].brand = { name, target, tone, plan };
-          saveDB(newDb);
+          AppDB.save(newDb);
         }
-        alert('保存しました');
+        alert('設定を保存しました。');
         onBack();
       };
 
-      return e('div', {className: 'z1'}, 
-        e('div', {className: 'tool-header'}, 
-          e('div', {className: 'flex-row', style:{alignItems:'center'}}, 
-            e('button', {className: 'btn-sub', onClick: onBack}, '← 戻る'), 
-            e('h1', {className: 'app-ttl'}, '👤 マイ・ブランド ＆ AI設定')
-          )
-        ),
-        e('div', {className: 'tutorial-panel'}, 
-          e('div', {className: 'tutorial-body'}, 'ここで登録した情報は全ツールのプロンプトに自動で埋め込まれます。\n使用しているAIのプランに合わせてプロンプトが最適化されます。')
-        ),
-        e('div', {className: 'form-card'}, 
-          e('span', {className: 'form-label'}, '🤖 使用しているAIプラン'), 
-          e('select', {className: 'form-input', value: plan, onChange: (ev) => setPlan(ev.target.value)}, 
-            e('option', {value: 'free'}, '無料版 (ChatGPT Free 等)'), 
-            e('option', {value: 'paid'}, '有料版 (ChatGPT Plus 等)')
-          )
-        ),
-        e('div', {className: 'form-card'}, 
-          e('span', {className: 'form-label'}, '発信者名・肩書き'), 
-          e('input', {className: 'form-input', value: name, onChange: (ev) => setName(ev.target.value)})
-        ),
-        e('div', {className: 'form-card'}, 
-          e('span', {className: 'form-label'}, 'メインのターゲット層'), 
-          e('input', {className: 'form-input', value: target, onChange: (ev) => setTarget(ev.target.value)})
-        ),
-        e('div', {className: 'form-card'}, 
-          e('span', {className: 'form-label'}, '文体のクセ・ルール (例:絵文字多め)'), 
-          e('textarea', {className: 'form-input', style: {minHeight: 80}, value: tone, onChange: (ev) => setTone(ev.target.value)})
-        ),
-        e('button', {className: 'btn-primary', onClick: handleSave}, '保存する')
+      return el('div', {className: 'z1'}, 
+        el('div', {className: 'tool-header'}, el('div', {className: 'flex-row', style: {alignItems: 'center'}}, el('button', {className: 'btn-sub', onClick: onBack}, '← 戻る'), el('h1', {className: 'tool-header-title'}, '👤 マイ・ブランド ＆ AI設定'))),
+        el('div', {className: 'tutorial-panel'}, el('div', {className: 'tutorial-body'}, '登録した情報は全ツールのプロンプトに自動反映されます。使用しているAIプランに応じてプロンプトも最適化されます。')),
+        el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, '🤖 使用しているAIプラン'), el('select', {className: 'form-input', value: plan, onChange: (e) => setPlan(e.target.value)}, el('option', {value: 'free'}, '無料版 (ChatGPT Free 等)'), el('option', {value: 'paid'}, '有料版 (ChatGPT Plus 等)'))),
+        el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, '発信者名・肩書き'), el('input', {className: 'form-input', value: name, onChange: (e) => setName(e.target.value)})),
+        el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, 'メインのターゲット層'), el('input', {className: 'form-input', value: target, onChange: (e) => setTarget(e.target.value)})),
+        el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, '文体のクセ・ルール (例: 絵文字多め)'), el('textarea', {className: 'form-input', style: {minHeight: 100}, value: tone, onChange: (e) => setTone(e.target.value)})),
+        el('button', {className: 'btn-primary', onClick: save}, '設定を保存する')
       );
     };
 
-    const ProjectManager = ({user, onBack}) => {
-      const [db, setDb] = useState(getDB());
+    const ProjectScreen = ({user, onBack}) => {
+      const [db, setDb] = useState(AppDB.get());
       const uData = db.users[user];
       const [newProj, setNewProj] = useState('');
 
-      const handleCreate = () => {
+      const create = () => {
         if (!newProj.trim() || user === 'admin') return;
         const id = 'p_' + Date.now();
-        const newDb = getDB();
+        const newDb = AppDB.get();
         newDb.users[user].projects[id] = { name: newProj, data: {} };
         newDb.users[user].curProj = id;
-        saveDB(newDb);
-        setDb(newDb);
-        setNewProj('');
+        AppDB.save(newDb); setDb(newDb); setNewProj('');
       };
-
-      const handleSwitch = (id) => {
+      const switchProj = (id) => {
         if (user === 'admin') return;
-        const newDb = getDB();
+        const newDb = AppDB.get();
         newDb.users[user].curProj = id;
-        saveDB(newDb);
-        setDb(newDb);
-        onBack();
+        AppDB.save(newDb); setDb(newDb); onBack();
       };
 
-      return e('div', {className: 'z1'}, 
-        e('div', {className: 'tool-header'}, 
-          e('div', {className: 'flex-row', style:{alignItems:'center'}}, 
-            e('button', {className: 'btn-sub', onClick: onBack}, '← 戻る'), 
-            e('h1', {className: 'app-ttl'}, '📁 プロジェクト管理')
-          )
-        ),
-        e('div', {className: 'tutorial-panel'}, 
-          e('div', {className: 'tutorial-body'}, '案件ごとにデータを分けて保存できます。')
-        ),
-        e('div', {className: 'flex-row', style: {marginBottom: 20}}, 
-          e('input', {className: 'form-input flex-1', placeholder: '新プロジェクト名', value: newProj, onChange: (ev) => setNewProj(ev.target.value)}), 
-          e('button', {className: 'btn-primary', style: {width: 'auto'}, onClick: handleCreate, disabled: user === 'admin'}, '作成')
-        ),
+      return el('div', {className: 'z1'}, 
+        el('div', {className: 'tool-header'}, el('div', {className: 'flex-row', style: {alignItems: 'center'}}, el('button', {className: 'btn-sub', onClick: onBack}, '← 戻る'), el('h1', {className: 'tool-header-title'}, '📁 プロジェクト管理'))),
+        el('div', {className: 'tutorial-panel'}, el('div', {className: 'tutorial-body'}, '案件ごとにツール内の入力データを分けて保存できます。')),
+        el('div', {className: 'flex-row', style: {marginBottom: 20}}, el('input', {className: 'form-input flex-1', placeholder: '新プロジェクト名', value: newProj, onChange: (e) => setNewProj(e.target.value)}), el('button', {className: 'btn-primary', style: {width: 'auto', margin: 0}, onClick: create, disabled: user === 'admin'}, '作成')),
         Object.keys(uData.projects).map(k => {
           const p = uData.projects[k];
           const isCur = k === uData.curProj;
-          return e('div', {key: k, className: 'form-card flex-row', style: {justifyContent: 'space-between', alignItems: 'center', borderColor: isCur ? '#38bdf8' : 'rgba(255,255,255,0.08)'}}, 
-            e('span', {style: {fontWeight: 700, color: isCur ? '#38bdf8' : '#ffffff'}}, p.name + (isCur ? ' (選択中)' : '')), 
-            !isCur && e('button', {className: 'btn-sub', onClick: () => handleSwitch(k)}, '切り替え')
+          return el('div', {key: k, className: 'form-card flex-row', style: {justifyContent: 'space-between', alignItems: 'center', borderColor: isCur ? '#38bdf8' : 'rgba(255,255,255,0.08)'}}, 
+            el('span', {style: {fontWeight: 800, color: isCur ? '#38bdf8' : '#fff'}}, p.name + (isCur ? ' (選択中)' : '')),
+            !isCur && el('button', {className: 'btn-sub', onClick: () => switchProj(k)}, '切り替え')
           );
         })
-      );
-    };
-
-
-    /* =========================================================================
-       6. モーダル ＆ 認証画面
-       ========================================================================= */
-    const ManualModal = ({onClose}) => {
-      return e('div', {className: 'modal-overlay', onClick: onClose}, 
-        e('div', {className: 'modal-content', onClick: (ev) => ev.stopPropagation()}, 
-          e('div', {className: 'tool-header', style: {marginBottom: 16, paddingBottom: 10}}, 
-            e('h2', {style: {color: '#38bdf8', fontSize: 18, margin: 0}}, '📖 マニュアル'), 
-            e('button', {onClick: onClose, style: {fontSize: 24, background: 'none', border: 'none', color: '#888'}}, '×')
-          ),
-          e('div', {style: {fontSize: 13, lineHeight: 1.7}}, 
-            e('p', {style: {marginBottom: 12}}, '最新AIを操作する「完全無料」のプロンプト生成ツールです。'), 
-            e('div', {className: 'tutorial-panel'}, 
-              e('strong', {style: {color: '#fbbf24', display: 'block', marginBottom: 6}}, '🚀 使い方 (3ステップ)'), 
-              '1. ツールの【⚙️ 設定】で条件を入れプロンプトをコピー。\n2. ChatGPT等を開き、そのまま送信。\n3. 回答をすべてコピーし、【📥 読込】に貼り付け！'
-            ), 
-            e('div', {className: 'tutorial-panel', style: {borderColor: 'rgba(56,189,248,0.4)'}}, 
-              e('strong', {style: {color: '#38bdf8', display: 'block', marginBottom: 6}}, '🤖 無料版・有料版どちらを使うべき？'), 
-              '本格的に稼ぐなら', e('strong', {style: {color: '#f43f5e'}}, '「有料版一択」'), 'です。無料版は長文で途切れやすく、Web検索も弱いためです。\n※「マイ・ブランド設定」で有料版を選ぶと、AIの能力を引き出す専用プロンプトに自動で切り替わります。'
-            ), 
-            e('button', {className: 'btn-primary', onClick: onClose}, '理解して使う')
-          )
-        )
       );
     };
 
@@ -1035,37 +949,54 @@
 
       const handleSend = () => {
         if (!content.trim()) return;
-        const newDb = getDB();
-        newDb.inqs.push({ id: Date.now(), user: user, type: type, content: content, date: Date.now(), status: 'unread' });
-        saveDB(newDb);
-        setSent(true);
-        setTimeout(onClose, 2000);
+        const db = AppDB.get();
+        db.inquiries.push({ id: Date.now(), user, type, content, date: Date.now(), status: 'unread' });
+        AppDB.save(db);
+        setSent(true); setTimeout(onClose, 2000);
       };
 
-      return e('div', {className: 'modal-overlay', onClick: onClose}, 
-        e('div', {className: 'modal-content', onClick: (ev) => ev.stopPropagation()}, 
-          e('div', {className: 'tool-header', style: {marginBottom: 16, paddingBottom: 10}}, 
-            e('h2', {style: {color: '#f59e0b', fontSize: 18, margin: 0}}, '💬 管理者へ問合せ'), 
-            e('button', {onClick: onClose, style: {fontSize: 24, background: 'none', border: 'none', color: '#888'}}, '×')
+      return el('div', {className: 'modal-overlay', onClick: onClose}, 
+        el('div', {className: 'modal-content', onClick: (e) => e.stopPropagation()}, 
+          el('div', {className: 'tool-header', style: {marginBottom: 20, paddingBottom: 10}}, 
+            el('h2', {style: {color: '#f59e0b', fontSize: 18, margin: 0}}, '💬 管理者へのお問い合わせ'), 
+            el('button', {onClick: onClose, style: {fontSize: 24, background: 'none', border: 'none', color: '#888'}}, '×')
           ),
-          sent ? e('div', {style: {textAlign: 'center', color: '#4ade80', fontWeight: 800, padding: '30px 0'}}, '送信完了しました！') : 
-          e('div', null, 
-            e('div', {className: 'form-card'}, 
-              e('span', {className: 'form-label'}, '種別'), 
-              e('select', {className: 'form-input', value: type, onChange: (ev) => setType(ev.target.value)}, 
-                INQ_TYPES.map(o => e('option', {key: o, value: o}, o))
-              )
-            ), 
-            e('div', {className: 'form-card'}, 
-              e('span', {className: 'form-label'}, '内容'), 
-              e('textarea', {className: 'form-input', style: {minHeight: 120}, value: content, onChange: (ev) => setContent(ev.target.value)})
-            ), 
-            e('button', {className: 'btn-primary', style: {background: 'linear-gradient(135deg, #f59e0b, #d97706)'}, disabled: !content.trim(), onClick: handleSend}, '送信する')
+          sent ? el('div', {style: {textAlign: 'center', color: '#4ade80', fontWeight: 800, padding: '30px 0', fontSize: 18}}, '送信完了しました！') : 
+          el('div', null, 
+            el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, '種別'), el('select', {className: 'form-input', value: type, onChange: (e) => setType(e.target.value)}, INQ_TYPES.map(o => el('option', {key: o, value: o}, o)))),
+            el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, '内容'), el('textarea', {className: 'form-input', style: {minHeight: 120}, value: content, onChange: (e) => setContent(e.target.value)})),
+            el('button', {className: 'btn-primary', style: {background: 'linear-gradient(135deg, #f59e0b, #d97706)'}, disabled: !content.trim(), onClick: handleSend}, '送信する')
           )
         )
       );
     };
 
+    const ManualModal = ({onClose}) => {
+      return el('div', {className: 'modal-overlay', onClick: onClose}, 
+        el('div', {className: 'modal-content', onClick: (e) => e.stopPropagation()}, 
+          el('div', {className: 'tool-header', style: {marginBottom: 16, paddingBottom: 10}}, 
+            el('h2', {style: {color: '#38bdf8', fontSize: 18, margin: 0}}, '📖 AI Content Pro マニュアル'), 
+            el('button', {onClick: onClose, style: {fontSize: 24, background: 'none', border: 'none', color: '#888'}}, '×')
+          ),
+          el('div', {style: {fontSize: 13, lineHeight: 1.7}}, 
+            el('p', {style: {marginBottom: 16}}, '本ツールは、最新AIを操作してビジネスを自動化するプロンプトジェネレーターです。'), 
+            el('div', {className: 'tutorial-panel'}, 
+              el('strong', {style: {color: '#fbbf24', display: 'block', marginBottom: 8}}, '🚀 基本的な使い方 (3ステップ)'), 
+              '1. ツールの【⚙️ 条件設定】で情報を入力し、プロンプトを生成してコピー。\n2. 別タブでChatGPT等を開き、コピーした文章をそのまま送信。\n3. AIの回答をすべてコピーし、ツールの【📥 AI回答読込】に貼り付ける！'
+            ), 
+            el('div', {className: 'tutorial-panel', style: {borderColor: 'rgba(56, 189, 248, 0.4)'}}, 
+              el('strong', {style: {color: '#38bdf8', display: 'block', marginBottom: 8}}, '🤖 無料版・有料版どちらを使うべき？'), 
+              '本格的にマネタイズするなら', el('strong', {style: {color: '#f43f5e'}}, '「有料版一択」'), 'です。無料版は長文で途切れやすく、Web検索も弱いためです。\n※「マイ・ブランド設定」で有料版を選ぶと、AIの能力を引き出す専用プロンプトに自動で切り替わります。'
+            ), 
+            el('button', {className: 'btn-primary', onClick: onClose}, '理解してツールを使う')
+          )
+        )
+      );
+    };
+
+    /* =========================================================================
+       6. 認証 ＆ 管理ダッシュボード
+       ========================================================================= */
     const AuthScreen = ({onLogin}) => {
       const [isLogin, setIsLogin] = useState(true);
       const [un, setUn] = useState('');
@@ -1074,118 +1005,111 @@
       const [err, setErr] = useState('');
 
       const handleSubmit = () => {
-        setErr('');
-        const u = un.trim();
+        setErr(''); const u = un.trim();
         if (!u) return setErr('ユーザー名を入力してください');
         
-        const db = getDB();
+        const db = AppDB.get();
 
-        // Admin認証
         if (u === 'admin') {
           if (pw === db.admin.p) {
             localStorage.setItem(SESS_KEY, JSON.stringify({u: u, r: 'admin'}));
             onLogin(u, 'admin');
-          } else {
-            setErr('パスワードが違います');
-          }
+          } else { setErr('パスワードが違います'); }
           return;
         }
 
-        // 一般ユーザー認証
         if (isLogin) {
-          if (!db.users[u]) return setErr('未登録のユーザー名です');
+          if (!db.users[u]) return setErr('未登録のユーザー名です。新規申請を行ってください。');
           localStorage.setItem(SESS_KEY, JSON.stringify({u: u, r: db.users[u].status}));
           onLogin(u, db.users[u].status);
         } else {
-          if (db.users[u]) return setErr('登録済みの名前です');
+          if (db.users[u]) return setErr('既に登録されている名前です。ログインしてください。');
           const s = sns.trim();
-          if (!s || !s.includes('@')) return setErr('SNSアカウントは @ を含めてください');
+          if (!s || !s.includes('@')) return setErr('SNSアカウントは @ を含めて正確に入力してください');
           
           db.users[u] = {
-            status: 'pending', sns: s, date: Date.now(),
+            status: 'pending', sns: s, registeredAt: Date.now(),
             usage: {date: '', count: 0}, perms: {},
             brand: {plan: 'free', name: '', target: '', tone: ''},
             projects: {'default': {name: 'デフォルト', data: {}}},
             curProj: 'default'
           };
-          saveDB(db);
+          AppDB.save(db);
           localStorage.setItem(SESS_KEY, JSON.stringify({u: u, r: 'pending'}));
           onLogin(u, 'pending');
         }
       };
 
-      return e('div', {className: 'page-container'}, 
-        e('div', {className: 'grid-bg'}), 
-        e('div', {className: 'content-wrapper auth-container'}, 
-          e('h2', {style: {fontSize: 24, fontWeight: 900, marginBottom: 4}}, 'AI Content Pro'), 
-          e('p', {style: {color: '#38bdf8', fontWeight: 700, marginBottom: 24}}, 'SaaS Edition v29'), 
-          e('div', {className: 'flex-row', style: {background: 'rgba(0,0,0,0.3)', padding: 4, borderRadius: 8, marginBottom: 24}}, 
-            e('button', {onClick: () => {setIsLogin(true); setErr('');}, style: {flex: 1, padding: '10px', borderRadius: 6, background: isLogin ? '#38bdf8' : 'transparent', color: isLogin ? '#fff' : '#888', fontWeight: 700}}, 'ログイン'), 
-            e('button', {onClick: () => {setIsLogin(false); setErr('');}, style: {flex: 1, padding: '10px', borderRadius: 6, background: !isLogin ? '#38bdf8' : 'transparent', color: !isLogin ? '#fff' : '#888', fontWeight: 700}}, '新規申請')
+      return el('div', {className: 'page-container'}, 
+        el('div', {className: 'grid-bg'}), 
+        el('div', {className: 'content-wrapper auth-container'}, 
+          el('h2', {style: {fontSize: 26, fontWeight: 900, marginBottom: 8}}, 'AI Content Pro'), 
+          el('p', {style: {color: '#38bdf8', fontWeight: 800, marginBottom: 30}}, 'SaaS Edition v29'), 
+          el('div', {className: 'flex-row', style: {background: 'rgba(0,0,0,0.3)', padding: 6, borderRadius: 10, marginBottom: 24}}, 
+            el('button', {onClick: () => {setIsLogin(true); setErr('');}, style: {flex: 1, padding: '12px', borderRadius: 8, background: isLogin ? '#38bdf8' : 'transparent', color: isLogin ? '#fff' : '#888', fontWeight: 800}}, 'ログイン'), 
+            el('button', {onClick: () => {setIsLogin(false); setErr('');}, style: {flex: 1, padding: '12px', borderRadius: 8, background: !isLogin ? '#38bdf8' : 'transparent', color: !isLogin ? '#fff' : '#888', fontWeight: 800}}, '新規申請')
           ), 
-          e('input', {className: 'form-input', style: {marginBottom: 14}, placeholder: 'ユーザー名 (adminで管理者)', value: un, onChange: (ev) => setUn(ev.target.value)}), 
-          (!isLogin && un !== 'admin') && e('input', {className: 'form-input', style: {marginBottom: 14}, placeholder: 'SNSアカウント (@必須)', value: sns, onChange: (ev) => setSns(ev.target.value)}), 
-          un === 'admin' && e('input', {className: 'form-input', style: {marginBottom: 14}, type: 'password', placeholder: '管理者パスワード', value: pw, onChange: (ev) => setPw(ev.target.value)}), 
-          err && e('div', {className: 'error-box'}, err), 
-          e('button', {className: 'btn-primary', style: {marginTop: 10}, onClick: handleSubmit}, isLogin ? 'ログイン' : '申請して待機画面へ')
+          el('input', {className: 'form-input', style: {marginBottom: 16}, placeholder: 'ユーザー名', value: un, onChange: (e) => setUn(e.target.value)}), 
+          (!isLogin && un !== 'admin') && el('input', {className: 'form-input', style: {marginBottom: 16}, placeholder: 'SNSアカウント (@必須)', value: sns, onChange: (e) => setSns(e.target.value)}), 
+          un === 'admin' && el('input', {className: 'form-input', style: {marginBottom: 16}, type: 'password', placeholder: '管理者パスワード', value: pw, onChange: (e) => setPw(e.target.value)}), 
+          err && el('div', {className: 'error-box'}, err), 
+          el('button', {className: 'btn-primary', style: {marginTop: 10}, onClick: handleSubmit}, isLogin ? 'ログイン' : '申請して待機画面へ')
         )
       );
     };
 
     const AdminDashboard = ({onGoApp, onLogout}) => {
-      const [db, setDb] = useState(getDB());
+      const [db, setDb] = useState(AppDB.get());
       const [tab, setTab] = useState('users');
       const [expUser, setExpUser] = useState(null);
 
-      const updateStatus = (u, st) => { const newDb = getDB(); newDb.users[u].status = st; saveDB(newDb); setDb(newDb); };
-      const togglePerm = (u, tid) => { const newDb = getDB(); newDb.users[u].perms[tid] = !newDb.users[u].perms[tid]; saveDB(newDb); setDb(newDb); };
-      const markRead = (id) => { const newDb = getDB(); const iq = newDb.inqs.find(x => x.id === id); if(iq) { iq.status = 'read'; saveDB(newDb); setDb(newDb); } };
+      const updateStatus = (u, st) => { const newDb = AppDB.get(); newDb.users[u].status = st; AppDB.save(newDb); setDb(newDb); };
+      const togglePerm = (u, tid) => { const newDb = AppDB.get(); newDb.users[u].perms[tid] = !newDb.users[u].perms[tid]; AppDB.save(newDb); setDb(newDb); };
+      const markRead = (id) => { const newDb = AppDB.get(); const iq = newDb.inquiries.find(x => x.id === id); if(iq) { iq.status = 'read'; AppDB.save(newDb); setDb(newDb); } };
 
       const userKeys = Object.keys(db.users).filter(k => k !== 'admin');
-      const inqs = db.inqs || [];
+      const inqs = db.inquiries || [];
 
-      return e('div', {className: 'page-container'}, 
-        e('div', {className: 'grid-bg'}), 
-        e('div', {className: 'content-wrapper'}, 
-          e('div', {className: 'tool-header'}, 
-            e('h1', {className: 'app-ttl'}, '🎛️ 管理画面'), 
-            e('div', {className: 'flex-row'}, 
-              e('button', {className: 'btn-primary', style: {padding: '8px 16px', fontSize: 13, width: 'auto'}, onClick: onGoApp}, '🚀 ツールへ'), 
-              e('button', {className: 'btn-sub', onClick: onLogout}, 'ログアウト')
+      return el('div', {className: 'page-container'}, 
+        el('div', {className: 'grid-bg'}), 
+        el('div', {className: 'content-wrapper'}, 
+          el('div', {className: 'tool-header'}, 
+            el('h1', {className: 'main-title', style: {fontSize: 24, margin: 0}}, '🎛️ 管理画面'), 
+            el('div', {className: 'flex-row'}, 
+              el('button', {className: 'btn-primary', style: {padding: '10px 20px', fontSize: 13, width: 'auto', margin: 0}, onClick: onGoApp}, '🚀 ツールへ'), 
+              el('button', {className: 'btn-sub', onClick: onLogout}, 'ログアウト')
             )
           ), 
-          e('div', {className: 'tabs-container'}, 
-            e('button', {className: `tab-item ${tab === 'users' ? 'active' : ''}`, onClick: () => setTab('users')}, '👥 ユーザー管理'), 
-            e('button', {className: `tab-item ${tab === 'inqs' ? 'active' : ''}`, onClick: () => setTab('inqs')}, `📩 問い合わせ (${inqs.filter(x => x.status === 'unread').length})`)
+          el('div', {className: 'tabs-container'}, 
+            el('button', {className: `tab-item ${tab === 'users' ? 'active' : ''}`, onClick: () => setTab('users')}, '👥 ユーザー管理'), 
+            el('button', {className: `tab-item ${tab === 'inqs' ? 'active' : ''}`, onClick: () => setTab('inqs')}, `📩 問い合わせ (${inqs.filter(x => x.status === 'unread').length})`)
           ), 
-          tab === 'users' ? e('div', {className: 'form-card admin-table-wrapper'}, 
-            e('table', {className: 'admin-table'}, 
-              e('thead', null, 
-                e('tr', null, e('th', null, 'User'), e('th', null, 'SNS'), e('th', null, 'Status'), e('th', null, 'Action'))
-              ), 
-              e('tbody', null, 
-                userKeys.sort((a,b) => db.users[b].date - db.users[a].date).map(k => {
+          tab === 'users' ? el('div', {className: 'form-card admin-table-wrapper'}, 
+            el('table', {className: 'admin-table'}, 
+              el('thead', null, el('tr', null, el('th', null, 'ユーザー'), el('th', null, 'SNS'), el('th', null, 'ステータス'), el('th', null, '権限/操作'))), 
+              el('tbody', null, 
+                userKeys.sort((a,b) => db.users[b].registeredAt - db.users[a].registeredAt).map(k => {
                   const u = db.users[k];
                   const isExp = expUser === k;
-                  return e(Fragment, {key: k}, 
-                    e('tr', null, 
-                      e('td', {style: {fontWeight: 800}}, k), 
-                      e('td', {style: {color: '#38bdf8'}}, u.sns), 
-                      e('td', {style: {color: u.status === 'approved' ? '#4ade80' : '#f87171'}}, u.status), 
-                      e('td', null, 
-                        u.status !== 'approved' && e('button', {className: 'btn-sub', style: {background: '#16a34a', color: '#fff', marginRight: 6}, onClick: () => updateStatus(k, 'approved')}, '許可'), 
-                        u.status === 'approved' && e('button', {className: 'btn-sub', style: {marginRight: 6}, onClick: () => setExpUser(isExp ? null : k)}, '🔑 権限'), 
-                        u.status !== 'rejected' && e('button', {className: 'btn-sub', style: {background: '#e11d48', color: '#fff'}, onClick: () => updateStatus(k, 'rejected')}, 'Ban')
+                  return el(Fragment, {key: k}, 
+                    el('tr', null, 
+                      el('td', {style: {fontWeight: 800}}, k), 
+                      el('td', {style: {color: '#38bdf8'}}, u.sns), 
+                      el('td', {style: {color: u.status === 'approved' ? '#4ade80' : (u.status === 'pending' ? '#fbbf24' : '#f87171'), fontWeight: 800}}, u.status === 'approved' ? '許可済' : (u.status === 'pending' ? '待機中' : 'BAN')), 
+                      el('td', null, 
+                        u.status !== 'approved' && el('button', {className: 'btn-sub', style: {background: '#16a34a', color: '#fff', marginRight: 6}, onClick: () => updateStatus(k, 'approved')}, '許可'), 
+                        u.status === 'approved' && el('button', {className: 'btn-sub', style: {marginRight: 6}, onClick: () => setExpUser(isExp ? null : k)}, '🔑 権限付与'), 
+                        u.status !== 'rejected' && el('button', {className: 'btn-sub', style: {background: '#e11d48', color: '#fff'}, onClick: () => updateStatus(k, 'rejected')}, 'BAN')
                       )
                     ), 
-                    isExp && e('tr', null, 
-                      e('td', {colSpan: 4, style: {background: 'rgba(0,0,0,0.3)'}}, 
-                        e('p', {style: {fontSize: 11, color: '#fbbf24', marginBottom: 8}}, 'チェックしたツールは無制限になります'), 
-                        e('div', {className: 'flex-row'}, 
+                    isExp && el('tr', null, 
+                      el('td', {colSpan: 4, style: {background: 'rgba(0,0,0,0.4)'}}, 
+                        el('p', {style: {fontSize: 12, color: '#fbbf24', marginBottom: 12, fontWeight: 800}}, '✅ チェックを入れた機能は、このユーザーのみ【無制限】で利用可能になります'), 
+                        el('div', {className: 'flex-row'}, 
                           Object.keys(TOOLS).map(tid => 
-                            e('label', {key: tid, style: {fontSize: 12, display: 'flex', alignItems: 'center', gap: 6}}, 
-                              e('input', {type: 'checkbox', checked: !!(u.perms && u.perms[tid]), onChange: () => togglePerm(k, tid)}), 
-                              TOOLS[tid].n
+                            el('label', {key: tid, style: {fontSize: 12, display: 'flex', alignItems: 'center', gap: 6}}, 
+                              el('input', {type: 'checkbox', checked: !!(u.perms && u.perms[tid]), onChange: () => togglePerm(k, tid)}), 
+                              TOOLS[tid].name
                             )
                           )
                         )
@@ -1195,15 +1119,15 @@
                 })
               )
             )
-          ) : e('div', null, 
+          ) : el('div', null, 
             inqs.sort((a,b) => b.date - a.date).map(iq => 
-              e('div', {key: iq.id, className: 'form-card', style: {borderLeft: iq.status === 'unread' ? '3px solid #f59e0b' : ''}}, 
-                e('div', {className: 'flex-row', style: {justifyContent: 'space-between', marginBottom: 8}}, 
-                  e('span', {style: {fontWeight: 800, color: '#38bdf8'}}, `${iq.user} (${iq.type})`), 
-                  e('span', {style: {fontSize: 11, color: '#888'}}, fmtD(iq.date))
+              el('div', {key: iq.id, className: 'form-card', style: {borderLeft: iq.status === 'unread' ? '4px solid #f59e0b' : '1px solid rgba(255,255,255,0.08)'}}, 
+                el('div', {className: 'flex-row', style: {justifyContent: 'space-between', marginBottom: 12}}, 
+                  el('span', {style: {fontWeight: 800, color: '#38bdf8', fontSize: 15}}, `${iq.user} (${iq.type})`), 
+                  el('span', {style: {fontSize: 12, color: '#888'}}, formatDateTime(iq.date))
                 ), 
-                e('p', {style: {whiteSpace: 'pre-wrap', fontSize: 13}}, iq.content), 
-                iq.status === 'unread' && e('button', {className: 'btn-sub', style: {marginTop: 10}, onClick: () => markRead(iq.id)}, '既読にする')
+                el('p', {style: {whiteSpace: 'pre-wrap', fontSize: 14}}, iq.content), 
+                iq.status === 'unread' && el('button', {className: 'btn-sub', style: {marginTop: 14}, onClick: () => markRead(iq.id)}, '既読にする')
               )
             )
           )
@@ -1211,71 +1135,75 @@
       );
     };
 
-    const MainApp = ({user, role, onLogout, onGoAdmin}) => {
+    /* =========================================================================
+       7. メインダッシュボード（全機能のハブ）
+       ========================================================================= */
+    const MainDashboard = ({user, role, onLogout, onGoAdmin}) => {
       const [screen, setScreen] = useState('home');
-      const [showMan, setShowMan] = useState(false);
-      const [showInq, setShowInq] = useState(false);
+      const [showManual, setShowManual] = useState(false);
+      const [showInquiry, setShowInquiry] = useState(false);
 
-      const db = getDB();
+      const db = AppDB.get();
       const uData = db.users[user];
 
-      if (screen === 'brand') return e(BrandSettings, {user: user, onBack: () => setScreen('home')});
-      if (screen === 'proj') return e(ProjectManager, {user: user, onBack: () => setScreen('home')});
-      if (TOOLS[screen]) return e(ToolEngine, {toolId: screen, user: user, role: role, onBack: () => setScreen('home')});
+      if (screen === 'settings') return el(SettingsScreen, {user, onBack: () => setScreen('home')});
+      if (screen === 'projects') return el(ProjectScreen, {user, onBack: () => setScreen('home')});
+      if (TOOLS[screen]) return el(ToolEngine, {toolId: screen, user, role, onBack: () => setScreen('home')});
 
-      const pName = uData.projects[uData.curProj] ? uData.projects[uData.curProj].name : 'Proj';
+      const projName = uData.projects[uData.curProj] ? uData.projects[uData.curProj].name : 'プロジェクト';
       const today = new Date().toDateString();
-      const uStr = (uData.usage.date === today ? uData.usage.count : 0) + '/' + DAILY_LIMIT;
+      const usageCount = uData.usage.date === today ? uData.usage.count : 0;
+      const usageStr = `${usageCount} / ${DAILY_LIMIT}`;
 
-      return e('div', {className: 'page-container'}, 
-        showMan && e(ManualModal, {onClose: () => setShowMan(false)}), 
-        showInq && e(InquiryModal, {user: user, onClose: () => setShowInq(false)}), 
+      return el('div', {className: 'page-container'}, 
+        showManual && el(ManualModal, {onClose: () => setShowManual(false)}), 
+        showInquiry && el(InquiryModal, {user, onClose: () => setShowInquiry(false)}), 
         
-        e('div', {style: {position: 'absolute', top: 16, right: 16, zIndex: 100, display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end'}}, 
-          role === 'admin' && e('button', {className: 'btn-sub', style: {background: '#f59e0b', border: 'none', color: '#fff'}, onClick: onGoAdmin}, '🎛️管理'), 
-          role !== 'admin' && e('div', {className: 'btn-sub'}, '📂 ' + pName), 
-          role !== 'admin' && e('div', {className: 'btn-sub'}, '本日: ' + uStr + '回'), 
-          role !== 'admin' && e('button', {className: 'btn-sub', style: {color: '#f59e0b', borderColor: '#f59e0b'}, onClick: () => setShowInq(true)}, '💬 問合せ'), 
-          e('button', {className: 'btn-sub', onClick: () => setShowMan(true)}, '📖'), 
-          e('button', {className: 'btn-sub', onClick: onLogout}, 'ログアウト')
+        el('div', {style: {position: 'absolute', top: 16, right: 16, zIndex: 100, display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end'}}, 
+          role === 'admin' && el('button', {className: 'btn-sub', style: {background: '#f59e0b', border: 'none', color: '#fff'}, onClick: onGoAdmin}, '🎛️ 管理画面'), 
+          role !== 'admin' && el('div', {className: 'btn-sub', style: {cursor: 'default'}}, '📂 ' + projName), 
+          role !== 'admin' && el('div', {className: 'btn-sub', style: {cursor: 'default'}}, '本日: ' + usageStr + '回'), 
+          role !== 'admin' && el('button', {className: 'btn-sub', style: {color: '#f59e0b', borderColor: '#f59e0b'}, onClick: () => setShowInquiry(true)}, '💬 問合せ'), 
+          el('button', {className: 'btn-sub', onClick: () => setShowManual(true)}, '📖 マニュアル'), 
+          el('button', {className: 'btn-sub', style: {border: 'none', background: 'transparent'}, onClick: onLogout}, 'ログアウト')
         ),
         
-        e('div', {className: 'grid-bg'}), 
-        e('div', {className: 'badge-main', style: {marginTop: 50, marginBottom: 16}}, 'AI Content Pro v29'), 
-        e('h1', {className: 'main-title'}, 'AI Content', e('br'), e('span', null, 'Platform')), 
-        e('p', {className: 'main-subtitle'}, 'コンテンツ作成からSNS集客まで完全自動化'), 
+        el('div', {className: 'grid-bg'}), 
+        el('div', {className: 'badge-main', style: {marginTop: 60, marginBottom: 16}}, 'AI Content Pro v29'), 
+        el('h1', {className: 'main-title'}, 'AI Content', el('br'), el('span', null, 'Platform')), 
+        el('p', {className: 'main-subtitle'}, 'コンテンツ作成からSNS集客、ファン化まで', el('br'), 'すべてを完全無料で自動化する最強の指令塔'), 
         
-        role !== 'admin' && e('div', {className: 'flex-row', style: {justifyContent: 'center', marginBottom: 40}}, 
-          e('button', {className: 'btn-sub', onClick: () => setScreen('proj')}, '📂 プロジェクト切替'), 
-          e('button', {className: 'btn-sub', onClick: () => setScreen('brand')}, '👤 マイ・ブランド設定')
+        role !== 'admin' && el('div', {className: 'flex-row', style: {justifyContent: 'center', marginBottom: 50}}, 
+          el('button', {className: 'btn-sub', style: {padding: '12px 24px', fontSize: 14}, onClick: () => setScreen('projects')}, '📂 プロジェクト切替'), 
+          el('button', {className: 'btn-sub', style: {padding: '12px 24px', fontSize: 14}, onClick: () => setScreen('settings')}, '👤 マイ・ブランド ＆ AI設定')
         ),
         
-        e('div', {className: 'content-wrapper'}, 
-          CATS.map(c => 
-            e('div', {key: c.n, style: {marginBottom: 30}}, 
-              e('h2', {className: 'category-title'}, c.n), 
-              e('div', {className: 'tool-grid'}, 
-                c.t.map(tid => {
+        el('div', {className: 'content-wrapper'}, 
+          CATEGORIES.map(cat => 
+            el('div', {key: cat.name, style: {marginBottom: 40}}, 
+              el('h2', {className: 'category-title'}, cat.name), 
+              el('div', {className: 'tool-grid'}, 
+                cat.tools.map(tid => {
                   const t = TOOLS[tid];
                   const canAccess = DEF_UNLOCKED.includes(tid) || role === 'admin' || (uData.perms && uData.perms[tid]);
                   
-                  return e('div', {
+                  return el('div', {
                     key: tid, 
                     className: `tool-card ${canAccess ? '' : 'locked'}`, 
                     onClick: () => {
                       if (canAccess) setScreen(tid);
-                      else alert('🔒 この機能はロックされています。管理者にお問い合わせください。');
+                      else alert('🔒 この機能はロックされています。\n利用するには管理者への申請が必要です。');
                     }
                   }, 
-                    e('div', {className: 'badge-container'}, 
-                      !canAccess ? e('div', {className: 'badge-status locked'}, '🔒 ロック') : 
-                      (role === 'admin' || (uData.perms && uData.perms[tid])) ? e('div', {className: 'badge-status unlimited'}, '✨ 無制限') : 
-                      e('div', {className: 'badge-status free'}, '無料枠対象'), 
-                      t.b && e('div', {className: `badge-main ${t.b === '神機能' ? 'red' : ''}`, style: {margin: 0}}, t.b)
+                    el('div', {className: 'badge-row'}, 
+                      !canAccess ? el('div', {className: 'status-badge locked'}, '🔒 ロック') : 
+                      (role === 'admin' || (uData.perms && uData.perms[tid])) ? el('div', {className: 'status-badge unlimited'}, '✨ 無制限') : 
+                      el('div', {className: 'status-badge free'}, '無料枠対象'), 
+                      t.badge && el('div', {className: `badge-main ${t.badge === '神機能' ? 'red' : ''}`, style: {margin: 0}}, t.badge)
                     ), 
-                    e('div', {className: 'tc-icon'}, t.i), 
-                    e('div', {className: 'tc-name'}, t.n), 
-                    e('div', {className: 'tc-desc'}, t.d)
+                    el('div', {className: 'tool-icon'}, t.icon), 
+                    el('div', {className: 'tool-name'}, t.name), 
+                    el('div', {className: 'tool-desc'}, t.desc)
                   );
                 })
               )
@@ -1285,12 +1213,14 @@
       );
     };
 
-    // ── Root ──
+    /* =========================================================================
+       8. ルート管理 (安全なルーティングと認証監視)
+       ========================================================================= */
     const Root = () => {
       const [user, setUser] = useState(null);
       const [role, setRole] = useState(null);
       const [goAdmin, setGoAdmin] = useState(false);
-      const [showMan, setShowMan] = useState(false);
+      const [showManual, setShowManual] = useState(false);
 
       // 安全なセッション復元
       useEffect(() => {
@@ -1302,7 +1232,7 @@
               if (s.r === 'admin') {
                 setUser(s.u); setRole('admin'); setGoAdmin(true);
               } else {
-                const db = getDB();
+                const db = AppDB.get();
                 if (db.users[s.u]) {
                   setUser(s.u); setRole(db.users[s.u].status);
                 } else {
@@ -1323,47 +1253,47 @@
         try {
           const s = JSON.parse(localStorage.getItem(SESS_KEY) || '{}');
           if (s.u) {
-            const db = getDB();
+            const db = AppDB.get();
             if (db.users[s.u]) setRole(db.users[s.u].status);
           }
         } catch(e) {}
       };
 
       if (!user) {
-        return e(AuthScreen, {onLogin: (usr, rol) => {
+        return el(AuthScreen, {onLogin: (usr, rol) => {
           setUser(usr); setRole(rol); if (rol === 'admin') setGoAdmin(true);
         }});
       }
 
       if (role === 'admin' && goAdmin) {
-        return e(AdminDashboard, {onLogout: handleLogout, onGoApp: () => setGoAdmin(false)});
+        return el(AdminDashboard, {onLogout: handleLogout, onGoApp: () => setGoAdmin(false)});
       }
 
       if (role === 'pending' || role === 'rejected') {
-        return e('div', null, 
-          showMan && e(ManualModal, {onClose: () => setShowMan(false)}), 
-          e('div', {className: 'page-container'}, 
-            e('div', {className: 'grid-bg'}), 
-            e('div', {className: 'content-wrapper auth-container'}, 
-              e('h2', {style: {fontSize: 24, fontWeight: 900, marginBottom: 8}}, role === 'rejected' ? '🚫 拒否' : '⏳ 承認待ち'), 
-              e('p', {style: {color: 'rgba(255,255,255,0.6)', marginBottom: 20}}, role === 'rejected' ? '管理者に制限されています。' : '管理者の許可をお待ちください。'), 
-              e('button', {className: 'btn-sub', style: {width: '100%', marginBottom: 16, borderColor: '#38bdf8', color: '#38bdf8'}, onClick: () => setShowMan(true)}, '📖 承認待ちの間にマニュアルを読む'), 
-              e('button', {className: 'btn-primary', style: {marginBottom: 12}, onClick: checkStatus}, 'ステータス更新'), 
-              e('button', {className: 'btn-sub', style: {width: '100%'}, onClick: handleLogout}, 'ログアウト')
+        return el('div', null, 
+          showManual && el(ManualModal, {onClose: () => setShowManual(false)}), 
+          el('div', {className: 'page-container'}, 
+            el('div', {className: 'grid-bg'}), 
+            el('div', {className: 'content-wrapper auth-container', style: {marginTop: 60}}, 
+              el('h2', {style: {fontSize: 26, fontWeight: 900, marginBottom: 12}}, role === 'rejected' ? '🚫 拒否' : '⏳ 承認待ち'), 
+              el('p', {style: {color: 'rgba(255,255,255,0.6)', marginBottom: 24}}, role === 'rejected' ? '管理者に制限されています。' : '管理者の許可をお待ちください。'), 
+              el('button', {className: 'btn-sub', style: {width: '100%', marginBottom: 20, borderColor: '#38bdf8', color: '#38bdf8', padding: '14px'}, onClick: () => setShowManual(true)}, '📖 承認待ちの間にマニュアルを読む'), 
+              el('button', {className: 'btn-primary', style: {marginBottom: 16}, onClick: checkStatus}, 'ステータスを更新'), 
+              el('button', {className: 'btn-sub', style: {width: '100%'}, onClick: handleLogout}, 'ログアウト')
             )
           )
         );
       }
 
       if (role === 'approved' || (role === 'admin' && !goAdmin)) {
-        return e(MainApp, {user: user, role: role, onLogout: handleLogout, onGoAdmin: () => setGoAdmin(true)});
+        return el(MainDashboard, {user: user, role: role, onLogout: handleLogout, onGoAdmin: () => setGoAdmin(true)});
       }
 
       return null;
     };
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(e(Root, null));
+    root.render(el(Root, null));
 
   })();
   </script>
