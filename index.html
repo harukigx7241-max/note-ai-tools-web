@@ -58,32 +58,46 @@ a{text-decoration:none;color:inherit}
 .tabs{display:flex;overflow-x:auto;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:16px;gap:8px}
 .tab{background:transparent;border:none;color:rgba(255,255,255,.5);padding:8px 12px;cursor:pointer;font-weight:700;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
 .tab-on{color:#38bdf8;border-bottom-color:#38bdf8}
+.cpbtn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.ai-launcher-link { display:flex; align-items:center; justify-content:center; gap:6px; flex:1; padding:10px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:800; color:#fff; background:rgba(255,255,255,.1); transition:all 0.2s; white-space:nowrap;}
+.ai-launcher-link:hover { background:rgba(255,255,255,.2); transform:translateY(-2px);}
+.post-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;overflow:hidden;margin-bottom:12px}
+.post-hd{display:flex;justify-content:space-between;align-items:center;padding:10px 13px;border-bottom:1px solid rgba(255,255,255,.06)}
+.post-body{padding:12px 14px;max-height:400px;overflow-y:auto;font-size:13.5px;color:rgba(255,255,255,.85);white-space:pre-wrap;line-height:1.7}
 @media(max-width:560px){
   .main-ttl{font-size:28px}
   .tool-grid{grid-template-columns:1fr}
+  .admin-table th, .admin-table td { padding:8px 4px; font-size:11px; }
 }
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script>
+// ===================================================
+// JSXなし・純粋なReact.createElement で記述 (v25: クラッシュ完全修復版)
+// ===================================================
 (function(){
 'use strict';
 var h = React.createElement;
 var useState = React.useState, useEffect = React.useEffect;
 
 // ── データベースとシステム変数 ──
-var DB_KEY = 'AICP_v24_DB'; // Ver24でクリーンな環境に
-var SESS_KEY = 'AICP_v24_Sess';
+// v25に更新し、過去のバグデータを完全にリセットします
+var DB_KEY = 'AICP_v25_DB'; 
+var SESS_KEY = 'AICP_v25_Sess';
 var DAILY_LIMIT = 3;
 
+// DB初期化処理（管理者のデータ構造も完璧に作成）
 function getDB() {
   var d = localStorage.getItem(DB_KEY);
   if(d) return JSON.parse(d);
   return {
     admin: { p: 'admin123' },
-    users: {}, // { username: { status, sns, date, usage: {date, count}, perms: {toolId: true}, brand: {name, target, tone, plan}, projects: { id: {name, data} }, curProj: id } }
-    inquiries: [] // { id, user, type, content, date, status }
+    users: {
+      'admin': { status: 'approved', sns: '@admin', date: Date.now(), usage: {date:'', count:0}, perms: {}, brand: {plan:'paid'}, projects: {'default': {name:'管理者領域', data:{}}}, curProj: 'default' }
+    },
+    inquiries: []
   };
 }
 function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
@@ -91,10 +105,13 @@ function doCopy(t, cObj, setC, key){ if(navigator.clipboard && navigator.clipboa
 function parseJSON(t){ var c=t.replace(/```(?:json)?\n?/gi,'').replace(/```/g,'').trim(); var m=c.match(/\{[\s\S]*\}/); if(m) try{return JSON.parse(m[0]);}catch(e){} try{return JSON.parse(c);}catch(e){return null;} }
 function formatDate(ts) { var d = new Date(ts); return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+('0'+d.getMinutes()).slice(-2); }
 
-// ── 設定データ群 ──
-var THEMES = [ {id:'money',label:'💰 お金・節約'}, {id:'health',label:'💪 健康・ダイエット'}, {id:'career',label:'🚀 キャリア・副業'}, {id:'mindset',label:'🧠 マインドセット'}, {id:'relationship',label:'❤️ 人間関係・恋愛'}, {id:'productivity',label:'⚡ 生産性・習慣'}, {id:'parenting',label:'👶 育児・子育て'}, {id:'other',label:'📝 その他'} ];
-var TONES = [ {id:'story',label:'📖 体験談'}, {id:'howto',label:'📋 ハウツー'}, {id:'secret',label:'🔥 秘密・裏知識'}, {id:'contrast',label:'⚡ 比較・対比'}, {id:'warm',label:'💓 共感'}, {id:'custom',label:'✏️ カスタム'} ];
-var AGES = [ {id:'10s',label:'10代'},{id:'20s',label:'20代'},{id:'30s',label:'30代'}, {id:'40s',label:'40代'},{id:'50s',label:'50代以上'},{id:'all',label:'全年齢'} ];
+// ── 共通設定データ ──
+var SNS_PLATFORMS = [ {id:'both', label:'📱 X(単発) ＆ Threads (同時)'}, {id:'x_thread', label:'🧵 X (ツリー投稿)'}, {id:'x_single', label:'🐦 X (単発ポスト)'}, {id:'threads', label:'🌀 Threads (対話型)'} ];
+var SNS_TONES = [ {id:'value', label:'💡 ノウハウ共有 (有益・保存狙い)'}, {id:'story', label:'📖 ストーリー (共感・バズ狙い)'}, {id:'promo', label:'📣 直接宣伝 (クリック誘導優先)'} ];
+var IMG_TOOLS = [ {id:'chatgpt', label:'🟢 ChatGPT (DALL-E 3)'}, {id:'gemini', label:'🔵 Gemini (Nano Banana 2)'}, {id:'flux', label:'⚫ Grok / Flux.1'}, {id:'midjourney', label:'🎨 Midjourney (v6)'}, {id:'stablediffusion', label:'⚙️ Stable Diffusion 3'} ];
+var IMG_ASPECTS = [ {id:'16:9', label:'📺 16:9 (サムネイル)'}, {id:'1:1', label:'⬛ 1:1 (正方形)'}, {id:'3:1', label:'▭ 3:1 (ヘッダー)'}, {id:'9:16', label:'📱 9:16 (縦長)'} ];
+var IMG_LIGHTING = [ {id:'auto', label:'🤖 おまかせ'}, {id:'cinematic', label:'🎬 シネマティック'}, {id:'natural', label:'☀️ 自然光'}, {id:'neon', label:'🌃 サイバーパンク'}, {id:'studio', label:'📸 スタジオ照明'} ];
+var IMG_ANGLE = [ {id:'auto', label:'🤖 おまかせ'}, {id:'closeup', label:'👁️ クローズアップ'}, {id:'wide', label:'🌍 広角'}, {id:'bird', label:'🦅 俯瞰'}, {id:'low', label:'🐜 ローアングル'} ];
 var INQ_TYPES = ['機能追加の要望', '不具合・バグの報告', 'プロンプト修正依頼', 'その他のお問い合わせ'];
 
 var T_CATS = [
@@ -111,7 +128,7 @@ var TOOLS = {
     build: function(v,b) { return b+'「'+v.t1+'」について「'+v.t2+'」向けにnote有料記事を作成。\n価格/文字数:'+v.t3+'\n'+(v.chk?'最後に特典案内を含める\n':'')+'【厳守】前置きなしで以下のMarkdownのみ出力。\n---TITLES---\n1.タイトル案...\n---FREE_START---\n無料本文...\n---FREE_END---\n---PAID_START---\n有料本文...\n---PAID_END---'; }
   },
   research: { icon:'⚔️', name:'競合リサーチ', badge:'神機能', desc:'ライバルの弱点とブルーオーシャンを発見', 
-    tut:'【目的】売れているライバルの教材から「欠けている要素」を見つけます。\n【使い方】ライバルのセールス文や目次をコピペしてください。',
+    tut:'【目的】売れているライバルの教材から「欠けている要素」を見つけます。',
     fields: [ {id:'t1', t:'area', l:'ライバルの教材の目次・セールス文'}, {id:'t2', t:'input', l:'自分の強み(任意)'} ],
     build: function(v,b) { return b+'以下のライバル教材を分析し、弱点と私の強み「'+v.t2+'」を活かした勝てる商品コンセプトを3つ提案して。\n【ライバル情報】\n'+v.t1+'\n\n【ルール】前置きなしでJSON出力:\n{"concepts":[{"title":"コンセプト名","weakness":"ライバルの弱点","strategy":"勝つための戦略"}]}'; }
   },
@@ -137,8 +154,8 @@ var TOOLS = {
   },
   sns: { icon:'📱', name:'SNS集客ポスト生成', badge:'', desc:'X/Threadsでバズる投稿を作成', 
     tut:'【目的】記事やノウハウからSNSの投稿文を作ります。\n【コツ】モデリングにバズった他人の投稿を入れると型を真似てくれます。',
-    fields: [ {id:'t1', t:'select', l:'プラットフォーム', opts:['X(単発)','X(ツリー)','Threads','両方']}, {id:'t2', t:'area', l:'参考バズ投稿(モデリング) ※任意'}, {id:'t3', t:'area', l:'発信内容・元記事'} ],
-    build: function(v,b) { return b+'以下の内容で「'+v.t1+'」向けのSNS投稿を作成して。\n'+(v.t2?'【モデリング】以下の型を完全トレースすること:\n'+v.t2+'\n':'')+'【内容】\n'+v.t3+'\n\n【ルール】前置きなしでJSON出力:\n{"posts":["本文1..."]}'; }
+    fields: [ {id:'s1', t:'select', l:'プラットフォーム', opts:['X(単発)','X(ツリー)','Threads','両方']}, {id:'s2', t:'select', l:'目的', opts:['価値提供','ストーリー','宣伝']}, {id:'t2', t:'area', l:'参考バズ投稿(モデリング) ※任意'}, {id:'t1', t:'area', l:'発信内容・元記事'} ],
+    build: function(v,b) { return b+'以下の内容で「'+v.s1+'」向けの「'+v.s2+'」目的のSNS投稿を作成して。\n'+(v.t2?'【モデリング】以下の型を完全トレースすること:\n'+v.t2+'\n':'')+'【内容】\n'+v.t1+'\n\n【ルール】前置きなしでJSON出力:\n{"posts":["本文1..."]}'; }
   },
   video: { icon:'🎥', name:'ショート動画台本', badge:'', desc:'TikTok/Shorts用の台本生成', 
     tut:'【目的】60秒以内のショート動画の台本を作ります。',
@@ -183,7 +200,6 @@ function RenderJSON(obj) {
   return h('span',null, String(obj));
 }
 
-// ── AIプラン別プロンプトラッパー ──
 function wrapPrompt(plan, basePrompt) {
   var prefix = plan === 'paid' 
     ? '【システム設定: 有料版AIモード】\nあなたは高度な推論とWeb検索が可能な状態です。複雑な指示にも完璧に従い、最高品質の出力を行ってください。\n\n'
@@ -191,20 +207,34 @@ function wrapPrompt(plan, basePrompt) {
   return prefix + basePrompt;
 }
 
-// ── 魔法の共通ツールエンジン ──
+// ── マニュアルモーダル ──
+function ManualModal(p){
+  return h('div',{className:'modal-bg',onClick:p.onClose}, h('div',{className:'modal',onClick:function(e){e.stopPropagation();}}, h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16, borderBottom:'1px solid rgba(255,255,255,.1)', paddingBottom:10}}, h('span',{style:{fontWeight:900,fontSize:16, color:'#38bdf8'}},'📖 AI Content Pro マニュアル'), h('button',{onClick:p.onClose,style:{background:'none',border:'none',color:'rgba(255,255,255,.5)',fontSize:24,cursor:'pointer',lineHeight:1}},'×') ), h('div', {style:{fontSize:13, color:'rgba(255,255,255,.8)', lineHeight:1.7}}, h('p', {style:{marginBottom:12}}, '本ツールは、最新AIを操作するプロンプトジェネレーターです。'), h('div', {style:{background:'rgba(255,255,255,.05)', padding:'12px', borderRadius:8, marginBottom:12}}, h('p', {style:{fontWeight:800, color:'#fbbf24', marginBottom:6}}, '🚀 基本的な使い方 (3ステップ)'), h('ol', {style:{paddingLeft:20, margin:0}}, h('li', null, '各ツールの【⚙️ 条件設定】で設定を決め、プロンプトをコピー。'), h('li', null, 'ChatGPT等を開き、コピーした文章をそのまま送信。'), h('li', null, 'AIの回答をすべてコピーし、ツールの【📥 AI回答読込】に貼り付け！') ) ), h('div', {style:{background:'rgba(56,189,248,.05)', border:'1px solid rgba(56,189,248,.2)', padding:'12px', borderRadius:8, marginBottom:12}}, h('p', {style:{fontWeight:800, color:'#38bdf8', marginBottom:6}}, '🤖 AIは無料版・有料版どちらを使うべきか？'), h('p', {style:{marginBottom:6}}, '結論から言うと、本格的にマネタイズするなら',h('strong',{style:{color:'#f43f5e'}},'「有料版一択」'),'です。'), h('ul', {style:{paddingLeft:20, margin:0, fontSize:12}}, h('li',{style:{marginBottom:4}},h('strong',null,'無料版の弱点:'),' 長文を一度に出力しようとすると途中で切れる、複雑なJSONフォーマットをミスる、Web検索による最新情報の取得ができない等の問題があります。'), h('li',null,h('strong',null,'有料版の強み:'),' 「ChatGPT Plus」や「Claude Pro」であれば、一度に完璧な長文を出力し、Web検索を使って競合調査まで自動で行ってくれます。投資対効果は計り知れません。') ) ), h('p', {style:{fontSize:11, color:'rgba(255,255,255,.5)'}}, '※「👤 マイ・ブランド設定」で有料版を選択すると、AIの能力を限界まで引き出す専用プロンプトに自動で切り替わります。') ), h('button', {onClick:p.onClose, className:'btn-primary', style:{width:'100%', marginTop:16}}, '閉じる') ));
+}
+
+function WebLinks(p) {
+  return h('div', {style:{padding:'14px', background:'rgba(255,255,255,.03)', border:'1px solid rgba(56,189,248,.4)', borderRadius:'10px', marginBottom:16}}, h('p',{style:{fontSize:12, fontWeight:700, color:'#38bdf8', marginBottom:8}}, '以下のリンクからWeb版AIを開いてプロンプトを送信してください'), h('div',{style:{display:'flex', gap:'8px', flexWrap:'wrap', marginBottom:12}}, h('a', {href:'https://www.perplexity.ai/', target:'_blank', className:'ai-launcher-link'}, '🔍 Perplexity'), h('a', {href:'https://chatgpt.com/', target:'_blank', className:'ai-launcher-link'}, '🟢 ChatGPT'), h('a', {href:'https://claude.ai/', target:'_blank', className:'ai-launcher-link'}, '🟠 Claude') ), p.msg === false ? null : h('p',{style:{fontSize:11, color:'rgba(255,255,255,.5)', lineHeight:1.5}}, '回答が完了したら、出力された文章をすべてコピーして隣の「📥 AI回答読込」に貼り付けてください。') );
+}
+
+// ── 魔法の共通ツールエンジン (1画面完結型＆クラッシュ完全防止) ──
 function ToolEngine(props) {
   var tid = props.toolId; var tConf = TOOLS[tid];
-  var db = getDB(); var u = props.user; var uData = db.users[u];
-  var pid = uData.curProj; var pData = uData.projects[pid].data[tid] || {};
+  var db = getDB(); var u = props.user; 
+  var uData = db.users[u] || { curProj: 'default', projects: {'default': { data: {} }}, brand: {plan:'free'}, usage: {} };
+  var pid = uData.curProj || 'default';
+  var pData = (uData.projects[pid] && uData.projects[pid].data[tid]) ? uData.projects[pid].data[tid] : {};
   
   var [tab, setTab] = useState('settings');
   var [vals, setVals] = useState(pData);
   var [c, setC] = useState({}); var [links, setLinks] = useState(false);
   var [imp, setImp] = useState(''); var [res, setRes] = useState(null); var [err, setErr] = useState('');
 
+  // 保存処理 (管理者以外のみ保存)
   function updateVal(fid, val) {
     var n = Object.assign({}, vals); n[fid] = val; setVals(n);
-    var ndb = getDB(); ndb.users[u].projects[pid].data[tid] = n; saveDB(ndb);
+    if(props.role !== 'admin') {
+      var ndb = getDB(); ndb.users[u].projects[pid].data[tid] = n; saveDB(ndb);
+    }
   }
 
   function checkAuth() {
@@ -217,19 +247,23 @@ function ToolEngine(props) {
 
   function handleGen() {
     if(!checkAuth()) { alert('本日の無料枠('+DAILY_LIMIT+'回)を終了しました。\n無制限利用は管理者にお問い合わせください。'); return; }
+    
+    // 利用回数消費
     if(props.role !== 'admin' && !(uData.perms && uData.perms[tid])) {
       var ndb = getDB(); var today = new Date().toDateString();
       if(ndb.users[u].usage.date !== today) ndb.users[u].usage = {date:today, count:0};
       ndb.users[u].usage.count++; saveDB(ndb);
     }
-    var brandStr = ''; var plan = uData.brand.plan || 'free';
+
+    var brandStr = ''; var plan = (uData.brand && uData.brand.plan) ? uData.brand.plan : 'free';
     if(uData.brand && uData.brand.name) {
       brandStr = '【発信者情報(文体に反映)】名前:'+uData.brand.name+' ターゲット:'+(uData.brand.target||'')+' 文体:'+(uData.brand.tone||'')+'\n\n';
     }
     var rawPrompt = tConf.build(vals, brandStr);
     var finalPrompt = wrapPrompt(plan, rawPrompt);
     
-    doCopy(finalPrompt, c, setC, 'gen'); setLinks(true); setTab('settings'); // タブ遷移させない
+    doCopy(finalPrompt, c, setC, 'gen'); setLinks(true); 
+    if(!tConf.noJson && tid !== 'note') setTab('import'); // note以外はインポートタブへ誘導
   }
 
   function handleImp() {
@@ -243,14 +277,14 @@ function ToolEngine(props) {
     return h('div', {className:'z1'},
       h('div',{className:'app-hd', style:{marginBottom:0}}, h('div',{className:'app-hd-l'}, h('button',{className:'back-btn',onClick:props.onBack},'← 戻る'), h('h1',{className:'app-ttl'},tConf.name))),
       h('div',{className:'tut-panel', style:{marginTop:16}}, h('p',{className:'tut-title'},'💡 このツールの使い方'), h('p',{className:'tut-body'},tConf.tut)),
-      tConf.fields.map(function(f){ return h(UI_Field, {key:f.id, f:f, v:vals[f.id]||(f.t==='check'?false:''), onChange:function(v){updateVal(f.id,v)}}) }),
+      tConf.fields.map(function(f){ return h(UI_Field, {key:f.id, f:f, v:vals[f.id]||(f.t==='check'?false:f.opts?f.opts[0]:''), onChange:function(v){updateVal(f.id,v)}}) }),
       h('button',{className:'btn-primary',onClick:handleGen, style:{marginTop:10, marginBottom:16}}, c['gen']?'✓ プロンプトコピー完了':'📋 プロンプトを生成してコピー'),
-      links ? h('div', {style:{padding:'14px', background:'rgba(255,255,255,.03)', border:'1px solid rgba(56,189,248,.4)', borderRadius:'10px', marginBottom:16}}, h('p',{style:{fontSize:12, fontWeight:700, color:'#38bdf8', marginBottom:8}}, '以下のリンクからWeb版AIを開いてプロンプトを送信してください'), h('div',{style:{display:'flex', gap:'8px', flexWrap:'wrap', marginBottom:12}}, h('a', {href:'https://www.perplexity.ai/', target:'_blank', className:'btn-sub'}, '🔍 Perplexity'), h('a', {href:'https://chatgpt.com/', target:'_blank', className:'btn-sub'}, '🟢 ChatGPT'), h('a', {href:'https://claude.ai/', target:'_blank', className:'btn-sub'}, '🟠 Claude') ), h('p',{style:{fontSize:11, color:'rgba(255,255,255,.5)', lineHeight:1.5}}, '回答が完了したら、出力された文章をすべてコピーして下に貼り付けてください。')) : null,
-      h('div',{className:'card'}, h('span',{className:'lbl'},'📥 AIの回答を貼り付け'), h('textarea',{className:'inp',style:{minHeight:200},value:res||'',onChange:function(e){setRes(e.target.value)}}), h('button',{className:'btn-sub',style:{marginTop:10,width:'100%'},onClick:function(){doCopy(res||'',c,setC,'cpAll');}},c['cpAll']?'✓':'📋 全文コピー') )
+      links ? h(WebLinks, {msg:false}) : null,
+      h(Card, {label:'📥 AIの回答を貼り付け'}, h('textarea',{className:'inp',style:{minHeight:200},value:res||'',onChange:function(e){setRes(e.target.value)}}), h('button',{className:'btn-sub',style:{marginTop:10,width:'100%'},onClick:function(){doCopy(res||'',c,setC,'cpAll');}},c['cpAll']?'✓':'📋 全文コピー') )
     );
   }
 
-  // 通常ツールのUI (タブ式だがスクロール可能)
+  // 通常ツールのUI (タブ式)
   var tDefs = [['settings','⚙️ 設定',false], ['import','📥 読込',false], ['preview','👁 結果',!res]];
   return h('div', {className:'z1'},
     h('div',{className:'app-hd'}, h('div',{className:'app-hd-l'}, h('button',{className:'back-btn',onClick:props.onBack},'← 戻る'), h('h1',{className:'app-ttl'},tConf.name))),
@@ -258,11 +292,11 @@ function ToolEngine(props) {
     h('div', {style:{marginTop:16}},
       tab==='settings' ? h('div', null,
         h('div',{className:'tut-panel'}, h('p',{className:'tut-title'},'💡 使い方'), h('p',{className:'tut-body'},tConf.tut)),
-        tConf.fields.map(function(f){ return h(UI_Field, {key:f.id, f:f, v:vals[f.id]||(f.t==='check'?false:''), onChange:function(v){updateVal(f.id,v)}}) }),
+        tConf.fields.map(function(f){ return h(UI_Field, {key:f.id, f:f, v:vals[f.id]||(f.t==='check'?false:f.opts?f.opts[0]:''), onChange:function(v){updateVal(f.id,v)}}) }),
         h('button',{className:'btn-primary',onClick:handleGen, style:{marginTop:10, marginBottom:16}}, c['gen']?'✓ プロンプトコピー完了':'📋 プロンプト生成'),
-        links ? h('div', {style:{padding:'14px', background:'rgba(255,255,255,.03)', border:'1px solid rgba(56,189,248,.4)', borderRadius:'10px', marginBottom:16}}, h('p',{style:{fontSize:12, fontWeight:700, color:'#38bdf8', marginBottom:8}}, '以下のリンクからWeb版AIを開いてプロンプトを送信してください'), h('div',{style:{display:'flex', gap:'8px', flexWrap:'wrap', marginBottom:12}}, h('a', {href:'https://www.perplexity.ai/', target:'_blank', className:'btn-sub'}, '🔍 Perplexity'), h('a', {href:'https://chatgpt.com/', target:'_blank', className:'btn-sub'}, '🟢 ChatGPT'), h('a', {href:'https://claude.ai/', target:'_blank', className:'btn-sub'}, '🟠 Claude') ), !tConf.noJson?h('p',{style:{fontSize:11, color:'rgba(255,255,255,.5)', lineHeight:1.5}}, '回答が完了したら、出力された文章をすべてコピーして「📥 読込」タブに貼り付けてください。'):null) : null
+        links ? h(WebLinks, {msg:!tConf.noJson}) : null
       ) : null,
-      tab==='import' ? h('div', null, h('div',{className:'card'}, h('span',{className:'lbl'},'📥 AIの出力を貼り付け'), h('textarea', {className:'inp', style:{minHeight:150}, value:imp, onChange:function(e){setImp(e.target.value);}}), err?h('div',{className:'err',style:{marginTop:10}},'❌ '+err):null, h('button', {className:'btn-primary', disabled:!imp.trim(), style:{marginTop:10}, onClick:handleImp}, '反映して結果を見る') ) ) : null,
+      tab==='import' ? h('div', null, h(Card, {label:'📥 AIの出力を貼り付け'}, h('textarea', {className:'inp', style:{minHeight:150}, value:imp, onChange:function(e){setImp(e.target.value);}}), err?h('div',{className:'err',style:{marginTop:10}},'❌ '+err):null, h('button', {className:'btn-primary', disabled:!imp.trim(), style:{marginTop:10}, onClick:handleImp}, '反映して結果を見る') ) ) : null,
       tab==='preview' && res ? h('div',null, h('div',{style:{background:'rgba(255,255,255,.03)',padding:16,borderRadius:12}}, RenderJSON(res))) : null
     )
   );
@@ -270,25 +304,25 @@ function ToolEngine(props) {
 
 // ── ユーザー設定・プロジェクト ──
 function BrandSettings(props) {
-  var db = getDB(); var b = db.users[props.user].brand || {};
+  var db = getDB(); var b = (db.users[props.user] || {}).brand || {};
   var [name, setName] = useState(b.name||''); var [target, setTarget] = useState(b.target||''); var [tone, setTone] = useState(b.tone||''); var [plan, setPlan] = useState(b.plan||'free');
-  function save() { var ndb=getDB(); ndb.users[props.user].brand={name:name,target:target,tone:tone,plan:plan}; saveDB(ndb); alert('保存しました'); props.onBack(); }
+  function save() { if(props.user!=='admin') { var ndb=getDB(); ndb.users[props.user].brand={name:name,target:target,tone:tone,plan:plan}; saveDB(ndb); } alert('保存しました'); props.onBack(); }
   return h('div',{className:'z1'}, h('div',{className:'app-hd'}, h('div',{className:'app-hd-l'}, h('button',{className:'back-btn',onClick:props.onBack},'← 戻る'), h('h1',{className:'app-ttl'},'👤 マイ・ブランド ＆ AI設定'))), h('div',{className:'tut-panel'}, h('p',{className:'tut-body'},'ここで登録した情報は、全ツールのプロンプトに自動で埋め込まれます。また、使用しているAIのプランに合わせてプロンプトが最適化されます。')), h('div',{className:'card'}, h('span',{className:'lbl'},'🤖 使用しているAIプラン'), h('select',{className:'inp',value:plan,onChange:function(e){setPlan(e.target.value)}}, h('option',{value:'free'},'無料版 (ChatGPT Free / Claude Sonnet等)'), h('option',{value:'paid'},'有料版 (ChatGPT Plus / Claude Pro等)'))), h('div',{className:'card'}, h('span',{className:'lbl'},'発信者名・肩書き'),h('input',{className:'inp',value:name,onChange:function(e){setName(e.target.value)}})), h('div',{className:'card'}, h('span',{className:'lbl'},'メインのターゲット層'),h('input',{className:'inp',value:target,onChange:function(e){setTarget(e.target.value)}})), h('div',{className:'card'}, h('span',{className:'lbl'},'文体のクセ・ルール (例:絵文字多め)'},h('textarea',{className:'inp',style:{minHeight:80},value:tone,onChange:function(e){setTone(e.target.value)}})), h('button',{className:'btn-primary',onClick:save},'保存する') );
 }
 
 function ProjectManager(props) {
-  var [db, setDb] = useState(getDB()); var uData = db.users[props.user]; var [newP, setNewP] = useState('');
-  function create() { if(!newP.trim()) return; var id='p_'+Date.now(); var ndb=getDB(); ndb.users[props.user].projects[id]={name:newP,data:{}}; ndb.users[props.user].curProj=id; saveDB(ndb); setDb(ndb); setNewP(''); }
-  function switchP(id) { var ndb=getDB(); ndb.users[props.user].curProj=id; saveDB(ndb); setDb(ndb); props.onBack(); }
-  return h('div',{className:'z1'}, h('div',{className:'app-hd'}, h('div',{className:'app-hd-l'}, h('button',{className:'back-btn',onClick:props.onBack},'← 戻る'), h('h1',{className:'app-ttl'},'📁 プロジェクト管理'))), h('div',{className:'tut-panel'}, h('p',{className:'tut-body'},'案件ごとにデータを分けて保存できます。')), h('div',{className:'flex-row',style:{marginBottom:20}}, h('input',{className:'inp flex-1',placeholder:'新プロジェクト名',value:newP,onChange:function(e){setNewP(e.target.value)}}), h('button',{className:'btn-primary',style:{width:'auto'},onClick:create},'作成')), Object.keys(uData.projects).map(function(k){ var p=uData.projects[k]; var isCur=k===uData.curProj; return h('div',{key:k,className:'card',style:{display:'flex',justifyContent:'space-between',alignItems:'center',borderColor:isCur?'#38bdf8':'rgba(255,255,255,.08)'}}, h('span',{style:{fontWeight:700,color:isCur?'#38bdf8':'#fff'}},p.name+(isCur?' (選択中)':'')), !isCur?h('button',{className:'btn-sub',onClick:function(){switchP(k)}},'切り替え'):null ); }) );
+  var [db, setDb] = useState(getDB()); var uData = db.users[props.user] || { projects: {'default': {name:'管理者用'}}, curProj:'default' }; var [newP, setNewP] = useState('');
+  function create() { if(!newP.trim() || props.user==='admin') return; var id='p_'+Date.now(); var ndb=getDB(); ndb.users[props.user].projects[id]={name:newP,data:{}}; ndb.users[props.user].curProj=id; saveDB(ndb); setDb(ndb); setNewP(''); }
+  function switchP(id) { if(props.user==='admin') return; var ndb=getDB(); ndb.users[props.user].curProj=id; saveDB(ndb); setDb(ndb); props.onBack(); }
+  return h('div',{className:'z1'}, h('div',{className:'app-hd'}, h('div',{className:'app-hd-l'}, h('button',{className:'back-btn',onClick:props.onBack},'← 戻る'), h('h1',{className:'app-ttl'},'📁 プロジェクト管理'))), h('div',{className:'tut-panel'}, h('p',{className:'tut-body'},'案件ごとにデータを分けて保存できます。')), h('div',{className:'flex-row',style:{marginBottom:20}}, h('input',{className:'inp flex-1',placeholder:'新プロジェクト名',value:newP,onChange:function(e){setNewP(e.target.value)}}), h('button',{className:'btn-primary',style:{width:'auto'},onClick:create,disabled:props.user==='admin'},'作成')), Object.keys(uData.projects).map(function(k){ var p=uData.projects[k]; var isCur=k===uData.curProj; return h('div',{key:k,className:'card',style:{display:'flex',justifyContent:'space-between',alignItems:'center',borderColor:isCur?'#38bdf8':'rgba(255,255,255,.08)'}}, h('span',{style:{fontWeight:700,color:isCur?'#38bdf8':'#fff'}},p.name+(isCur?' (選択中)':'')), !isCur?h('button',{className:'btn-sub',onClick:function(){switchP(k)}},'切り替え'):null ); }) );
 }
 
 // ── 問い合わせシステム ──
 function InquiryModal(props) {
   var [type, setType] = useState(INQ_TYPES[0]); var [content, setContent] = useState(''); var [sent, setSent] = useState(false);
   function send() {
-    if(!content.trim()) return;
-    var ndb = getDB();
+    if(!content.trim()) return; var ndb = getDB();
+    if(!ndb.inquiries) ndb.inquiries = [];
     ndb.inquiries.push({ id: Date.now(), user: props.user, type: type, content: content, date: Date.now(), status: 'unread' });
     saveDB(ndb); setSent(true); setTimeout(props.onClose, 2000);
   }
@@ -312,39 +346,34 @@ function AuthScreen(props) {
       saveDB(db); localStorage.setItem(SESS_KEY, JSON.stringify({u:u, r:'pending'})); props.onLogin(u, 'pending');
     }
   }
-  return h('div', {className:'pg'}, h('div',{className:'grid-bg'}), h('div', {className:'z1 auth-box'}, h('h2', {style:{marginBottom:4}}, 'AI Content Pro'), h('p', {style:{marginBottom:16,color:'#38bdf8',fontWeight:700}}, 'SaaS Edition v24'), h('div', {style:{display:'flex', gap:10, marginBottom:20, background:'rgba(0,0,0,.3)', padding:4, borderRadius:8}}, h('button', {onClick:function(){setIsLogin(true);setErr('');}, style:{flex:1, padding:'8px', borderRadius:6, border:'none', background:isLogin?'#38bdf8':'transparent', color:isLogin?'#fff':'rgba(255,255,255,.5)', fontWeight:700}}, 'ログイン'), h('button', {onClick:function(){setIsLogin(false);setErr('');}, style:{flex:1, padding:'8px', borderRadius:6, border:'none', background:!isLogin?'#38bdf8':'transparent', color:!isLogin?'#fff':'rgba(255,255,255,.5)', fontWeight:700}}, '新規申請') ), h('input', {className:'inp', style:{marginBottom:12}, placeholder:'ユーザー名 (adminで管理者)', value:un, onChange:function(e){setUn(e.target.value);}}), (!isLogin && un!=='admin') ? h('input', {className:'inp', style:{marginBottom:12}, placeholder:'SNSアカウント (@必須)', value:sns, onChange:function(e){setSns(e.target.value);}}) : null, un==='admin' ? h('input', {className:'inp', style:{marginBottom:12}, type:'password', placeholder:'管理者パスワード', value:pw, onChange:function(e){setPw(e.target.value);}}) : null, err ? h('div', {className:'err'}, err) : null, h('button', {className:'btn-primary', style:{marginTop:10}, onClick:handleSubmit}, isLogin?'ログイン':'申請して待機画面へ') ));
+  return h('div', {className:'pg'}, h('div',{className:'grid-bg'}), h('div', {className:'z1 auth-box'}, h('h2', {style:{marginBottom:4}}, 'AI Content Pro'), h('p', {style:{marginBottom:16,color:'#38bdf8',fontWeight:700}}, 'SaaS Edition v25'), h('div', {style:{display:'flex', gap:10, marginBottom:20, background:'rgba(0,0,0,.3)', padding:4, borderRadius:8}}, h('button', {onClick:function(){setIsLogin(true);setErr('');}, style:{flex:1, padding:'8px', borderRadius:6, border:'none', background:isLogin?'#38bdf8':'transparent', color:isLogin?'#fff':'rgba(255,255,255,.5)', fontWeight:700}}, 'ログイン'), h('button', {onClick:function(){setIsLogin(false);setErr('');}, style:{flex:1, padding:'8px', borderRadius:6, border:'none', background:!isLogin?'#38bdf8':'transparent', color:!isLogin?'#fff':'rgba(255,255,255,.5)', fontWeight:700}}, '新規申請') ), h('input', {className:'inp', style:{marginBottom:12}, placeholder:'ユーザー名 (adminで管理者)', value:un, onChange:function(e){setUn(e.target.value);}}), (!isLogin && un!=='admin') ? h('input', {className:'inp', style:{marginBottom:12}, placeholder:'SNSアカウント (@必須)', value:sns, onChange:function(e){setSns(e.target.value);}}) : null, un==='admin' ? h('input', {className:'inp', style:{marginBottom:12}, type:'password', placeholder:'管理者パスワード', value:pw, onChange:function(e){setPw(e.target.value);}}) : null, err ? h('div', {className:'err'}, err) : null, h('button', {className:'btn-primary', style:{marginTop:10}, onClick:handleSubmit}, isLogin?'ログイン':'申請して待機画面へ') ));
 }
 
-function PendingScreen(p) { return h('div', {className:'pg'}, h('div',{className:'grid-bg'}), h('div', {className:'z1 auth-box'}, h('h2', null, p.rejected?'🚫 アクセス拒否':'⏳ 承認待ち'), h('p', null, p.rejected?'管理者に制限されています。':'管理者の許可をお待ちください。'), h('div',{style:{background:'rgba(245,158,11,.1)',border:'1px solid rgba(245,158,11,.3)',padding:12,borderRadius:8,marginBottom:16}}, h('p',{style:{color:'#f59e0b',fontWeight:800,fontSize:13,marginBottom:4}},'⚠️ 承認前に必ずマニュアルをご確認ください。'), h('button',{className:'btn-sub',style:{width:'100%'},onClick:p.onOpenManual},'📖 マニュアルを読む')), h('button', {className:'btn-primary', style:{marginBottom:12}, onClick:p.onCheck}, 'ステータス更新'), h('button', {className:'btn-sub', style:{width:'100%'}, onClick:p.onLogout}, 'ログアウト') )); }
+function PendingScreen(p) { return h('div', {className:'pg'}, h('div',{className:'grid-bg'}), h('div', {className:'z1 auth-box'}, h('h2', null, p.rejected?'🚫 アクセス拒否':'⏳ 承認待ち'), h('p', null, p.rejected?'管理者に制限されています。':'管理者の許可をお待ちください。'), h('button',{className:'btn-sub',style:{width:'100%',marginBottom:16,borderColor:'#38bdf8',color:'#38bdf8'},onClick:p.onOpenManual},'📖 承認待ちの間にマニュアルを読む'), h('button', {className:'btn-primary', style:{marginBottom:12}, onClick:p.onCheck}, 'ステータス更新'), h('button', {className:'btn-sub', style:{width:'100%'}, onClick:p.onLogout}, 'ログアウト') )); }
 
 function AdminDashboard(props) {
   var [db, setDb] = useState(getDB()); var [tab, setTab] = useState('users'); var [exp, setExp] = useState(null);
   function upSt(u, st) { var ndb=getDB(); ndb.users[u].status=st; saveDB(ndb); setDb(ndb); }
   function togglePerm(u, tid) { var ndb=getDB(); if(!ndb.users[u].perms) ndb.users[u].perms={}; ndb.users[u].perms[tid] = !ndb.users[u].perms[tid]; saveDB(ndb); setDb(ndb); }
   function markRead(id) { var ndb=getDB(); var inq=ndb.inquiries.find(function(i){return i.id===id;}); if(inq) { inq.status='read'; saveDB(ndb); setDb(ndb); } }
-  var uKeys = Object.keys(db.users); var inqs = db.inquiries || [];
-  return h('div', {className:'pg'}, h('div',{className:'grid-bg'}), h('div', {className:'z1'}, h('div', {className:'app-hd'}, h('h1',{className:'app-ttl'},'🎛️ 管理者ダッシュボード'), h('div',{style:{display:'flex',gap:10}}, h('button',{className:'btn-primary', style:{padding:'6px 12px', fontSize:12}, onClick:props.onGoApp},'🚀 ツールへ'), h('button',{className:'back-btn',onClick:props.onLogout},'ログアウト') ) ), h('div',{className:'tabs'}, h('button',{className:'tab'+(tab==='users'?' tab-on':''),onClick:function(){setTab('users')}},'👥 ユーザー管理'), h('button',{className:'tab'+(tab==='inq'?' tab-on':''),onClick:function(){setTab('inq')}},'📩 問い合わせ ('+inqs.filter(function(i){return i.status==='unread'}).length+')') ), h('div', {className:'card', style:{overflowX:'auto', padding:'10px'}}, tab==='users' ? h('table', {className:'admin-table'}, h('thead', null, h('tr', null, h('th',null,'ユーザー'), h('th',null,'ステータス'), h('th',null,'権限/操作'))), h('tbody', null, uKeys.sort(function(a,b){return db.users[b].date-db.users[a].date;}).map(function(k){ var u = db.users[k]; var isExp=exp===k; return h(React.Fragment, {key:k}, h('tr', null, h('td', null, h('div',{style:{fontWeight:700}},k), h('div',{style:{fontSize:11,color:'#38bdf8'}},u.sns)), h('td', {style:{color:u.status==='approved'?'#4ade80':'#f87171'}}, u.status), h('td', null, u.status!=='approved'?h('button',{className:'btn-sub',style:{background:'#16a34a',color:'#fff',marginRight:6},onClick:function(){upSt(k,'approved')}},'許可'):null, u.status==='approved'?h('button',{className:'btn-sub',style:{marginRight:6},onClick:function(){setExp(isExp?null:k)}},'🔑権限'):null, u.status!=='rejected'?h('button',{className:'btn-sub',style:{background:'#e11d48',color:'#fff'},onClick:function(){upSt(k,'rejected')}},'Ban'):null ) ), isExp?h('tr',null, h('td',{colSpan:3,style:{background:'rgba(0,0,0,.3)'}}, h('p',{style:{fontSize:11,color:'#fbbf24',marginBottom:6}},'チェックしたツールは無制限利用可能になります'), h('div',{className:'flex-row'}, Object.keys(TOOLS).map(function(tid){ return h('label',{key:tid,style:{fontSize:11,display:'flex',alignItems:'center',gap:4}}, h('input',{type:'checkbox',checked:!!(u.perms&&u.perms[tid]),onChange:function(){togglePerm(k,tid)}}),TOOLS[tid].name) }) ) )):null ); }))) : h('div',null, inqs.sort(function(a,b){return b.date-a.date}).map(function(iq){ return h('div',{key:iq.id, style:{background:'rgba(255,255,255,.05)',padding:12,borderRadius:8,marginBottom:10, borderLeft:iq.status==='unread'?'3px solid #f59e0b':''}}, h('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:8}}, h('div',null,h('span',{style:{fontWeight:800,color:'#38bdf8',marginRight:10}},iq.user), h('span',{style:{fontSize:11,background:'rgba(255,255,255,.1)',padding:'2px 6px',borderRadius:4}},iq.type)), h('span',{style:{fontSize:11,color:'rgba(255,255,255,.4)'}},formatDate(iq.date))), h('p',{style:{fontSize:13,whiteSpace:'pre-wrap'}},iq.content), iq.status==='unread'?h('button',{className:'btn-sub',style:{marginTop:10,fontSize:11,padding:'4px 8px'},onClick:function(){markRead(iq.id)}},'既読にする'):null ); }) ) ) ) );
-}
-
-// ── マニュアル (AI推奨含む) ──
-function ManualModal2(p){
-  return h('div',{className:'modal-bg',onClick:p.onClose}, h('div',{className:'modal',onClick:function(e){e.stopPropagation();}}, h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16, borderBottom:'1px solid rgba(255,255,255,.1)', paddingBottom:10}}, h('span',{style:{fontWeight:900,fontSize:16, color:'#38bdf8'}},'📖 AI Content Pro マニュアル'), h('button',{onClick:p.onClose,style:{background:'none',border:'none',color:'rgba(255,255,255,.5)',fontSize:24,cursor:'pointer',lineHeight:1}},'×') ), h('div', {style:{fontSize:13, color:'rgba(255,255,255,.8)', lineHeight:1.7}}, h('p', {style:{marginBottom:12}}, '本ツールは、最新AIを操作するプロンプトジェネレーターです。'), h('div', {style:{background:'rgba(255,255,255,.05)', padding:'12px', borderRadius:8, marginBottom:12}}, h('p', {style:{fontWeight:800, color:'#fbbf24', marginBottom:6}}, '🚀 基本的な使い方 (3ステップ)'), h('ol', {style:{paddingLeft:20, margin:0}}, h('li', null, '各ツールの【⚙️ 条件設定】で設定を決め、プロンプトをコピー。'), h('li', null, 'ChatGPT等を開き、コピーした文章をそのまま送信。'), h('li', null, 'AIの回答をすべてコピーし、ツールの【📥 AI回答読込】に貼り付け！') ) ), h('div', {style:{background:'rgba(56,189,248,.05)', border:'1px solid rgba(56,189,248,.2)', padding:'12px', borderRadius:8, marginBottom:12}}, h('p', {style:{fontWeight:800, color:'#38bdf8', marginBottom:6}}, '🤖 AIは無料版・有料版どちらを使うべきか？'), h('p', {style:{marginBottom:6}}, '結論から言うと、本格的にマネタイズするなら',h('strong',{style:{color:'#f43f5e'}},'「有料版一択」'),'です。'), h('ul', {style:{paddingLeft:20, margin:0, fontSize:12}}, h('li',{style:{marginBottom:4}},h('strong',null,'無料版の弱点:'),' 長文を一度に出力しようとすると途中で切れる、複雑なJSONフォーマットをミスる、Web検索による最新情報の取得ができない等の問題があります。'), h('li',null,h('strong',null,'有料版の強み:'),' 「ChatGPT Plus」や「Claude Pro」であれば、一度に完璧な長文を出力し、Web検索を使って競合調査まで自動で行ってくれます。投資対効果は計り知れません。') ) ), h('p', {style:{fontSize:11, color:'rgba(255,255,255,.5)'}}, '※「👤 マイ・ブランド設定」で有料版を選択すると、AIの能力を限界まで引き出す専用プロンプトに切り替わります。') ), h('button', {onClick:p.onClose, className:'btn-primary', style:{width:'100%', marginTop:16}}, '理解してツールを使う') ));
+  var uKeys = Object.keys(db.users).filter(function(k){return k!=='admin'}); var inqs = db.inquiries || [];
+  return h('div', {className:'pg'}, h('div',{className:'grid-bg'}), h('div', {className:'z1'}, h('div', {className:'app-hd'}, h('h1',{className:'app-ttl'},'🎛️ 管理者ダッシュボード'), h('div',{style:{display:'flex',gap:10}}, h('button',{className:'btn-primary', style:{padding:'6px 12px', fontSize:12, background:'linear-gradient(135deg,#f59e0b,#d97706)'}, onClick:props.onGoApp},'🚀 ツールへ'), h('button',{className:'back-btn',onClick:props.onLogout},'ログアウト') ) ), h('div',{className:'tabs'}, h('button',{className:'tab'+(tab==='users'?' tab-on':''),onClick:function(){setTab('users')}},'👥 ユーザー管理'), h('button',{className:'tab'+(tab==='inq'?' tab-on':''),onClick:function(){setTab('inq')}},'📩 問い合わせ ('+inqs.filter(function(i){return i.status==='unread'}).length+')') ), h('div', {className:'card', style:{overflowX:'auto', padding:'10px'}}, tab==='users' ? h('table', {className:'admin-table'}, h('thead', null, h('tr', null, h('th',null,'ユーザー'), h('th',null,'SNS'), h('th',null,'ステータス'), h('th',null,'操作'))), h('tbody', null, uKeys.sort(function(a,b){return db.users[b].date-db.users[a].date;}).map(function(k){ var u = db.users[k]; var isExp=exp===k; return h(React.Fragment, {key:k}, h('tr', null, h('td', null, h('div',{style:{fontWeight:700}},k)), h('td', {style:{color:'#38bdf8'}}, u.sns), h('td', {style:{color:u.status==='approved'?'#4ade80':'#f87171'}}, u.status), h('td', null, u.status!=='approved'?h('button',{className:'btn-sub',style:{background:'#16a34a',color:'#fff',marginRight:6},onClick:function(){upSt(k,'approved')}},'許可'):null, u.status==='approved'?h('button',{className:'btn-sub',style:{marginRight:6},onClick:function(){setExp(isExp?null:k)}},'🔑権限'):null, u.status!=='rejected'?h('button',{className:'btn-sub',style:{background:'#e11d48',color:'#fff'},onClick:function(){upSt(k,'rejected')}},'Ban'):null ) ), isExp?h('tr',null, h('td',{colSpan:4,style:{background:'rgba(0,0,0,.3)'}}, h('p',{style:{fontSize:11,color:'#fbbf24',marginBottom:6}},'チェックしたツールは無制限利用可能になります'), h('div',{className:'flex-row'}, Object.keys(TOOLS).map(function(tid){ return h('label',{key:tid,style:{fontSize:11,display:'flex',alignItems:'center',gap:4}}, h('input',{type:'checkbox',checked:!!(u.perms&&u.perms[tid]),onChange:function(){togglePerm(k,tid)}}),TOOLS[tid].name) }) ) )):null ); }))) : h('div',null, inqs.sort(function(a,b){return b.date-a.date}).map(function(iq){ return h('div',{key:iq.id, style:{background:'rgba(255,255,255,.05)',padding:12,borderRadius:8,marginBottom:10, borderLeft:iq.status==='unread'?'3px solid #f59e0b':''}}, h('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:8}}, h('div',null,h('span',{style:{fontWeight:800,color:'#38bdf8',marginRight:10}},iq.user), h('span',{style:{fontSize:11,background:'rgba(255,255,255,.1)',padding:'2px 6px',borderRadius:4}},iq.type)), h('span',{style:{fontSize:11,color:'rgba(255,255,255,.4)'}},formatDate(iq.date))), h('p',{style:{fontSize:13,whiteSpace:'pre-wrap'}},iq.content), iq.status==='unread'?h('button',{className:'btn-sub',style:{marginTop:10,fontSize:11,padding:'4px 8px'},onClick:function(){markRead(iq.id)}},'既読にする'):null ); }) ) ) ) );
 }
 
 // ── メインダッシュボード ──
 function MainApp(props){
   var [screen, setScreen] = useState('landing'); var [man, setMan] = useState(false); var [inq, setInq] = useState(false);
-  var db = getDB(); var uData = props.role==='admin' ? null : db.users[props.user];
+  var db = getDB(); var uData = db.users[props.user] || { curProj: 'default', projects: {'default': {name:'管理者領域'}}, usage: {date:'', count:0} };
 
   if(screen==='brand') return h(BrandSettings, {user:props.user, onBack:function(){setScreen('landing')}});
   if(screen==='proj') return h(ProjectManager, {user:props.user, onBack:function(){setScreen('landing')}});
   if(TOOLS[screen]) return h(ToolEngine, {toolId:screen, user:props.user, role:props.role, onBack:function(){setScreen('landing')}});
 
-  var projName = uData ? uData.projects[uData.curProj].name : '管理者モード';
-  var usageStr = uData ? (uData.usage.date===new Date().toDateString()?uData.usage.count:0) + '/' + DAILY_LIMIT : '∞';
+  var projName = uData.projects[uData.curProj] ? uData.projects[uData.curProj].name : 'プロジェクト';
+  var usageStr = (uData.usage.date===new Date().toDateString()?uData.usage.count:0) + '/' + DAILY_LIMIT;
 
   return h('div',{className:'pg'},
-    man ? h(ManualModal2, {onClose: function(){setMan(false);}}) : null,
+    man ? h(ManualModal, {onClose: function(){setMan(false);}}) : null,
     inq ? h(InquiryModal, {user:props.user, onClose: function(){setInq(false);}}) : null,
     h('div', {style:{position:'absolute', top:16, right:16, zIndex:100, display:'flex', gap:8, alignItems:'center', flexWrap:'wrap', justifyContent:'flex-end'}}, 
       props.role === 'admin' ? h('button', {className:'btn-sub', onClick:props.onGoAdmin, style:{background:'linear-gradient(135deg,#f59e0b,#d97706)',border:'none'}}, '🎛️ 管理') : null,
@@ -354,7 +383,7 @@ function MainApp(props){
       h('button', {className:'btn-sub', onClick:function(){setMan(true);}}, '📖'),
       h('button', {className:'btn-sub', style:{border:'none',background:'transparent'}, onClick:props.onLogout}, 'ログアウト')
     ),
-    h('div',{className:'grid-bg'}), h('div',{className:'z1 badge-sm', style:{marginTop:40}},'✦ AI Content Pro (v24)'), h('h1',{className:'z1 main-ttl'}, 'AI Content',h('br'),h('span',null,'Platform')), h('p',{className:'z1 main-sub'},'コンテンツ作成からSNS集客、ファン化まで',h('br'),'すべてを完全無料で自動化する最強の指令塔'),
+    h('div',{className:'grid-bg'}), h('div',{className:'z1 badge-sm', style:{marginTop:40}},'✦ AI Content Pro (v25)'), h('h1',{className:'z1 main-ttl'}, 'AI Content',h('br'),h('span',null,'Platform')), h('p',{className:'z1 main-sub'},'コンテンツ作成からSNS集客、ファン化まで',h('br'),'すべてを完全無料で自動化する最強の指令塔'),
     
     props.role !== 'admin' ? h('div', {className:'z1 flex-row', style:{marginBottom:30, justifyContent:'center'}},
       h('button', {className:'btn-rl', onClick:function(){setScreen('proj')}}, '📂 プロジェクト切替'),
@@ -372,20 +401,19 @@ function MainApp(props){
   );
 }
 
-// ── ルート管理 (軽量版) ──
+// ── ルート管理 (軽量版・イベント駆動) ──
 function Root() {
   var [user, setUser] = useState(null); var [role, setRole] = useState(null); var [goAdmin, setGoAdmin] = useState(false); var [man, setMan] = useState(false);
   useEffect(function() {
     var s = localStorage.getItem(SESS_KEY);
     if (s) { s = JSON.parse(s); if (s.r === 'admin') { setUser(s.u); setRole('admin'); setGoAdmin(true); } else { var db = getDB(); if (db.users[s.u]) { setUser(s.u); setRole(db.users[s.u].status); } else localStorage.removeItem(SESS_KEY); } }
   }, []);
-  // ここでのsetIntervalは削除し、必要な時だけチェックするように変更（クラッシュ対策）
   function handleLogout() { localStorage.removeItem(SESS_KEY); setUser(null); setRole(null); setGoAdmin(false); }
   function checkStatus() { var s = JSON.parse(localStorage.getItem(SESS_KEY)||'{}'); if(s.u) { var db = getDB(); if(db.users[s.u]) setRole(db.users[s.u].status); } }
 
   if (!user) return h(AuthScreen, { onLogin: function(u, r) { setUser(u); setRole(r); if(r==='admin') setGoAdmin(true); } });
   if (role === 'admin' && goAdmin) return h(AdminDashboard, { onLogout: handleLogout, onGoApp: function(){setGoAdmin(false);} });
-  if (role === 'pending' || role === 'rejected') return h('div',null, man?h(ManualModal2,{onClose:function(){setMan(false)}}):null, h(PendingScreen, { rejected: role === 'rejected', onCheck: checkStatus, onLogout: handleLogout, onOpenManual: function(){setMan(true)} }) );
+  if (role === 'pending' || role === 'rejected') return h('div',null, man?h(ManualModal,{onClose:function(){setMan(false)}}):null, h(PendingScreen, { rejected: role === 'rejected', onCheck: checkStatus, onLogout: handleLogout, onOpenManual: function(){setMan(true)} }) );
   if (role === 'approved' || (role === 'admin' && !goAdmin)) return h(MainApp, { user:user, role: role, onLogout: handleLogout, onGoAdmin: function(){setGoAdmin(true);} });
   return null;
 }
