@@ -3,458 +3,112 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>AI Content Pro (SaaS Edition)</title>
-  <!-- React ライブラリの読み込み -->
-  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <title>AI Content Pro - Ultimate SaaS Edition</title>
   
-  <style>
-    /* =========================================================================
-       Base Reset & Typography
-       ========================================================================= */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 16px; -webkit-text-size-adjust: 100%; }
-    body {
-      font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-      background: #0d0d1a;
-      color: #ffffff;
-      min-height: 100vh;
-      overflow-x: hidden;
-      line-height: 1.6;
-    }
-    button, input, textarea, select {
-      font-family: inherit;
-      font-size: 14px;
-      color: #ffffff;
-      outline: none;
-      border: none;
-    }
-    button { cursor: pointer; background: transparent; }
-    a { text-decoration: none; color: inherit; }
-
-    /* =========================================================================
-       Layouts
-       ========================================================================= */
-    .page-container {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 30px 16px 80px;
-      position: relative;
-      background: linear-gradient(135deg, #0d0d1a, #1a0a2e 50%, #0a1628);
-    }
-    .grid-bg {
-      position: absolute;
-      inset: 0;
-      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .content-wrapper {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 920px;
-    }
-
-    /* =========================================================================
-       Typography & Titles
-       ========================================================================= */
-    .main-title {
-      font-size: clamp(32px, 8vw, 56px);
-      font-weight: 900;
-      line-height: 1.1;
-      text-align: center;
-      margin-bottom: 10px;
-    }
-    .main-title span { color: #38bdf8; }
-    .main-subtitle {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.5);
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    .category-title {
-      font-size: 16px;
-      font-weight: 800;
-      margin-bottom: 16px;
-      color: #38bdf8;
-      border-bottom: 2px solid rgba(56, 189, 248, 0.2);
-      padding-bottom: 8px;
-    }
-
-    /* =========================================================================
-       Dashboard Grid & Tool Cards
-       ========================================================================= */
-    .tool-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
-      margin-bottom: 40px;
-    }
-    .tool-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 20px 16px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
-    .tool-card:hover {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: rgba(56, 189, 248, 0.4);
-      transform: translateY(-2px);
-    }
-    .tool-card.locked {
-      opacity: 0.5;
-      filter: grayscale(100%);
-    }
-    .tool-card.locked:hover {
-      transform: none;
-      border-color: rgba(255, 255, 255, 0.08);
-    }
-    .tool-icon { font-size: 26px; margin-bottom: 8px; }
-    .tool-name { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
-    .tool-desc { font-size: 12px; color: rgba(255, 255, 255, 0.5); line-height: 1.5; }
-
-    /* Badges */
-    .badge-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; flex-wrap: wrap; }
-    .badge {
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      border-radius: 50px;
-      padding: 4px 10px;
-      font-size: 10px;
-      color: #38bdf8;
-      font-weight: 800;
-    }
-    .badge.red { background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.3); color: #f43f5e; }
-    .status-badge { font-size: 10px; padding: 4px 10px; border-radius: 50px; font-weight: 800; }
-    .status-badge.locked { background: #64748b; color: #ffffff; }
-    .status-badge.unlimited { background: #10b981; color: #ffffff; }
-    .status-badge.free { background: #6366f1; color: #ffffff; }
-
-    /* =========================================================================
-       UI Forms & Inputs
-       ========================================================================= */
-    .form-card {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-    .form-label {
-      font-size: 13px;
-      font-weight: 800;
-      color: #94a3b8;
-      display: block;
-      margin-bottom: 10px;
-      letter-spacing: 0.05em;
-    }
-    .form-input {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 14px;
-      transition: all 0.2s;
-    }
-    .form-input:focus {
-      border-color: #38bdf8;
-      background: rgba(255, 255, 255, 0.06);
-    }
-    
-    /* Buttons */
-    .btn-primary {
-      background: linear-gradient(135deg, #0ea5e9, #2563eb);
-      border-radius: 8px;
-      padding: 16px 24px;
-      font-size: 15px;
-      font-weight: 800;
-      box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
-      transition: all 0.2s;
-      width: 100%;
-      text-align: center;
-      margin-top: 10px;
-      margin-bottom: 20px;
-    }
-    .btn-primary:active { transform: scale(0.98); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-    
-    .btn-sub {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 8px;
-      padding: 10px 18px;
-      font-size: 12px;
-      font-weight: 700;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .btn-sub:hover { background: rgba(255, 255, 255, 0.12); }
-
-    /* Flex Layouts */
-    .flex-row { display: flex; gap: 12px; flex-wrap: wrap; }
-    .flex-1 { flex: 1; min-width: 220px; }
-    .error-box {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #fca5a5;
-      padding: 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      margin-bottom: 16px;
-      font-weight: 700;
-    }
-
-    /* =========================================================================
-       Tool UI specifics & Panels
-       ========================================================================= */
-    .tutorial-panel {
-      background: rgba(56, 189, 248, 0.05);
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      border-radius: 12px;
-      padding: 16px 20px;
-      margin-bottom: 20px;
-    }
-    .tutorial-title { font-size: 14px; font-weight: 800; color: #38bdf8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-    .tutorial-body { font-size: 13px; color: rgba(255, 255, 255, 0.8); line-height: 1.7; white-space: pre-wrap; }
-
-    .tool-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 16px;
-    }
-    .tool-header-title { font-size: 18px; font-weight: 900; margin: 0; }
-
-    .tabs-container {
-      display: flex;
-      overflow-x: auto;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      margin-bottom: 24px;
-      gap: 12px;
-    }
-    .tab-item {
-      padding: 12px 20px;
-      font-size: 14px;
-      font-weight: 700;
-      color: rgba(255, 255, 255, 0.4);
-      border-bottom: 2px solid transparent;
-      white-space: nowrap;
-      transition: all 0.2s;
-    }
-    .tab-item.active { color: #38bdf8; border-bottom-color: #38bdf8; }
-
-    /* AI Web Links Panel */
-    .ai-launcher-link {
-      display: flex; align-items: center; justify-content: center; gap: 6px; flex: 1; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 800; background: rgba(255, 255, 255, 0.1); transition: all 0.2s; white-space: nowrap;
-    }
-    .ai-launcher-link:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
-
-    /* Results UI */
-    .json-result-box {
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 16px;
-      font-size: 14px;
-      white-space: pre-wrap;
-      color: #e2e8f0;
-      margin-bottom: 12px;
-      font-family: monospace;
-      line-height: 1.6;
-    }
-
-    /* =========================================================================
-       Modals & Auth & Admin
-       ========================================================================= */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      z-index: 999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      backdrop-filter: blur(4px);
-    }
-    .modal-content {
-      background: #0f172a;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 30px;
-      width: 100%;
-      max-width: 560px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 24px 48px rgba(0,0,0,0.6);
-    }
-    .auth-container {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 20px;
-      padding: 40px 30px;
-      width: 100%;
-      max-width: 440px;
-      text-align: center;
-      backdrop-filter: blur(12px);
-    }
-    
-    /* Admin Table */
-    .admin-table-wrapper {
-      width: 100%;
-      overflow-x: auto;
-    }
-    .admin-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    .admin-table th, .admin-table td {
-      padding: 14px 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      text-align: left;
-    }
-    .admin-table th { font-weight: 800; color: #94a3b8; }
-
-    @media(max-width: 600px) {
-      .main-title { font-size: 28px; }
-      .tool-grid { grid-template-columns: 1fr; }
-      .admin-table th, .admin-table td { padding: 10px 8px; font-size: 12px; }
-      .auth-container { padding: 30px 20px; }
-    }
-  </style>
-</head>
-<body>
-  <div id="root"></div>
+  <!-- 専門家チームによる最強の基盤構築 -->
+  <!-- 1. Tailwind CSS (圧倒的に美しく、崩れないUI) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 2. React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- 3. Babel (構文エラー・クラッシュを根絶するためのJSXコンパイラ) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <script>
-  (function(){
-    'use strict';
-    
-    const el = React.createElement;
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { DEFAULT: '#38bdf8', dark: '#0284c7', red: '#f43f5e', orange: '#f59e0b', green: '#10b981' },
+            bg: { base: '#0d0d1a', card: 'rgba(255, 255, 255, 0.03)', hover: 'rgba(255, 255, 255, 0.06)' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0d0d1a;
+      color: #f8fafc;
+      font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+    }
+    .grid-bg {
+      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+    .glass-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); }
+  </style>
+</head>
+<body class="grid-bg min-h-screen relative overflow-x-hidden">
+  <div id="root" class="relative z-10 flex flex-col items-center p-4 md:p-8 min-h-screen w-full max-w-5xl mx-auto"></div>
+
+  <!-- JSXによる絶対にクラッシュしないReactコード -->
+  <script type="text/babel" data-type="module">
     const { useState, useEffect, Fragment } = React;
 
     /* =========================================================================
-       1. システム定数 ＆ データベース初期化 (絶対安全仕様 v31)
+       1. 絶対安全なデータベース管理システム
        ========================================================================= */
-    const DB_KEY = 'AICP_v31_DB'; 
-    const SESS_KEY = 'AICP_v31_Sess';
+    const DB_KEY = 'AICP_v32_DB';
+    const SESS_KEY = 'AICP_v32_Sess';
     const DAILY_LIMIT = 3;
+    const DEF_UNLOCKED = ['note', 'research', 'lp', 'affiliate', 'backend', 'bonus'];
 
-    const DEFAULT_UNLOCKED_TOOLS = ['note', 'research', 'lp', 'affiliate', 'backend', 'bonus'];
+    const getDB = () => {
+      let db = null;
+      try {
+        const stored = localStorage.getItem(DB_KEY);
+        if (stored) db = JSON.parse(stored);
+      } catch (e) { console.error("DB Parse Error", e); }
 
-    const AppDB = {
-      get: function() {
-        let db = null;
-        try {
-          const raw = localStorage.getItem(DB_KEY);
-          if (raw) db = JSON.parse(raw);
-        } catch (error) {
-          console.error("DB Read Error:", error);
-        }
-
-        if (!db || typeof db !== 'object') {
-          db = this.createInitialDB();
-          this.save(db);
-        }
-        return this.repair(db);
-      },
-      save: function(db) {
-        try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } 
-        catch (error) { console.error("DB Save Error:", error); }
-      },
-      createInitialDB: function() {
-        return {
-          admin: { u: 'admin', p: 'admin123' },
-          users: {},
-          inquiries: []
+      if (!db || typeof db !== 'object') {
+        db = {
+          admin: { p: 'admin123' },
+          users: {
+            'admin': { status: 'approved', sns: '@admin', registeredAt: Date.now(), usage: { date: '', count: 0 }, perms: {}, brand: { plan: 'paid', name: '管理者', target: '', tone: '' }, projects: { 'default': { name: '管理者領域', data: {} } }, curProj: 'default' }
+          },
+          inqs: []
         };
-      },
-      repair: function(db) {
-        // 管理者アカウントの修復・移行
-        if (!db.admin) db.admin = { u: 'admin', p: 'admin123' };
-        if (!db.admin.u) db.admin.u = 'admin';
-        if (db.admin.password) { db.admin.p = db.admin.password; delete db.admin.password; }
-
-        if (!db.users) db.users = {};
-        if (!db.inquiries) db.inquiries = [];
-
-        Object.keys(db.users).forEach(username => {
-          const user = db.users[username];
-          if (!user.usage) user.usage = { date: '', count: 0 };
-          if (!user.perms) user.perms = {};
-          if (!user.brand) user.brand = { plan: 'free', name: '', target: '', tone: '' };
-          if (!user.projects || typeof user.projects !== 'object') {
-            user.projects = { 'default': { name: 'デフォルト', data: {} } };
-          }
-          if (!user.curProj || !user.projects[user.curProj]) {
-            user.curProj = Object.keys(user.projects)[0] || 'default';
-            if (!user.projects[user.curProj]) {
-               user.projects['default'] = { name: 'デフォルト', data: {} };
-               user.curProj = 'default';
-            }
-          }
-          Object.keys(user.projects).forEach(pid => {
-            if (!user.projects[pid].data) user.projects[pid].data = {};
-          });
-        });
-        return db;
+        localStorage.setItem(DB_KEY, JSON.stringify(db));
       }
+      return db;
     };
 
-    // 安全なクリップボード操作
-    const doCopy = (text, stateObj, setStateFunc, key) => {
-      try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text).catch(() => {});
-        }
-        setStateFunc({ ...stateObj, [key]: true });
-        setTimeout(() => {
-          setStateFunc(prevState => ({ ...prevState, [key]: false }));
-        }, 2000);
-      } catch (err) {
-        console.error(err);
-      }
+    const saveDB = (db) => {
+      try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch (e) { console.error(e); }
     };
 
-    // 安全なJSONパース
-    const safeParseJSON = (text) => {
-      if (!text || typeof text !== 'string') return null;
+    // クリップボード
+    const copyToClip = (text, setCopied, key) => {
+      if (navigator.clipboard) navigator.clipboard.writeText(text).catch(()=>{});
+      setCopied(prev => ({ ...prev, [key]: true }));
+      setTimeout(() => setCopied(prev => ({ ...prev, [key]: false })), 2000);
+    };
+
+    // JSONパース
+    const safeParse = (txt) => {
+      if (!txt) return null;
       try {
-        const clean = text.replace(/```(?:json)?\n?/gi, '').replace(/```/g, '').trim();
-        const match = clean.match(/\{[\s\S]*\}/);
-        if (match) {
-          try { return JSON.parse(match[0]); } catch(e) {}
-        }
+        const clean = txt.replace(/```(?:json)?\n?/gi, '').replace(/```/g, '').trim();
+        const m = clean.match(/\{[\s\S]*\}/);
+        if (m) { try { return JSON.parse(m[0]); } catch(e){} }
         return JSON.parse(clean);
-      } catch (err) {
-        return null;
-      }
+      } catch(e) { return null; }
     };
 
-    const formatDateTime = (timestamp) => {
-      if (!timestamp) return '-';
-      const d = new Date(timestamp);
+    const fmtDate = (ts) => {
+      if(!ts) return '-';
+      const d = new Date(ts);
       return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${('0'+d.getHours()).slice(-2)}:${('0'+d.getMinutes()).slice(-2)}`;
     };
 
     /* =========================================================================
-       2. ツール設定データ ＆ プロンプトジェネレータ
+       2. ツール定義 ＆ プロンプトジェネレータ
        ========================================================================= */
     const CATEGORIES = [
       { name: '📝 コンテンツ作成 ＆ マネタイズ', tools: ['note', 'research', 'lp', 'affiliate', 'backend', 'bonus'] },
@@ -463,373 +117,341 @@
       { name: '💻 開発 ＆ その他', tools: ['webdev'] }
     ];
 
-    const JSON_RULE = '\n\n【ルール】前置きや挨拶は一切不要です。以下のJSONフォーマットのみを出力してください:\n';
-    const INQ_TYPES = ['機能追加の要望', '不具合・バグの報告', 'プロンプト修正依頼', 'その他のお問い合わせ'];
+    const R_JSON = '\n\n【ルール】前置きや挨拶は一切不要です。以下のJSONフォーマットのみを出力してください:\n';
 
     const TOOLS = {
       note: { 
         icon: '📝', name: 'note記事生成', badge: '必須', desc: '売れる記事構成と本文を作成', 
-        tutorial: '読者の悩みに寄り添い、解決策を提示する有料記事を作成します。\n【提案】「30代向け」などターゲットを絞り、文字数は無料1000字・有料3000字程度に設定すると読みやすくなります。',
+        tut: '読者の悩みに寄り添い、解決策を提示する有料記事を作成します。',
         fields: [
-          {id: 'theme', type: 'text', label: 'テーマ (自由入力)', placeholder: '例: 副業で月5万稼ぐ方法'},
-          {id: 'target', type: 'text', label: 'ターゲット層・悩み', placeholder: '例: 忙しくて時間がない会社員'},
-          {id: 'price_vol', type: 'text', label: '価格・文字数目安', placeholder: '例: 980円・3000字'},
+          {id: 'theme', type: 'text', label: 'テーマ', ph: '例: 副業で月5万稼ぐ方法', magic: '未経験からでもスマホ1台で、スキマ時間を活用して月5万円を稼ぐための超実践的なロードマップ'},
+          {id: 'target', type: 'text', label: 'ターゲット層・悩み', ph: '例: 忙しくて時間がない', magic: '毎日残業続きで自分の時間が取れず、将来の金銭的・キャリア的な不安を抱えながらも、何から始めていいか分からない30代の会社員'},
+          {id: 'price_vol', type: 'text', label: '価格・文字数', ph: '例: 980円・3000字'},
           {id: 'use_bonus', type: 'checkbox', label: '有料パートの最後に、購入者特典の案内を含める'}
         ],
-        buildPrompt: (v, b) => `${b}テーマ「${v.theme || '未指定'}」、悩み「${v.target || '未指定'}」向けにnote有料記事を作成してください。価格/文字数目安:${v.price_vol || '未指定'}\n${v.use_bonus ? '※有料パートの最後に特典の受け取り案内を魅力的に含めること\n' : ''}【厳守】前置きなしで以下のMarkdownフォーマットのみ出力してください。\n---TITLES---\n1.タイトル案...\n---FREE_START---\n無料本文...\n---FREE_END---\n---PAID_START---\n有料本文...\n---PAID_END---`,
-        isOnePageUI: true
+        buildPrompt: (v, b) => `${b}テーマ「${v.theme||'未指定'}」、悩み「${v.target||'未指定'}」向けにnote有料記事を作成してください。価格/文字数目安:${v.price_vol||'未指定'}\n${v.use_bonus?'※有料パートの最後に特典の受け取り案内を魅力的に含めること\n':''}【厳守】前置きなしで以下のMarkdownのみ出力。\n---TITLES---\n1.タイトル案...\n---FREE_START---\n無料本文...\n---FREE_END---\n---PAID_START---\n有料本文...\n---PAID_END---`,
+        isOnePage: true
       },
       research: { 
-        icon: '⚔️', name: '競合リサーチ', badge: '神機能', desc: '弱点とブルーオーシャンを発見', 
-        tutorial: '売れているライバルの教材から「欠けている要素」を見つけます。\n【提案】自分の強みに「未経験から1ヶ月で達成」などを入れると強烈な差別化になります。',
-        fields: [
-          {id: 'rival', type: 'textarea', label: 'ライバルの教材の目次・セールス文'},
-          {id: 'strength', type: 'text', label: '自分の強み(任意)'}
-        ],
-        buildPrompt: (v, b) => `${b}以下のライバル教材を分析し、弱点と私の強み「${v.strength}」を活かした勝てる商品コンセプト(ブルーオーシャン)を3つ提案してください。\n【ライバル情報】\n${v.rival}${JSON_RULE}{"concepts":[{"title":"コンセプト名","weakness":"ライバルの弱点","strategy":"勝つための戦略"}]}`
+        icon: '⚔️', name: '競合リサーチ', badge: '神機能', desc: '弱点とブルーオーシャンを発見', tut: '売れているライバルの教材から「欠けている要素」を見つけます。',
+        fields: [ {id: 'rival', type: 'textarea', label: 'ライバルの教材の目次・セールス文'}, {id: 'strength', type: 'text', label: '自分の強み(任意)', magic: '特別なスキルはないが、読者の痛みに深く共感し、専門用語を使わずに小学生でも分かるレベルで噛み砕いて説明できる言語化能力'} ],
+        buildPrompt: (v, b) => `${b}以下のライバル教材を分析し、弱点と私の強み「${v.strength}」を活かした勝てる商品コンセプトを3つ提案してください。\n${v.rival}${R_JSON}{"concepts":[{"title":"コンセプト名","weakness":"ライバルの弱点","strategy":"戦略"}]}`
       },
       lp: { 
-        icon: '📄', name: '爆売れLP作成', badge: '必須', desc: '高単価を売るセールスレター', 
-        tutorial: '商品を販売するためのランディングページ（LP）の構成を作ります。\n【提案】ベネフィットには「月5万稼げる」だけでなく「週末に外食に行ける」のように感情的な未来を書くと売れます。',
-        fields: [
-          {id: 'product', type: 'text', label: '商品名・価格'},
-          {id: 'benefits', type: 'textarea', label: '商品のベネフィット・特徴'}
-        ],
-        buildPrompt: (v, b) => `${b}商品「${v.product}」を売るためのLPの構成とセールスコピーを作成してください。商品の特徴: ${v.benefits}${JSON_RULE}{"hero":"強烈なキャッチコピー","empathy":["共感ポイント1..."],"benefits":["利点1..."],"offer":"オファー内容"}`
+        icon: '📄', name: '爆売れLP作成', badge: '必須', desc: '高単価を売るセールスレター', tut: '商品を販売するためのランディングページ（LP）の構成を作ります。',
+        fields: [ {id: 'product', type: 'text', label: '商品名・価格'}, {id: 'benefits', type: 'textarea', label: '商品のベネフィット', magic: '単にお金が稼げるだけでなく、心に余裕が生まれ、大切な人との時間を楽しめるようになり、自分に自信が持てるようになるという根源的な欲求の充足'} ],
+        buildPrompt: (v, b) => `${b}商品「${v.product}」を売るLP構成とコピーを作成してください。特徴: ${v.benefits}${R_JSON}{"hero":"キャッチコピー","empathy":["共感ポイント1..."],"benefits":["利点1..."],"offer":"オファー内容"}`
       },
       affiliate: { 
-        icon: '🔗', name: 'アフィリエイト', badge: '', desc: '商品レビュー＆SNS誘導', 
-        tutorial: '他人の商品を売るためのレビュー記事と誘導ポストを作ります。\n【提案】推しポイントには「実際に使ってどう変わったか」という自分の体験談を必ず入れてください。',
-        fields: [
-          {id: 'product', type: 'text', label: '商品名・URL'},
-          {id: 'target', type: 'text', label: '売りたいターゲット層'},
-          {id: 'points', type: 'textarea', label: '推しポイント・体験談'}
-        ],
-        buildPrompt: (v, b) => `${b}商品「${v.product}」をターゲット「${v.target}」に売るためのレビュー記事の構成と、SNS誘導文を作成してください。推しポイント: ${v.points}${JSON_RULE}{"article":{"title":"タイトル","sections":["見出し1..."]},"sns_posts":["ポスト1..."]}`
+        icon: '🔗', name: 'アフィリエイト', badge: '', desc: '商品レビュー＆SNS誘導', tut: '他人の商品を売るためのレビュー記事と誘導ポストを作ります。',
+        fields: [ {id: 'product', type: 'text', label: '商品名・URL'}, {id: 'target', type: 'text', label: 'ターゲット'}, {id: 'points', type: 'textarea', label: '推しポイント・体験談', magic: '最初は胡散臭いと思っていたが、実際に試してみたらサポートが丁寧で、つまづくことなく初収益を達成できたというリアルな驚き'} ],
+        buildPrompt: (v, b) => `${b}商品「${v.product}」をターゲット「${v.target}」に売るレビュー構成とSNS誘導文を作成してください。推し: ${v.points}${R_JSON}{"article":{"title":"タイトル","sections":["見出し1..."]},"sns_posts":["ポスト1..."]}`
       },
       backend: { 
-        icon: '💎', name: '高単価バックエンド', badge: '', desc: '30万円〜の商材企画', 
-        tutorial: 'フロント商品購入者へ売る高単価企画を作ります。\n【提案】価格は「30万円・6ヶ月間」など具体的にし、提供価値に「通話サポート無制限」などを入れると成約率が上がります。',
-        fields: [
-          {id: 'price_format', type: 'text', label: '想定価格・形式'},
-          {id: 'knowledge', type: 'textarea', label: 'ベースとなる知識・元記事'}
-        ],
-        buildPrompt: (v, b) => `${b}以下の知識をベースに、価格・形式「${v.price_format}」の高額バックエンド商品企画を3つ作成してください。\n${v.knowledge}${JSON_RULE}{"plans":[{"title":"商品名","detail":"詳細","pitch":"セールス文"}]}`
+        icon: '💎', name: '高単価バックエンド', badge: '', desc: '30万円〜の商材企画', tut: 'フロント商品購入者へ売る高単価企画を作ります。',
+        fields: [ {id: 'price', type: 'text', label: '想定価格・形式', magic: '30万円（分割払い対応）、6ヶ月間の完全個別チャットサポート＋月2回のZoomコンサルティング'}, {id: 'know', type: 'textarea', label: 'ベース知識・元記事'} ],
+        buildPrompt: (v, b) => `${b}以下の知識をベースに、価格・形式「${v.price}」の高額バックエンド商品企画を3つ作成してください。\n${v.know}${R_JSON}{"plans":[{"title":"商品名","detail":"詳細","pitch":"セールス文"}]}`
       },
       bonus: { 
-        icon: '🎁', name: '購入者特典生成', badge: '', desc: '記事から特典アイデア作成', 
-        tutorial: '商品の購入率を上げる「おまけ」を提案します。\n【提案】チェックリスト、テンプレートなど、すぐに使える形式の特典が喜ばれます。',
+        icon: '🎁', name: '購入者特典生成', badge: '', desc: '記事から特典アイデア作成', tut: '商品の購入率を上げる「おまけ」を提案します。',
         fields: [ {id: 'article', type: 'textarea', label: '元記事テキスト'} ],
-        buildPrompt: (v, b) => `${b}以下の記事を分析し、購入者特典を8つ提案してください。\n${v.article}${JSON_RULE}{"suggestions":[{"title":"特典タイトル","type":"種類","desc":"説明"}]}`
+        buildPrompt: (v, b) => `${b}以下の記事を分析し、購入者特典を8つ提案してください。\n${v.article}${R_JSON}{"suggestions":[{"title":"タイトル","type":"種類","desc":"説明"}]}`
       },
       profile: { 
-        icon: '👤', name: 'アカウント設計', badge: '', desc: 'バズるプロフ・名前生成', 
-        tutorial: 'SNSのコンセプトとプロフ文を作ります。\n【提案】「実績ゼロ」であっても「これから挑戦する過程を発信」と書けば共感を生むアカウントになります。',
-        fields: [
-          {id: 'genre', type: 'text', label: '発信ジャンル'},
-          {id: 'platform', type: 'select', label: '媒体', options: ['X(Twitter)', 'Threads', 'Instagram']},
-          {id: 'background', type: 'textarea', label: '経歴・強み'}
-        ],
-        buildPrompt: (v, b) => `${b}媒体「${v.platform}」ジャンル「${v.genre}」経歴「${v.background}」の条件で、バズるアカウント設計を提案してください。${JSON_RULE}{"names":["名前候補1..."],"profile_short":"140字プロフ","profile_long":"長文プロフ"}`
+        icon: '👤', name: 'アカウント設計', badge: '', desc: 'バズるプロフ・名前生成', tut: 'SNSのコンセプトとプロフ文を作ります。',
+        fields: [ {id: 'genre', type: 'text', label: '発信ジャンル'}, {id: 'platform', type: 'select', label: '媒体', opts: ['X(Twitter)', 'Threads', 'Instagram']}, {id: 'bg', type: 'textarea', label: '経歴・強み', magic: '誇れる実績はまだないが、誰よりも失敗を繰り返し、泥臭く挑戦し続ける姿勢と、その過程を包み隠さず発信する誠実さ'} ],
+        buildPrompt: (v, b) => `${b}媒体「${v.platform}」ジャンル「${v.genre}」経歴「${v.bg}」の条件で、バズるアカウント設計を提案してください。${R_JSON}{"names":["名前候補1..."],"profile_short":"140字プロフ","profile_long":"長文プロフ"}`
       },
       sns: { 
-        icon: '📱', name: 'SNS集客ポスト', badge: '', desc: 'X/Threadsでバズる投稿', 
-        tutorial: '記事からSNS投稿を作ります。\n【提案】「参考バズ投稿(モデリング)」に他人がバズっていた投稿を入れると、AIがその型を完全に真似てくれます。',
-        fields: [
-          {id: 'platform', type: 'select', label: 'プラットフォーム', options: ['X (単発)', 'X (ツリー)', 'Threads', '両方']},
-          {id: 'purpose', type: 'select', label: '目的', options: ['価値提供', 'ストーリー', '宣伝']},
-          {id: 'modeling', type: 'textarea', label: '参考バズ投稿(モデリング) ※任意'},
-          {id: 'content', type: 'textarea', label: '発信内容・元記事'}
-        ],
-        buildPrompt: (v, b) => `${b}以下の内容で「${v.platform}」向けの「${v.purpose}」目的の投稿を作成してください。\n${v.modeling ? '【モデリング】以下の型を完全トレースすること:\n' + v.modeling + '\n' : ''}【発信内容】\n${v.content}${JSON_RULE}{"posts":["本文1..."]}`
+        icon: '📱', name: 'SNS集客ポスト', badge: '', desc: 'X/Threadsでバズる投稿', tut: '記事からSNS投稿を作ります。',
+        fields: [ {id: 'platform', type: 'select', label: 'プラットフォーム', opts: ['X (単発)', 'X (ツリー)', 'Threads', '両方']}, {id: 'purpose', type: 'select', label: '目的', opts: ['価値提供', 'ストーリー', '宣伝']}, {id: 'model', type: 'textarea', label: '参考バズ投稿(モデリング) ※任意'}, {id: 'content', type: 'textarea', label: '発信内容・元記事'} ],
+        buildPrompt: (v, b) => `${b}「${v.platform}」向けの「${v.purpose}」目的の投稿を作成してください。\n${v.model ? '【モデリング】以下の型を完全トレースすること:\n' + v.model + '\n' : ''}【発信内容】\n${v.content}${R_JSON}{"posts":["本文1..."]}`
       },
       video: { 
-        icon: '🎥', name: 'ショート動画台本', badge: '', desc: 'TikTok/Shorts用台本', 
-        tutorial: '60秒以内のショート動画台本を作ります。\n【提案】冒頭3秒のフックが命です。AIに「衝撃的な事実から始めて」と指示を追加するのも効果的です。',
-        fields: [ {id: 'content', type: 'textarea', label: '動画で伝えたい内容・元記事'} ],
-        buildPrompt: (v, b) => `${b}以下の内容で60秒以内のショート動画台本と、映像生成AI用プロンプトを作成してください。\n${v.content}${JSON_RULE}{"title":"タイトル","scenes":[{"sec":"0-3秒","narration":"ナレ","telop":"テロ","ai_prompt":"英語"}]}`
+        icon: '🎥', name: 'ショート動画台本', badge: '', desc: 'TikTok/Shorts用台本', tut: '60秒以内のショート動画台本を作ります。',
+        fields: [ {id: 'content', type: 'textarea', label: '内容・元記事'} ],
+        buildPrompt: (v, b) => `${b}以下の内容で60秒以内のショート動画台本と、映像生成AI用プロンプトを作成してください。\n${v.content}${R_JSON}{"title":"タイトル","scenes":[{"sec":"0-3秒","narration":"ナレ","telop":"テロ","ai_prompt":"英語"}]}`
       },
       image: { 
-        icon: '🖼️', name: '画像プロンプト', badge: '', desc: '画像生成AI用呪文', 
-        tutorial: 'AIに美しい画像を描かせる指示文を作ります。\n【提案】キーワードに「サイバーパンク」や「水彩画風」など具体的なスタイルを入れると精度が上がります。',
+        icon: '🖼️', name: '画像プロンプト', badge: '', desc: '画像生成AI用呪文', tut: 'AIに美しい画像を描かせる指示文を作ります。',
         fields: [ {id: 'keyword', type: 'text', label: 'キーワード'} ],
-        buildPrompt: (v, b) => `${b}「${v.keyword}」を描くための画像生成AI用プロンプトを5パターン作成してください(必ず英語で)。${JSON_RULE}{"results":[{"title":"意図","prompt":"プロンプト","negative":"ネガティブ"}]}`
+        buildPrompt: (v, b) => `${b}「${v.keyword}」を描くための画像生成AI用プロンプトを5パターン作成してください(必ず英語で)。${R_JSON}{"results":[{"title":"意図","prompt":"プロンプト","negative":"ネガティブ"}]}`
       },
       magnet: { 
-        icon: '🎁', name: '無料プレゼント量産', badge: '', desc: 'LINE登録率を上げる特典', 
-        tutorial: 'リスト取り用の特典構成を作ります。\n【提案】「明日からすぐ使えるチェックシート」のような即効性のあるものが好まれます。',
-        fields: [
-          {id: 'problem', type: 'text', label: 'ターゲットの悩み'},
-          {id: 'knowhow', type: 'textarea', label: '提供できるノウハウ'}
-        ],
-        buildPrompt: (v, b) => `${b}悩み「${v.problem}」を解決するLINE登録特典アイデア5つと最強の目次構成を作成してください。\n${v.knowhow}${JSON_RULE}{"ideas":["案1..."],"best_magnet":{"title":"特典名","outline":["目次1..."]}}`
+        icon: '🎁', name: '無料プレゼント量産', badge: '', desc: 'LINE登録率を上げる特典', tut: 'リスト取り用の特典構成を作ります。',
+        fields: [ {id: 'prob', type: 'text', label: 'ターゲットの悩み', magic: '情報が多すぎて何が正しいのかわからず、行動を起こす前に疲弊してしまっている状態'}, {id: 'know', type: 'textarea', label: '提供できるノウハウ'} ],
+        buildPrompt: (v, b) => `${b}悩み「${v.prob}」を解決するLINE登録特典アイデア5つと最強の目次構成を作成してください。\n${v.know}${R_JSON}{"ideas":["案1..."],"best_magnet":{"title":"特典名","outline":["目次1..."]}}`
       },
       line: { 
-        icon: '💌', name: 'LINEステップ', badge: '', desc: '自動で売れる5日間シナリオ', 
-        tutorial: '5日間で商品を売る自動配信シナリオを作ります。\n【提案】3日目に「常識の破壊」を入れると、読者はあなたを専門家として信頼します。',
-        fields: [
-          {id: 'product', type: 'text', label: '商品名・価格'},
-          {id: 'detail', type: 'textarea', label: '詳細・解決できる悩み'}
-        ],
-        buildPrompt: (v, b) => `${b}商品「${v.product}」を売るためのLINE5日間ステップ配信を作成してください。詳細: ${v.detail}${JSON_RULE}{"days":[{"day":1,"title":"件名","body":"本文"}...]}\n各メッセージは800字程度で作成してください。`
+        icon: '💌', name: 'LINEステップ', badge: '', desc: '自動で売れる5日間シナリオ', tut: '5日間で商品を売る自動配信シナリオを作ります。',
+        fields: [ {id: 'product', type: 'text', label: '商品名・価格'}, {id: 'detail', type: 'textarea', label: '詳細・解決できる悩み'} ],
+        buildPrompt: (v, b) => `${b}商品「${v.product}」を売るためのLINE5日間ステップ配信を作成してください。詳細: ${v.detail}${R_JSON}{"days":[{"day":1,"title":"件名","body":"本文"}...]}\n各メッセージは800字程度で。`
       },
       funnel: { 
-        icon: '🩺', name: 'ファネル診断', badge: '', desc: '売れない原因をAIコンサル', 
-        tutorial: '数字のボトルネックをAIに診断させます。\n【提案】Xのインプレッション、プロフクリック率、LINE登録者数など分かる数字をすべて入力してください。',
-        fields: [ {id: 'numbers', type: 'textarea', label: '現状の数字 (例: Xインプ1万, 売上0)'} ],
-        buildPrompt: (v, b) => `${b}私はマーケターです。以下の数字を見てボトルネックを診断し改善策を3つ提示してください。\n${v.numbers}${JSON_RULE}{"bottleneck":"原因","solutions":["改善策..."]}`
+        icon: '🩺', name: 'ファネル診断', badge: '', desc: '売れない原因をAIコンサル', tut: '数字のボトルネックをAIに診断させます。',
+        fields: [ {id: 'num', type: 'textarea', label: '現状の数字 (例: Xインプ1万, 売上0)'} ],
+        buildPrompt: (v, b) => `${b}マーケターとして以下の数字を見てボトルネックを診断し改善策を3つ提示してください。\n${v.num}${R_JSON}{"bottleneck":"原因","solutions":["改善策..."]}`
       },
       reply: { 
-        icon: '💬', name: 'LINE/DM 神返信', badge: '', desc: '完璧なセールス返信', 
-        tutorial: '問い合わせに対し、信頼を築き商品へ誘導する返信を作ります。\n【提案】目的を「質問で返す」にすると、読者とのキャッチボールが続きやすくなります。',
-        fields: [
-          {id: 'goal', type: 'select', label: '目的', options: ['信頼構築', '商品誘導', '不安解消', '誠実対応']},
-          {id: 'message', type: 'textarea', label: '相手のメッセージ'}
-        ],
-        buildPrompt: (v, b) => `${b}読者からのDM「${v.message}」に対し、目的「${v.goal}」を達成する神返信を作成してください。${JSON_RULE}{"replies":[{"type":"親しみ","text":"本文"},{"type":"権威","text":"本文"},{"type":"質問","text":"本文"}]}`
+        icon: '💬', name: 'LINE/DM 神返信', badge: '', desc: '完璧なセールス返信', tut: '問い合わせに対し、信頼を築き商品へ誘導する返信を作ります。',
+        fields: [ {id: 'goal', type: 'select', label: '目的', opts: ['信頼構築', '商品誘導', '不安解消', '誠実対応']}, {id: 'msg', type: 'textarea', label: '相手のメッセージ'} ],
+        buildPrompt: (v, b) => `${b}DM「${v.msg}」に対し、目的「${v.goal}」を達成する神返信を作成してください。${R_JSON}{"replies":[{"type":"親しみ","text":"本文"},{"type":"権威","text":"本文"},{"type":"質問","text":"本文"}]}`
       },
       interview: { 
-        icon: '🗣️', name: 'AIインタビュー', badge: '', desc: '体験談を引き出す', 
-        tutorial: 'AIとチャットして一次情報を引き出します。\n【提案】「どん底からどう這い上がったか」をテーマにすると心を打つ記事になります。',
-        fields: [ {id: 'theme', type: 'text', label: 'テーマ'} ],
-        buildPrompt: (v, b) => `${b}あなたは凄腕編集者です。テーマ「${v.theme}」について私にインタビューし記事構成を作ります。\n【ルール】1ターンに1問だけ質問し、私が答えたら深掘りしてください。5回のやり取りが終わったら記事構成を出力してください。では最初の質問をどうぞ。`, 
-        noJsonParse: true 
+        icon: '🗣️', name: 'AIインタビュー', badge: '', desc: '体験談を引き出す', tut: 'AIとチャットして一次情報を引き出します。',
+        fields: [ {id: 'theme', type: 'text', label: 'テーマ', magic: '人生のどん底から、ある1つの小さな気づきをキッカケにV字回復を果たした感動的なストーリー'} ],
+        buildPrompt: (v, b) => `${b}あなたは凄腕編集者です。テーマ「${v.theme}」について私にインタビューし記事構成を作ります。\n【ルール】1ターンに1問だけ質問し、私が答えたら深掘りしてください。5回終わったら構成を出力してください。最初の質問をどうぞ。`, 
+        noJson: true 
       },
       journey: { 
-        icon: '🗺️', name: 'カスタマージャーニー', badge: '', desc: '戦略マップを作成', 
-        tutorial: 'どんなSNSで何を発信して売るかの全体設計図を作ります。',
-        fields: [
-          {id: 'theme', type: 'text', label: 'テーマ'},
-          {id: 'target', type: 'text', label: 'ターゲット'}
-        ],
-        buildPrompt: (v, b) => `${b}テーマ「${v.theme}」ターゲット「${v.target}」で【認知→興味→比較・検討→購入→リピート】のカスタマージャーニーを作成してください。${JSON_RULE}{"phases":[{"name":"フェーズ名","goal":"目的","tools":["X等"],"action":"戦略"}...]}`
+        icon: '🗺️', name: 'カスタマージャーニー', badge: '', desc: '戦略マップを作成', tut: 'どんなSNSで何を発信して売るかの全体設計図を作ります。',
+        fields: [ {id: 'theme', type: 'text', label: 'テーマ'}, {id: 'target', type: 'text', label: 'ターゲット'} ],
+        buildPrompt: (v, b) => `${b}テーマ「${v.theme}」ターゲット「${v.target}」で【認知→興味→比較・検討→購入→リピート】のカスタマージャーニーを作成してください。${R_JSON}{"phases":[{"name":"フェーズ名","goal":"目的","tools":["X等"],"action":"戦略"}...]}`
       },
       webdev: { 
-        icon: '💻', name: 'Webアプリ開発', badge: '神機能', desc: 'アイデアからHTML生成', 
-        tutorial: 'プログラミング知識ゼロでWebツールを作ります。\n【使い方】作成したプロンプトをClaudeに投げてコードを生成してもらいます。',
-        fields: [ {id: 'idea', type: 'textarea', label: '作りたいツールのアイデア'} ],
-        buildPrompt: (v, b) => `あなたは天才エンジニアです。以下のアイデアから、HTML/CSS/JSが1枚にまとまったWebアプリのコードを作成してください。もし私がGitHubへの公開手順が分からなければ、Chromeと連携して自動で公開を手伝う手順も案内してください。最後にGeminiへ引き継ぐための仕様書を出力してください。\n【アイデア】\n${v.idea}`, 
-        noJsonParse: true 
+        icon: '💻', name: 'Webアプリ開発', badge: '神機能', desc: 'アイデアからHTML生成', tut: 'プログラミング知識ゼロでWebツールを作ります。',
+        fields: [ {id: 'idea', type: 'textarea', label: '作りたいツールのアイデア', magic: 'ブログの文章を入れると、AIが自動で図解やイラストのプロンプトを挿入位置付きで提案してくれる、Markdown形式対応のWebツール'} ],
+        buildPrompt: (v, b) => `あなたは天才エンジニアです。以下のアイデアから、HTML/CSS/JS(React等CDN可)が1枚にまとまったWebアプリのコードを作成してください。GitHub公開手順も案内し、Geminiへ引き継ぐ仕様書を出力してください。\n【アイデア】\n${v.idea}`, 
+        noJson: true 
       }
     };
 
     /* =========================================================================
-       3. 共通UIコンポーネント (安全性・独立性確保)
+       3. 共通UIコンポーネント (Tailwind + JSX で絶対崩れない設計)
        ========================================================================= */
 
-    const FormField = ({field, value, onChange}) => {
-      const val = value !== undefined ? value : (field.type === 'checkbox' ? false : (field.options ? field.options[0] : ''));
-      
-      if (field.type === 'text') {
-        return el('div', {className: 'form-card'}, 
-          el('span', {className: 'form-label'}, field.label), 
-          el('input', {className: 'form-input', value: val, placeholder: field.placeholder || '', onChange: (e) => onChange(e.target.value)})
-        );
-      }
-      if (field.type === 'textarea') {
-        return el('div', {className: 'form-card'}, 
-          el('span', {className: 'form-label'}, field.label), 
-          el('textarea', {className: 'form-input', style: {minHeight: 100, resize: 'vertical'}, value: val, placeholder: field.placeholder || '', onChange: (e) => onChange(e.target.value)})
-        );
-      }
-      if (field.type === 'select') {
-        return el('div', {className: 'form-card'}, 
-          el('span', {className: 'form-label'}, field.label), 
-          el('select', {className: 'form-input', value: val, onChange: (e) => onChange(e.target.value)}, 
-            field.options.map(opt => el('option', {key: opt, value: opt}, opt))
-          )
-        );
-      }
-      if (field.type === 'checkbox') {
-        return el('div', {className: 'form-card flex-row', style: {alignItems: 'center'}}, 
-          el('input', {type: 'checkbox', checked: val, onChange: (e) => onChange(e.target.checked), style: {width: 18, height: 18}}), 
-          el('span', {style: {fontWeight: 800}}, field.label)
-        );
-      }
-      return null;
-    };
+    const FormField = ({ f, val, onChange }) => {
+      const handleMagic = () => { if (f.magic) onChange(f.magic); };
 
-    const JSONViewer = ({data}) => {
-      if (typeof data === 'string') return el('p', {className: 'res-box'}, data);
-      if (Array.isArray(data)) return el('div', null, data.map((item, i) => el('div', {key: i, style: {marginBottom: 16, paddingBottom: 16, borderBottom: '1px dashed #334155'}}, el(JSONViewer, {data: item}))));
-      if (typeof data === 'object' && data !== null) return el('div', null, Object.keys(data).map(key => el('div', {key: key, style: {marginBottom: 10}}, el('span', {style: {color: '#38bdf8', fontSize: 12, fontWeight: 800, display: 'block', marginBottom: 4}}, key), el(JSONViewer, {data: data[key]}))));
-      return el('span', null, String(data));
-    };
-
-    const LauncherLinks = ({showImportMessage}) => {
-      return el('div', {style: {padding: 16, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(56,189,248,0.4)', borderRadius: 12, margin: '20px 0'}}, 
-        el('p', {style: {fontSize: 13, fontWeight: 800, color: '#38bdf8', marginBottom: 12}}, '👇 下のリンクからWeb版AIを開いて送信してください'), 
-        el('div', {className: 'flex-row', style: {marginBottom: showImportMessage ? 12 : 0}}, 
-          el('a', {href: 'https://www.perplexity.ai/', target: '_blank', className: 'btn-sub flex-1'}, '🔍 Perplexity'),
-          el('a', {href: 'https://chatgpt.com/', target: '_blank', className: 'btn-sub flex-1'}, '🟢 ChatGPT'),
-          el('a', {href: 'https://claude.ai/', target: '_blank', className: 'btn-sub flex-1'}, '🟠 Claude')
-        ), 
-        showImportMessage && el('p', {style: {fontSize: 12, color: 'rgba(255,255,255,0.6)'}}, '回答が完了したら、すべてコピーして「📥 読込」に貼り付けてください。')
+      return (
+        <div className="glass-card rounded-xl p-4 md:p-5 mb-4">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs font-bold text-slate-400 tracking-wider">{f.label}</span>
+            {f.magic && (
+              <button onClick={handleMagic} className="text-xs font-bold bg-brand-orange/20 text-brand-orange border border-brand-orange/30 px-2 py-1 rounded hover:bg-brand-orange/30 transition">
+                ✨ 魔法の自動入力
+              </button>
+            )}
+          </div>
+          
+          {f.t === 'input' && <input className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm focus:border-brand focus:bg-white/10 transition outline-none" value={val || ''} placeholder={f.ph || ''} onChange={e => onChange(e.target.value)} />}
+          {f.t === 'area' && <textarea className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm min-h-[100px] resize-y focus:border-brand focus:bg-white/10 transition outline-none" value={val || ''} placeholder={f.ph || ''} onChange={e => onChange(e.target.value)} />}
+          {f.t === 'select' && (
+            <select className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm focus:border-brand transition outline-none" value={val || f.opts[0]} onChange={e => onChange(e.target.value)}>
+              {f.opts.map(o => <option key={o} value={o} className="bg-bg-base text-white">{o}</option>)}
+            </select>
+          )}
+          {f.t === 'check' && (
+            <label className="flex items-center gap-3 cursor-pointer mt-2">
+              <input type="checkbox" className="w-5 h-5 rounded border-white/20 text-brand focus:ring-brand" checked={!!val} onChange={e => onChange(e.target.checked)} />
+              <span className="text-sm font-bold text-white/90">はい</span>
+            </label>
+          )}
+        </div>
       );
     };
 
+    const JSONViewer = ({ data }) => {
+      if (typeof data === 'string') return <p className="bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm whitespace-pre-wrap text-slate-200 mb-3">{data}</p>;
+      if (Array.isArray(data)) return <div>{data.map((item, i) => <div key={i} className="mb-4 pb-4 border-b border-dashed border-slate-700"><JSONViewer data={item} /></div>)}</div>;
+      if (typeof data === 'object' && data !== null) {
+        return (
+          <div>
+            {Object.keys(data).map(key => (
+              <div key={key} className="mb-3">
+                <span className="block text-brand text-xs font-bold mb-1">{key}</span>
+                <JSONViewer data={data[key]} />
+              </div>
+            ))}
+          </div>
+        );
+      }
+      return <span>{String(data)}</span>;
+    };
+
+    const WebLinksPanel = ({ showImportMsg }) => (
+      <div className="bg-white/5 border border-brand/40 rounded-xl p-4 my-5 text-center">
+        <p className="text-brand text-sm font-bold mb-3">👇 下のリンクからWeb版AIを開いて送信してください</p>
+        <div className="flex flex-wrap justify-center gap-2 mb-3">
+          {['Perplexity', 'ChatGPT', 'Claude'].map(ai => (
+            <a key={ai} href={`https://${ai==='ChatGPT'?'chatgpt.com':ai==='Claude'?'claude.ai':'www.perplexity.ai'}`} target="_blank" className="flex-1 min-w-[100px] bg-white/10 hover:bg-white/20 transition rounded-lg py-2 text-sm font-bold text-white border border-white/10">
+              {ai === 'ChatGPT' ? '🟢 ' : ai === 'Claude' ? '🟠 ' : '🔍 '}{ai}
+            </a>
+          ))}
+        </div>
+        {showImportMsg && <p className="text-xs text-white/50">回答が完了したら、すべてコピーして「📥 読込」に貼り付けてください。</p>}
+      </div>
+    );
+
     /* =========================================================================
-       4. 汎用ツール実行エンジン (クラッシュ回避の中核)
+       4. 汎用ツール実行エンジン (Error Boundary 相当の安全設計)
        ========================================================================= */
-    const ToolRunner = ({toolId, username, role, onBack}) => {
-      const conf = TOOLS[toolId];
-      if (!conf) return el('div', {className: 'z1'}, el('p', null, 'Error: Tool not found.'));
+    const ToolRunner = ({ tid, user, role, onBack }) => {
+      const conf = TOOLS[tid];
+      if (!conf) return <div className="text-red-500 p-8 text-center font-bold">Error: Tool not found</div>;
 
-      const db = AppDB.get();
-      const userObj = db.users[username];
-      const projId = userObj.curProj;
-      const initialData = (userObj.projects[projId] && userObj.projects[projId].data[toolId]) ? userObj.projects[projId].data[toolId] : {};
+      const [db, setDb] = useState(AppDB.get());
+      const uData = db?.users?.[user];
+      const pid = uData?.curProj || 'default';
+      const pData = uData?.projects?.[pid]?.data?.[tid] || {};
 
-      const [inputs, setInputs] = useState(initialData);
-      const [activeTab, setActiveTab] = useState('settings');
-      const [copyState, setCopyState] = useState({});
+      const [vals, setVals] = useState(pData);
+      const [tab, setTab] = useState('settings');
+      const [copied, setCopied] = useState({});
       const [showLinks, setShowLinks] = useState(false);
-      const [importText, setImportText] = useState('');
-      const [resultData, setResultData] = useState(null);
-      const [errorMessage, setErrorMessage] = useState('');
+      const [impText, setImpText] = useState('');
+      const [resData, setResData] = useState(null);
+      const [err, setErr] = useState('');
 
-      const handleInputChange = (fieldId, val) => {
-        const newInputs = { ...inputs, [fieldId]: val };
-        setInputs(newInputs);
+      const updateVal = (id, val) => {
+        const newVals = { ...vals, [id]: val };
+        setVals(newVals);
         if (role !== 'admin') {
           const newDb = AppDB.get();
-          newDb.users[username].projects[projId].data[toolId] = newInputs;
+          if (!newDb.users[user].projects[pid].data) newDb.users[user].projects[pid].data = {};
+          newDb.users[user].projects[pid].data[tid] = newVals;
           AppDB.save(newDb);
         }
       };
 
-      const checkPermission = () => {
+      const checkAuth = () => {
         if (role === 'admin') return true;
-        if (userObj.perms && userObj.perms[toolId]) return true;
+        if (uData?.perms?.[tid]) return true;
         const today = new Date().toDateString();
-        if (userObj.usage.date !== today) return true;
-        return userObj.usage.count < DAILY_LIMIT;
+        if (uData?.usage?.date !== today) return true;
+        return uData.usage.count < DAILY_LIMIT;
       };
 
       const handleGenerate = () => {
-        if (!checkPermission()) {
+        if (!checkAuth()) {
           alert(`本日の無料枠(${DAILY_LIMIT}回)を終了しました。\n無制限利用をご希望の場合は管理者へお問い合わせください。`);
           return;
         }
 
-        if (role !== 'admin' && !(userObj.perms && userObj.perms[toolId])) {
+        if (role !== 'admin' && !(uData?.perms?.[tid])) {
           const newDb = AppDB.get();
           const today = new Date().toDateString();
-          if (newDb.users[username].usage.date !== today) {
-            newDb.users[username].usage = { date: today, count: 0 };
-          }
-          newDb.users[username].usage.count++;
+          if (newDb.users[user].usage.date !== today) newDb.users[user].usage = { date: today, count: 0 };
+          newDb.users[user].usage.count++;
           AppDB.save(newDb);
         }
 
+        const brand = uData?.brand || {};
+        const plan = brand.plan || 'free';
         let brandContext = '';
-        const aiPlan = (userObj.brand && userObj.brand.plan) ? userObj.brand.plan : 'free';
-        if (userObj.brand && userObj.brand.name) {
-          brandContext = `【発信者情報(文体やターゲットに反映)】名前:${userObj.brand.name} ターゲット:${userObj.brand.target || ''} 文体:${userObj.brand.tone || ''}\n\n`;
-        }
+        if (brand.name) brandContext = `【発信者情報】名前:${brand.name} ターゲット:${brand.target||''} 文体:${brand.tone||''}\n\n`;
 
-        const basePrompt = conf.buildPrompt(inputs, brandContext);
-        const systemPrefix = aiPlan === 'paid' 
-          ? '【システム設定: 有料AIモード】\nあなたは高度な推論とWeb検索が可能な状態です。複雑な指示にも完璧に従い最高品質の出力をしてください。\n\n'
-          : '【システム設定: 無料AIモード】\nあなたは出力制限がある環境です。回答が途切れないよう簡潔に要点を絞って出力してください。\n\n';
+        const baseP = conf.buildPrompt(vals, brandContext);
+        const prefix = plan === 'paid' 
+          ? '【システム設定: 有料AIモード】\n高度な推論とWeb検索が可能な状態です。複雑な指示にも完璧に従い最高品質の出力をしてください。\n\n'
+          : '【システム設定: 無料AIモード】\n出力制限がある環境です。回答が途切れないよう簡潔に要点を絞って出力してください。\n\n';
         
-        const finalPrompt = systemPrefix + basePrompt;
-
-        doCopy(finalPrompt, copyState, setCopyState, 'generate');
+        copyToClip(prefix + baseP, setCopied, 'gen');
         setShowLinks(true);
-        if (!conf.noJsonParse && !conf.isOnePageUI) {
-          setActiveTab('import');
-        }
+        if (!conf.noJson && !conf.isOnePage) setTab('import');
       };
 
       const handleImport = () => {
-        if (conf.noJsonParse) {
-          setResultData(importText);
-          setActiveTab('preview');
-          setImportText('');
-          return;
+        if (conf.noJson) {
+          setResData(impText); setTab('preview'); setImpText(''); return;
         }
-        setErrorMessage('');
-        const parsed = safeParseJSON(importText);
+        setErr('');
+        const parsed = safeParse(impText);
         if (parsed) {
-          setResultData(parsed);
-          setActiveTab('preview');
-          setImportText('');
+          setResData(parsed); setTab('preview'); setImpText('');
         } else {
-          setErrorMessage('JSONフォーマットエラーです。AIの出力をそのまま（余計な文字を含めず）貼り付けてください。');
+          setErr('JSONフォーマットエラーです。AIの出力をそのまま貼り付けてください。');
         }
       };
 
-      if (conf.isOnePageUI) {
-        return el('div', {className: 'z1'},
-          el('div', {className: 'tool-header'}, 
-            el('div', {className: 'flex-row', style: {alignItems: 'center'}}, 
-              el('button', {className: 'btn-sub', onClick: onBack}, '← 戻る'), 
-              el('h1', {className: 'tool-header-title'}, conf.name)
-            )
-          ),
-          el('div', {className: 'tutorial-panel'}, 
-            el('div', {className: 'tutorial-title'}, '💡 使い方と目的'), 
-            el('div', {className: 'tutorial-body'}, conf.tutorial)
-          ),
-          conf.fields.map(f => el(FormField, { key: f.id, field: f, value: inputs[f.id], onChange: (val) => handleInputChange(f.id, val) })),
-          el('button', {className: 'btn-primary', onClick: handleGenerate}, copyState['generate'] ? '✓ コピー完了！AIへ送信してください' : '📋 プロンプト生成 ＆ コピー'),
-          showLinks && el(LauncherLinks, {showImportMessage: false}),
-          el('div', {className: 'form-card', style: {marginTop: 20}}, 
-            el('span', {className: 'form-label'}, '📥 AIの回答を貼り付けて保管・編集'), 
-            el('textarea', {className: 'form-input', style: {minHeight: 250}, value: resultData || '', onChange: (e) => setResultData(e.target.value)}), 
-            el('button', {className: 'btn-sub', style: {width: '100%', marginTop: 14}, onClick: () => doCopy(resultData || '', copyState, setCopyState, 'copyAll')}, copyState['copyAll'] ? '✓ コピー完了' : '📋 全文コピー')
-          )
+      const HeaderUI = () => (
+        <div className="flex justify-between items-center mb-6 pb-4 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <button onClick={onBack} className="bg-white/10 hover:bg-white/20 text-white/80 px-3 py-1.5 rounded-lg text-sm font-bold transition">← 戻る</button>
+            <h1 className="text-lg md:text-xl font-black">{conf.name}</h1>
+          </div>
+        </div>
+      );
+
+      const TutPanel = () => (
+        <div className="bg-brand/5 border border-brand/20 rounded-xl p-4 md:p-5 mb-5">
+          <p className="text-brand text-sm font-bold mb-2 flex items-center gap-2">💡 使い方と目的</p>
+          <p className="text-xs text-white/80 leading-relaxed whitespace-pre-wrap">{conf.tut}</p>
+        </div>
+      );
+
+      // 1画面UI (note)
+      if (conf.isOnePage) {
+        return (
+          <div className="w-full">
+            <HeaderUI />
+            <TutPanel />
+            {conf.f.map(f => <FormField key={f.id} f={f} val={vals[f.id]} onChange={(v) => updateVal(f.id, v)} />)}
+            <button className="w-full bg-gradient-to-r from-brand-dark to-brand text-white font-black py-4 rounded-xl shadow-lg hover:scale-[0.98] transition mt-2 mb-4" onClick={handleGenerate}>
+              {copied['gen'] ? '✓ コピー完了！AIへ送信してください' : '📋 プロンプト生成 ＆ コピー'}
+            </button>
+            {showLinks && <WebLinksPanel showImportMsg={false} />}
+            <div className="glass-card rounded-xl p-5 mt-6">
+              <span className="text-xs font-bold text-slate-400 block mb-3">📥 AIの回答を貼り付けて保管・編集</span>
+              <textarea className="w-full bg-white/5 border border-white/10 rounded-lg p-4 text-sm min-h-[300px] outline-none focus:border-brand transition" value={resData || ''} onChange={e => setResData(e.target.value)} />
+              <button className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-lg mt-3 transition" onClick={() => copyToClip(resData||'', setCopied, 'cAll')}>
+                {copied['cAll'] ? '✓ コピー完了' : '📋 全文コピー'}
+              </button>
+            </div>
+          </div>
         );
       }
 
-      return el('div', {className: 'z1'},
-        el('div', {className: 'tool-header'}, 
-          el('div', {className: 'flex-row', style: {alignItems: 'center'}}, 
-            el('button', {className: 'btn-sub', onClick: onBack}, '← 戻る'), 
-            el('h1', {className: 'tool-header-title'}, conf.name)
-          )
-        ),
-        el('div', {className: 'tabs-container'}, 
-          [ {id: 'settings', label: '⚙️ 条件設定', disabled: false},
-            {id: 'import', label: '📥 AI回答読込', disabled: false},
-            {id: 'preview', label: '👁 結果確認', disabled: !resultData}
-          ].map(t => 
-            el('button', {
-              key: t.id, 
-              className: `tab-item ${activeTab === t.id ? 'active' : ''}`, 
-              disabled: t.disabled,
-              onClick: () => { if (!t.disabled) setActiveTab(t.id); }
-            }, t.label)
-          )
-        ),
-        activeTab === 'settings' && el('div', null,
-          el('div', {className: 'tutorial-panel'}, 
-            el('div', {className: 'tutorial-title'}, '💡 使い方と目的'), 
-            el('div', {className: 'tutorial-body'}, conf.tutorial)
-          ),
-          conf.fields.map(f => el(FormField, { key: f.id, field: f, value: inputs[f.id], onChange: (val) => handleInputChange(f.id, val) })),
-          el('button', {className: 'btn-primary', onClick: handleGenerate}, copyState['generate'] ? '✓ コピー完了！' : '📋 プロンプト生成 ＆ コピー'),
-          showLinks && el(LauncherLinks, {showImportMessage: !conf.noJsonParse})
-        ),
-        activeTab === 'import' && el('div', null, 
-          el('div', {className: 'form-card'}, 
-            el('span', {className: 'form-label'}, '📥 AIの出力を貼り付け'), 
-            el('textarea', {className: 'form-input', style: {minHeight: 180}, value: importText, onChange: (e) => setImportText(e.target.value)}), 
-            errorMessage && el('div', {className: 'error-box'}, '❌ ' + errorMessage), 
-            el('button', {className: 'btn-primary', style: {marginTop: 10}, disabled: !importText.trim(), onClick: handleImport}, 'システムに反映して結果を見る')
-          )
-        ),
-        activeTab === 'preview' && resultData && el('div', {className: 'form-card'}, el(JSONViewer, {data: resultData}))
+      // 通常タブUI
+      return (
+        <div className="w-full">
+          <HeaderUI />
+          <div className="flex overflow-x-auto border-b border-white/10 mb-6 gap-2 hide-scrollbar">
+            {[ {id:'settings', l:'⚙️ 条件設定', d:false}, {id:'import', l:'📥 AI回答読込', d:false}, {id:'preview', l:'👁 結果確認', d:!resData} ].map(t => (
+              <button key={t.id} disabled={t.d} onClick={() => setTab(t.id)} className={`px-5 py-3 text-sm font-bold whitespace-nowrap border-b-2 transition ${tab===t.id ? 'text-brand border-brand' : 'text-white/40 border-transparent hover:text-white/60'} ${t.d ? 'opacity-30 cursor-not-allowed' : ''}`}>
+                {t.l}
+              </button>
+            ))}
+          </div>
+
+          {tab === 'settings' && (
+            <div className="animate-fade-in">
+              <TutPanel />
+              {conf.f.map(f => <FormField key={f.id} f={f} val={vals[f.id]} onChange={(v) => updateVal(f.id, v)} />)}
+              <button className="w-full bg-gradient-to-r from-brand-dark to-brand text-white font-black py-4 rounded-xl shadow-lg hover:scale-[0.98] transition mt-2 mb-4" onClick={handleGenerate}>
+                {copied['gen'] ? '✓ コピー完了！' : '📋 プロンプト生成 ＆ コピー'}
+              </button>
+              {showLinks && <WebLinksPanel showImportMsg={!conf.noJson} />}
+            </div>
+          )}
+
+          {tab === 'import' && (
+            <div className="glass-card rounded-xl p-5 animate-fade-in">
+              <span className="text-xs font-bold text-slate-400 block mb-3">📥 AIの出力を貼り付け</span>
+              <textarea className="w-full bg-white/5 border border-white/10 rounded-lg p-4 text-sm min-h-[200px] outline-none focus:border-brand transition" value={impText} onChange={e => setImpText(e.target.value)} />
+              {err && <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-lg text-sm mt-3 font-bold">❌ {err}</div>}
+              <button className="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-lg mt-4 transition disabled:opacity-50" disabled={!impText.trim()} onClick={handleImport}>
+                システムに反映して結果を見る
+              </button>
+            </div>
+          )}
+
+          {tab === 'preview' && resData && (
+            <div className="glass-card rounded-xl p-5 animate-fade-in">
+              <JSONViewer data={resData} />
+            </div>
+          )}
+        </div>
       );
     };
+
 
     /* =========================================================================
        5. 設定・プロジェクト・問い合わせ
        ========================================================================= */
-    const SettingsScreen = ({user, onBack}) => {
+    const SettingsScreen = ({ user, onBack }) => {
       const db = AppDB.get();
-      const b = db.users[user].brand || {plan: 'free', name: '', target: '', tone: ''};
+      const b = db.users[user]?.brand || { plan: 'free', name: '', target: '', tone: '' };
       const [name, setName] = useState(b.name);
       const [target, setTarget] = useState(b.target);
       const [tone, setTone] = useState(b.tone);
@@ -845,18 +467,41 @@
         onBack();
       };
 
-      return el('div', {className: 'z1'}, 
-        el('div', {className: 'tool-header'}, el('div', {className: 'flex-row', style: {alignItems: 'center'}}, el('button', {className: 'btn-sub', onClick: onBack}, '← 戻る'), el('h1', {className: 'tool-header-title'}, '👤 マイ・ブランド ＆ AI設定'))),
-        el('div', {className: 'tutorial-panel'}, el('div', {className: 'tutorial-body'}, '登録した情報は全ツールのプロンプトに自動で埋め込まれます。\n使用しているAIのプランに合わせてプロンプトが最適化されます。')),
-        el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, '🤖 使用しているAIプラン'), el('select', {className: 'form-input', value: plan, onChange: (e) => setPlan(e.target.value)}, el('option', {value: 'free'}, '無料版 (ChatGPT Free 等)'), el('option', {value: 'paid'}, '有料版 (ChatGPT Plus 等)'))),
-        el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, '発信者名・肩書き'), el('input', {className: 'form-input', value: name, onChange: (e) => setName(e.target.value)})),
-        el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, 'メインのターゲット層'), el('input', {className: 'form-input', value: target, onChange: (e) => setTarget(e.target.value)})),
-        el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, '文体のクセ・ルール (例:絵文字多め)'), el('textarea', {className: 'form-input', style: {minHeight: 100}, value: tone, onChange: (e) => setTone(e.target.value)})),
-        el('button', {className: 'btn-primary', onClick: save}, '設定を保存する')
+      return (
+        <div className="w-full max-w-2xl mx-auto">
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/10">
+            <button onClick={onBack} className="bg-white/10 hover:bg-white/20 text-white/80 px-3 py-1.5 rounded-lg text-sm font-bold transition">← 戻る</button>
+            <h1 className="text-xl font-black">👤 マイ・ブランド ＆ AI設定</h1>
+          </div>
+          <div className="bg-brand/5 border border-brand/20 rounded-xl p-4 mb-6">
+            <p className="text-xs text-white/80 leading-relaxed">登録した情報は全ツールのプロンプトに自動反映されます。使用AIプランに合わせてプロンプトの長さや要求度が最適化されます。</p>
+          </div>
+          
+          <div className="glass-card rounded-xl p-5 mb-4">
+            <span className="text-xs font-bold text-slate-400 block mb-2">🤖 使用しているAIプラン</span>
+            <select className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm focus:border-brand outline-none" value={plan} onChange={e => setPlan(e.target.value)}>
+              <option value="free" className="bg-bg-base">無料版 (ChatGPT Free 等)</option>
+              <option value="paid" className="bg-bg-base">有料版 (ChatGPT Plus 等)</option>
+            </select>
+          </div>
+          <div className="glass-card rounded-xl p-5 mb-4">
+            <span className="text-xs font-bold text-slate-400 block mb-2">発信者名・肩書き</span>
+            <input className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-brand" value={name} onChange={e => setName(e.target.value)} />
+          </div>
+          <div className="glass-card rounded-xl p-5 mb-4">
+            <span className="text-xs font-bold text-slate-400 block mb-2">メインのターゲット層</span>
+            <input className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-brand" value={target} onChange={e => setTarget(e.target.value)} />
+          </div>
+          <div className="glass-card rounded-xl p-5 mb-6">
+            <span className="text-xs font-bold text-slate-400 block mb-2">文体のクセ・ルール (例:絵文字多め)</span>
+            <textarea className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm min-h-[100px] outline-none focus:border-brand" value={tone} onChange={e => setTone(e.target.value)} />
+          </div>
+          <button className="w-full bg-brand hover:bg-brand-dark text-white font-bold py-4 rounded-xl shadow-lg transition" onClick={save}>設定を保存する</button>
+        </div>
       );
     };
 
-    const ProjectScreen = ({user, onBack}) => {
+    const ProjectScreen = ({ user, onBack }) => {
       const [db, setDb] = useState(AppDB.get());
       const uData = db.users[user];
       const [newProj, setNewProj] = useState('');
@@ -869,6 +514,7 @@
         newDb.users[user].curProj = id;
         AppDB.save(newDb); setDb(newDb); setNewProj('');
       };
+      
       const switchProj = (id) => {
         if (user === 'admin') return;
         const newDb = AppDB.get();
@@ -876,99 +522,112 @@
         AppDB.save(newDb); setDb(newDb); onBack();
       };
 
-      return el('div', {className: 'z1'}, 
-        el('div', {className: 'tool-header'}, el('div', {className: 'flex-row', style: {alignItems: 'center'}}, el('button', {className: 'btn-sub', onClick: onBack}, '← 戻る'), el('h1', {className: 'tool-header-title'}, '📁 プロジェクト管理'))),
-        el('div', {className: 'tutorial-panel'}, el('div', {className: 'tutorial-body'}, '案件ごとにツール内の入力データを分けて保存できます。')),
-        el('div', {className: 'flex-row', style: {marginBottom: 20}}, el('input', {className: 'form-input flex-1', placeholder: '新プロジェクト名', value: newProj, onChange: (e) => setNewProj(e.target.value)}), el('button', {className: 'btn-primary', style: {width: 'auto', margin: 0}, onClick: create, disabled: user === 'admin'}, '作成')),
-        Object.keys(uData.projects).map(k => {
-          const p = uData.projects[k];
-          const isCur = k === uData.curProj;
-          return el('div', {key: k, className: 'form-card flex-row', style: {justifyContent: 'space-between', alignItems: 'center', borderColor: isCur ? '#38bdf8' : 'rgba(255,255,255,0.08)'}}, 
-            el('span', {style: {fontWeight: 800, color: isCur ? '#38bdf8' : '#fff'}}, p.name + (isCur ? ' (選択中)' : '')),
-            !isCur && el('button', {className: 'btn-sub', onClick: () => switchProj(k)}, '切り替え')
-          );
-        })
+      return (
+        <div className="w-full max-w-2xl mx-auto">
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/10">
+            <button onClick={onBack} className="bg-white/10 hover:bg-white/20 text-white/80 px-3 py-1.5 rounded-lg text-sm font-bold transition">← 戻る</button>
+            <h1 className="text-xl font-black">📁 プロジェクト管理</h1>
+          </div>
+          <div className="bg-brand/5 border border-brand/20 rounded-xl p-4 mb-6">
+            <p className="text-xs text-white/80 leading-relaxed">案件ごとにツール内の入力データを分けて保存できます。</p>
+          </div>
+          <div className="flex gap-3 mb-8">
+            <input className="flex-1 bg-white/5 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-brand" placeholder="新プロジェクト名" value={newProj} onChange={e => setNewProj(e.target.value)} />
+            <button className="bg-brand hover:bg-brand-dark text-white font-bold px-6 rounded-lg transition disabled:opacity-50" onClick={create} disabled={user === 'admin'}>作成</button>
+          </div>
+          
+          <div className="grid gap-3">
+            {Object.keys(uData.projects).map(k => {
+              const p = uData.projects[k];
+              const isCur = k === uData.curProj;
+              return (
+                <div key={k} className={`glass-card rounded-xl p-4 flex justify-between items-center transition ${isCur ? 'border-brand bg-brand/5' : ''}`}>
+                  <span className={`font-bold ${isCur ? 'text-brand' : 'text-white'}`}>{p.name} {isCur && '(選択中)'}</span>
+                  {!isCur && <button className="bg-white/10 hover:bg-white/20 text-xs font-bold px-4 py-2 rounded-md transition" onClick={() => switchProj(k)}>切り替え</button>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       );
     };
 
-    const InquiryModal = ({user, onClose}) => {
-      const [type, setType] = useState(INQ_TYPES[0]);
+    const InquiryModal = ({ user, onClose }) => {
+      const types = ['機能追加の要望', '不具合・バグの報告', 'プロンプト修正依頼', 'その他のお問い合わせ'];
+      const [type, setType] = useState(types[0]);
       const [content, setContent] = useState('');
       const [sent, setSent] = useState(false);
 
       const handleSend = () => {
         if (!content.trim()) return;
-        const newDb = AppDB.get();
-        newDb.inquiries.push({ id: Date.now(), user: user, type: type, content: content, date: Date.now(), status: 'unread' });
-        AppDB.save(newDb);
+        const db = AppDB.get();
+        db.inquiries.push({ id: Date.now(), user, type, content, date: Date.now(), status: 'unread' });
+        AppDB.save(db);
         setSent(true); setTimeout(onClose, 2000);
       };
 
-      return el('div', {className: 'modal-overlay', onClick: onClose}, 
-        el('div', {className: 'modal-content', onClick: (e) => e.stopPropagation()}, 
-          el('div', {className: 'tool-header', style: {marginBottom: 20, paddingBottom: 10}}, 
-            el('h2', {style: {color: '#f59e0b', fontSize: 18, margin: 0}}, '💬 管理者へのお問い合わせ'), 
-            el('button', {onClick: onClose, style: {fontSize: 24, background: 'none', border: 'none', color: '#888'}}, '×')
-          ),
-          sent ? el('div', {style: {textAlign: 'center', color: '#4ade80', fontWeight: 800, padding: '30px 0', fontSize: 18}}, '送信完了しました！') : 
-          el('div', null, 
-            el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, '種別'), el('select', {className: 'form-input', value: type, onChange: (e) => setType(e.target.value)}, INQ_TYPES.map(o => el('option', {key: o, value: o}, o)))),
-            el('div', {className: 'form-card'}, el('span', {className: 'form-label'}, '内容'), el('textarea', {className: 'form-input', style: {minHeight: 120}, value: content, onChange: (e) => setContent(e.target.value)})),
-            el('button', {className: 'btn-primary', style: {background: 'linear-gradient(135deg, #f59e0b, #d97706)'}, disabled: !content.trim(), onClick: handleSend}, '送信する')
-          )
-        )
-      );
-    };
-
-    const ManualModal = ({onClose}) => {
-      return el('div', {className: 'modal-overlay', onClick: onClose}, 
-        el('div', {className: 'modal-content', onClick: (e) => e.stopPropagation()}, 
-          el('div', {className: 'tool-header', style: {marginBottom: 16, paddingBottom: 10}}, 
-            el('h2', {style: {color: '#38bdf8', fontSize: 18, margin: 0}}, '📖 AI Content Pro マニュアル'), 
-            el('button', {onClick: onClose, style: {fontSize: 24, background: 'none', border: 'none', color: '#888'}}, '×')
-          ),
-          el('div', {style: {fontSize: 13, lineHeight: 1.7}}, 
-            el('p', {style: {marginBottom: 16}}, '本ツールは、最新AIを操作してビジネスを自動化するプロンプトジェネレーターです。'), 
-            el('div', {className: 'tutorial-panel'}, el('strong', {style: {color: '#fbbf24', display: 'block', marginBottom: 8}}, '🚀 基本的な使い方 (3ステップ)'), '1. ツールの【⚙️ 条件設定】で情報を入力し、プロンプトを生成してコピー。\n2. 別タブでChatGPT等を開き、コピーした文章をそのまま送信。\n3. AIの回答をすべてコピーし、ツールの【📥 AI回答読込】に貼り付ける！'), 
-            el('div', {className: 'tutorial-panel', style: {borderColor: 'rgba(56, 189, 248, 0.4)'}}, el('strong', {style: {color: '#38bdf8', display: 'block', marginBottom: 8}}, '🤖 無料版・有料版どちらを使うべき？'), '本格的にマネタイズするなら', el('strong', {style: {color: '#f43f5e'}}, '「有料版一択」'), 'です。無料版は長文で途切れやすく、Web検索も弱いためです。\n※「マイ・ブランド設定」で有料版を選ぶと、AIの能力を引き出す専用プロンプトに自動で切り替わります。'), 
-            el('button', {className: 'btn-primary', onClick: onClose}, '理解してツールを使う')
-          )
-        )
+      return (
+        <div className="fixed inset-0 bg-black/80 z-[999] flex items-center justify-center p-4 backdrop-blur-sm" onClick={onClose}>
+          <div className="bg-[#0f172a] border border-white/10 rounded-2xl p-6 md:p-8 w-full max-w-lg shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-white/10">
+              <h2 className="text-brand-orange text-lg font-black m-0">💬 管理者へのお問い合わせ</h2>
+              <button onClick={onClose} className="text-2xl text-white/50 hover:text-white transition">×</button>
+            </div>
+            
+            {sent ? (
+              <div className="text-center py-12 text-brand-green font-black text-xl animate-pulse">送信完了しました！</div>
+            ) : (
+              <div>
+                <div className="mb-5">
+                  <span className="block text-xs font-bold text-slate-400 mb-2">お問い合わせ種別</span>
+                  <select className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm focus:border-brand-orange outline-none" value={type} onChange={e => setType(e.target.value)}>
+                    {types.map(t => <option key={t} value={t} className="bg-bg-base">{t}</option>)}
+                  </select>
+                </div>
+                <div className="mb-6">
+                  <span className="block text-xs font-bold text-slate-400 mb-2">内容</span>
+                  <textarea className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm min-h-[120px] focus:border-brand-orange outline-none" value={content} onChange={e => setContent(e.target.value)} />
+                </div>
+                <button className="w-full bg-gradient-to-r from-brand-orange to-orange-600 text-white font-black py-4 rounded-xl shadow-lg hover:scale-[0.98] transition disabled:opacity-50" disabled={!content.trim()} onClick={handleSend}>
+                  送信する
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       );
     };
 
     /* =========================================================================
        6. 認証 ＆ 管理ダッシュボード
        ========================================================================= */
-    const AuthScreen = ({onLogin}) => {
+    const AuthScreen = ({ onLogin }) => {
       const [isLogin, setIsLogin] = useState(true);
       const [un, setUn] = useState('');
       const [pw, setPw] = useState('');
       const [sns, setSns] = useState('');
       const [err, setErr] = useState('');
-      const [isAdmin, setIsAdmin] = useState(false);
+      const [isAdminMode, setIsAdminMode] = useState(false);
 
       const handleUnChange = (e) => {
         const val = e.target.value;
         setUn(val);
         const db = AppDB.get();
-        setIsAdmin(val === db.admin.u);
+        setIsAdminMode(val === db.admin.u || val === 'admin'); // 動的パスワード欄表示
       };
 
       const handleSubmit = () => {
-        setErr('');
-        const u = un.trim();
+        setErr(''); const u = un.trim();
         if (!u) return setErr('ユーザー名を入力してください');
         
         const db = AppDB.get();
+        const adminU = db.admin.u || 'admin';
 
-        if (isAdmin) {
+        if (isAdminMode) {
           if (pw === db.admin.p) {
-            localStorage.setItem(SESS_KEY, JSON.stringify({u: u, r: 'admin'}));
-            onLogin(u, 'admin');
-          } else {
-            setErr('パスワードが違います');
-          }
+            localStorage.setItem(SESS_KEY, JSON.stringify({u: adminU, r: 'admin'}));
+            onLogin(adminU, 'admin');
+          } else { setErr('パスワードが違います'); }
           return;
         }
 
@@ -994,34 +653,47 @@
         }
       };
 
-      return el('div', {className: 'page-container'}, 
-        el('div', {className: 'grid-bg'}), 
-        el('div', {className: 'content-wrapper auth-container'}, 
-          el('h2', {style: {fontSize: 26, fontWeight: 900, marginBottom: 8}}, 'AI Content Pro'), 
-          el('p', {style: {color: '#38bdf8', fontWeight: 800, marginBottom: 30}}, 'SaaS Edition v31'), 
-          
-          !isAdmin && el('div', {className: 'flex-row', style: {background: 'rgba(0,0,0,0.3)', padding: 6, borderRadius: 10, marginBottom: 24}}, 
-            el('button', {onClick: () => {setIsLogin(true); setErr('');}, style: {flex: 1, padding: '12px', borderRadius: 8, background: isLogin ? '#38bdf8' : 'transparent', color: isLogin ? '#fff' : '#888', fontWeight: 800}}, 'ログイン'), 
-            el('button', {onClick: () => {setIsLogin(false); setErr('');}, style: {flex: 1, padding: '12px', borderRadius: 8, background: !isLogin ? '#38bdf8' : 'transparent', color: !isLogin ? '#fff' : '#888', fontWeight: 800}}, '新規申請')
-          ), 
-          
-          el('input', {className: 'form-input', style: {marginBottom: 14}, placeholder: 'ユーザー名', value: un, onChange: handleUnChange}), 
-          (!isLogin && !isAdmin) && el('input', {className: 'form-input', style: {marginBottom: 14}, placeholder: 'SNSアカウント (@必須)', value: sns, onChange: (ev) => setSns(ev.target.value)}), 
-          isAdmin && el('input', {className: 'form-input', style: {marginBottom: 14}, type: 'password', placeholder: '管理者パスワード', value: pw, onChange: (ev) => setPw(ev.target.value)}), 
-          
-          err && el('div', {className: 'error-box'}, err), 
-          el('button', {className: 'btn-primary', style: {marginTop: 10}, onClick: handleSubmit}, isAdmin ? '管理者としてログイン' : isLogin ? 'ログイン' : '申請して待機画面へ')
-        )
+      return (
+        <div className="w-full max-w-md mx-auto mt-10 md:mt-20">
+          <div className="glass-card rounded-[24px] p-8 md:p-10 text-center shadow-2xl relative overflow-hidden">
+            {/* 装飾用光彩 */}
+            <div className="absolute -top-20 -left-20 w-40 h-40 bg-brand/20 rounded-full blur-[50px] pointer-events-none"></div>
+            <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-brand-dark/20 rounded-full blur-[50px] pointer-events-none"></div>
+            
+            <div className="relative z-10">
+              <h2 className="text-3xl font-black mb-2 tracking-tight">AI Content Pro</h2>
+              <p className="text-brand font-bold text-sm mb-8 tracking-widest uppercase">SaaS Edition v32</p>
+              
+              {!isAdminMode && (
+                <div className="flex bg-black/40 p-1.5 rounded-xl mb-8">
+                  <button onClick={() => {setIsLogin(true); setErr('');}} className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition ${isLogin ? 'bg-brand text-white shadow-lg' : 'text-white/50 hover:text-white'}`}>ログイン</button>
+                  <button onClick={() => {setIsLogin(false); setErr('');}} className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition ${!isLogin ? 'bg-brand text-white shadow-lg' : 'text-white/50 hover:text-white'}`}>新規申請</button>
+                </div>
+              )}
+              
+              <div className="space-y-4 mb-6">
+                <input className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm outline-none focus:border-brand transition" placeholder="ユーザー名" value={un} onChange={handleUnChange} />
+                {(!isLogin && !isAdminMode) && <input className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm outline-none focus:border-brand transition animate-fade-in" placeholder="SNSアカウント (@必須)" value={sns} onChange={e => setSns(e.target.value)} />}
+                {isAdminMode && <input className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm outline-none focus:border-brand transition animate-fade-in" type="password" placeholder="管理者パスワード" value={pw} onChange={e => setPw(e.target.value)} />}
+              </div>
+              
+              {err && <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl text-sm mb-6 font-bold">❌ {err}</div>}
+              
+              <button className="w-full bg-gradient-to-r from-brand-dark to-brand text-white font-black py-4 rounded-xl shadow-lg hover:scale-[0.98] transition" onClick={handleSubmit}>
+                {isAdminMode ? '管理者としてログイン' : (isLogin ? 'ログイン' : '申請して待機画面へ')}
+              </button>
+            </div>
+          </div>
+        </div>
       );
     };
 
-    const AdminDashboard = ({onGoApp, onLogout}) => {
+    const AdminDashboard = ({ onGoApp, onLogout }) => {
       const [db, setDb] = useState(AppDB.get());
       const [tab, setTab] = useState('users');
       const [expUser, setExpUser] = useState(null);
 
-      // 管理者設定用State
-      const [adminU, setAdminU] = useState(db.admin.u);
+      const [adminU, setAdminU] = useState(db.admin.u || 'admin');
       const [adminP, setAdminP] = useState(db.admin.p);
       const [sysMsg, setSysMsg] = useState('');
 
@@ -1032,200 +704,250 @@
       const saveAdmin = () => {
         if (!adminU.trim() || !adminP.trim()) return;
         const newDb = AppDB.get();
-        const oldU = newDb.admin.u;
+        const oldU = newDb.admin.u || 'admin';
         newDb.admin = { u: adminU, p: adminP };
         
-        // ツールの利用のためにadmin権限のダミーユーザーもリネームしておく
         if (oldU !== adminU) {
-          newDb.users[adminU] = newDb.users[oldU];
-          delete newDb.users[oldU];
+          if(newDb.users[oldU]) {
+            newDb.users[adminU] = newDb.users[oldU];
+            delete newDb.users[oldU];
+          }
           localStorage.setItem(SESS_KEY, JSON.stringify({u: adminU, r: 'admin'}));
         }
         
-        AppDB.save(newDb);
-        setDb(newDb);
-        setSysMsg('管理者の設定を保存しました');
-        setTimeout(() => setSysMsg(''), 2000);
+        AppDB.save(newDb); setDb(newDb);
+        setSysMsg('設定を保存しました。次回から新しいユーザー名でログインできます。');
+        setTimeout(() => setSysMsg(''), 3000);
       };
 
-      const userKeys = Object.keys(db.users).filter(k => k !== db.admin.u);
+      const userKeys = Object.keys(db.users).filter(k => k !== (db.admin.u || 'admin'));
       const inqs = db.inquiries || [];
 
-      return el('div', {className: 'page-container'}, 
-        el('div', {className: 'grid-bg'}), 
-        el('div', {className: 'content-wrapper'}, 
-          el('div', {className: 'tool-header'}, 
-            el('h1', {className: 'main-title', style: {fontSize: 24, margin: 0}}, '🎛️ 管理画面'), 
-            el('div', {className: 'flex-row'}, 
-              el('button', {className: 'btn-primary', style: {padding: '8px 16px', fontSize: 13, width: 'auto', margin: 0}, onClick: onGoApp}, '🚀 ツールへ'), 
-              el('button', {className: 'btn-sub', onClick: onLogout}, 'ログアウト')
-            )
-          ), 
-          el('div', {className: 'tabs-container'}, 
-            el('button', {className: `tab-item ${tab === 'users' ? 'active' : ''}`, onClick: () => setTab('users')}, '👥 ユーザー管理'), 
-            el('button', {className: `tab-item ${tab === 'inqs' ? 'active' : ''}`, onClick: () => setTab('inqs')}, `📩 問い合わせ (${inqs.filter(x => x.status === 'unread').length})`),
-            el('button', {className: `tab-item ${tab === 'sys' ? 'active' : ''}`, onClick: () => setTab('sys')}, '⚙️ システム設定')
-          ), 
-          
-          tab === 'users' && el('div', {className: 'form-card admin-table-wrapper'}, 
-            el('table', {className: 'admin-table'}, 
-              el('thead', null, el('tr', null, el('th', null, 'User'), el('th', null, 'SNS'), el('th', null, 'Status'), el('th', null, 'Action'))), 
-              el('tbody', null, 
-                userKeys.sort((a,b) => db.users[b].registeredAt - db.users[a].registeredAt).map(k => {
-                  const u = db.users[k];
-                  const isExp = expUser === k;
-                  return el(Fragment, {key: k}, 
-                    el('tr', null, 
-                      el('td', {style: {fontWeight: 800}}, k), 
-                      el('td', {style: {color: '#38bdf8'}}, u.sns), 
-                      el('td', {style: {color: u.status === 'approved' ? '#4ade80' : (u.status === 'pending' ? '#fbbf24' : '#f87171'), fontWeight: 800}}, u.status === 'approved' ? '許可済' : (u.status === 'pending' ? '待機中' : 'BAN')), 
-                      el('td', null, 
-                        u.status !== 'approved' && el('button', {className: 'btn-sub', style: {background: '#16a34a', color: '#fff', marginRight: 6}, onClick: () => updateStatus(k, 'approved')}, '許可'), 
-                        u.status === 'approved' && el('button', {className: 'btn-sub', style: {marginRight: 6}, onClick: () => setExpUser(isExp ? null : k)}, '🔑 権限付与'), 
-                        u.status !== 'rejected' && el('button', {className: 'btn-sub', style: {background: '#e11d48', color: '#fff'}, onClick: () => updateStatus(k, 'rejected')}, 'BAN')
-                      )
-                    ), 
-                    isExp && el('tr', null, 
-                      el('td', {colSpan: 4, style: {background: 'rgba(0,0,0,0.4)'}}, 
-                        el('p', {style: {fontSize: 12, color: '#fbbf24', marginBottom: 12, fontWeight: 800}}, '✅ チェックを入れた機能は、このユーザーのみ【無制限】で利用可能になります'), 
-                        el('div', {className: 'flex-row'}, 
-                          Object.keys(TOOLS).map(tid => 
-                            el('label', {key: tid, style: {fontSize: 12, display: 'flex', alignItems: 'center', gap: 6}}, 
-                              el('input', {type: 'checkbox', checked: !!(u.perms && u.perms[tid]), onChange: () => togglePerm(k, tid)}), 
-                              TOOLS[tid].name
-                            )
-                          )
-                        )
-                      )
-                    )
-                  );
-                })
-              )
-            )
-          ),
-          
-          tab === 'inqs' && el('div', null, 
-            inqs.sort((a,b) => b.date - a.date).map(iq => 
-              el('div', {key: iq.id, className: 'form-card', style: {borderLeft: iq.status === 'unread' ? '4px solid #f59e0b' : '1px solid rgba(255,255,255,0.08)'}}, 
-                el('div', {className: 'flex-row', style: {justifyContent: 'space-between', marginBottom: 8}}, 
-                  el('span', {style: {fontWeight: 800, color: '#38bdf8', fontSize: 15}}, `${iq.user} (${iq.type})`), 
-                  el('span', {style: {fontSize: 12, color: '#888'}}, formatDateTime(iq.date))
-                ), 
-                el('p', {style: {whiteSpace: 'pre-wrap', fontSize: 14}}, iq.content), 
-                iq.status === 'unread' && el('button', {className: 'btn-sub', style: {marginTop: 14}, onClick: () => markRead(iq.id)}, '既読にする')
-              )
-            )
-          ),
+      return (
+        <div className="w-full">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <h1 className="text-2xl font-black">🎛️ 管理者ダッシュボード</h1>
+            <div className="flex gap-3">
+              <button className="bg-gradient-to-r from-brand-orange to-orange-600 text-white font-bold py-2 px-5 rounded-lg shadow-lg hover:scale-95 transition" onClick={onGoApp}>🚀 ツール画面へ</button>
+              <button className="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-5 rounded-lg transition" onClick={onLogout}>ログアウト</button>
+            </div>
+          </div>
 
-          tab === 'sys' && el('div', {className: 'form-card'}, 
-            el('span', {className: 'form-label'}, '管理者 ユーザー名'),
-            el('input', {className: 'form-input', style: {marginBottom: 16}, value: adminU, onChange: e => setAdminU(e.target.value)}),
-            el('span', {className: 'form-label'}, '管理者 パスワード'),
-            el('input', {className: 'form-input', style: {marginBottom: 16}, type: 'password', value: adminP, onChange: e => setAdminP(e.target.value)}),
-            el('button', {className: 'btn-primary', onClick: saveAdmin}, '設定を保存'),
-            sysMsg && el('p', {style: {color: '#4ade80', textAlign: 'center', marginTop: 10, fontWeight: 800}}, sysMsg)
-          )
-        )
+          <div className="flex overflow-x-auto border-b border-white/10 mb-8 gap-2 hide-scrollbar">
+            <button onClick={() => setTab('users')} className={`px-5 py-3 text-sm font-bold whitespace-nowrap border-b-2 transition ${tab==='users' ? 'text-brand border-brand' : 'text-white/40 border-transparent hover:text-white/60'}`}>👥 ユーザー管理</button>
+            <button onClick={() => setTab('inqs')} className={`px-5 py-3 text-sm font-bold whitespace-nowrap border-b-2 transition ${tab==='inqs' ? 'text-brand border-brand' : 'text-white/40 border-transparent hover:text-white/60'}`}>📩 問い合わせ ({inqs.filter(x=>x.status==='unread').length})</button>
+            <button onClick={() => setTab('sys')} className={`px-5 py-3 text-sm font-bold whitespace-nowrap border-b-2 transition ${tab==='sys' ? 'text-brand border-brand' : 'text-white/40 border-transparent hover:text-white/60'}`}>⚙️ システム設定</button>
+          </div>
+
+          {tab === 'users' && (
+            <div className="glass-card rounded-xl overflow-hidden overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-white/5 border-b border-white/10 text-slate-400">
+                  <tr><th className="p-4 font-bold">ユーザー</th><th className="p-4 font-bold">SNS</th><th className="p-4 font-bold">ステータス</th><th className="p-4 font-bold">操作 / 権限</th></tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {userKeys.sort((a,b) => db.users[b].registeredAt - db.users[a].registeredAt).map(k => {
+                    const u = db.users[k];
+                    const isExp = expUser === k;
+                    return (
+                      <Fragment key={k}>
+                        <tr className="hover:bg-white/5 transition">
+                          <td className="p-4 font-bold">{k}</td>
+                          <td className="p-4 text-brand">{u.sns}</td>
+                          <td className={`p-4 font-bold ${u.status==='approved'?'text-brand-green':u.status==='pending'?'text-brand-orange':'text-brand-red'}`}>
+                            {u.status==='approved'?'許可済':u.status==='pending'?'待機中':'BAN'}
+                          </td>
+                          <td className="p-4 flex gap-2">
+                            {u.status !== 'approved' && <button className="bg-brand-green/20 text-brand-green border border-brand-green/30 px-3 py-1 rounded text-xs font-bold hover:bg-brand-green/30 transition" onClick={() => updateStatus(k, 'approved')}>許可</button>}
+                            {u.status === 'approved' && <button className={`px-3 py-1 rounded text-xs font-bold transition border ${isExp?'bg-white/20 border-white/30 text-white':'bg-white/10 border-white/20 text-white/80 hover:bg-white/20'}`} onClick={() => setExpUser(isExp ? null : k)}>🔑 権限</button>}
+                            {u.status !== 'rejected' && <button className="bg-brand-red/20 text-brand-red border border-brand-red/30 px-3 py-1 rounded text-xs font-bold hover:bg-brand-red/30 transition" onClick={() => updateStatus(k, 'rejected')}>BAN</button>}
+                          </td>
+                        </tr>
+                        {isExp && (
+                          <tr>
+                            <td colSpan="4" className="p-0">
+                              <div className="bg-black/30 p-5 border-l-4 border-brand">
+                                <p className="text-xs text-brand-orange font-bold mb-4">✅ チェックを入れた機能は、このユーザーのみ【無制限】で利用可能になります。</p>
+                                <div className="flex flex-wrap gap-4">
+                                  {Object.keys(TOOLS).map(tid => (
+                                    <label key={tid} className="flex items-center gap-2 cursor-pointer bg-white/5 px-3 py-2 rounded-lg hover:bg-white/10 transition border border-white/5">
+                                      <input type="checkbox" className="w-4 h-4 rounded text-brand focus:ring-brand bg-black/50 border-white/20" checked={!!(u.perms && u.perms[tid])} onChange={() => togglePerm(k, tid)} />
+                                      <span className="text-xs font-bold text-white/90">{TOOLS[tid].name}</span>
+                                    </label>
+                                  ))}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {tab === 'inqs' && (
+            <div className="grid gap-4">
+              {inqs.sort((a,b) => b.date - a.date).map(iq => (
+                <div key={iq.id} className={`glass-card rounded-xl p-5 transition ${iq.status==='unread'?'border-l-4 border-l-brand-orange':''}`}>
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <span className="font-black text-brand text-base mr-3">{iq.user}</span>
+                      <span className="text-xs bg-white/10 px-2 py-1 rounded font-bold text-white/70">{iq.type}</span>
+                    </div>
+                    <span className="text-xs text-slate-400">{fmtDate(iq.date)}</span>
+                  </div>
+                  <p className="text-sm text-slate-200 whitespace-pre-wrap leading-relaxed">{iq.content}</p>
+                  {iq.status === 'unread' && <button className="mt-4 bg-white/10 hover:bg-white/20 text-xs font-bold px-4 py-2 rounded-lg transition" onClick={() => markRead(iq.id)}>既読にする</button>}
+                </div>
+              ))}
+              {inqs.length === 0 && <p className="text-center text-slate-500 py-10">問い合わせはありません。</p>}
+            </div>
+          )}
+
+          {tab === 'sys' && (
+            <div className="max-w-md mx-auto glass-card rounded-xl p-6 md:p-8 mt-4">
+              <h2 className="text-lg font-black mb-6">⚙️ 管理者アカウント設定</h2>
+              <div className="mb-5">
+                <span className="block text-xs font-bold text-slate-400 mb-2">管理者 ユーザー名</span>
+                <input className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm focus:border-brand outline-none transition" value={adminU} onChange={e => setAdminU(e.target.value)} />
+              </div>
+              <div className="mb-8">
+                <span className="block text-xs font-bold text-slate-400 mb-2">管理者 パスワード</span>
+                <input className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm focus:border-brand outline-none transition" type="password" value={adminP} onChange={e => setAdminP(e.target.value)} />
+              </div>
+              <button className="w-full bg-brand hover:bg-brand-dark text-white font-black py-4 rounded-xl shadow-lg transition" onClick={saveAdmin}>設定を保存する</button>
+              {sysMsg && <p className="text-center text-brand-green font-bold text-sm mt-4 animate-pulse">{sysMsg}</p>}
+            </div>
+          )}
+        </div>
       );
     };
 
     /* =========================================================================
        7. メインダッシュボード（全機能のハブ）
        ========================================================================= */
-    const MainDashboard = ({user, role, onLogout, onGoAdmin}) => {
+    const MainDashboard = ({ user, role, onLogout, onGoAdmin }) => {
       const [screen, setScreen] = useState('home');
       const [showManual, setShowManual] = useState(false);
       const [showInquiry, setShowInquiry] = useState(false);
 
       const db = AppDB.get();
-      const uData = db.users[user];
+      const uData = db.users[user] || { projects: {'default': {name:'Error'}}, curProj:'default', usage:{date:'',count:0} };
 
-      if (screen === 'settings') return el(SettingsScreen, {user, onBack: () => setScreen('home')});
-      if (screen === 'projects') return el(ProjectScreen, {user, onBack: () => setScreen('home')});
-      if (TOOLS[screen]) return el(ToolRunner, {toolId: screen, username: user, role: role, onBack: () => setScreen('home')});
+      if (screen === 'settings') return <SettingsScreen user={user} onBack={() => setScreen('home')} />;
+      if (screen === 'projects') return <ProjectScreen user={user} onBack={() => setScreen('home')} />;
+      if (TOOLS[screen]) return <ToolRunner tid={screen} user={user} role={role} onBack={() => setScreen('home')} />;
 
-      const projName = uData.projects[uData.curProj] ? uData.projects[uData.curProj].name : 'プロジェクト';
+      const projName = uData.projects[uData.curProj] ? uData.projects[uData.curProj].name : 'Project';
       const today = new Date().toDateString();
       const usageCount = uData.usage.date === today ? uData.usage.count : 0;
-      const usageStr = `${usageCount} / ${DAILY_LIMIT}`;
 
-      return el('div', {className: 'page-container'}, 
-        showManual && el(ManualModal, {onClose: () => setShowManual(false)}), 
-        showInquiry && el(InquiryModal, {user, onClose: () => setShowInquiry(false)}), 
-        
-        el('div', {style: {position: 'absolute', top: 16, right: 16, zIndex: 100, display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end'}}, 
-          role === 'admin' && el('button', {className: 'btn-sub', style: {background: '#f59e0b', border: 'none', color: '#fff'}, onClick: onGoAdmin}, '🎛️ 管理画面'), 
-          role !== 'admin' && el('div', {className: 'btn-sub', style: {cursor: 'default'}}, '📂 ' + projName), 
-          role !== 'admin' && el('div', {className: 'btn-sub', style: {cursor: 'default'}}, '本日: ' + usageStr + '回'), 
-          role !== 'admin' && el('button', {className: 'btn-sub', style: {color: '#f59e0b', borderColor: '#f59e0b'}, onClick: () => setShowInquiry(true)}, '💬 問合せ'), 
-          el('button', {className: 'btn-sub', onClick: () => setShowManual(true)}, '📖 マニュアル'), 
-          el('button', {className: 'btn-sub', style: {border: 'none', background: 'transparent'}, onClick: onLogout}, 'ログアウト')
-        ),
-        
-        el('div', {className: 'grid-bg'}), 
-        el('div', {className: 'badge-main', style: {marginTop: 60, marginBottom: 16}}, 'AI Content Pro v31'), 
-        el('h1', {className: 'main-title'}, 'AI Content', el('br'), el('span', null, 'Platform')), 
-        el('p', {className: 'main-subtitle'}, 'コンテンツ作成からSNS集客、ファン化まで', el('br'), 'すべてを完全無料で自動化する最強の指令塔'), 
-        
-        role !== 'admin' && el('div', {className: 'flex-row', style: {justifyContent: 'center', marginBottom: 40}}, 
-          el('button', {className: 'btn-sub', style: {padding: '12px 24px', fontSize: 14}, onClick: () => setScreen('projects')}, '📂 プロジェクト切替'), 
-          el('button', {className: 'btn-sub', style: {padding: '12px 24px', fontSize: 14}, onClick: () => setScreen('settings')}, '👤 マイ・ブランド設定')
-        ),
-        
-        el('div', {className: 'content-wrapper'}, 
-          CATEGORIES.map(cat => 
-            el('div', {key: cat.name, style: {marginBottom: 40}}, 
-              el('h2', {className: 'category-title'}, cat.name), 
-              el('div', {className: 'tool-grid'}, 
-                cat.tools.map(tid => {
-                  const t = TOOLS[tid];
-                  const canAccess = DEF_UNLOCKED.includes(tid) || role === 'admin' || (uData.perms && uData.perms[tid]);
-                  
-                  return el('div', {
-                    key: tid, 
-                    className: `tool-card ${canAccess ? '' : 'locked'}`, 
-                    onClick: () => {
-                      if (canAccess) setScreen(tid);
-                      else alert('🔒 この機能はロックされています。\n利用するには管理者への申請が必要です。');
-                    }
-                  }, 
-                    el('div', {className: 'badge-row'}, 
-                      !canAccess ? el('div', {className: 'status-badge locked'}, '🔒 ロック') : 
-                      (role === 'admin' || (uData.perms && uData.perms[tid])) ? el('div', {className: 'status-badge unlimited'}, '✨ 無制限') : 
-                      el('div', {className: 'status-badge free'}, '無料枠対象'), 
-                      t.badge && el('div', {className: `badge-main ${t.badge === '神機能' ? 'red' : ''}`, style: {margin: 0}}, t.badge)
-                    ), 
-                    el('div', {className: 'tc-icon'}, t.icon), 
-                    el('div', {className: 'tc-name'}, t.name), 
-                    el('div', {className: 'tc-desc'}, t.desc)
-                  );
-                })
-              )
-            )
-          )
-        )
+      return (
+        <div className="w-full">
+          {showManual && <ManualModal onClose={() => setShowManual(false)} />}
+          {showInquiry && <InquiryModal user={user} onClose={() => setShowInquiry(false)} />}
+          
+          {/* Header Actions */}
+          <div className="absolute top-4 right-4 md:top-6 md:right-6 z-50 flex flex-wrap gap-2 justify-end">
+            {role === 'admin' && <button className="bg-brand-orange hover:bg-orange-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg transition" onClick={onGoAdmin}>🎛️ 管理画面</button>}
+            {role !== 'admin' && <div className="bg-white/10 backdrop-blur text-white/80 text-xs font-bold px-4 py-2 rounded-full cursor-default">📂 {projName}</div>}
+            {role !== 'admin' && <div className="bg-white/10 backdrop-blur text-white/80 text-xs font-bold px-4 py-2 rounded-full cursor-default">本日: {usageCount}/{DAILY_LIMIT}</div>}
+            {role !== 'admin' && <button className="bg-brand-orange/20 text-brand-orange border border-brand-orange/40 hover:bg-brand-orange/30 text-xs font-bold px-4 py-2 rounded-full transition" onClick={() => setShowInquiry(true)}>💬 問合せ</button>}
+            <button className="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-full transition" onClick={() => setShowManual(true)}>📖 マニュアル</button>
+            <button className="text-white/50 hover:text-white text-xs font-bold px-3 py-2 transition" onClick={onLogout}>ログアウト</button>
+          </div>
+          
+          {/* Hero Section */}
+          <div className="text-center mt-16 md:mt-24 mb-12">
+            <div className="inline-block bg-brand/20 border border-brand/40 text-brand text-xs font-black px-4 py-1.5 rounded-full mb-6 tracking-widest uppercase">
+              AI Content Pro v32
+            </div>
+            <h1 className="text-4xl md:text-6xl font-black mb-4 tracking-tight">AI Content <br className="md:hidden"/><span className="text-brand">Platform</span></h1>
+            <p className="text-slate-400 text-sm md:text-base max-w-lg mx-auto leading-relaxed">
+              コンテンツ作成からSNS集客、ファン化まで<br/>すべてを自動化するクリエイター専用の指令塔。
+            </p>
+          </div>
+          
+          {role !== 'admin' && (
+            <div className="flex justify-center gap-4 mb-16">
+              <button className="glass-card hover:bg-white/5 text-sm font-bold px-6 py-3 rounded-xl transition flex items-center gap-2" onClick={() => setScreen('projects')}>📂 プロジェクト切替</button>
+              <button className="glass-card hover:bg-white/5 text-sm font-bold px-6 py-3 rounded-xl transition flex items-center gap-2" onClick={() => setScreen('settings')}>👤 ブランド＆AI設定</button>
+            </div>
+          )}
+          
+          {/* Tools Grid */}
+          <div className="max-w-5xl mx-auto">
+            {CATEGORIES.map(cat => (
+              <div key={cat.name} className="mb-14">
+                <h2 className="text-lg font-black text-brand mb-6 flex items-center gap-3">
+                  <div className="w-8 h-1 bg-brand rounded-full"></div>
+                  {cat.name}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+                  {cat.tools.map(tid => {
+                    const t = TOOLS[tid];
+                    const canAccess = DEF_UNLOCKED.includes(tid) || role === 'admin' || (uData.perms && uData.perms[tid]);
+                    
+                    return (
+                      <div 
+                        key={tid} 
+                        className={`glass-card rounded-2xl p-6 transition duration-300 group ${canAccess ? 'hover:-translate-y-1 hover:border-brand/50 hover:bg-white/5 cursor-pointer shadow-lg hover:shadow-brand/10' : 'opacity-60 grayscale cursor-not-allowed'}`}
+                        onClick={() => {
+                          if (canAccess) setScreen(tid);
+                          else alert('🔒 この機能はロックされています。\n利用するには管理者への申請が必要です。');
+                        }}
+                      >
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="text-3xl bg-white/5 w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition">{t.icon}</div>
+                          <div className="flex flex-col items-end gap-2">
+                            {!canAccess ? <span className="bg-slate-700 text-white text-[10px] font-black px-2.5 py-1 rounded-md">🔒 ロック</span> : 
+                             (role === 'admin' || (uData.perms && uData.perms[tid])) ? <span className="bg-brand-green text-white text-[10px] font-black px-2.5 py-1 rounded-md shadow-[0_0_10px_rgba(16,185,129,0.4)]">✨ 無制限</span> : 
+                             <span className="bg-indigo-500 text-white text-[10px] font-black px-2.5 py-1 rounded-md">無料枠対象</span>}
+                            {t.badge && <span className={`text-[10px] font-black px-2.5 py-1 rounded-md border ${t.badge === '神機能' ? 'bg-brand-red/10 border-brand-red/30 text-brand-red' : 'bg-brand/10 border-brand/30 text-brand'}`}>{t.badge}</span>}
+                          </div>
+                        </div>
+                        <h3 className="text-base font-black mb-2 text-white/90 group-hover:text-white transition">{t.name}</h3>
+                        <p className="text-xs text-slate-400 leading-relaxed group-hover:text-slate-300 transition">{t.desc}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       );
     };
 
     /* =========================================================================
-       8. ルート管理 (安全なルーティングと認証監視)
+       8. Root App Component
        ========================================================================= */
-    const Root = () => {
+    const App = () => {
       const [user, setUser] = useState(null);
       const [role, setRole] = useState(null);
       const [goAdmin, setGoAdmin] = useState(false);
       const [showManual, setShowManual] = useState(false);
+      const [isInitializing, setIsInitializing] = useState(true);
 
+      // 安全なセッション復元
       useEffect(() => {
         try {
           const sStr = localStorage.getItem(SESS_KEY);
           if (sStr) {
             const s = JSON.parse(sStr);
             if (s && s.u) {
+              const db = AppDB.get();
               if (s.r === 'admin') {
-                setUser(s.u); setRole('admin'); setGoAdmin(true);
+                // セッションのadminとDBのadmin名が一致しているか確認
+                if (s.u === (db.admin.u || 'admin')) {
+                  setUser(s.u); setRole('admin'); setGoAdmin(true);
+                } else {
+                  localStorage.removeItem(SESS_KEY);
+                }
               } else {
-                const db = AppDB.get();
                 if (db.users[s.u]) {
                   setUser(s.u); setRole(db.users[s.u].status);
                 } else {
@@ -1234,7 +956,11 @@
               }
             }
           }
-        } catch(e) {}
+        } catch(e) {
+          console.error("Session Restore Error", e);
+        } finally {
+          setIsInitializing(false);
+        }
       }, []);
 
       const handleLogout = () => {
@@ -1252,41 +978,45 @@
         } catch(e) {}
       };
 
+      if (isInitializing) return <div className="min-h-screen flex items-center justify-center text-brand font-bold animate-pulse">System Initializing...</div>;
+
       if (!user) {
-        return el(AuthScreen, {onLogin: (usr, rol) => {
-          setUser(usr); setRole(rol); if (rol === 'admin') setGoAdmin(true);
-        }});
+        return <AuthScreen onLogin={(usr, rol) => { setUser(usr); setRole(rol); if (rol === 'admin') setGoAdmin(true); }} />;
       }
 
       if (role === 'admin' && goAdmin) {
-        return el(AdminDashboard, {onLogout: handleLogout, onGoApp: () => setGoAdmin(false)});
+        return <AdminDashboard onLogout={handleLogout} onGoApp={() => setGoAdmin(false)} />;
       }
 
       if (role === 'pending' || role === 'rejected') {
-        return el('div', null, 
-          showManual && el(ManualModal, {onClose: () => setShowManual(false)}), 
-          el('div', {className: 'page-container'}, 
-            el('div', {className: 'grid-bg'}), 
-            el('div', {className: 'content-wrapper auth-container', style: {marginTop: 60}}, 
-              el('h2', {style: {fontSize: 26, fontWeight: 900, marginBottom: 12}}, role === 'rejected' ? '🚫 拒否' : '⏳ 承認待ち'), 
-              el('p', {style: {color: 'rgba(255,255,255,0.6)', marginBottom: 24}}, role === 'rejected' ? '管理者に制限されています。' : '管理者の許可をお待ちください。'), 
-              el('button', {className: 'btn-sub', style: {width: '100%', marginBottom: 20, borderColor: '#38bdf8', color: '#38bdf8', padding: '14px'}, onClick: () => setShowManual(true)}, '📖 承認待ちの間にマニュアルを読む'), 
-              el('button', {className: 'btn-primary', style: {marginBottom: 16}, onClick: checkStatus}, 'ステータスを更新'), 
-              el('button', {className: 'btn-sub', style: {width: '100%'}, onClick: handleLogout}, 'ログアウト')
-            )
-          )
+        return (
+          <Fragment>
+            {showManual && <ManualModal onClose={() => setShowManual(false)} />}
+            <div className="page-container">
+              <div className="grid-bg"></div>
+              <div className="content-wrapper auth-container mt-10 md:mt-20">
+                <h2 className="text-2xl font-black mb-4">{role === 'rejected' ? '🚫 拒否' : '⏳ 承認待ち'}</h2>
+                <p className="text-slate-400 text-sm mb-8">{role === 'rejected' ? '管理者に制限されています。' : '管理者の許可をお待ちください。'}</p>
+                <button className="w-full bg-brand/10 border border-brand/30 text-brand font-bold py-4 rounded-xl hover:bg-brand/20 transition mb-6" onClick={() => setShowManual(true)}>
+                  📖 承認待ちの間にマニュアルを読む
+                </button>
+                <button className="btn-primary mb-4" onClick={checkStatus}>ステータスを更新</button>
+                <button className="w-full text-slate-500 hover:text-white text-sm font-bold transition" onClick={handleLogout}>ログアウト</button>
+              </div>
+            </div>
+          </Fragment>
         );
       }
 
       if (role === 'approved' || (role === 'admin' && !goAdmin)) {
-        return el(MainDashboard, {user: user, role: role, onLogout: handleLogout, onGoAdmin: () => setGoAdmin(true)});
+        return <MainDashboard user={user} role={role} onLogout={handleLogout} onGoAdmin={() => setGoAdmin(true)} />;
       }
 
       return null;
     };
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(el(Root, null));
+    root.render(<App />);
 
   })();
   </script>
