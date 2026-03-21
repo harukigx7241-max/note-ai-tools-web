@@ -147,6 +147,7 @@
           if (!user.usage) user.usage = { count: 0, date: '' };
           if (!user.perms) user.perms = {};
           if (!user.brand) user.brand = { plan: 'free', name: '' };
+          if (!user.settings) user.settings = { aiModel: 'chatgpt_free' }; // 追加: AIモデル設定の初期化
         });
         return db;
       },
@@ -171,8 +172,13 @@
         { prod: "高単価クロージングの極意", tgt: "成約率が上がらず悩むフリーランス", val: "心理学を用いた、相手から「売ってほしい」と言わせる台本構築" }
       ],
       note: [
-        { theme: "スマホ1台で月5万稼ぐ極意", target_detail: "スキルがない20代", benefit: "自由な時間と経済的自立", authority: "月収30万の現役マーケター", price: "2,980", free_vol: "1500", paid_vol: "4000", guarantee: true },
-        { theme: "40代からの逆転劇。経験をデジタル資産に変える", target_detail: "一歩踏み出す勇気が出ないベテラン社員", benefit: "経験がコンテンツになり、定年後の不安が自信に変わる", authority: "AIを相棒に年商2000万を稼ぐ起業家", price: "4,980", free_vol: "2000", paid_vol: "7000", guarantee: true }
+        { age: "10代", theme: "スキルなしの10代がスマホ1台で月5万稼ぐ極意", target_detail: "バイト以外で稼ぎたいがスキルがない10代", benefit: "学業と両立しながら自由な経済基盤を築く", authority: "SNSを駆使して月収30万の現役学生マーケター", price: "1,980", free_vol: "1500", paid_vol: "4000", guarantee: true },
+        { age: "20代", theme: "スキルなしの20代がスマホ1台で月5万稼ぐ極意", target_detail: "将来が不安だが何から始めればいいか分からない20代", benefit: "会社に依存しない自由な経済基盤と選択肢", authority: "AIツールを駆使し副業で月収30万の現役マーケター", price: "2,980", free_vol: "1500", paid_vol: "4000", guarantee: true },
+        { age: "30代", theme: "残業ゼロで月5万。30代向け「家事としての副業」時短術", target_detail: "子供との時間を大切にしたいが今の給料では不安な30代", benefit: "時間的な余裕を削らずに教育資金と心のゆとりを手に入れる", authority: "AI自動化で週3時間労働で月10万稼ぐ30代パパ", price: "2,980", free_vol: "2000", paid_vol: "5000", guarantee: false },
+        { age: "40代", theme: "40代からの逆転劇。経験をデジタル資産に変える", target_detail: "今の会社に一生いるつもりはないが、一歩踏み出す勇気が出ない40代", benefit: "これまでの経験が最高のコンテンツになり、定年後の不安が自信に変わる", authority: "独立後、AIを相棒に年商2000万を稼ぐ起業家", price: "4,980", free_vol: "2000", paid_vol: "7000", guarantee: true },
+        { age: "50代", theme: "50代から始める。趣味と知識を収益化するAI活用法", target_detail: "老後資金に不安があり、無理なく自分のペースで副収入を得たい50代", benefit: "趣味を楽しみながら、経済的な不安のない安定したセカンドライフ", authority: "定年前に独立しAIで月収50万を達成したシニア起業家", price: "3,980", free_vol: "1500", paid_vol: "6000", guarantee: true },
+        { age: "60代", theme: "60代からの挑戦。AIで実現する「生涯現役」の働き方", target_detail: "年金だけでは不安があり、社会との繋がりを持ちながら稼ぎたい60代", benefit: "体力に頼らず、これまでの知恵を活かして生涯現役で活躍できる未来", authority: "60歳からPCを学びAIで安定収益を構築したシニアアドバイザー", price: "2,980", free_vol: "1500", paid_vol: "5000", guarantee: false },
+        { age: "全年齢", theme: "完全未経験から始めるAIコンテンツビジネスの教科書", target_detail: "副業に興味はあるがスキルがなく、何から始めていいか分からない全年齢", benefit: "年齢や場所にとらわれない、新しい時代の働き方と自由な時間", authority: "AIツールを駆使し、半年で副業月収30万円を達成した現役マーケター", price: "2,980", free_vol: "1500", paid_vol: "4000", guarantee: true }
       ],
       lp: [
         { prod: "AIコンテンツビジネス完全マスター講座", bene: "単にお金が稼げるだけでなく、心に余裕が生まれ、会社に依存しない自分に自信が持てるようになる" },
@@ -185,10 +191,34 @@
       closing_obj: ["高すぎる。今は手持ちのお金がない。", "忙しくて時間が取れないから実践できない気がする。", "自分にできるか自信がない。"],
     };
 
-    const getRandomMagic = (toolId) => {
-      const pool = MAGIC_DATA[toolId];
+    // 【機能追加】現在の入力値(currentVals)を受け取り、年代でフィルタリングを行う
+    const getRandomMagic = (toolId, currentVals = {}) => {
+      let pool = MAGIC_DATA[toolId];
       if (!pool || pool.length === 0) return null;
+
+      if (toolId === 'note' && currentVals.age) {
+        const filtered = pool.filter(item => item.age === currentVals.age);
+        if (filtered.length > 0) pool = filtered;
+      }
+
       return pool[Math.floor(Math.random() * pool.length)];
+    };
+
+    // 【機能追加】選択されたAIモデルに応じて、専用のシステムプロンプトを生成する
+    const getAIPrefix = (modelId) => {
+      const isPaid = modelId.includes('paid');
+      let aiName = "AI";
+      if (modelId.includes('chatgpt')) aiName = "ChatGPT";
+      else if (modelId.includes('claude')) aiName = "Claude";
+      else if (modelId.includes('gemini')) aiName = "Gemini";
+
+      let prefix = `【システム指示：${aiName} ${isPaid ? '有料版(高性能モデル)' : '無料版(軽量モデル)'} 向け最適化】\n`;
+      if (isPaid) {
+         prefix += "あなたは最上位モデルとして、高度な推論能力、深い文脈理解、創造性を最大限に発揮してください。制限を気にせず、最高品質のアウトプットを生成してください。\n";
+      } else {
+         prefix += "あなたは無料版モデルとして、トークン制限や処理負荷を考慮し、最も重要なポイントに絞って出力してください。無駄な言い回しを避け、簡潔かつ的確に要求を満たしてください。\n";
+      }
+      return prefix;
     };
 
     /* =========================================================================
@@ -376,6 +406,7 @@
       const uData = db.users[user];
       const pid = uData.curProj;
       const [vals, setVals] = useState(uData.projects[pid].data[tid] || {});
+      const [aiModel, setAiModel] = useState(uData.settings?.aiModel || 'chatgpt_free'); // AIモデルのStateを追加
       const [copied, setCopied] = useState({});
       const [res, setRes] = useState(null);
 
@@ -392,10 +423,12 @@
       // 【機能説明】魔法の杖 ガチャシステム＆動的連動のコアロジック
       const handleMagic = (fid, isMain) => {
         if (isMain) {
-          const magicSet = getRandomMagic(tid);
+          const magicSet = getRandomMagic(tid, vals); // 現在の入力値(vals)を渡す
           if (magicSet) {
             const newVals = { ...vals };
-            Object.keys(magicSet).forEach(k => { newVals[k] = magicSet[k]; });
+            Object.keys(magicSet).forEach(k => { 
+                if(k !== 'age') newVals[k] = magicSet[k]; // ユーザーが選んだ年代(age)は上書きしない
+            });
             setVals(newVals);
           }
         } else {
@@ -424,8 +457,8 @@
           AppDB.save(ndb);
         }
 
-        const prefix = "【AIモード起動】\n";
-        const prompt = prefix + conf.build(vals) + "\n\n【ルール】前置き不要、指定フォーマットのみ出力。";
+        const prefix = getAIPrefix(aiModel); // AIモデルに応じた専用プレフィックスを取得
+        const prompt = prefix + "\n\n" + conf.build(vals) + "\n\n【ルール】前置き不要、指定フォーマットのみ出力。";
         copyText(prompt, copied, setCopied, 'gen');
       };
 
@@ -437,9 +470,36 @@
         )
       );
 
+      // 【機能追加】AIモデル選択UIの生成
+      const aiModelSelector = div({ className: 'glass-panel rounded-2xl p-4 md:p-6 mb-4 md:mb-5 animate-in w-full border-brand/40 bg-brand/5' },
+        div({ className: 'flex flex-col sm:flex-row justify-between sm:items-center mb-3 gap-2' },
+          span({ className: 'text-[11px] md:text-xs font-black text-brand-light tracking-widest uppercase break-words' }, '🤖 使用するAIモデル (全ツール共通設定)'),
+        ),
+        select({ 
+          className: 'input-base !bg-black/60', 
+          value: aiModel, 
+          onChange: (e) => {
+            const newModel = e.target.value;
+            setAiModel(newModel);
+            const ndb = AppDB.get();
+            if(!ndb.users[user].settings) ndb.users[user].settings = {};
+            ndb.users[user].settings.aiModel = newModel;
+            AppDB.save(ndb);
+          }
+        },
+          option({ value: 'chatgpt_free' }, 'ChatGPT (無料版)'),
+          option({ value: 'chatgpt_paid' }, 'ChatGPT Plus (有料版)'),
+          option({ value: 'claude_free' }, 'Claude 3 (無料版)'),
+          option({ value: 'claude_paid' }, 'Claude 3 Pro (有料版)'),
+          option({ value: 'gemini_free' }, 'Gemini (無料版)'),
+          option({ value: 'gemini_paid' }, 'Gemini Advanced (有料版)')
+        )
+      );
+
       return div({ className: 'w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8' },
         header,
         conf.tut && div({ className: 'bg-brand/5 border border-brand/20 rounded-2xl p-4 md:p-6 mb-6 md:mb-8 break-words' }, p({ className: 'text-xs md:text-sm text-brand-light font-bold' }, '💡 ' + conf.tut)),
+        aiModelSelector, // 新規追加したAIモデル選択UIを挿入
         div({ className: 'space-y-4' }, conf.fields.map(f => el(FormInput, { key: f.id, f, val: vals[f.id], onChange: update, onMagic: handleMagic }))),
         button({ onClick: onGenerate, className: 'w-full py-4 md:py-6 rounded-2xl btn-gradient text-white font-black text-lg md:text-xl shadow-xl mt-4 mb-8 md:mb-10 break-words' }, copied.gen ? '✓ コピー完了！AIへ送信してください' : '📋 プロンプト生成 ＆ コピー'),
         div({ className: 'glass-panel rounded-3xl p-6 md:p-8 animate-in w-full mb-10' },
@@ -636,4 +696,5 @@
   </script>
 </body>
 </html>
+
 
