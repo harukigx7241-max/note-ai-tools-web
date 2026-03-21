@@ -87,7 +87,6 @@
     const h1 = (props, ...children) => el('h1', props, ...children);
     const h2 = (props, ...children) => el('h2', props, ...children);
     const h3 = (props, ...children) => el('h3', props, ...children);
-    const h4 = (props, ...children) => el('h4', props, ...children); // 🌟 ここが欠けていたため追加しました
     const button = (props, ...children) => el('button', props, ...children);
     const input = (props) => el('input', props);
     const textarea = (props) => el('textarea', props);
@@ -98,10 +97,10 @@
     /* =========================================================================
        2. データベース管理 & エラーロギング
        ========================================================================= */
-    const DB_KEY = 'AICP_v60_Secure_DB'; 
-    const SESS_KEY = 'AICP_v60_Session';
+    const DB_KEY = 'AICP_v61_Secure_DB'; 
+    const SESS_KEY = 'AICP_v61_Session';
     const DAILY_LIMIT = 5;
-    const SYS_VERSION = 'v60.0.0 Stable';
+    const SYS_VERSION = 'v61.0.0 Stable';
 
     const AppDB = {
       get: () => {
@@ -109,7 +108,8 @@
         try { 
           let raw = localStorage.getItem(DB_KEY); 
           if(!raw) {
-            raw = localStorage.getItem('AICP_v59_Secure_DB') || localStorage.getItem('AICP_v58_Secure_DB');
+            // 前バージョンのデータを引き継ぎ
+            raw = localStorage.getItem('AICP_v60_Secure_DB') || localStorage.getItem('AICP_v59_Secure_DB');
             if(raw) localStorage.setItem(DB_KEY, raw);
           }
           if (raw) db = JSON.parse(raw); 
@@ -764,7 +764,7 @@
       const manualModal = showManual ? div({ className: 'fixed inset-0 z-[200] flex items-center justify-center bg-black/80 p-4 md:p-6 animate-in' },
         div({ className: 'glass-panel rounded-2xl md:rounded-[2rem] max-w-2xl w-full p-6 md:p-10 relative max-h-[90vh] overflow-y-auto' },
           button({ onClick: () => setShowManual(false), className: 'absolute top-4 right-4 md:top-6 md:right-6 text-slate-400 hover:text-white text-xl md:text-2xl font-bold' }, '✕'),
-          h3({ className: 'text-xl md:text-2xl font-black text-brand-light mb-6 flex items-center gap-2 border-b border-white/10 pb-4' }, '📖 使い方マニュアル'),
+          el('h3', { className: 'text-xl md:text-2xl font-black text-brand-light mb-6 flex items-center gap-2 border-b border-white/10 pb-4' }, '📖 使い方マニュアル'),
           div({ 
             className: 'text-sm md:text-base text-slate-300 leading-relaxed whitespace-pre-wrap', 
             dangerouslySetInnerHTML: renderMarkdown(conf.manual || 'このツールのマニュアルは準備中です。') 
@@ -1100,7 +1100,7 @@
         ),
 
         tab === 'settings' && div({ className: 'glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-10 animate-in' },
-          h2({ className: 'text-xl font-black text-white mb-6' }, '⚙️ システム全体設定'),
+          el('h2', { className: 'text-xl font-black text-white mb-6' }, '⚙️ システム全体設定'),
           div({ className: 'bg-black/30 p-5 rounded-xl border border-white/5 max-w-md' },
             label({ className: 'block text-xs font-bold text-brand-light mb-2' }, '一般ユーザーのデフォルト1日使用回数'),
             div({ className: 'flex gap-2' },
@@ -1443,11 +1443,11 @@
       const termsModal = showTerms ? div({ className: 'fixed inset-0 z-[300] flex items-center justify-center bg-black/80 p-4 md:p-6 animate-in' },
         div({ className: 'glass-panel rounded-2xl md:rounded-[2rem] max-w-2xl w-full p-6 md:p-8 relative max-h-[90vh] flex flex-col' },
           button({ onClick: () => setShowTerms(false), className: 'absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold' }, '✕'),
-          h3({ className: 'text-lg md:text-xl font-black text-white mb-4 border-b border-white/10 pb-4' }, '📜 AI Content Pro 利用規約'),
+          el('h3', { className: 'text-lg md:text-xl font-black text-white mb-4 border-b border-white/10 pb-4' }, '📜 AI Content Pro 利用規約'),
           div({ className: 'overflow-y-auto pr-2 text-xs md:text-sm text-slate-300 leading-relaxed space-y-4 flex-1' },
             p(null, '本ツール（以下「本サービス」といいます）を利用する全てのユーザーは、以下の規約に同意したものとみなします。本サービスは厳重なセキュリティで監視されており、違反行為が発覚した場合は即座にアクセス権を剥奪し、状況により法的措置を取る場合があります。'),
             
-            h4({ className: 'font-bold text-white mt-4' }, '第1条（禁止事項）'),
+            el('h4', { className: 'font-bold text-white mt-4' }, '第1条（禁止事項）'),
             p(null, 'ユーザーは、本サービスの利用にあたり、以下の行為をしてはなりません。'),
             el('ul', { className: 'list-disc pl-5 space-y-1' },
               el('li', null, '本サービスのアクセスURL、ログイン情報（XのID等）を第三者に共有、譲渡、または貸与する行為。'),
@@ -1457,7 +1457,7 @@
               el('li', null, '本サービスを通じて生成したプロンプトや出力結果を、ツールそのものの機能として再販する行為（生成された「記事」や「構成」を自分のコンテンツとして販売することは許可されています）。')
             ),
 
-            h4({ className: 'font-bold text-white mt-4' }, '第2条（権利の剥奪と免責）'),
+            el('h4', { className: 'font-bold text-white mt-4' }, '第2条（権利の剥奪と免責）'),
             el('ul', { className: 'list-disc pl-5 space-y-1' },
               el('li', null, '管理者は、ユーザーが本規約に違反したと判断した場合、事前の通知なく当該ユーザーの利用権利を永久に剥奪できるものとします。'),
               el('li', null, '本サービスを利用して生じた一切の損害（生成AIの出力内容によるトラブル等を含む）について、管理者は一切の責任を負いません。')
