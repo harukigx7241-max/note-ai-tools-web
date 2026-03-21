@@ -87,6 +87,7 @@
     const h1 = (props, ...children) => el('h1', props, ...children);
     const h2 = (props, ...children) => el('h2', props, ...children);
     const h3 = (props, ...children) => el('h3', props, ...children);
+    const h4 = (props, ...children) => el('h4', props, ...children); // 🌟 ここが欠けていたため追加しました
     const button = (props, ...children) => el('button', props, ...children);
     const input = (props) => el('input', props);
     const textarea = (props) => el('textarea', props);
@@ -95,34 +96,12 @@
     const label = (props, ...children) => el('label', props, ...children);
 
     /* =========================================================================
-       2. Error Boundary
+       2. データベース管理 & エラーロギング
        ========================================================================= */
-    class ErrorBoundary extends Component {
-      constructor(props) { super(props); this.state = { hasError: false, errorInfo: null }; }
-      static getDerivedStateFromError(error) { return { hasError: true }; }
-      componentDidCatch(error, errorInfo) { this.setState({ errorInfo: error.toString() }); }
-      render() {
-        if (this.state.hasError) {
-          return div({ className: "min-h-screen flex items-center justify-center p-4 md:p-6" },
-            div({ className: "glass-panel p-6 md:p-8 rounded-2xl max-w-xl w-full text-center" },
-              h2({ className: "text-xl md:text-2xl font-black text-brand-danger mb-4" }, "⚠️ システムエラーが発生しました"),
-              p({ className: "text-slate-300 text-sm mb-6 leading-relaxed" }, "画面を描画できませんでした。以下のボタンで初期化してください。"),
-              div({ className: "bg-black/50 p-4 rounded-lg text-left overflow-auto text-xs text-slate-500 mb-6 font-mono" }, this.state.errorInfo),
-              button({ onClick: () => { localStorage.clear(); window.location.reload(); }, className: "btn-gradient w-full py-3 rounded-xl font-bold text-white" }, "システムをリセットして復旧する")
-            )
-          );
-        }
-        return this.props.children;
-      }
-    }
-
-    /* =========================================================================
-       3. データベース管理 & 便利関数
-       ========================================================================= */
-    const DB_KEY = 'AICP_v53_Secure_DB'; 
-    const SESS_KEY = 'AICP_v53_Session';
+    const DB_KEY = 'AICP_v60_Secure_DB'; 
+    const SESS_KEY = 'AICP_v60_Session';
     const DAILY_LIMIT = 5;
-    const SYS_VERSION = 'v53.0.0 Stable';
+    const SYS_VERSION = 'v60.0.0 Stable';
 
     const AppDB = {
       get: () => {
@@ -130,7 +109,7 @@
         try { 
           let raw = localStorage.getItem(DB_KEY); 
           if(!raw) {
-            raw = localStorage.getItem('AICP_v52_Secure_DB');
+            raw = localStorage.getItem('AICP_v59_Secure_DB') || localStorage.getItem('AICP_v58_Secure_DB');
             if(raw) localStorage.setItem(DB_KEY, raw);
           }
           if (raw) db = JSON.parse(raw); 
@@ -138,16 +117,19 @@
         
         if (!db || typeof db !== 'object') {
           db = { 
-            config: { adminU: 'admin', adminP: 'admin123', toolVisibility: {}, toolMaintenance: {} }, 
+            config: { adminU: 'admin', adminP: 'admin123', toolVisibility: {}, toolMaintenance: {}, defaultDailyLimit: 5 }, 
             inquiries: [],
-            users: { 'admin': { nickname: 'システム管理者', status: 'approved', registeredAt: Date.now(), usage: { count: 0, date: '' }, perms: {}, brand: { plan: 'paid', name: '管理者' }, projects: { 'default': { name: '管理者領域', data: {} } }, curProj: 'default', settings: { aiModel: 'chatgpt_free' } } } 
+            errorLogs: [],
+            users: { 'admin': { nickname: 'システム管理者', status: 'approved', registeredAt: Date.now(), usage: { count: 0, date: '' }, perms: {}, brand: { plan: 'paid', name: '管理者' }, projects: { 'default': { name: '管理者領域', data: {} } }, curProj: 'default', settings: { aiModel: 'chatgpt_free' }, recentTools: [], customLimit: null } } 
           };
           localStorage.setItem(DB_KEY, JSON.stringify(db));
         }
         
-        if (!db.config) db.config = { adminU: 'admin', adminP: 'admin123', toolVisibility: {}, toolMaintenance: {} };
+        if (!db.config) db.config = { adminU: 'admin', adminP: 'admin123', toolVisibility: {}, toolMaintenance: {}, defaultDailyLimit: 5 };
         if (!db.config.toolMaintenance) db.config.toolMaintenance = {};
+        if (db.config.defaultDailyLimit === undefined) db.config.defaultDailyLimit = 5;
         if (!db.inquiries) db.inquiries = [];
+        if (!db.errorLogs) db.errorLogs = [];
 
         Object.keys(db.users).forEach(u => {
           let user = db.users[u];
@@ -158,11 +140,72 @@
           if (!user.perms) user.perms = {};
           if (!user.brand) user.brand = { plan: 'free', name: '' };
           if (!user.settings) user.settings = { aiModel: 'chatgpt_free' };
+          if (!user.recentTools) user.recentTools = [];
+          if (user.customLimit === undefined) user.customLimit = null; 
         });
         return db;
       },
       save: (db) => { try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch (e) {} }
     };
+
+    const logError = (source, message, stack) => {
+      try {
+        const db = AppDB.get();
+        if (!db.errorLogs) db.errorLogs = [];
+        db.errorLogs.unshift({ id: Date.now().toString(), date: Date.now(), source, message, stack });
+        if (db.errorLogs.length > 50) db.errorLogs = db.errorLogs.slice(0, 50);
+        AppDB.save(db);
+      } catch(e) { console.error("ロギング中のエラー", e); }
+    };
+
+    window.addEventListener('error', (event) => {
+      logError('Window Error', event.message, event.error ? event.error.stack : '');
+    });
+
+    window.addEventListener('unhandledrejection', (event) => {
+      logError('Unhandled Promise', event.reason ? event.reason.toString() : 'Unknown reason', event.reason && event.reason.stack ? event.reason.stack : '');
+    });
+
+    /* =========================================================================
+       3. Error Boundary
+       ========================================================================= */
+    class ErrorBoundary extends Component {
+      constructor(props) { super(props); this.state = { hasError: false, errorInfo: null, stack: null }; }
+      static getDerivedStateFromError(error) { return { hasError: true }; }
+      componentDidCatch(error, errorInfo) { 
+        this.setState({ errorInfo: error.toString(), stack: errorInfo.componentStack }); 
+        logError('React ErrorBoundary', error.toString(), errorInfo.componentStack);
+      }
+      render() {
+        if (this.state.hasError) {
+          const errText = this.state.errorInfo + '\n\n' + (this.state.stack || '');
+          return div({ className: "min-h-screen flex items-center justify-center p-4 md:p-6" },
+            div({ className: "glass-panel p-6 md:p-8 rounded-2xl max-w-2xl w-full text-center" },
+              h2({ className: "text-xl md:text-2xl font-black text-brand-danger mb-4" }, "⚠️ システムエラーが発生しました"),
+              p({ className: "text-slate-300 text-sm mb-6 leading-relaxed" }, "画面を描画できませんでした。以下のエラー内容をコピーして開発者に報告し、「リセットして復旧する」ボタンを押してください。"),
+              
+              div({ className: "bg-black/50 p-4 rounded-lg text-left overflow-hidden relative mb-6 border border-white/10" }, 
+                div({ className: "flex justify-between items-center mb-2" },
+                  span({ className: "text-xs font-bold text-brand-danger" }, "エラー詳細ログ"),
+                  button({ 
+                    onClick: () => { navigator.clipboard.writeText(errText).then(() => alert('エラー内容をコピーしました。')); },
+                    className: "bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded text-xs font-bold text-white transition shadow"
+                  }, "📋 エラーをコピーする")
+                ),
+                textarea({ 
+                  className: "w-full bg-transparent text-[10px] text-slate-400 font-mono h-32 outline-none resize-y", 
+                  readOnly: true, 
+                  value: errText 
+                })
+              ),
+              
+              button({ onClick: () => { localStorage.clear(); window.location.reload(); }, className: "btn-gradient w-full py-3 md:py-4 rounded-xl font-bold text-white shadow-lg" }, "システムをリセットして復旧する")
+            )
+          );
+        }
+        return this.props.children;
+      }
+    }
 
     const copyText = (text, state, setState, key) => {
       if (navigator.clipboard) navigator.clipboard.writeText(text).catch(()=>{});
@@ -234,7 +277,6 @@
       return nextItem;
     };
 
-    // 🌟 AIモデル別の最強システムプロンプト設定
     const getAIPrefix = (modelId) => {
       const isPaid = modelId.includes('paid');
       let aiName = "AI";
@@ -275,20 +317,51 @@
     };
 
     const parseNoteRes = (text) => {
-      if (!text) return { title: '', free: '', paid: '' };
-      let title = '', free = '', paid = '';
+      if (!text) return { title: '', free: '', paid: '', tags: '', url: '', toc: '' };
+      let title = '', free = '', paid = '', tags = '', url = '';
+      
       const titleMatch = text.match(/【タイトル】\n([\s\S]*?)(?=【無料エリア】|$)/);
-      const freeMatch = text.match(/【無料エリア】\n([\s\S]*?)(?=【有料エリア】|$)/);
-      const paidMatch = text.match(/【有料エリア】\n([\s\S]*?)$/);
+      const freeMatch = text.match(/【無料エリア】\n([\s\S]*?)(?=【有料エリア】|【投稿設定案】|$)/);
+      const paidMatch = text.match(/【有料エリア】\n([\s\S]*?)(?=【投稿設定案】|$)/);
+      const settingsMatch = text.match(/【投稿設定案】\n([\s\S]*?)$/);
+
       if (titleMatch) title = titleMatch[1].trim().replace(/<br\/>/g, '\n');
       if (freeMatch) free = freeMatch[1].trim().replace(/<br\/>/g, '\n');
       if (paidMatch) paid = paidMatch[1].trim().replace(/<br\/>/g, '\n');
+      
+      if (settingsMatch) {
+         const sText = settingsMatch[1];
+         const tMatch = sText.match(/ハッシュタグ:\s*(.*)/);
+         const uMatch = sText.match(/カスタムURL:\s*(.*)/);
+         if(tMatch) tags = tMatch[1].trim();
+         if(uMatch) url = uMatch[1].trim();
+      }
+
       if (!title && !free && !paid) free = text; 
-      return { title, free, paid };
+
+      const extractTOC = (textToParse) => {
+        const lines = textToParse.split('\n');
+        const tocLines = [];
+        lines.forEach(line => {
+          const match = line.match(/^(##|###)\s+(.*)/);
+          if (match) {
+            const level = match[1] === '##' ? 1 : 2;
+            const heading = match[2].replace(/\*\*/g, '').replace(/#/g, '').trim();
+            const indent = level === 1 ? '■ ' : '　・ ';
+            tocLines.push(indent + heading);
+          }
+        });
+        return tocLines.join('\n');
+      };
+      
+      let toc = extractTOC((free || '') + '\n' + (paid || ''));
+      if(!toc) toc = '（見出しがありません）';
+
+      return { title, free, paid, tags, url, toc };
     };
 
     /* =========================================================================
-       5. 全33ツール完全定義リスト（🌟構造化プロンプトへ完全刷新）
+       5. 全33ツール完全定義リスト
        ========================================================================= */
     const TOOLS = {
       campaign: { cat: 'omega', icon: '👑', name: '全自動ファネル構築', badge: '特級', desc: '商品名からLP, SNS, LINEを一撃生成', 
@@ -371,7 +444,7 @@
           { id: 'paid_vol', t: 'text', l: '有料部分の文字数', ph: '例: 4000' },
           { id: 'guarantee', t: 'check', l: '返金保証をアピール' }
         ],
-        build: (v) => `# 指示\nあなたはトップクラスのコンテンツプロデューサー兼セールスライターです。\n以下の【入力情報】と【条件】を元に、読者が思わず購入したくなる高品質なnote有料記事を執筆してください。\n\n# 入力情報\n- ジャンル: ${v.genre}\n- ターゲット年代: ${v.age}\n- 記事テーマ: ${v.theme}\n- ターゲットの悩み: ${v.target_detail}\n- 読者が得られる未来: ${v.benefit}\n- 著者の実績・権威性: ${v.authority}\n- 販売価格: ${v.price}円\n- 文字数目安: 無料部分 約${v.free_vol}字 / 有料部分 約${v.paid_vol}字\n${v.guarantee ? '- 特別オファー: 返金保証あり（記事内で強くアピールすること）' : ''}\n\n# 執筆条件\n1. PASONAの法則（Problem, Agitation, Solution, Narrowing down, Action）を用いて読者の感情を動かす構成にすること。\n2. 無料パートの最後（有料パートへの切り替わり部分）で、強烈な好奇心と「どうしても続きが読みたい」という欲求（オープンループ）を仕掛けること。\n3. 専門用語はなるべく避け、読者に寄り添う共感的なトーン＆マナーで執筆すること。\n\n# 重要:出力フォーマット\n必ず以下の3つのセクションに見出し記号を用いて分けて出力してください。Markdown形式（#や**）で美しく装飾すること。\n\n【タイトル】\n（キャッチーでクリックしたくなるタイトル案）\n\n【無料エリア】\n（無料部分の本文をここに記述）\n\n【有料エリア】\n（有料部分の本文をここに記述）`, isOnePage: true },
+        build: (v) => `# 指示\nあなたはトップクラスのコンテンツプロデューサー兼セールスライターです。\n以下の【入力情報】と【条件】を元に、読者が思わず購入したくなる高品質なnote有料記事を執筆してください。\n\n# 入力情報\n- ジャンル: ${v.genre}\n- ターゲット年代: ${v.age}\n- 記事テーマ: ${v.theme}\n- ターゲットの悩み: ${v.target_detail}\n- 読者が得られる未来: ${v.benefit}\n- 著者の実績・権威性: ${v.authority}\n- 販売価格: ${v.price}円\n- 文字数目安: 無料部分 約${v.free_vol}字 / 有料部分 約${v.paid_vol}字\n${v.guarantee ? '- 特別オファー: 返金保証あり（記事内で強くアピールすること）' : ''}\n\n# 執筆条件\n1. PASONAの法則を用いて読者の感情を動かす構成にすること。\n2. 無料パートの最後（有料パートへの切り替わり部分）で、強烈な好奇心と「どうしても続きが読みたい」という欲求を仕掛けること。\n\n# 重要:出力フォーマット\n必ず以下の見出し記号を用いて4つのセクションに分けて出力してください。Markdown形式で美しく装飾すること。\n\n【タイトル】\n（キャッチーでクリックしたくなるタイトル案）\n\n【無料エリア】\n（無料部分の本文をここに記述）\n\n【有料エリア】\n（有料部分の本文をここに記述）\n\n【投稿設定案】\nハッシュタグ: （記事に最適なハッシュタグをスペース区切りで5個）\nカスタムURL: （記事テーマを表す短い英数字ハイフン繋ぎのURL）`, isOnePage: true },
       
       lp: { cat: 'mon', icon: '📄', name: '爆売れLP作成', desc: '高単価商品を成約させるセールスレター構成',
         manual: '**【ツールの目的】**\n高単価商品を販売するための縦長のセールスページ（LP）の文章と構成案を作成します。',
@@ -574,7 +647,6 @@
       const [res, setRes] = useState(uData.projects[pid].data[tid]?.res || '');
       const [resTab, setResTab] = useState('edit');
       const [showManual, setShowManual] = useState(false); 
-      // 🌟 プロンプト確認・編集エリア用のState
       const [generatedPrompt, setGeneratedPrompt] = useState('');
 
       useEffect(() => { window.scrollTo(0, 0); }, []);
@@ -632,9 +704,10 @@
         }
       };
 
-      // 🌟 プロンプト生成処理（画面に表示させるように変更）
       const onGenerate = () => {
+        const userLimit = uData.customLimit !== null && uData.customLimit !== undefined ? uData.customLimit : db.config.defaultDailyLimit;
         let canAccess = false;
+        
         if (role === 'admin') canAccess = true;
         else {
           const systemVisible = db.config.toolVisibility[tid] !== false;
@@ -642,7 +715,8 @@
           const userPerm = uData.perms[tid];
           const isPermitted = userPerm !== undefined ? userPerm : DEF_UNLOCKED.includes(tid);
           if (systemVisible && isPermitted && !isMaintenance) {
-             if (uData.usage.date !== new Date().toDateString() || uData.usage.count < DAILY_LIMIT) canAccess = true;
+             if (userLimit === -1) canAccess = true;
+             else if (uData.usage.date !== new Date().toDateString() || uData.usage.count < userLimit) canAccess = true;
           }
         }
 
@@ -659,8 +733,8 @@
         const prefix = getAIPrefix(aiModel);
         const prompt = prefix + "\n" + conf.build(vals) + "\n\n【最終出力ルール】\n・AIとしての前置き、挨拶、要約などは一切不要です。\n・指定されたフォーマットの本文のみを直接出力してください。";
         
-        setGeneratedPrompt(prompt); // 画面上に表示
-        copyText(prompt, copied, setCopied, 'gen'); // とりあえずコピーもしておく
+        setGeneratedPrompt(prompt);
+        copyText(prompt, copied, setCopied, 'gen');
       };
 
       const generateNotePromo = (type) => {
@@ -672,6 +746,8 @@
         } else if (type === 'sns') {
           prompt = `以下のnote記事を宣伝し、購入（または閲覧）を促すSNS（X, Threads）用の投稿文を3パターン作成せよ。\n記事タイトル: ${targetTitle}\nターゲット: ${vals.target_detail || "（未設定）"}\nベネフィット: ${vals.benefit || "（未設定）"}`;
         }
+        setGeneratedPrompt(prompt);
+        window.scrollTo({top: 300, behavior: 'smooth'});
         copyText(prompt, copied, setCopied, type);
       };
 
@@ -722,6 +798,8 @@
         )
       );
 
+      const parsedNoteData = tid === 'note' ? parseNoteRes(res) : {};
+
       return div({ className: 'w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8' },
         manualModal,
         header,
@@ -732,17 +810,15 @@
           button({ onClick: handleClear, className: 'text-xs md:text-sm text-slate-400 hover:text-white transition flex items-center gap-1' }, '🗑️ 入力内容をクリア')
         ),
 
-        // 🌟 生成ボタン
         button({ onClick: onGenerate, className: 'w-full py-4 md:py-6 rounded-2xl btn-gradient text-white font-black text-lg md:text-xl shadow-xl mt-4 break-words' }, copied.gen ? '✓ プロンプトを生成しました' : '📋 プロンプトを生成する'),
         
-        // 🌟 新機能：生成されたプロンプトの確認・編集エリア
         generatedPrompt && div({ className: 'glass-panel rounded-2xl p-4 md:p-6 mt-6 mb-10 animate-in border-brand/50 relative' },
           span({ className: 'block text-[10px] md:text-xs font-black text-brand-light tracking-widest uppercase mb-3' }, '📝 生成されたプロンプト (AIに投げる前に自由に編集・肉付けできます)'),
           textarea({ className: 'input-base min-h-[200px] text-sm leading-relaxed !bg-black/50', value: generatedPrompt, onChange: e => setGeneratedPrompt(e.target.value) }),
           button({ onClick: () => copyText(generatedPrompt, copied, setCopied, 'manual_copy'), className: 'w-full bg-brand hover:bg-brand-dark py-3 md:py-4 rounded-xl font-bold mt-4 transition text-white text-sm md:text-base shadow' }, copied.manual_copy ? '✓ コピーしました' : '📋 このプロンプトをコピーしてAIへ貼り付け')
         ),
         
-        div({ className: 'mb-8 md:mb-10' }), // スペーサー
+        div({ className: 'mb-8 md:mb-10' }), 
 
         div({ className: 'glass-panel rounded-3xl p-6 md:p-8 animate-in w-full mb-10' },
           div({ className: 'flex justify-between items-end mb-6 border-b border-white/10 pb-4 overflow-x-auto hide-scrollbar' },
@@ -750,6 +826,9 @@
               button({ onClick: () => setResTab('edit'), className: `px-3 py-2 md:px-4 md:py-2 text-xs md:text-sm font-bold rounded-lg transition ${resTab === 'edit' ? 'bg-brand text-white' : 'text-slate-400 hover:bg-white/5'}` }, '✍️ 編集 (Markdown)'),
               button({ onClick: () => setResTab('preview'), className: `px-3 py-2 md:px-4 md:py-2 text-xs md:text-sm font-bold rounded-lg transition ${resTab === 'preview' ? 'bg-brand text-white' : 'text-slate-400 hover:bg-white/5'}` }, '👁️ プレビュー'),
               tid === 'note' && button({ onClick: () => setResTab('post'), className: `px-3 py-2 md:px-4 md:py-2 text-xs md:text-sm font-bold rounded-lg transition ${resTab === 'post' ? 'bg-brand text-white' : 'text-slate-400 hover:bg-white/5'}` }, '🚀 noteへ投稿')
+            ),
+            res && div({ className: 'shrink-0 ml-4' },
+              span({ className: 'text-xs md:text-sm text-slate-400 font-bold bg-black/40 px-3 py-1.5 rounded-lg' }, `📝 ${res.length}文字`)
             )
           ),
           
@@ -763,8 +842,8 @@
               div({ className: 'flex flex-col sm:flex-row gap-3' },
                 button({ onClick: () => {
                   const prompt = `以下の文章を、読者の感情をより強く揺さぶるように「熱量高く」書き直してください。\n\n${res}`;
-                  setGeneratedPrompt(prompt); // 表示領域を更新
-                  window.scrollTo({top: 300, behavior: 'smooth'}); // プロンプトエリアへ移動
+                  setGeneratedPrompt(prompt); 
+                  window.scrollTo({top: 300, behavior: 'smooth'}); 
                   copyText(prompt, copied, setCopied, 're_heat');
                 }, className: 'flex-1 bg-brand-danger/20 hover:bg-brand-danger/30 text-brand-danger border border-brand-danger/30 py-3 md:py-4 rounded-xl text-sm md:text-base font-bold transition' }, copied.re_heat ? '✓ プロンプト生成済' : '🔥 熱量を上げる'),
                 button({ onClick: () => {
@@ -790,8 +869,8 @@
             div({ className: 'bg-black/30 p-4 rounded-xl border border-white/5' },
               span({ className: 'block text-xs font-bold text-brand-light mb-2' }, 'Step 1. タイトル'),
               div({ className: 'flex gap-2' },
-                input({ className: 'input-base flex-1 !py-2 text-sm', value: parseNoteRes(res).title, readOnly: true }),
-                button({ onClick: () => copyText(parseNoteRes(res).title, copied, setCopied, 'c_title'), className: 'bg-white/10 hover:bg-white/20 px-4 rounded-lg text-xs font-bold text-white whitespace-nowrap transition' }, copied.c_title ? '✓ コピー済' : '📋 コピー')
+                input({ id: 'c-title-in', className: 'input-base flex-1 !py-2 text-sm', value: parsedNoteData.title, readOnly: true }),
+                button({ onClick: () => { document.getElementById('c-title-in').select(); document.execCommand('copy'); copyText('', copied, setCopied, 'c_title'); }, className: 'bg-white/10 hover:bg-white/20 px-4 rounded-lg text-xs font-bold text-white whitespace-nowrap transition' }, copied.c_title ? '✓ コピー済' : '📋 コピー')
               )
             ),
 
@@ -803,7 +882,7 @@
               div({ 
                 id: 'note-free-content',
                 className: 'bg-slate-50 p-4 md:p-6 rounded-lg preview-content text-sm md:text-base overflow-x-auto shadow-inner max-h-[300px] overflow-y-auto',
-                dangerouslySetInnerHTML: renderMarkdown(parseNoteRes(res).free || '内容がありません') 
+                dangerouslySetInnerHTML: renderMarkdown(parsedNoteData.free || '内容がありません') 
               })
             ),
 
@@ -815,12 +894,12 @@
               div({ 
                 id: 'note-paid-content',
                 className: 'bg-slate-50 p-4 md:p-6 rounded-lg preview-content text-sm md:text-base overflow-x-auto shadow-inner max-h-[300px] overflow-y-auto',
-                dangerouslySetInnerHTML: renderMarkdown(parseNoteRes(res).paid || '内容がありません') 
+                dangerouslySetInnerHTML: renderMarkdown(parsedNoteData.paid || '内容がありません') 
               })
             ),
 
             div({ className: 'pt-4 border-t border-white/10' },
-              span({ className: 'block text-xs font-black text-slate-400 mb-3' }, '🚀 宣伝・集客素材を作る (プロンプト生成)'),
+              span({ className: 'block text-xs font-black text-slate-400 mb-3' }, '🚀 Step 4. 宣伝・集客素材を作る (プロンプト生成)'),
               div({ className: 'flex flex-col sm:flex-row gap-3' },
                 button({ onClick: () => {
                   generateNotePromo('thumb');
@@ -834,15 +913,56 @@
             ),
             
             div({ className: 'pt-4 border-t border-white/10' },
-              span({ className: 'block text-xs font-bold text-brand-light mb-3' }, '✅ Step 5. 公開前の最終チェックリスト'),
+              span({ className: 'block text-xs font-bold text-brand-light mb-3' }, '⚙️ Step 5. 公開設定の自動入力サポート（任意）'),
+              p({ className: 'text-sm text-slate-300 mb-4' }, 'AIが記事内容から自動判別した設定案です。自由に書き換えてコピーしてください。'),
+              div({ className: 'bg-black/30 p-4 md:p-5 rounded-xl border border-white/5 space-y-4' },
+                div(null,
+                  span({ className: 'block text-[10px] font-bold text-slate-400 mb-1' }, '自動抽出された目次 (テキスト形式)'),
+                  div({ className: 'flex gap-2' },
+                    textarea({ className: 'input-base flex-1 !py-2 text-sm min-h-[100px] leading-relaxed', defaultValue: parsedNoteData.toc, id: 'auto-toc' }),
+                    button({ onClick: () => { document.getElementById('auto-toc').select(); document.execCommand('copy'); copyText('', copied, setCopied, 'c_toc'); }, className: 'bg-white/10 hover:bg-white/20 px-3 rounded-lg text-xs font-bold text-white transition' }, copied.c_toc ? '✓ コピー済' : 'コピー')
+                  )
+                ),
+                div(null,
+                  span({ className: 'block text-[10px] font-bold text-slate-400 mb-1' }, '推奨ハッシュタグ (5個程度)'),
+                  div({ className: 'flex gap-2' },
+                    input({ className: 'input-base flex-1 !py-2 text-sm text-brand-light font-bold', defaultValue: parsedNoteData.tags || `#${vals.genre ? vals.genre.split('・')[0] : '副業'} #初心者 #note収益化`, id: 'auto-tags' }),
+                    button({ onClick: () => { document.getElementById('auto-tags').select(); document.execCommand('copy'); copyText('', copied, setCopied, 'c_tags'); }, className: 'bg-white/10 hover:bg-white/20 px-3 rounded-lg text-xs font-bold text-white transition' }, copied.c_tags ? '✓ コピー済' : 'コピー')
+                  )
+                ),
+                div(null,
+                  span({ className: 'block text-[10px] font-bold text-slate-400 mb-1' }, 'カスタムURL案 (英数字ハイフン)'),
+                  div({ className: 'flex gap-2' },
+                    input({ className: 'input-base flex-1 !py-2 text-sm font-mono', defaultValue: parsedNoteData.url || 'ai-monetize-article', id: 'auto-url' }),
+                    button({ onClick: () => { document.getElementById('auto-url').select(); document.execCommand('copy'); copyText('', copied, setCopied, 'c_url'); }, className: 'bg-white/10 hover:bg-white/20 px-3 rounded-lg text-xs font-bold text-white transition' }, copied.c_url ? '✓ コピー済' : 'コピー')
+                  )
+                ),
+                div(null,
+                  span({ className: 'block text-[10px] font-bold text-slate-400 mb-1' }, '返金設定の自動判別'),
+                  div({ className: 'flex items-center gap-2 bg-black/50 p-2.5 rounded-lg border border-white/10' },
+                    span({ className: 'text-sm font-bold ' + (vals.guarantee ? 'text-brand-accent' : 'text-slate-400') }, vals.guarantee ? '✅ 「返金を受け付ける」をON推奨' : '無効でOK (設定不要)')
+                  )
+                ),
+                div(null,
+                  span({ className: 'block text-[10px] font-bold text-slate-400 mb-1' }, 'LINE等のCTA (無料エリア末尾用)'),
+                  div({ className: 'flex gap-2' },
+                    textarea({ className: 'input-base flex-1 !py-2 text-sm min-h-[60px]', defaultValue: '🎁 無料プレゼントはこちら👇\n公式LINE: https://lin.ee/xxxxxx', id: 'auto-cta' }),
+                    button({ onClick: () => { document.getElementById('auto-cta').select(); document.execCommand('copy'); copyText('', copied, setCopied, 'c_cta'); }, className: 'bg-white/10 hover:bg-white/20 px-3 rounded-lg text-xs font-bold text-white transition' }, copied.c_cta ? '✓ コピー済' : 'コピー')
+                  )
+                )
+              )
+            ),
+            
+            div({ className: 'pt-4 border-t border-white/10' },
+              span({ className: 'block text-xs font-bold text-brand-light mb-3' }, '✅ Step 6. 公開前の最終チェックリスト'),
               div({ className: 'bg-black/30 p-4 md:p-5 rounded-xl border border-white/5 space-y-3' },
                 label({ className: 'flex items-start gap-3 cursor-pointer group' },
                   input({ type: 'checkbox', className: 'mt-1 w-4 h-4 accent-brand rounded border-white/20 shrink-0' }),
-                  span({ className: 'text-sm text-slate-300 group-hover:text-white transition leading-snug' }, 'ハッシュタグ(#)を5〜7個設定した')
+                  span({ className: 'text-sm text-slate-300 group-hover:text-white transition leading-snug' }, 'コピーした目次を無料エリアの冒頭に貼り付けた')
                 ),
                 label({ className: 'flex items-start gap-3 cursor-pointer group' },
                   input({ type: 'checkbox', className: 'mt-1 w-4 h-4 accent-brand rounded border-white/20 shrink-0' }),
-                  span({ className: 'text-sm text-slate-300 group-hover:text-white transition leading-snug' }, '無料エリアの冒頭に「目次」を追加した')
+                  span({ className: 'text-sm text-slate-300 group-hover:text-white transition leading-snug' }, 'ハッシュタグ(#)を5〜7個設定した')
                 ),
                 label({ className: 'flex items-start gap-3 cursor-pointer group' },
                   input({ type: 'checkbox', className: 'mt-1 w-4 h-4 accent-brand rounded border-white/20 shrink-0' }),
@@ -954,11 +1074,73 @@
           )
         ),
         div({ className: 'flex gap-2 overflow-x-auto mb-6 md:mb-10 border-b border-white/5 hide-scrollbar whitespace-nowrap' },
-          [{id:'users', l:'👥 ユーザー管理'}, {id:'tools', l:'🛠 ツール管理 (表示/メンテ)'}, {id:'inquiries', l:'📩 問い合わせ'}].map(t =>
+          [{id:'users', l:'👥 ユーザー管理'}, {id:'tools', l:'🛠 ツール管理'}, {id:'inquiries', l:'📩 問い合わせ'}, {id:'settings', l:'⚙️ 設定'}, {id:'errors', l:'🚨 エラーログ'}].map(t =>
             button({ key: t.id, onClick: () => setTab(t.id), className: 'px-6 md:px-8 py-3 md:py-4 text-xs md:text-sm font-black transition-all ' + (tab===t.id ? 'border-brand text-brand border-b-2' : 'text-slate-500 border-b-2 border-transparent') }, t.l)
           )
         ),
         
+        tab === 'errors' && div({ className: 'space-y-4 animate-in' },
+          (!db.errorLogs || db.errorLogs.length === 0) ? p({ className: 'text-slate-400 text-center py-10 font-bold' }, '現在、記録されているエラーはありません。素晴らしい！') :
+          db.errorLogs.map(err => 
+            div({ key: err.id, className: 'glass-panel p-5 md:p-6 rounded-2xl relative overflow-hidden border border-brand-danger/30' },
+              div({ className: 'flex justify-between items-start mb-3' },
+                span({ className: 'text-[10px] md:text-xs text-brand-danger font-black bg-brand-danger/20 px-2.5 py-1 rounded' }, err.source),
+                span({ className: 'text-[10px] text-slate-400' }, new Date(err.date).toLocaleString())
+              ),
+              p({ className: 'text-sm text-white font-mono break-all mb-4' }, err.message),
+              err.stack && div({ className: 'mt-2 pt-4 border-t border-white/10 relative' },
+                button({ 
+                  onClick: () => { navigator.clipboard.writeText(`Source: ${err.source}\nMessage: ${err.message}\n\nStack:\n${err.stack}`).then(() => alert('コピーしました')); },
+                  className: 'absolute -top-3 right-0 bg-white/10 hover:bg-white/20 px-3 py-1 rounded text-[10px] font-bold text-white transition'
+                }, '📋 コピー'),
+                textarea({ className: 'w-full bg-black/40 text-[10px] text-slate-400 font-mono p-3 rounded-lg h-24 outline-none resize-y', readOnly: true, value: err.stack })
+              )
+            )
+          )
+        ),
+
+        tab === 'settings' && div({ className: 'glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-10 animate-in' },
+          h2({ className: 'text-xl font-black text-white mb-6' }, '⚙️ システム全体設定'),
+          div({ className: 'bg-black/30 p-5 rounded-xl border border-white/5 max-w-md' },
+            label({ className: 'block text-xs font-bold text-brand-light mb-2' }, '一般ユーザーのデフォルト1日使用回数'),
+            div({ className: 'flex gap-2' },
+              input({ 
+                  type: 'number', 
+                  min: '0', 
+                  className: 'input-base flex-1', 
+                  value: db.config.defaultDailyLimit,
+                  onChange: e => {
+                      const n = AppDB.get();
+                      n.config.defaultDailyLimit = Number(e.target.value) || 0;
+                      AppDB.save(n);
+                      setDb(n);
+                  }
+              }),
+              span({ className: 'self-center text-slate-400 font-bold text-sm' }, '回')
+            ),
+            p({ className: 'text-xs text-slate-500 mt-2 leading-relaxed' }, '※ここで設定した回数が、全一般ユーザーの基本上限になります。（個別に制限を設定しているユーザーを除く）')
+          ),
+          div({ className: 'mt-8 border-t border-white/10 pt-6' },
+              button({
+                  onClick: () => {
+                      if(confirm('全ユーザーの「個別の使用回数制限」と「個別のツール権限」をすべてリセットし、デフォルト設定に戻します。よろしいですか？')) {
+                          const n = AppDB.get();
+                          Object.keys(n.users).forEach(u => {
+                              if (u !== 'admin') {
+                                  n.users[u].customLimit = null;
+                                  n.users[u].perms = {};
+                              }
+                          });
+                          AppDB.save(n);
+                          setDb(n);
+                          alert('全ユーザーの設定をリセットしました。');
+                      }
+                  },
+                  className: 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 px-4 py-2 rounded-lg text-xs font-bold transition'
+              }, '⚠️ 全ユーザーの個別設定をリセット')
+          )
+        ),
+
         tab === 'tools' && div({ className: 'glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-10 animate-in overflow-x-auto' },
           p({ className: 'text-brand-accent text-xs md:text-sm font-bold mb-6' }, '⚠️ ツールごとに「一覧への表示/非表示」と「メンテナンスモード（一覧には出るが使用不可）」を設定できます。'),
           el('table', { className: 'w-full text-left min-w-[500px]' },
@@ -1009,7 +1191,7 @@
         tab === 'users' && div({ className: 'glass-panel rounded-2xl md:rounded-[2rem] overflow-hidden animate-in overflow-x-auto' },
           el('table', { className: 'w-full text-left min-w-[600px]' },
             el('thead', { className: 'bg-white/5' }, el('tr', null, ['ニックネーム / @ユーザー名', '状態', '操作'].map(th => el('th', { className: 'p-4 md:p-6 text-[10px] md:text-xs font-black text-slate-500 uppercase' }, th)))),
-            el('tbody', { className: 'divide-y divide-white/5' }, users.map(k => Fragment({ key: k },
+            el('tbody', { className: 'divide-y divide-white/5' }, users.map(k => el(Fragment, { key: k },
               el('tr', { className: 'hover:bg-white/5 transition' },
                 el('td', { className: 'p-4 md:p-6 font-bold text-white text-xs md:text-sm' }, 
                   div(null, span({ className: 'block mb-1' }, db.users[k].nickname || '未設定'), span({ className: 'text-[10px] text-brand-light font-normal' }, k))
@@ -1018,11 +1200,29 @@
                 el('td', { className: 'p-4 md:p-6 flex flex-wrap gap-2' },
                   db.users[k].status !== 'approved' && button({ onClick: () => setStatus(k, 'approved'), className: 'text-brand-success font-black text-[10px] md:text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded transition' }, '許可'),
                   db.users[k].status === 'approved' && button({ onClick: () => setStatus(k, 'rejected'), className: 'text-brand-danger font-black text-[10px] md:text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded transition' }, '権利剥奪'),
-                  db.users[k].status === 'approved' && button({ onClick: () => setEditingUser(editingUser === k ? null : k), className: 'text-white font-black text-[10px] md:text-xs bg-brand hover:bg-brand-dark px-3 py-1.5 rounded transition' }, editingUser === k ? '閉じる' : '⚙️ 権限')
+                  db.users[k].status === 'approved' && button({ onClick: () => setEditingUser(editingUser === k ? null : k), className: 'text-white font-black text-[10px] md:text-xs bg-brand hover:bg-brand-dark px-3 py-1.5 rounded transition' }, editingUser === k ? '閉じる' : '⚙️ 設定')
                 )
               ),
               editingUser === k && el('tr', null,
                 el('td', { colSpan: 3, className: 'p-4 md:p-6 bg-black/40 border-b border-white/5' },
+                  div({ className: 'mb-6 p-4 bg-black/30 rounded-xl border border-white/5 flex flex-col sm:flex-row items-start sm:items-center gap-4' },
+                    span({ className: 'block text-xs font-bold text-brand-light' }, '⏱️ 1日の使用回数制限'),
+                    select({
+                        className: 'input-base !py-2 text-sm w-full sm:w-auto',
+                        value: db.users[k].customLimit === null ? 'default' : db.users[k].customLimit,
+                        onChange: e => {
+                            const val = e.target.value;
+                            const n = AppDB.get();
+                            n.users[k].customLimit = val === 'default' ? null : Number(val);
+                            AppDB.save(n);
+                            setDb(n);
+                        }
+                    },
+                        option({ value: 'default' }, `デフォルト設定に従う (${db.config.defaultDailyLimit}回)`),
+                        option({ value: '-1' }, '無制限 (∞)'),
+                        [1, 3, 5, 10, 20, 50, 100].map(num => option({ key: num, value: num }, `${num}回`))
+                    )
+                  ),
                   span({ className: 'block text-xs font-bold text-brand-light mb-4' }, '⚙️ このユーザーが使用できるツールを個別に設定'),
                   div({ className: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3' },
                     Object.keys(TOOLS).map(tid => {
@@ -1050,16 +1250,57 @@
       const db = AppDB.get();
       const uData = db.users[props.user];
 
+      const [expandedCats, setExpandedCats] = useState(() => {
+        const initial = {};
+        CATEGORIES.forEach((cat) => { initial[cat.id] = false; });
+        return initial;
+      });
+
       useEffect(() => { window.scrollTo(0, 0); }, [screen]);
+
+      const openTool = (tid) => {
+        const isMaintenance = db.config.toolMaintenance[tid] === true;
+        const userPerm = uData.perms[tid];
+        const isPermitted = props.role === 'admin' || (userPerm !== undefined ? userPerm : DEF_UNLOCKED.includes(tid));
+        
+        if (isMaintenance && props.role !== 'admin') {
+          alert('現在メンテナンス中です。ご迷惑をおかけします。');
+          return;
+        }
+        if (!isPermitted) {
+          alert('🔒 管理者によってロックされています');
+          return;
+        }
+
+        const ndb = AppDB.get();
+        let recent = ndb.users[props.user].recentTools || [];
+        recent = recent.filter(t => t !== tid); 
+        recent.unshift(tid); 
+        if (recent.length > 6) recent.pop(); 
+        ndb.users[props.user].recentTools = recent;
+        AppDB.save(ndb);
+
+        setScreen(tid);
+      };
+
+      const toggleCat = (catId) => {
+        setExpandedCats(prev => ({ ...prev, [catId]: !prev[catId] }));
+      };
 
       if (TOOLS[screen]) return el(ToolCore, { tid: screen, user: props.user, role: props.role, onBack: () => setScreen('home') });
 
       const usage = (uData.usage.date === new Date().toDateString()) ? uData.usage.count : 0;
+      
+      const userLimit = uData.customLimit !== null && uData.customLimit !== undefined ? uData.customLimit : db.config.defaultDailyLimit;
+      const limitText = userLimit === -1 ? '∞' : userLimit;
+
+      const recent = uData.recentTools || [];
+      const recentVisible = recent.filter(tid => TOOLS[tid] && db.config.toolVisibility[tid] !== false);
 
       return div({ className: 'w-full animate-in relative min-h-screen pb-20' },
         div({ className: 'w-full flex justify-end items-center p-4 gap-2 flex-wrap z-50' },
           props.role === 'admin' && button({ onClick: props.onGoAdmin, className: 'bg-brand-accent text-white px-4 py-2 md:px-5 md:py-2.5 rounded-full text-[10px] md:text-xs font-black shadow-lg shadow-brand-accent/30 active:scale-95 transition' }, '🎛️ 管理'),
-          div({ className: 'glass-panel px-4 py-2 md:px-5 md:py-2.5 rounded-full text-[10px] md:text-xs font-black text-white/50 border-white/10' }, 'LIMIT: ' + usage + '/' + DAILY_LIMIT),
+          div({ className: 'glass-panel px-4 py-2 md:px-5 md:py-2.5 rounded-full text-[10px] md:text-xs font-black text-white/50 border-white/10' }, 'LIMIT: ' + usage + ' / ' + limitText),
           button({ onClick: props.onLogout, className: 'bg-white/5 hover:bg-white/10 px-4 py-2 md:px-5 md:py-2.5 rounded-full text-[10px] md:text-xs font-black text-white/50 transition' }, 'ログアウト')
         ),
         div({ className: 'text-center mt-6 md:mt-10 mb-12 md:mb-20 px-4' },
@@ -1069,39 +1310,81 @@
           h1({ className: 'text-4xl md:text-7xl font-black tracking-tighter mb-4 md:mb-8 leading-tight text-white' }, 'Content ', span({ className: 'text-brand' }, 'Master')),
           p({ className: 'text-slate-400 text-xs md:text-base max-w-2xl mx-auto leading-relaxed' }, 'クラウドワークスから独自のコンテンツ販売まで、すべてを完全自動化。')
         ),
+        
         div({ className: 'px-4 sm:px-6 lg:px-8 pb-10' }, 
+          recentVisible.length > 0 && div({ className: 'mb-12 md:mb-16 max-w-6xl mx-auto animate-in' },
+            h2({ className: 'text-lg md:text-xl font-black text-white mb-6 flex items-center gap-3 md:gap-4' }, 
+              div({ className: 'w-1.5 md:w-2 h-6 md:h-8 bg-brand rounded-full' }), 
+              '🕒 最近使ったツール'
+            ),
+            div({ className: 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4' },
+              recentVisible.map(tid => {
+                const t = TOOLS[tid];
+                const isMaintenance = db.config.toolMaintenance[tid] === true;
+                const userPerm = uData.perms[tid];
+                const isPermitted = props.role === 'admin' || (userPerm !== undefined ? userPerm : DEF_UNLOCKED.includes(tid));
+                const canAccess = props.role === 'admin' || (isPermitted && !isMaintenance);
+
+                return div({ 
+                    key: 'recent-' + tid, 
+                    onClick: () => openTool(tid), 
+                    className: 'glass-panel p-4 md:p-5 rounded-xl md:rounded-2xl transition duration-300 hover:-translate-y-1 hover:border-brand/40 cursor-pointer relative overflow-hidden group flex flex-col items-center justify-center text-center ' + (canAccess?'':'opacity-50 grayscale') 
+                  },
+                  div({ className: 'text-3xl md:text-4xl mb-3 group-hover:scale-110 transition' }, t.icon),
+                  span({ className: 'text-xs md:text-sm font-bold text-white/90 group-hover:text-white line-clamp-2 leading-snug' }, t.name),
+                  isMaintenance && span({ className: 'absolute top-2 right-2 bg-brand-danger/20 text-brand-danger text-[8px] font-black px-1.5 py-0.5 rounded border border-brand-danger/30' }, 'メンテ中')
+                );
+              })
+            )
+          ),
+
           CATEGORIES.map(cat => {
             const visible = Object.keys(TOOLS).filter(k => TOOLS[k].cat === cat.id && db.config.toolVisibility[k] !== false);
             if (visible.length === 0) return null;
-            return div({ key: cat.id, className: 'mb-12 md:mb-20 max-w-6xl mx-auto' },
-              h2({ className: 'text-lg md:text-xl font-black text-white mb-6 md:mb-10 flex items-center gap-3 md:gap-4' }, div({ className: 'w-1.5 md:w-2 h-6 md:h-8 bg-brand rounded-full' }), cat.name),
-              div({ className: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6' },
-                visible.map(tid => {
-                  const t = TOOLS[tid];
-                  const isMaintenance = db.config.toolMaintenance[tid] === true;
-                  const userPerm = uData.perms[tid];
-                  const isPermitted = props.role === 'admin' || (userPerm !== undefined ? userPerm : DEF_UNLOCKED.includes(tid));
-                  const canAccess = props.role === 'admin' || (isPermitted && !isMaintenance);
+            
+            const isExpanded = expandedCats[cat.id];
 
-                  return div({ key: tid, onClick: () => { 
-                      if(isMaintenance && props.role !== 'admin') alert('現在メンテナンス中です。ご迷惑をおかけします。');
-                      else if(isPermitted) setScreen(tid); 
-                      else alert('🔒 管理者によってロックされています'); 
-                    }, 
-                    className: 'glass-panel rounded-2xl md:rounded-[2rem] p-6 md:p-8 transition duration-300 hover:-translate-y-1 hover:border-brand/40 cursor-pointer relative overflow-hidden group ' + (canAccess?'':'opacity-50 grayscale') },
-                    div({ className: 'flex justify-between items-start mb-6 md:mb-8' },
-                      div({ className: 'text-4xl md:text-5xl group-hover:scale-110 transition' }, t.icon),
-                      isMaintenance ? span({ className: 'bg-brand-danger/20 text-brand-danger text-[9px] md:text-[10px] font-black px-2 py-1 md:px-3 md:py-1.5 rounded-lg border border-brand-danger/30 shrink-0' }, '🚧 メンテ中') :
-                      t.badge && span({ className: 'bg-brand/10 text-brand text-[9px] md:text-[10px] font-black px-2 py-1 md:px-3 md:py-1.5 rounded-lg border border-brand/20 shrink-0' }, t.badge)
-                    ),
-                    h3({ className: 'text-lg md:text-xl font-black mb-2 md:mb-3 text-white/90 group-hover:text-white transition break-words' }, t.name),
-                    p({ className: 'text-xs md:text-sm text-slate-500 break-words' }, t.desc)
-                  );
-                })
+            return div({ key: cat.id, className: 'mb-6 md:mb-8 max-w-6xl mx-auto glass-panel rounded-2xl md:rounded-[2rem] overflow-hidden transition-all duration-300' },
+              div({ 
+                onClick: () => toggleCat(cat.id), 
+                className: 'p-5 md:p-8 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-colors select-none' 
+              },
+                h2({ className: 'text-lg md:text-xl font-black text-white flex items-center gap-3 md:gap-4 m-0' }, 
+                  div({ className: 'w-1.5 md:w-2 h-6 md:h-8 bg-brand rounded-full' }), 
+                  cat.name
+                ),
+                span({ className: 'text-slate-400 transform transition-transform duration-300 ' + (isExpanded ? 'rotate-180' : '') }, '▼')
+              ),
+              
+              isExpanded && div({ className: 'px-5 md:px-8 pb-6 md:pb-8 pt-0 animate-in' },
+                div({ className: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 border-t border-white/10 pt-6 md:pt-8' },
+                  visible.map(tid => {
+                    const t = TOOLS[tid];
+                    const isMaintenance = db.config.toolMaintenance[tid] === true;
+                    const userPerm = uData.perms[tid];
+                    const isPermitted = props.role === 'admin' || (userPerm !== undefined ? userPerm : DEF_UNLOCKED.includes(tid));
+                    const canAccess = props.role === 'admin' || (isPermitted && !isMaintenance);
+
+                    return div({ 
+                        key: tid, 
+                        onClick: () => openTool(tid), 
+                        className: 'bg-black/30 border border-white/5 rounded-2xl p-6 md:p-8 transition duration-300 hover:-translate-y-1 hover:border-brand/40 hover:bg-white/5 cursor-pointer relative overflow-hidden group ' + (canAccess?'':'opacity-50 grayscale') 
+                      },
+                        div({ className: 'flex justify-between items-start mb-4 md:mb-6' },
+                          div({ className: 'text-4xl md:text-5xl group-hover:scale-110 transition' }, t.icon),
+                          isMaintenance ? span({ className: 'bg-brand-danger/20 text-brand-danger text-[9px] md:text-[10px] font-black px-2 py-1 md:px-3 md:py-1.5 rounded-lg border border-brand-danger/30 shrink-0' }, '🚧 メンテ中') :
+                          t.badge && span({ className: 'bg-brand/10 text-brand text-[9px] md:text-[10px] font-black px-2 py-1 md:px-3 md:py-1.5 rounded-lg border border-brand/20 shrink-0' }, t.badge)
+                        ),
+                        h3({ className: 'text-lg md:text-xl font-black mb-2 md:mb-3 text-white/90 group-hover:text-white transition break-words' }, t.name),
+                        p({ className: 'text-xs md:text-sm text-slate-500 break-words' }, t.desc)
+                    );
+                  })
+                )
               )
             );
           })
         ),
+        
         el(InquiryForm, { user: props.user, nickname: uData.nickname })
       );
     };
@@ -1114,6 +1397,9 @@
       const [xId, setXId] = useState('@');
       const [isL, setIsL] = useState(true);
       const [err, setErr] = useState('');
+      
+      const [agreed, setAgreed] = useState(false);
+      const [showTerms, setShowTerms] = useState(false);
 
       const handleXIdChange = (e) => {
         let val = e.target.value;
@@ -1144,15 +1430,47 @@
             setErr('登録情報が見つからないか、管理者の承認待ち、または権利剥奪状態です。');
           }
         } else {
+          if (!agreed) return setErr('利用規約に同意してください。');
+          
           if (db.users[x]) return setErr('この@ユーザー名は既に登録されています。');
-          db.users[x] = { nickname: n, status: 'pending', registeredAt: Date.now(), usage: { count: 0, date: '' }, perms: {}, brand: { plan: 'free', name: '' }, projects: { 'default': { name: 'デフォルト', data: {} } }, curProj: 'default', settings: { aiModel: 'chatgpt_free' } };
+          db.users[x] = { nickname: n, status: 'pending', registeredAt: Date.now(), usage: { count: 0, date: '' }, perms: {}, brand: { plan: 'free', name: '' }, projects: { 'default': { name: 'デフォルト', data: {} } }, curProj: 'default', settings: { aiModel: 'chatgpt_free' }, recentTools: [], customLimit: null };
           AppDB.save(db);
           alert('申請が完了しました。管理者の承認をお待ちください。');
           setIsL(true);
         }
       };
 
-      return div({ className: 'w-full max-w-md mx-auto mt-20 md:mt-32 animate-in px-4' },
+      const termsModal = showTerms ? div({ className: 'fixed inset-0 z-[300] flex items-center justify-center bg-black/80 p-4 md:p-6 animate-in' },
+        div({ className: 'glass-panel rounded-2xl md:rounded-[2rem] max-w-2xl w-full p-6 md:p-8 relative max-h-[90vh] flex flex-col' },
+          button({ onClick: () => setShowTerms(false), className: 'absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold' }, '✕'),
+          h3({ className: 'text-lg md:text-xl font-black text-white mb-4 border-b border-white/10 pb-4' }, '📜 AI Content Pro 利用規約'),
+          div({ className: 'overflow-y-auto pr-2 text-xs md:text-sm text-slate-300 leading-relaxed space-y-4 flex-1' },
+            p(null, '本ツール（以下「本サービス」といいます）を利用する全てのユーザーは、以下の規約に同意したものとみなします。本サービスは厳重なセキュリティで監視されており、違反行為が発覚した場合は即座にアクセス権を剥奪し、状況により法的措置を取る場合があります。'),
+            
+            h4({ className: 'font-bold text-white mt-4' }, '第1条（禁止事項）'),
+            p(null, 'ユーザーは、本サービスの利用にあたり、以下の行為をしてはなりません。'),
+            el('ul', { className: 'list-disc pl-5 space-y-1' },
+              el('li', null, '本サービスのアクセスURL、ログイン情報（XのID等）を第三者に共有、譲渡、または貸与する行為。'),
+              el('li', null, '本サービスのソースコードの閲覧、抽出、複製、改変、リバースエンジニアリング、またはそれらを試みる行為。'),
+              el('li', null, '本サービスのアイデアや構造を模倣し、類似または競合するツール・サイトを開発、公開、販売する行為。'),
+              el('li', null, '本サービスのサーバーやネットワークシステムに過度な負荷をかける行為、および不正アクセス行為。'),
+              el('li', null, '本サービスを通じて生成したプロンプトや出力結果を、ツールそのものの機能として再販する行為（生成された「記事」や「構成」を自分のコンテンツとして販売することは許可されています）。')
+            ),
+
+            h4({ className: 'font-bold text-white mt-4' }, '第2条（権利の剥奪と免責）'),
+            el('ul', { className: 'list-disc pl-5 space-y-1' },
+              el('li', null, '管理者は、ユーザーが本規約に違反したと判断した場合、事前の通知なく当該ユーザーの利用権利を永久に剥奪できるものとします。'),
+              el('li', null, '本サービスを利用して生じた一切の損害（生成AIの出力内容によるトラブル等を含む）について、管理者は一切の責任を負いません。')
+            )
+          ),
+          div({ className: 'mt-6 pt-4 border-t border-white/10 text-center' },
+            button({ onClick: () => { setAgreed(true); setShowTerms(false); }, className: 'w-full btn-gradient py-3 rounded-xl font-bold text-white shadow-lg' }, '規約を確認して閉じる')
+          )
+        )
+      ) : null;
+
+      return div({ className: 'w-full max-w-md mx-auto mt-16 md:mt-24 animate-in px-4 pb-10' },
+        termsModal,
         div({ className: 'glass-panel rounded-3xl md:rounded-[2.5rem] p-8 md:p-12 shadow-2xl text-center relative overflow-hidden' },
           h2({ className: 'text-2xl md:text-3xl font-black mb-10 md:mb-12 tracking-tight text-white' }, 'AI Content Pro'),
           div({ className: 'flex bg-black/40 p-1 md:p-1.5 rounded-xl mb-6 md:mb-8' },
@@ -1168,6 +1486,20 @@
               span({ className: 'block text-[10px] text-brand-light font-bold mb-1 ml-2' }, 'Xのユーザー名 (ID)'),
               input({ className: 'input-base text-center font-mono', placeholder: '@username', value: xId, onChange: handleXIdChange })
             ),
+            
+            !isL && div({ className: 'mt-4 pt-4 border-t border-white/10' },
+              label({ className: 'flex items-start gap-3 cursor-pointer group' },
+                input({ type: 'checkbox', className: 'mt-1 w-4 h-4 accent-brand rounded border-white/20 shrink-0 cursor-pointer', checked: agreed, onChange: e => setAgreed(e.target.checked) }),
+                div({ className: 'text-xs text-slate-300 leading-snug' }, 
+                  span({ 
+                    onClick: (e) => { e.preventDefault(); setShowTerms(true); }, 
+                    className: 'text-brand hover:underline font-bold' 
+                  }, '利用規約（禁止事項等）'),
+                  ' を確認し、同意します。違反時はアカウントが即時剥奪されることを承諾します。'
+                )
+              )
+            ),
+
             err && p({ className: 'text-brand-danger text-[10px] md:text-xs font-bold text-center' }, '❌ ' + err),
             button({ onClick: login, className: 'w-full btn-gradient py-3 md:py-4 rounded-xl md:rounded-2xl text-white font-black text-base md:text-lg shadow-xl mt-2 md:mt-4' }, isL ? 'ログインする' : '申請を送信する')
           )
