@@ -118,7 +118,7 @@
     const DB_KEY = 'AICP_v45_Secure_DB';
     const SESS_KEY = 'AICP_v45_Session';
     const DAILY_LIMIT = 5;
-    const SYS_VERSION = 'v45.0.0 Stable';
+    const SYS_VERSION = 'v45.0.1 Stable';
 
     const AppDB = {
       get: () => {
@@ -138,6 +138,7 @@
           localStorage.setItem(DB_KEY, JSON.stringify(db));
         }
 
+        // 強力な修復ロジック（欠損データを補完）
         if (!db.config) db.config = { adminU: 'admin', adminP: 'admin123', toolVisibility: {} };
         Object.keys(db.users).forEach(u => {
           let user = db.users[u];
@@ -192,7 +193,7 @@
 
     /* =========================================================================
        5. 全33ツール完全定義リスト
-       【機能説明】アプリ内で使用するすべてのツールの入力フォームとプロンプト構築ルール。
+       【機能説明】アプリ内で使用するすべてのツールの入力フォームとプロンプト構築ルールを定義します。
        ========================================================================= */
     const TOOLS = {
       /* --- 1. 🔥 オメガ特級ツール --- */
@@ -330,6 +331,7 @@
       { id: 'sns', name: '🚀 集客 ＆ SNSアカウント設計' },
       { id: 'fun', name: '💬 ファン化 ＆ セールス自動化' }
     ];
+
     /* =========================================================================
        6. 共通UIコンポーネント (フォームや表示周り)
        【機能説明】各ツール共通で使用される入力枠の生成やデザインを行います。
@@ -427,7 +429,8 @@
         copyText(prompt, copied, setCopied, 'gen');
       };
 
-      const header = div({ className: 'flex flex-col sm:flex-row justify-between sm:items-center mb-6 md:mb-8 pb-4 md:pb-6 border-b border-white/10 animate-in gap-4' },
+      // 【修正】ツール画面のヘッダーもフレックスで折り返すよう修正
+      const header = div({ className: 'flex flex-col sm:flex-row justify-between sm:items-center mb-6 md:mb-8 pb-4 md:pb-6 border-b border-white/10 animate-in gap-4 pt-4' },
         div({ className: 'flex items-center gap-3 md:gap-4' },
           button({ onClick: onBack, className: 'glass-panel px-4 py-2 md:px-5 md:py-2.5 rounded-xl text-xs md:text-sm font-bold hover:bg-white/10 transition shrink-0' }, '← BACK'),
           div(null, h1({ className: 'text-xl md:text-2xl font-black text-white break-words' }, conf.name), p({ className: 'text-[10px] md:text-xs text-brand font-bold uppercase tracking-widest mt-1 break-words' }, conf.desc))
@@ -439,7 +442,7 @@
         conf.tut && div({ className: 'bg-brand/5 border border-brand/20 rounded-2xl p-4 md:p-6 mb-6 md:mb-8 break-words' }, p({ className: 'text-xs md:text-sm text-brand-light font-bold' }, '💡 ' + conf.tut)),
         div({ className: 'space-y-4' }, conf.fields.map(f => el(FormInput, { key: f.id, f, val: vals[f.id], onChange: update, onMagic: handleMagic }))),
         button({ onClick: onGenerate, className: 'w-full py-4 md:py-6 rounded-2xl btn-gradient text-white font-black text-lg md:text-xl shadow-xl mt-4 mb-8 md:mb-10 break-words' }, copied.gen ? '✓ コピー完了！AIへ送信してください' : '📋 プロンプト生成 ＆ コピー'),
-        div({ className: 'glass-panel rounded-3xl p-6 md:p-8 animate-in w-full' },
+        div({ className: 'glass-panel rounded-3xl p-6 md:p-8 animate-in w-full mb-10' },
           span({ className: 'block text-[10px] md:text-xs font-black text-slate-400 mb-4 tracking-[0.2em] uppercase break-words' }, '📥 AIの回答を貼り付けて保存・編集'),
           textarea({ className: 'input-base min-h-[300px] md:min-h-[400px]', value: res || '', onChange: e => setRes(e.target.value) }),
           button({ onClick: () => copyText(res, copied, setCopied, 'ca'), className: 'w-full bg-white/10 hover:bg-white/20 py-3 md:py-4 rounded-xl font-black mt-6 transition text-white text-sm md:text-base' }, copied.ca ? '✓ コピーしました' : '📋 全文コピー')
@@ -449,7 +452,7 @@
 
     /* =========================================================================
        8. 管理者ダッシュボード (SPA完全版)
-       【機能説明】画面遷移なしで管理業務を行うためのパネル。ツールの表示/非表示やユーザーBANを行います。
+       【機能説明】画面遷移なしで管理業務を行うためのパネル。
        ========================================================================= */
     const AdminDash = (props) => {
       const [db, setDb] = useState(AppDB.get());
@@ -459,7 +462,7 @@
       const setVisible = (tid) => { const n = AppDB.get(); n.config.toolVisibility[tid] = !n.config.toolVisibility[tid]; AppDB.save(n); setDb(n); };
       const setStatus = (u, st) => { const n = AppDB.get(); n.users[u].status = st; AppDB.save(n); setDb(n); };
 
-      return div({ className: 'w-full max-w-6xl mx-auto animate-in px-4 sm:px-6 lg:px-8' },
+      return div({ className: 'w-full max-w-6xl mx-auto animate-in px-4 sm:px-6 lg:px-8 pt-6' },
         div({ className: 'flex flex-col md:flex-row justify-between items-center mb-8 gap-4 pb-4 md:pb-6 border-b border-white/10' },
           h1({ className: 'text-2xl md:text-3xl font-black text-white tracking-tighter' }, '🎛️ DASHBOARD'),
           div({ className: 'flex gap-2 md:gap-3 w-full md:w-auto justify-center' },
@@ -500,7 +503,7 @@
 
     /* =========================================================================
        9. ユーザーダッシュボード (メインメニュー)
-       【機能説明】全33のツールをカテゴリーごとに並べて表示し、クリックでそのツール画面へ遷移させます。
+       【機能説明】UIの重なりバグを修正。ステータスバーを独立したヘッダーとして配置しました。
        ========================================================================= */
     const MainApp = (props) => {
       const [screen, setScreen] = useState('home');
@@ -511,17 +514,22 @@
 
       const usage = (uData.usage.date === new Date().toDateString()) ? uData.usage.count : 0;
 
-      return div({ className: 'w-full animate-in relative' },
-        div({ className: 'absolute top-2 right-2 md:top-6 md:right-8 z-50 flex flex-wrap gap-2 justify-end max-w-full px-2' },
-          props.role === 'admin' && button({ onClick: props.onGoAdmin, className: 'bg-brand-accent text-white px-3 py-1.5 md:px-6 md:py-2.5 rounded-full text-[9px] md:text-[10px] font-black shadow-lg shadow-brand-accent/30 active:scale-95' }, '🎛️ 管理'),
-          div({ className: 'glass-panel px-3 py-1.5 md:px-6 md:py-2.5 rounded-full text-[9px] md:text-[10px] font-black text-white/50 border-white/10' }, 'LIMIT: ' + usage + '/' + DAILY_LIMIT),
-          button({ onClick: props.onLogout, className: 'bg-white/5 hover:bg-white/10 px-3 py-1.5 md:px-6 md:py-2.5 rounded-full text-[9px] md:text-[10px] font-black text-white/50 transition' }, 'LOGOUT')
+      return div({ className: 'w-full animate-in relative min-h-screen pb-20' },
+        // 【修正】重なりの原因であったabsoluteを外し、独立したフレックスボックスのヘッダーとして配置
+        div({ className: 'w-full flex justify-end items-center p-4 gap-2 flex-wrap z-50' },
+          props.role === 'admin' && button({ onClick: props.onGoAdmin, className: 'bg-brand-accent text-white px-4 py-2 md:px-5 md:py-2.5 rounded-full text-[10px] md:text-xs font-black shadow-lg shadow-brand-accent/30 active:scale-95 transition' }, '🎛️ 管理'),
+          div({ className: 'glass-panel px-4 py-2 md:px-5 md:py-2.5 rounded-full text-[10px] md:text-xs font-black text-white/50 border-white/10' }, 'LIMIT: ' + usage + '/' + DAILY_LIMIT),
+          button({ onClick: props.onLogout, className: 'bg-white/5 hover:bg-white/10 px-4 py-2 md:px-5 md:py-2.5 rounded-full text-[10px] md:text-xs font-black text-white/50 transition' }, 'LOGOUT')
         ),
-        div({ className: 'text-center mt-16 md:mt-20 mb-16 md:mb-28 px-4' },
-          div({ className: 'inline-block glass-panel px-4 md:px-6 py-1.5 md:py-2 rounded-full mb-6 md:mb-10' }, span({ className: 'text-brand text-[9px] md:text-[10px] font-black tracking-[0.2em] md:tracking-[0.4em] uppercase' }, 'AI Content Pro Stable')),
+        // タイトル部分
+        div({ className: 'text-center mt-6 md:mt-10 mb-12 md:mb-20 px-4' },
+          div({ className: 'inline-block glass-panel px-4 md:px-6 py-1.5 md:py-2 rounded-full mb-6 md:mb-8 mx-auto' }, 
+            span({ className: 'text-brand text-[9px] md:text-[10px] font-black tracking-[0.2em] md:tracking-[0.4em] uppercase' }, 'AI Content Pro Stable')
+          ),
           h1({ className: 'text-4xl md:text-7xl font-black tracking-tighter mb-4 md:mb-8 leading-tight text-white' }, 'Content ', span({ className: 'text-brand' }, 'Master')),
           p({ className: 'text-slate-400 text-xs md:text-base max-w-2xl mx-auto leading-relaxed' }, 'クラウドワークスから独自のコンテンツ販売まで、すべてを完全自動化。')
         ),
+        // ツール一覧
         div({ className: 'px-4 sm:px-6 lg:px-8' }, 
           CATEGORIES.map(cat => {
             const visible = Object.keys(TOOLS).filter(k => TOOLS[k].cat === cat.id && db.config.toolVisibility[k] !== false);
@@ -550,7 +558,6 @@
 
     /* =========================================================================
        10. ログインUI (認証と新規登録)
-       【機能説明】ユーザーの識別とログイン処理を行います。admin/admin123で管理者画面へ。
        ========================================================================= */
     const AuthBox = (props) => {
       const [u, setU] = useState('');
@@ -605,7 +612,6 @@
 
     /* =========================================================================
        11. Root マウント (起点)
-       【機能説明】アプリの起動ポイント。セッションを確認し、どの画面を出すか決定します。
        ========================================================================= */
     const App = () => {
       const [auth, setAuth] = useState({ u: null, r: null });
@@ -630,3 +636,4 @@
   </script>
 </body>
 </html>
+
