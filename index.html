@@ -1,1624 +1,510 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>AI Content Pro - Ultimate Stable Edition</title>
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: { DEFAULT: '#0ea5e9', light: '#38bdf8', dark: '#0369a1', accent: '#f59e0b', danger: '#f43f5e', success: '#10b981' }
-          }
-        }
-      }
-    }
-  </script>
-
-  <script>
-    // 【セキュリティ対策】右クリック・開発者ツール・ソースコード表示の簡易ブロック
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-      if (e.key === 'F12' || 
-         (e.ctrlKey && e.shiftKey && ['I', 'J', 'C', 'i', 'j', 'c'].includes(e.key)) ||
-         (e.ctrlKey && ['U', 'u', 'S', 's'].includes(e.key))) {
-        e.preventDefault();
-      }
-    });
-  </script>
-
-  <style>
-    body { background-color: #020617; color: #f8fafc; font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; overflow-x: hidden; }
-    .grid-bg {
-      position: fixed; inset: 0; z-index: -1;
-      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-    }
-    .glass-panel {
-      background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-    .input-base {
-      width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 0.75rem; padding: 1rem; color: #fff; font-size: 16px; outline: none; transition: 0.2s;
-    }
-    .input-base:focus { border-color: #38bdf8; background: rgba(0, 0, 0, 0.6); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15); }
-    .input-base::placeholder { color: rgba(255, 255, 255, 0.2); }
-    .btn-gradient { background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); transition: 0.3s; }
-    .btn-gradient:hover { filter: brightness(1.1); transform: translateY(-2px); }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .animate-in { animation: fadeIn 0.4s ease-out forwards; }
+<!DOCTYPE html>  
+<html lang="ja">  
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">  
+  <title>AI Content Pro - Ultimate SaaS Edition</title>  
     
-    .preview-content { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #1e293b; }
-    .preview-content h1 { font-size: 1.8rem; font-weight: 900; margin-top: 1.5em; margin-bottom: 0.5em; border-bottom: 1px solid #cbd5e1; padding-bottom: 0.3em; }
-    .preview-content h2 { font-size: 1.5rem; font-weight: 800; margin-top: 1.5em; margin-bottom: 0.5em; padding-left: 0.5em; border-left: 4px solid #0ea5e9; }
-    .preview-content h3 { font-size: 1.2rem; font-weight: 700; margin-top: 1.2em; margin-bottom: 0.5em; }
-    .preview-content p { margin-bottom: 1em; line-height: 1.8; }
-    .preview-content strong { font-weight: 900; color: #000; }
-    .preview-content ul { list-style-type: disc; margin-left: 2em; margin-bottom: 1em; }
-    .preview-content li { margin-bottom: 0.3em; }
-  </style>
-</head>
-<body>
-  <div class="grid-bg"></div>
-  <div id="root"></div>
-
-  <script>
-  (function() {
-    'use strict';
-
-    /* =========================================================================
-       1. React Element Helpers
-       ========================================================================= */
-    const el = React.createElement;
-    const { useState, useEffect, Component, Fragment } = React;
-
-    const div = (props, ...children) => el('div', props, ...children);
-    const span = (props, ...children) => el('span', props, ...children);
-    const p = (props, ...children) => el('p', props, ...children);
-    const h1 = (props, ...children) => el('h1', props, ...children);
-    const h2 = (props, ...children) => el('h2', props, ...children);
-    const h3 = (props, ...children) => el('h3', props, ...children);
-    const button = (props, ...children) => el('button', props, ...children);
-    const input = (props) => el('input', props);
-    const textarea = (props) => el('textarea', props);
-    const select = (props, ...children) => el('select', props, ...children);
-    const option = (props, ...children) => el('option', props, ...children);
-    const label = (props, ...children) => el('label', props, ...children);
-
-    /* =========================================================================
-       2. データベース管理 & エラーロギング
-       ========================================================================= */
-    const DB_KEY = 'AICP_v61_Secure_DB'; 
-    const SESS_KEY = 'AICP_v61_Session';
-    const DAILY_LIMIT = 5;
-    const SYS_VERSION = 'v61.0.1 Stable';
-
-    const AppDB = {
-      get: () => {
-        let db = null;
-        try { 
-          let raw = localStorage.getItem(DB_KEY); 
-          if(!raw) {
-            raw = localStorage.getItem('AICP_v60_Secure_DB') || localStorage.getItem('AICP_v59_Secure_DB');
-            if(raw) localStorage.setItem(DB_KEY, raw);
-          }
-          if (raw) db = JSON.parse(raw); 
-        } catch (e) {}
-        
-        if (!db || typeof db !== 'object') {
-          db = { 
-            config: { adminU: 'admin', adminP: 'admin123', toolVisibility: {}, toolMaintenance: {}, defaultDailyLimit: 5 }, 
-            inquiries: [],
-            errorLogs: [],
-            users: { 'admin': { nickname: 'システム管理者', status: 'approved', registeredAt: Date.now(), usage: { count: 0, date: '' }, perms: {}, brand: { plan: 'paid', name: '管理者' }, projects: { 'default': { name: '管理者領域', data: {} } }, curProj: 'default', settings: { aiModel: 'chatgpt_free' }, recentTools: [], customLimit: null } } 
-          };
-          localStorage.setItem(DB_KEY, JSON.stringify(db));
-        }
-        
-        if (!db.config) db.config = { adminU: 'admin', adminP: 'admin123', toolVisibility: {}, toolMaintenance: {}, defaultDailyLimit: 5 };
-        if (!db.config.toolMaintenance) db.config.toolMaintenance = {};
-        if (db.config.defaultDailyLimit === undefined) db.config.defaultDailyLimit = 5;
-        if (!db.inquiries) db.inquiries = [];
-        if (!db.errorLogs) db.errorLogs = [];
-
+  <script src="https://cdn.tailwindcss.com"></script>  
+    
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>  
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>  
+  
+  <script>  
+    tailwind.config = {  
+      theme: {  
+        extend: {  
+          colors: {  
+            brand: { DEFAULT: '#0ea5e9', light: '#38bdf8', dark: '#0369a1', accent: '#f59e0b', danger: '#f43f5e', success: '#10b981' },
+            bg: { DEFAULT: '#020617', panel: '#0f172a', input: '#00000066' }
+          }  
+        }  
+      }  
+    }  
+  </script>  
+  
+  <script>  
+    document.addEventListener('contextmenu', e => e.preventDefault());  
+    document.addEventListener('keydown', e => {  
+      if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.upper())) || (e.ctrlKey && ['U','S'].includes(e.key.upper()))) e.preventDefault();
+    });  
+  </script>  
+  
+  <style>  
+    body { background-color: #020617; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans JP", sans-serif; overflow: hidden; height: 100vh; }  
+    .glass-panel { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }  
+    .input-base { width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 0.75rem; padding: 1rem; color: #fff; font-size: 15px; outline: none; transition: 0.2s; }  
+    .input-base:focus { border-color: #38bdf8; background: rgba(0, 0, 0, 0.6); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15); }  
+    .btn-gradient { background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); transition: 0.3s; color: white; font-weight: bold; }  
+    .btn-gradient:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }  
+    .btn-gradient:active:not(:disabled) { transform: translateY(1px); }
+    .btn-gradient:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .hide-scrollbar::-webkit-scrollbar { display: none; }  
+    
+    .preview-content h1 { font-size: 1.7rem; font-weight: 900; margin: 1.5em 0 0.5em; border-bottom: 1px solid #cbd5e1; padding-bottom: 0.3em; color: #000; }  
+    .preview-content h2 { font-size: 1.4rem; font-weight: 800; margin: 1.5em 0 0.5em; padding-left: 0.5em; border-left: 4px solid #0ea5e9; color: #111; }  
+    .preview-content h3 { font-size: 1.1rem; font-weight: 700; margin: 1.2em 0 0.5em; color: #222; }  
+    .preview-content p { margin-bottom: 1em; line-height: 1.8; color: #333; }  
+    .preview-content strong { font-weight: 900; color: #0ea5e9; }  
+    .preview-content ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 1em; color: #333; }  
+    .preview-content li { margin-bottom: 0.3em; }  
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }  
+    .animate-in { animation: fadeIn 0.3s ease-out forwards; }  
+  </style>  
+</head>  
+<body>  
+  <div id="root"></div>  
+  
+  <script>  
+  (function() {  
+    'use strict';  
+    const el = React.createElement;  
+    const { useState, useEffect, Component, Fragment, useRef } = React;  
+    const div = (pr, ...c) => el('div', pr, ...c);  
+    const span = (pr, ...c) => el('span', pr, ...c);  
+    const button = (pr, ...c) => el('button', pr, ...c);  
+    const h1 = (pr, ...c) => el('h1', pr, ...c);
+    const h2 = (pr, ...c) => el('h2', pr, ...c);
+    const h3 = (pr, ...c) => el('h3', pr, ...c);
+    const p = (pr, ...c) => el('p', pr, ...c);
+    const label = (pr, ...c) => el('label', pr, ...c);
+    const input = (pr, ...c) => el('input', pr, ...c);
+    const option = (pr, ...c) => el('option', pr, ...c);
+  
+    const DB_KEY = 'AICP_v70_BYOK_DB';   
+    const SESS_KEY = 'AICP_v70_Session';  
+    const SYS_VERSION = 'v70.1.0 SaaS Beta';  
+  
+    const AppDB = {  
+      get: () => {  
+        let db = null;  
+        try { db = JSON.parse(localStorage.getItem(DB_KEY)); } catch (e) {}  
+        if (!db) {  
+          db = {   
+            config: { adminU: 'admin', adminP: 'admin123' },   
+            users: { 'admin': { nickname: '管理者', status: 'approved', usage: { count: 0 }, perms: {}, settings: { aiModel: 'chatgpt_free', keys: {openai:'', anthropic:'', google:''} }, curProj: 'default', projects: { 'default': { name: '管理者領域', data: {} } } } }   
+          };  
+          localStorage.setItem(DB_KEY, JSON.stringify(db));  
+        }  
         Object.keys(db.users).forEach(u => {
-          let user = db.users[u];
-          if (!user.nickname) user.nickname = u; 
-          if (!user.projects) user.projects = { 'default': { name: 'デフォルト', data: {} } };
-          if (!user.curProj) user.curProj = 'default';
-          if (!user.usage) user.usage = { count: 0, date: '' };
-          if (!user.perms) user.perms = {};
-          if (!user.brand) user.brand = { plan: 'free', name: '' };
-          if (!user.settings) user.settings = { aiModel: 'chatgpt_free' };
-          if (!user.recentTools) user.recentTools = [];
-          if (user.customLimit === undefined) user.customLimit = null; 
+            if(!db.users[u].settings) db.users[u].settings = { aiModel: 'chatgpt_free' };
+            if(!db.users[u].settings.keys) db.users[u].settings.keys = {openai:'', anthropic:'', google:''};
         });
-        return db;
-      },
-      save: (db) => { try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch (e) {} }
-    };
-
-    const logError = (source, message, stack) => {
-      try {
-        const db = AppDB.get();
-        if (!db.errorLogs) db.errorLogs = [];
-        db.errorLogs.unshift({ id: Date.now().toString(), date: Date.now(), source, message, stack });
-        if (db.errorLogs.length > 50) db.errorLogs = db.errorLogs.slice(0, 50);
-        AppDB.save(db);
-      } catch(e) { console.error("ロギング中のエラー", e); }
-    };
-
-    window.addEventListener('error', (event) => {
-      logError('Window Error', event.message, event.error ? event.error.stack : '');
-    });
-
-    window.addEventListener('unhandledrejection', (event) => {
-      logError('Unhandled Promise', event.reason ? event.reason.toString() : 'Unknown reason', event.reason && event.reason.stack ? event.reason.stack : '');
-    });
-
-    /* =========================================================================
-       3. Error Boundary
-       ========================================================================= */
-    class ErrorBoundary extends Component {
-      constructor(props) { super(props); this.state = { hasError: false, errorInfo: null, stack: null }; }
-      static getDerivedStateFromError(error) { return { hasError: true }; }
-      componentDidCatch(error, errorInfo) { 
-        this.setState({ errorInfo: error.toString(), stack: errorInfo.componentStack }); 
-        logError('React ErrorBoundary', error.toString(), errorInfo.componentStack);
-      }
-      render() {
-        if (this.state.hasError) {
-          const errText = this.state.errorInfo + '\n\n' + (this.state.stack || '');
-          return div({ className: "min-h-screen flex items-center justify-center p-4 md:p-6" },
-            div({ className: "glass-panel p-6 md:p-8 rounded-2xl max-w-2xl w-full text-center" },
-              h2({ className: "text-xl md:text-2xl font-black text-brand-danger mb-4" }, "⚠️ システムエラーが発生しました"),
-              p({ className: "text-slate-300 text-sm mb-6 leading-relaxed" }, "画面を描画できませんでした。以下のエラー内容をコピーして開発者に報告し、「リセットして復旧する」ボタンを押してください。"),
-              
-              div({ className: "bg-black/50 p-4 rounded-lg text-left overflow-hidden relative mb-6 border border-white/10" }, 
-                div({ className: "flex justify-between items-center mb-2" },
-                  span({ className: "text-xs font-bold text-brand-danger" }, "エラー詳細ログ"),
-                  button({ 
-                    onClick: () => { navigator.clipboard.writeText(errText).then(() => alert('エラー内容をコピーしました。')); },
-                    className: "bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded text-xs font-bold text-white transition shadow"
-                  }, "📋 エラーをコピーする")
-                ),
-                textarea({ 
-                  className: "w-full bg-transparent text-[10px] text-slate-400 font-mono h-32 outline-none resize-y", 
-                  readOnly: true, 
-                  value: errText 
-                })
-              ),
-              
-              button({ onClick: () => { localStorage.clear(); window.location.reload(); }, className: "btn-gradient w-full py-3 md:py-4 rounded-xl font-bold text-white shadow-lg" }, "システムをリセットして復旧する")
-            )
-          );
-        }
-        return this.props.children;
-      }
-    }
-
-    const copyText = (text, state, setState, key) => {
-      if (navigator.clipboard) navigator.clipboard.writeText(text).catch(()=>{});
-      setState({ ...state, [key]: true });
-      setTimeout(() => setState(prev => ({ ...prev, [key]: false })), 2000);
-    };
-
-    const copyRichText = (elementId, state, setState, key) => {
-      const el = document.getElementById(elementId);
-      if (el) {
-        const selection = window.getSelection();
-        const range = document.createRange();
-        range.selectNodeContents(el);
-        selection.removeAllRanges();
-        selection.addRange(range);
-        try {
-          document.execCommand('copy');
-          setState(prev => ({ ...prev, [key]: true }));
-          setTimeout(() => setState(prev => ({ ...prev, [key]: false })), 2000);
-        } catch(e) {}
-        selection.removeAllRanges();
-      }
-    };
-
-    /* =========================================================================
-       4. 魔法の杖＆AIシステムプロンプト (🌟大幅アップデート済)
-       ========================================================================= */
-    const MAGIC_DATA = {
-      campaign: [
-        { prod: "AIコンテンツマスター", tgt: "時間がない30代会社員", val: "1日15分で収益化する時短術と完全自動化ツール群" },
-        { prod: "高単価クロージングの極意", tgt: "成約率が上がらず悩むフリーランス", val: "心理学を用いた、相手から「売ってほしい」と言わせる台本構築" },
-        { prod: "非常識なSNS集客プログラム", tgt: "フォロワーが伸びない個人事業主", val: "フォロワー数に依存せず、濃い見込み客だけを集める仕組み" },
-        { prod: "ゼロから始めるWebデザイン講座", tgt: "副業で月5万稼ぎたい主婦", val: "未経験でもプロ並みのデザインが作れるテンプレートと案件獲得ノウハウ" },
-        { prod: "ズボラ向け！自動化ブログアフィリエイト", tgt: "記事を書くのが苦痛な初心者", val: "AIに記事を書かせて放置で稼ぐ仕組み" },
-        { prod: "スキマ時間で月10万！動画編集ブートキャンプ", tgt: "パソコン初心者", val: "テンプレを使った超効率的な編集術と案件獲得サポート" },
-        { prod: "週末起業コンサルタント養成講座", tgt: "今の会社に不満を持つ中堅社員", val: "自分の経験を高単価商品にして独立するロードマップ" },
-        { prod: "恋愛コンサル・マッチングアプリ攻略法", tgt: "出会いがない20代・30代男性", val: "メッセージのテンプレと好感度MAXのプロフィール写真の極意" },
-        { prod: "デジタルイラスト完全マネタイズ", tgt: "絵を描くのが好きな学生", val: "SNS発信とココナラでの依頼獲得術" },
-        { prod: "実店舗向け・Googleマップ集客法", tgt: "広告費をかけられない飲食店オーナー", val: "MEO対策と口コミ獲得の自動化システム" },
-        { prod: "占い・スピリチュアル起業プログラム", tgt: "占いを仕事にしたい女性", val: "ゼロから月商30万を作る集客とオンライン鑑定のコツ" },
-        { prod: "英語コンプレックス解消！コーチング", tgt: "何度も挫折した社会人", val: "科学的な学習法と毎日のオンライン進捗管理" },
-        { prod: "不動産投資・ゼロイチ入門", tgt: "貯金はあるが運用方法がわからない会社員", val: "リスクを抑えた物件選びと有利な融資の引き方" },
-        { prod: "パーソナルトレーナー独立支援", tgt: "ジム勤務から独立したいトレーナー", val: "SNSを使った高単価顧客の獲得法とオンライン指導術" },
-        { prod: "ズボラでも続く！資産運用マスター", tgt: "投資初心者の主婦", val: "ほったらかしで増えるインデックス投資の基礎と実践" }
-      ],
-      note: [
-        { age: "10代", theme: "スキルなしの10代がスマホ1台で月5万稼ぐ極意", target_detail: "バイト以外で稼ぎたいがスキルがない10代", benefit: "学業と両立しながら自由な経済基盤を築く", authority: "SNSを駆使して月収30万の現役学生マーケター", price: "1,980", free_vol: "1500", paid_vol: "4000", guarantee: true },
-        { age: "10代", theme: "10代から始める「SNS影響力」の育て方", target_detail: "発信を始めたいが何を発信していいかわからない", benefit: "同世代に圧倒的な差をつける影響力と収益", authority: "総フォロワー10万人の10代インフルエンサー", price: "1,480", free_vol: "1000", paid_vol: "3000", guarantee: false },
-        { age: "10代", theme: "バイトを辞めたい高校生へ。フリマアプリ転売の教科書", target_detail: "お小遣いが足りないがバイトの時間が取れない", benefit: "身の回りの不用品や安く仕入れた物で月3万円を安定して稼ぐ", authority: "高校在学中に月商10万円を達成した物販プレイヤー", price: "1,980", free_vol: "1500", paid_vol: "3500", guarantee: true },
-        { age: "10代", theme: "10代限定！イラストをSNSでバズらせてお小遣いを稼ぐ方法", target_detail: "絵を描くのは好きだけどお金にする方法がわからない", benefit: "自分の好きなイラストでファンを作り、依頼案件で収入を得る", authority: "SNS発信だけで毎月5万円稼ぐ学生クリエイター", price: "2,480", free_vol: "1200", paid_vol: "4000", guarantee: false },
-        { age: "10代", theme: "ゲーム実況で月3万稼ぐ！中高生のためのYouTube入門", target_detail: "ゲームが好きで実況をやってみたいが機材や編集がわからない", benefit: "スマホと安い機材だけで、登録者を増やし収益化の条件をクリアする", authority: "登録者5万人の現役学生ゲーム実況者", price: "2,980", free_vol: "2000", paid_vol: "5000", guarantee: true },
-        { age: "20代", theme: "スキルなしの20代がスマホ1台で月5万稼ぐ極意", target_detail: "将来が不安だが何から始めればいいか分からない20代", benefit: "会社に依存しない自由な経済基盤と選択肢", authority: "AIツールを駆使し副業で月収30万の現役マーケター", price: "2,980", free_vol: "1500", paid_vol: "4000", guarantee: true },
-        { age: "20代", theme: "20代で手取り20万から抜け出す「個人ビジネス」の始め方", target_detail: "このまま会社員を続けることに絶望している20代", benefit: "給料日を待たずに好きなタイミングで収入を得る生活", authority: "25歳で独立し年商1000万を達成した起業家", price: "3,980", free_vol: "2000", paid_vol: "5000", guarantee: true },
-        { age: "20代", theme: "転職せずに収入アップ！20代向け週末副業ロードマップ", target_detail: "本業は辞めたくないが、もっと自由に使えるお金が欲しい", benefit: "週末の数時間だけで本業プラスアルファの安定した収入源を作る", authority: "週末副業だけで年間200万円稼ぐパラレルワーカー", price: "2,480", free_vol: "1500", paid_vol: "4500", guarantee: false },
-        { age: "20代", theme: "20代女子のための「SNS×美容」で賢く稼ぐアフィリエイト", target_detail: "美容代がかさむので、コスメの知識を活かして稼ぎたい", benefit: "無料で最新コスメを試しつつ、紹介料で美容代をゼロにする", authority: "インスタ美容垢で月20万稼ぐインフルエンサー", price: "2,980", free_vol: "1800", paid_vol: "4000", guarantee: true },
-        { age: "20代", theme: "将来の不安を消す！20代から始める「少額」資産運用術", target_detail: "投資に興味はあるが、減るのが怖くて手が出せない", benefit: "毎月1万円から始めて、将来の資産を自動で増やす安心感", authority: "20代で資産1000万円を達成した個人投資家", price: "1,980", free_vol: "2000", paid_vol: "5000", guarantee: true },
-        { age: "30代", theme: "残業ゼロで月5万。30代向け「家事としての副業」時短術", target_detail: "子供との時間を大切にしたいが今の給料では不安な30代", benefit: "時間的な余裕を削らずに教育資金と心のゆとりを手に入れる", authority: "AI自動化で週3時間労働で月10万稼ぐ30代パパ", price: "2,980", free_vol: "2000", paid_vol: "5000", guarantee: false },
-        { age: "30代", theme: "30代からのキャリア逆転。AIを部下にする仕事術", target_detail: "仕事の負担ばかり増え、給料が上がらない中堅社員", benefit: "作業の8割を自動化し、社内で圧倒的な評価と自分の時間を手に入れる", authority: "AI導入コンサルで独立した元・窓際サラリーマン", price: "4,980", free_vol: "1500", paid_vol: "6000", guarantee: true },
-        { age: "30代", theme: "育休中に月10万！ママのための「在宅Webデザイン」入門", target_detail: "保育園問題や復職への不安があり、在宅で稼ぐスキルが欲しい", benefit: "子供のそばにいながら、フリーランスとして自由に働く未来", authority: "未経験からWebデザイナーになり月収30万の現役ママ", price: "3,980", free_vol: "1800", paid_vol: "5500", guarantee: true },
-        { age: "30代", theme: "30代会社員が「自分の知識」をnoteで売って月5万稼ぐ方法", target_detail: "特別なスキルはないと思っているが、会社以外の収入源が欲しい", benefit: "本業で得た些細な経験が「売れる商品」になり自信に繋がる", authority: "匿名noteで累計500部販売した会社員ブロガー", price: "2,980", free_vol: "1500", paid_vol: "4500", guarantee: false },
-        { age: "30代", theme: "失敗しない！30代のための副業選びと時間管理の極意", target_detail: "過去に副業に挑戦したが、忙しすぎて全て挫折した", benefit: "無理のないスケジュールで、確実に結果が出る副業を見つける", authority: "多数の副業を経験し、自動化に成功したタイムマネジメント講師", price: "1,980", free_vol: "1200", paid_vol: "3500", guarantee: true },
-        { age: "40代", theme: "40代からの逆転劇。経験をデジタル資産に変える", target_detail: "今の会社に一生いるつもりはないが、一歩踏み出す勇気が出ない40代", benefit: "これまでの経験が最高のコンテンツになり、定年後の不安が自信に変わる", authority: "独立後、AIを相棒に年商2000万を稼ぐ起業家", price: "4,980", free_vol: "2000", paid_vol: "7000", guarantee: true },
-        { age: "40代", theme: "遅咲きでも勝てる。40代特化のSNSブランディング", target_detail: "若者の勢いについていけずSNS発信に挫折した40代", benefit: "「大人の落ち着き」を武器に高単価なクライアントを獲得する", authority: "45歳からXを始め、半年で月商100万を達成したコンサルタント", price: "5,980", free_vol: "1500", paid_vol: "6000", guarantee: true },
-        { age: "40代", theme: "40代から未経験で始める「動画編集」副業のリアル", target_detail: "パソコンスキルに自信はないが、需要のあるスキルを身につけたい", benefit: "テンプレを活用し、週末の作業だけで月5万円を安定して稼ぐ", authority: "42歳で動画編集を始め、フリーランスになったクリエイター", price: "3,480", free_vol: "1800", paid_vol: "5000", guarantee: false },
-        { age: "40代", theme: "会社に依存しない！40代向け「週末コンサルタント」の始め方", target_detail: "今の仕事のスキルを活かして、個人で稼ぐ力を試してみたい", benefit: "週末だけのコンサル業で、本業の収入を超えるパラレルキャリア", authority: "週末コンサルから独立を果たした元営業マン", price: "4,980", free_vol: "2500", paid_vol: "7500", guarantee: true },
-        { age: "40代", theme: "40代の貯金不安を解消する「月3万円」の堅実な稼ぎ方", target_detail: "老後資金が不安だが、リスクのある投資や怪しい副業はしたくない", benefit: "誰でもできる堅実な作業で、確実に資産を増やしていく安心感", authority: "堅実な副業を教えるファイナンシャルプランナー", price: "1,980", free_vol: "1500", paid_vol: "4000", guarantee: true },
-        { age: "50代", theme: "50代から始める。趣味と知識を収益化するAI活用法", target_detail: "老後資金に不安があり、無理なく自分のペースで副収入を得たい50代", benefit: "趣味を楽しみながら、経済的な不安のない安定したセカンドライフ", authority: "定年前に独立しAIで月収50万を達成したシニア起業家", price: "3,980", free_vol: "1500", paid_vol: "6000", guarantee: true },
-        { age: "50代", theme: "50代からの逆襲。管理職の経験を売るコンテンツビジネス", target_detail: "役職定年が見えてきて収入とやりがいに不安を感じている", benefit: "培ったマネジメント経験がお金に変わり、定年後も求められ続ける", authority: "元・上場企業部長のコンテンツクリエイター", price: "4,980", free_vol: "2000", paid_vol: "6000", guarantee: false },
-        { age: "50代", theme: "早期リタイアを実現する！50代向け「不動産投資」の基本", target_detail: "退職金だけでは不安で、安定した不労所得の柱を作りたい", benefit: "失敗しない物件選びで、毎月安定した家賃収入を得る生活", authority: "50代で大家になり早期リタイアを実現した不動産投資家", price: "5,980", free_vol: "2500", paid_vol: "8000", guarantee: true },
-        { age: "50代", theme: "50代でも遅くない！スマホ1台で始める「ゆるSNS発信」", target_detail: "難しいパソコン操作はできないが、SNSで同年代と繋がりつつ稼ぎたい", benefit: "スマホの簡単な操作だけで、感謝されながらお小遣いを稼ぐ", authority: "スマホ発信で月5万稼ぐシニアインフルエンサー", price: "2,480", free_vol: "1200", paid_vol: "4000", guarantee: true },
-        { age: "50代", theme: "定年後の不安をなくす、50代からの「スモールビジネス」", target_detail: "定年後も社会と関わり、自分のペースで小さく商売を始めたい", benefit: "初期費用ゼロでリスクなく起業し、生きがいと収入を手に入れる", authority: "55歳で起業し、地域で愛されるビジネスを展開する経営者", price: "3,480", free_vol: "1800", paid_vol: "5000", guarantee: false },
-        { age: "60代", theme: "60代からの挑戦。AIで実現する「生涯現役」の働き方", target_detail: "年金だけでは不安があり、社会との繋がりを持ちながら稼ぎたい60代", benefit: "体力に頼らず、これまでの知恵を活かして生涯現役で活躍できる未来", authority: "60歳からPCを学びAIで安定収益を構築したシニアアドバイザー", price: "2,980", free_vol: "1500", paid_vol: "5000", guarantee: false },
-        { age: "60代", theme: "パソコンが苦手な60代でもできる「スマホだけ」の備忘録ブログ", target_detail: "難しいことは覚えられないが、毎日の生活を記録しながらお小遣いが欲しい", benefit: "ボケ防止になり、さらに孫におもちゃを買ってあげられるお小遣いが手に入る", authority: "スマホブログで月3万円稼ぐ65歳", price: "1,980", free_vol: "1000", paid_vol: "3000", guarantee: true },
-        { age: "60代", theme: "60代の知恵をお金に変える！シニア向けコンサルティング入門", target_detail: "長年の仕事や人生経験を、若い世代の役に立てたい", benefit: "感謝されながら、自宅にいながら電話やZoomでアドバイスして稼ぐ", authority: "経験を活かして若手経営者を支援する60代コンサルタント", price: "3,980", free_vol: "1800", paid_vol: "5000", guarantee: true },
-        { age: "60代", theme: "年金＋月5万で豊かに暮らす。60代からの「メルカリ不用品販売」", target_detail: "家の片付けをしつつ、無理のない範囲で収入を増やしたい", benefit: "家がスッキリ片付き、毎月5万円の余裕ができる", authority: "フリマアプリを使いこなすシニア販売員", price: "1,480", free_vol: "1000", paid_vol: "2500", guarantee: false },
-        { age: "60代", theme: "孫に囲まれる老後資金を作る！60代の「安全な」資産運用", target_detail: "手元の資金を少しでも増やしたいが、騙されたり大きく減るのが怖い", benefit: "低リスクで堅実に資産を守りながら、少しずつ増やす安心感", authority: "シニア向け資産防衛アドバイザー", price: "2,480", free_vol: "1500", paid_vol: "4000", guarantee: true },
-        { age: "全年齢", theme: "完全未経験から始めるAIコンテンツビジネスの教科書", target_detail: "副業に興味はあるがスキルがなく、何から始めていいか分からない", benefit: "年齢や場所にとらわれない、新しい時代の働き方と自由な時間", authority: "AIツールを駆使し、半年で副業月収30万円を達成した現役マーケター", price: "2,980", free_vol: "1500", paid_vol: "4000", guarantee: true },
-        { age: "全年齢", theme: "フォロワー100人でも月10万稼ぐ「超・濃密」ファン化戦略", target_detail: "毎日投稿しているのに商品が全く売れずに疲弊している", benefit: "少ないフォロワーでも高単価商品が飛ぶように売れる仕組み", authority: "フォロワー300人で月商100万のSNSコンサルタント", price: "3,980", free_vol: "2000", paid_vol: "5000", guarantee: true },
-        { age: "全年齢", theme: "初心者必見！「売れる文章」がスラスラ書けるコピーライティングの型", target_detail: "文章を書くのが苦手で、読者がすぐ離脱してしまう", benefit: "テンプレに当てはめるだけで、読者が思わず買ってしまう文章が完成する", authority: "成約率20%を叩き出す現役セールスライター", price: "2,480", free_vol: "1500", paid_vol: "4500", guarantee: true },
-        { age: "全年齢", theme: "誰でもできる！ChatGPTを使って「自動で」ブログ記事を量産する方法", target_detail: "ブログを始めたいが、記事を書く時間と労力がない", benefit: "AIに指示を出すだけで、SEOに強い記事が1日数分で完成する", authority: "AIブログで月収50万を自動化しているアフィリエイター", price: "3,480", free_vol: "1800", paid_vol: "5500", guarantee: false },
-        { age: "全年齢", theme: "顔出し不要・匿名で稼ぐ！「声だけ」YouTubeの始め方", target_detail: "動画配信に興味はあるが、顔バレや身バレが怖くて踏み出せない", benefit: "プライバシーを守りながら、安全にYouTubeからの広告収入を得る", authority: "顔出しなしで登録者10万人のYouTubeクリエイター", price: "2,980", free_vol: "2000", paid_vol: "6000", guarantee: true },
-        { age: "全年齢", theme: "ココナラで最初の1万円を稼ぐための「プロフィール」の書き方", target_detail: "ココナラに出品したけれど、全く依頼が来ない", benefit: "見込み客から「あなたにお願いしたい」と直接指名されるようになる", authority: "ココナラ最高ランクを獲得し続けるプロ出品者", price: "1,480", free_vol: "1000", paid_vol: "3000", guarantee: true },
-        { age: "全年齢", theme: "Canvaでプロ級デザイン！SNS画像を作って販売する副業術", target_detail: "デザインセンスはないが、オシャレな画像を作って稼いでみたい", benefit: "無料ツールを使うだけでプロ並みの画像が作れ、企業から案件がもらえる", authority: "未経験からCanvaデザイナーとして独立したクリエイター", price: "1,980", free_vol: "1200", paid_vol: "4000", guarantee: false }
-      ],
-      lp: [
-        { prod: "AIコンテンツビジネス完全マスター講座", bene: "単にお金が稼げるだけでなく、心に余裕が生まれ、会社に依存しない自分に自信が持てるようになる" },
-        { prod: "非常識なSNS集客プログラム", bene: "フォロワー数に依存せず、濃い見込み客だけを集めて高単価で販売する仕組みが手に入る" },
-        { prod: "時間管理・生産性爆上げブートキャンプ", bene: "1日の作業時間を半分に減らしつつ、売上を2倍にする究極のタイムマネジメントが身につく" },
-        { prod: "未経験からプロへ！Webデザイナー独立養成スクール", bene: "パソコン1台でどこでも働ける自由なライフスタイルと、確かなデザインスキルが手に入る" },
-        { prod: "フォロワーを熱狂させる！ストーリーライティング講座", bene: "ファンが勝手に増え続け、セールスなしでも「売ってほしい」と言われる状態になる" },
-        { prod: "動画編集×AI・超効率化マスタークラス", bene: "編集にかかる時間を80%削減し、より多くの案件をこなして収入を激増させられる" },
-        { prod: "リバウンドなし！潜在意識ダイエット・プログラム", bene: "我慢や辛い運動を手放し、一生太らない「痩せ体質」と自信を取り戻すことができる" },
-        { prod: "ゼロから月商100万！週末起業コンサルタント・ロードマップ", bene: "本業のリスクを取らずに、自分の知識を高額商品に変えて週末だけで稼ぐ仕組みが作れる" },
-        { prod: "恋愛無双！マッチングアプリ攻略・完全コンサル", bene: "いいねが止まらなくなり、理想の相手と週末ごとにデートに行ける充実した毎日が手に入る" },
-        { prod: "実店舗の救世主！MEO対策・自動集客システム導入パック", bene: "広告費をゼロにしても、Googleマップ経由で新規の来店客が毎月安定して訪れるようになる" },
-        { prod: "脱・三日坊主！英語学習・パーソナルコーチング", bene: "海外旅行やビジネスで堂々と英語を話し、コンプレックスを克服して世界が広がる" },
-        { prod: "売上V字回復！公式LINE・Lステップ構築代行サービス", bene: "見込み客への教育と販売が完全自動化され、寝ている間にも売上が立つ仕組みが完成する" },
-        { prod: "初心者向け・ほったらかし資産運用マニュアル", bene: "将来のお金の不安から解放され、お金のために働く人生から抜け出す第一歩が踏み出せる" },
-        { prod: "プロが教える！失敗しないオンラインサロン運営構築", bene: "毎月安定したサブスクリプション収入が入り、精神的な余裕と強固なコミュニティが手に入る" },
-        { prod: "心と体を整える・ヨガ＆マインドフルネス講座", bene: "日々のストレスや疲れをリセットし、毎日を前向きでエネルギッシュに過ごせるようになる" }
-      ],
-      cw_proposal: [
-        { skill: "最新AIを熟知し、高品質かつ迅速に納品可能です。専用ツールで校正も完璧に行います。" },
-        { skill: "過去のマーケティング経験を活かし、単なる作業者ではなく「売上を上げるパートナー」として貢献します。" },
-        { skill: "レスポンスが早く、クライアント様の意図を汲み取った提案型のコミュニケーションが可能です。" },
-        { skill: "ユーザーの目を惹く感情的なコピーライティングを得意としており、高いクリック率を実現します。" },
-        { skill: "専門的なリサーチ力が強みで、他にはない深い知見を盛り込んだ独自性の高い記事を執筆します。" },
-        { skill: "納期を前倒しで納品することをモットーとしており、お急ぎの案件にも柔軟に対応いたします。" },
-        { skill: "過去にディレクターの経験があり、指示の意図を正確に把握して修正の手間を最小限に抑えます。" },
-        { skill: "丁寧なヒアリングを心掛けており、要件が固まりきっていない状態からのご相談も歓迎です。" },
-        { skill: "SEOの最新トレンドを把握しており、検索意図を満たす構成案の作成からお任せいただけます。" },
-        { skill: "長期的な目線でプロジェクトにコミットし、改善提案を自発的に行うことができます。" }
-      ],
-      closing_obj: [
-        "高すぎる。今は手持ちのお金がない。", 
-        "忙しくて時間が取れないから実践できない気がする。", 
-        "自分にできるか自信がない。", 
-        "家族（妻・夫）に反対されるかもしれない。",
-        "過去に似たような教材を買って失敗したから不安だ。",
-        "もう少し自分一人で頑張ってみてから決めたい。",
-        "他の人のコンサルと何が違うのかわからない。",
-        "パソコンやITツールが苦手なのでついていけるか心配。",
-        "成果が出るまでに時間がかかりそうでモチベーションが続かないかも。",
-        "クーリングオフや返金保証の条件が厳しそう。"
-      ]
-    };
-
-    const getRandomMagic = (toolId, currentVals = {}) => {
-      let pool = MAGIC_DATA[toolId];
-      if (!pool || pool.length === 0) return null;
-      if (toolId === 'note' && currentVals.age) {
-        const filtered = pool.filter(item => item.age === currentVals.age);
-        if (filtered.length > 0) pool = filtered;
-      }
-      if(pool.length === 1) return pool[0];
-      
-      let nextItem;
-      let attempts = 0;
-      
-      const checkKey = Object.keys(pool[0]).find(k => k !== 'age' && k !== 'genre');
-
-      do {
-        nextItem = pool[Math.floor(Math.random() * pool.length)];
-        attempts++;
-      } while (attempts < 10 && checkKey && currentVals[checkKey] && nextItem[checkKey] === currentVals[checkKey]);
-      
-      return nextItem;
-    };
-
-    const getAIPrefix = (modelId) => {
-      const isPaid = modelId.includes('paid');
-      let aiName = "AI";
-      let specificInstruction = "";
-
-      if (modelId.includes('chatgpt')) {
-        aiName = "ChatGPT";
-        specificInstruction = "論理的な推論プロセス（Chain of Thought）を用い、段階的に深く思考してから最終的な結論を出力してください。読者の心理を巧みに操るコピーライティングの技術をフル活用してください。";
-      } else if (modelId.includes('claude')) {
-        aiName = "Claude";
-        specificInstruction = "非常に自然で人間らしい、感情に寄り添った温かみのある文章で構成してください。また、指定されたフォーマットや制約条件を「厳格に」遵守してください。";
-      } else if (modelId.includes('gemini')) {
-        aiName = "Gemini";
-        specificInstruction = "Web上の最新の知見を踏まえ、提供された情報を網羅的に分析し、多角的な視点から革新的かつ実用的なアイデアを提案してください。";
-      }
-
-      let prefix = `【システム指示：${aiName} ${isPaid ? '有料版(最上位モデル)' : '無料版(軽量モデル)'} 向け最適化】\n`;
-      if (isPaid) {
-         prefix += `あなたは各分野のトップクラスの専門家（AI）です。制限を設けず、あなたの持つ最高の推論能力、深い文脈理解、創造性を最大限に発揮してください。\n${specificInstruction}\n`;
-      } else {
-         prefix += `あなたは優秀なアシスタントAIです。トークン制限や処理負荷を考慮し、最も重要なポイントに絞って出力してください。無駄な前置きや言い回しを避け、簡潔かつ的確に要求を満たしてください。\n${specificInstruction}\n`;
-      }
-      return prefix;
-    };
-
-    const renderMarkdown = (text) => {
-      if (!text) return { __html: '' };
-      let html = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
-      html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-      html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-      html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
-      html = html.replace(/^\- (.*$)/gim, '<ul><li>$1</li></ul>');
-      html = html.replace(/<\/ul>\n*<ul>/gim, '');
-      html = html.replace(/\n/g, '<br/>');
-      html = html.replace(/【(.*?)】/g, '<strong style="color:#0ea5e9;">【$1】</strong>');
-      return { __html: html };
-    };
-
-    const parseNoteRes = (text) => {
-      if (!text) return { title: '', free: '', paid: '', tags: '', url: '', toc: '' };
-      let title = '', free = '', paid = '', tags = '', url = '';
-      
-      const titleMatch = text.match(/【タイトル】\n([\s\S]*?)(?=【無料エリア】|$)/);
-      const freeMatch = text.match(/【無料エリア】\n([\s\S]*?)(?=【有料エリア】|【投稿設定案】|$)/);
-      const paidMatch = text.match(/【有料エリア】\n([\s\S]*?)(?=【投稿設定案】|$)/);
-      const settingsMatch = text.match(/【投稿設定案】\n([\s\S]*?)$/);
-
-      if (titleMatch) title = titleMatch[1].trim().replace(/<br\/>/g, '\n');
-      if (freeMatch) free = freeMatch[1].trim().replace(/<br\/>/g, '\n');
-      if (paidMatch) paid = paidMatch[1].trim().replace(/<br\/>/g, '\n');
-      
-      if (settingsMatch) {
-         const sText = settingsMatch[1];
-         const tMatch = sText.match(/ハッシュタグ:\s*(.*)/);
-         const uMatch = sText.match(/カスタムURL:\s*(.*)/);
-         if(tMatch) tags = tMatch[1].trim();
-         if(uMatch) url = uMatch[1].trim();
-      }
-
-      if (!title && !free && !paid) free = text; 
-
-      const extractTOC = (textToParse) => {
-        const lines = textToParse.split('\n');
-        const tocLines = [];
-        lines.forEach(line => {
-          const match = line.match(/^(##|###)\s+(.*)/);
-          if (match) {
-            const level = match[1] === '##' ? 1 : 2;
-            const heading = match[2].replace(/\*\*/g, '').replace(/#/g, '').trim();
-            const indent = level === 1 ? '■ ' : '　・ ';
-            tocLines.push(indent + heading);
-          }
-        });
-        return tocLines.join('\n');
-      };
-      
-      let toc = extractTOC((free || '') + '\n' + (paid || ''));
-      if(!toc) toc = '（見出しがありません）';
-
-      return { title, free, paid, tags, url, toc };
-    };
-
-    /* =========================================================================
-       5. 全33ツール完全定義リスト
-       ========================================================================= */
-    const TOOLS = {
-      campaign: { cat: 'omega', icon: '👑', name: '全自動ファネル構築', badge: '特級', desc: '商品名からLP, SNS, LINEを一撃生成', 
-        manual: '**【ツールの目的】**\n商品名とターゲットを入力するだけで、集客から販売までの全ステップ（LP、SNS投稿、LINE配信、クロージング）を一貫した世界観で自動生成します。',
-        fields: [ 
-          { id: 'prod', t: 'text', l: '商品名・テーマ', isMainMagic: true, ph: '例: AIコンテンツ販売マスター講座' }, 
-          { id: 'tgt', t: 'text', l: 'ターゲット層', ph: '例: 毎日残業で疲れ果て、現状を変えたい30代会社員' }, 
-          { id: 'val', t: 'area', l: '提供価値の詳細', ph: '例: 1日15分の作業で収益化できる時短術と、完全自動化の仕組みが手に入る' } 
-        ],
-        build: (v) => `# 指示\nあなたは世界トップクラスのダイレクトレスポンスマーケターです。\n以下の【入力情報】をもとに、ターゲットを確実に購入へと導くマーケティングファネルを構築してください。\n\n# 入力情報\n- 商品名・テーマ: ${v.prod}\n- ターゲット層: ${v.tgt}\n- 提供価値の詳細: ${v.val}\n\n# 条件\n- 全てのコンテンツを一貫した世界観・トーンで作成すること。\n- ターゲットの深い悩みや欲求に寄り添い、行動を強く喚起するコピーライティングを用いること。\n\n# 出力フォーマット\n以下の4つの要素をMarkdown形式で出力してください。\n\n## 1. LPの強烈なヘッドコピーと構成案\n## 2. SNS集客用のバズる投稿文 (3パターン)\n## 3. LINE教育用の5日間ステップシナリオ (1〜5日目の件名と本文の要約)\n## 4. セールス用のクロージング文`, isOnePage: true },
-      
-      vsl: { cat: 'omega', icon: '🎬', name: 'VSL(ウェビナー)台本', desc: '高単価商品を売るための洗脳レベル動画台本',
-        manual: '**【ツールの目的】**\n動画で商品を販売する際（ウェビナー等）の、成約率を極限まで高める台本を生成します。',
-        fields: [ 
-          { id: 'prod', t: 'text', l: '販売商品名', ph: '例: 潜在意識ダイエットプログラム' }, 
-          { id: 'old', t: 'area', l: '顧客が信じている古い常識', ph: '例: 痩せるためには厳しい食事制限が必要だ' }, 
-          { id: 'new', t: 'area', l: 'あなたが提示する新常識', ph: '例: 腸内環境と潜在意識を整えるだけで勝手に痩せる' } 
-        ],
-        build: (v) => `# 指示\nあなたは成約率に定評のある凄腕のビデオセールスレター(VSL)のコピーライターです。\n以下の【入力情報】をもとに、視聴者を画面に釘付けにし、洗脳レベルで購買意欲を高める動画台本を作成してください。\n\n# 入力情報\n- 販売商品名: ${v.prod}\n- 顧客が信じている古い常識: ${v.old}\n- あなたが提示する新常識: ${v.new}\n\n# 条件\n- 以下の構成（導入→常識の破壊→解決策の提示→実績証明→オファー）に沿って作成すること。\n- 古い常識を論理的かつ感情的に破壊し、新常識の優位性を強烈にアピールすること。\n\n# 出力フォーマット\nMarkdown形式で、各セクションごとに台本（ナレーション）を出力してください。`, isOnePage: true },
-      
-      sns_cal: { cat: 'omega', icon: '🗓️', name: '30日間SNSカレンダー', desc: '1ヶ月分のバズる投稿企画を全自動構築',
-        manual: '**【ツールの目的】**\n1ヶ月分の投稿テーマと構成案をカレンダー形式で生成します。',
-        fields: [ 
-          { id: 'theme', t: 'text', l: '発信テーマ', ph: '例: Canvaを使ったデザインの稼ぎ方' }, 
-          { id: 'goal', t: 'text', l: '最終目的 (例: LINE登録)', ph: '例: 公式LINEへの登録誘導' } 
-        ],
-        build: (v) => `# 指示\nあなたは優秀なSNSマーケターです。\n以下の【入力情報】をもとに、ターゲットを魅了し最終目的に導く30日分のSNS投稿カレンダーを作成してください。\n\n# 入力情報\n- 発信テーマ: ${v.theme}\n- 最終目的: ${v.goal}\n\n# 条件\n- 読者を教育・共感・集客するバランスの良い投稿構成にすること。\n\n# 出力フォーマット\nMarkdownの表形式（| 日付 | 投稿テーマ | 投稿の狙い | 具体的な構成案 |）で30日分出力してください。`, isOnePage: true },
-      
-      agent_team: { cat: 'omega', icon: '🤖', name: 'AIエージェント会議', desc: '4人の専門家AIに議論させ最高品質の回答を出す',
-        manual: '**【ツールの目的】**\n4人のAI専門家があなたの悩みを多角的に分析し、1つの完璧な解決策を導き出します。',
-        fields: [ { id: 'prob', t: 'area', l: '解決したい悩みや課題', ph: '例: Xのフォロワーが伸びない' } ],
-        build: (v) => `# 指示\nあなたは「凄腕マーケター」「行動心理学者」「天才コピーライター」「辛口の編集長」の4人の役割を同時に演じるAIエージェントチームです。\n以下の【課題】について4人で深く議論を行い、最終的な最高品質の解決策を提示してください。\n\n# 課題\n${v.prob}\n\n# 条件\n- 各専門家の視点から鋭い意見を戦わせること。\n- 抽象的なアドバイスではなく、明日から実行できる具体的なアクションプランに落とし込むこと。\n\n# 出力フォーマット\n1. 専門家4人による議論の過程（対話形式で簡潔に）\n2. 最終的な結論とアクションプラン（Markdown形式）`, isOnePage: true },
-      
-      affiliate_center: { cat: 'omega', icon: '🤝', name: 'アフィリエイトセンター', desc: '他人に紹介してもらうための募集文と素材',
-        manual: '**【ツールの目的】**\nあなたの商品を他人に売ってもらうための「募集文」と「紹介用テンプレート」を生成します。',
-        fields: [ 
-          { id: 'prod', t: 'text', l: '商品名', ph: '例: X完全攻略マニュアル' }, 
-          { id: 'reward', t: 'text', l: 'アフィリエイト報酬額', ph: '例: 1件につき50%' }, 
-          { id: 'appeal', t: 'area', l: '商品の売りやすさ・魅力', ph: '例: 初心者でも実績が出やすい' } 
-        ],
-        build: (v) => `# 指示\nあなたはアフィリエイトセンターの運営責任者です。\n以下の【入力情報】をもとに、商品を他の人に紹介してもらうための素材一式を作成してください。\n\n# 入力情報\n- 商品名: ${v.prod}\n- アフィリエイト報酬額: ${v.reward}\n- 商品の魅力: ${v.appeal}\n\n# 出力フォーマット\n以下の2点を作成してください。\n1. 熱狂的なアフィリエイター募集文（LPやDMで使えるもの）\n2. アフィリエイターがコピペですぐに使える「紹介用SNSポスト素材」3種`, isOnePage: true },
-      
-      launch: { cat: 'omega', icon: '🚀', name: 'プロダクトローンチ生成', desc: '数千万円規模の売上を狙う7日間シナリオ',
-        manual: '**【ツールの目的】**\n短期間で爆発的な売上を作る「プロダクトローンチ」の全体構成とメルマガ/LINEの文案を作成します。',
-        fields: [ 
-          { id: 'prod', t: 'text', l: '商品名', ph: '例: 動画編集マスタークラス' }, 
-          { id: 'story', t: 'area', l: 'どん底からの成功ストーリー', ph: '例: 手取り15万から独立し月商100万' } 
-        ],
-        build: (v) => `# 指示\nあなたは数億円を売り上げるプロダクトローンチの専門家です。\n以下の【入力情報】をもとに、商品を爆発的に売るための7日間ローンチシナリオを作成してください。\n\n# 入力情報\n- 商品名: ${v.prod}\n- ストーリー: ${v.story}\n\n# 条件\n- 読者の感情を揺さぶり、購買意欲を日を追うごとに高めること。\n\n# 出力フォーマット\n1日目: 共感と絶望の共有\n2日目: 原因の特定\n3日目: 解決策の提示\n4日目: 証拠と実績\n5日目: オファー予告\n6日目: 販売開始\n7日目: ラストコール\n各日の「件名（フック）」と「本文の構成案」を出力してください。`, isOnePage: true },
-      
-      slide_gen: { cat: 'omega', icon: '📊', name: 'ウェビナースライド構成', desc: 'スライドのページ単位での構成指示書',
-        manual: '**【ツールの目的】**\nウェビナーで使うプレゼンスライドの全ページ分の構成を作成します。',
-        fields: [ { id: 'theme', t: 'text', l: 'ウェビナーのテーマ', ph: '例: ゼロから始めるAI副業' } ],
-        build: (v) => `# 指示\nあなたはプロのプレゼンテーション・デザイナーです。\nテーマ「${v.theme}」のウェビナー用スライド構成を作成してください。\n\n# 条件\n- 全15ページ程度で構成すること。\n- 視聴者を飽きさせず、最後のアクション（商品の購入等）へスムーズに繋げる流れにすること。\n\n# 出力フォーマット\nページ番号ごとに以下の要素をMarkdownで出力してください。\n- スライドの大見出し\n- 箇条書きのテキスト内容\n- 挿入すべき画像や図解のイメージ指示`, isOnePage: true },
-      
-      watermark: { cat: 'omega', icon: '🛡️', name: 'コンテンツ盗用防止＆規約', desc: '無断転載を防ぐ法的効力を持たせた警告文',
-        manual: '**【ツールの目的】**\n作成したコンテンツが無断転載されるのを防ぐための、法的効力を持った強い警告文を作成します。',
-        fields: [ { id: 'name', t: 'text', l: '著作者名・ブランド名', ph: '例: AI Content Pro' }, { id: 'type', t: 'select', l: 'コンテンツの種類', opts: ['note有料記事', 'PDF教材', '動画講座', '会員サイト'] } ],
-        build: (v) => `# 指示\nあなたは著作権法に精通した法務担当者です。\n以下の【入力情報】をもとに、コンテンツの無断転載・漏洩・盗用を強力に牽制する警告文を作成してください。\n\n# 入力情報\n- 著作者名・ブランド名: ${v.name}\n- コンテンツの種類: ${v.type}\n\n# 条件\n- 発覚時の法的措置（損害賠償請求や刑事告訴など）を具体的に明記すること。\n- 威圧的になりすぎず、正当な購入者を不快にさせないが、不正者には絶対的な強制力を持つトーンにすること。\n\n# 出力フォーマット\nそのまま教材の冒頭に貼り付けられる形式のテキスト`, isOnePage: true },
-      
-      cs_bot: { cat: 'omega', icon: '🎧', name: '顧客サポートQ&A生成', desc: '販売後の問い合わせ対応ナレッジを自動生成',
-        manual: '**【ツールの目的】**\nお客様から来るであろう「よくある質問」を予測し、丁寧な回答案を20個自動生成します。',
-        fields: [ 
-          { id: 'prod', t: 'text', l: '商品名', ph: '例: 不動産投資初心者向けマニュアル' }, 
-          { id: 'desc', t: 'area', l: '商品の内容や仕様', ph: '例: 全10章のPDF。購入後すぐDL可能。' } 
-        ],
-        build: (v) => `# 指示\nあなたは優秀なカスタマーサクセスマネージャーです。\n以下の【商品情報】をもとに、購入前・購入後の顧客が抱くであろう「よくある質問と回答（FAQ）」を網羅的に予測・作成してください。\n\n# 商品情報\n- 商品名: ${v.prod}\n- 商品の内容・仕様: ${v.desc}\n\n# 条件\n- 初心者向けの初歩的な質問から、技術的な内容まで幅広く20個作成すること。\n- 顧客の不安を払拭する、非常に丁寧でホスピタリティの高い口調で回答すること。\n\n# 出力フォーマット\nQ1: ...\nA1: ...\nという形式でMarkdown出力してください。`, isOnePage: true },
-
-      note: { cat: 'mon', icon: '📝', name: 'note記事 究極生成', badge: '必須', desc: '文字数・価格を分離した最強の記事作成', 
-        manual: '**【ツールの目的】**\n読者の悩みに寄り添い、行動を促す「売れるnote有料記事」を全自動で構成します。',
+        return db;  
+      },  
+      save: (db) => { try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch (e) {} }  
+    };  
+  
+    const getAIPrefix = (modelId) => {  
+      const isPaid = modelId.includes('paid');  
+      let aiName = modelId.includes('claude') ? 'Claude' : modelId.includes('gemini') ? 'Gemini' : 'ChatGPT';
+      let spec = isPaid ? '有料版(最上位モデル)です。最高の創造性を発揮してください。' : '無料版です。簡潔かつ的確に要求を満たしてください。';
+      return `【システム指示：${aiName} ${spec}】\nあなたは世界トップクラスの専門家（AI）アシ কূটনীতিকです。\n`;  
+    };  
+  
+    const renderMarkdown = (text) => {  
+      if (!text) return { __html: '' };  
+      let html = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');  
+      html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');  
+      html = html.replace(/^### (.*$)/gim, '<h3 class="text-lg font-bold mt-4 mb-2">$1</h3>');  
+      html = html.replace(/^## (.*$)/gim, '<h2 class="text-xl font-black mt-6 mb-3 border-l-4 border-brand pl-2">$1</h2>');  
+      html = html.replace(/^# (.*$)/gim, '<h1 class="text-2xl font-black mt-8 mb-4 border-b border-gray-200 pb-2">$1</h1>');  
+      html = html.replace(/^\- (.*$)/gim, '<ul class="list-disc pl-5 mb-2"><li>$1</li></ul>');  
+      html = html.replace(/<\/ul>\n*<ul class="list-disc pl-5 mb-2">/gim, '');  
+      html = html.replace(/\n/g, '<br/>');  
+      return { __html: html };  
+    };  
+  
+    const TOOLS = {  
+      note: { cat: 'mon', icon: '📝', name: 'note記事 究極生成', desc: '売れるnote記事を、各LLM経由で爆速執筆。', 
         fields: [
-          { id: 'genre', t: 'select', l: 'ジャンル', opts: ['お金・副業', '美容・健康', '人間関係・恋愛', 'キャリア・仕事', '趣味・ライフスタイル'] },
-          { id: 'age', t: 'select', l: 'ターゲット年代', opts: ['10代', '20代', '30代', '40代', '50代', '60代', '全年齢'] },
-          { id: 'theme', t: 'text', l: '記事テーマ', isMainMagic: true, ph: '例: スマホ1台で月5万稼ぐ極意' },
-          { id: 'target_detail', t: 'text', l: '具体的な読者の悩み', ph: '例: 副業したいがパソコンスキルが全くない' },
-          { id: 'benefit', t: 'text', l: '読者が得られる未来', ph: '例: スキルゼロからでも安定した副収入を得て心にゆとりができる' },
-          { id: 'authority', t: 'text', l: '著者の実績・権威性', ph: '例: 月収30万を達成した現役マーケター' },
-          { id: 'price', t: 'text', l: '販売価格 (円)', ph: '例: 2980' },
-          { id: 'free_vol', t: 'text', l: '無料部分の文字数', ph: '例: 1500' },
-          { id: 'paid_vol', t: 'text', l: '有料部分の文字数', ph: '例: 4000' },
+          { id: 'theme', t: 'text', l: '記事テーマ', ph: '例: スマホ1台で月5万稼ぐ極意', isMainMagic: true },
+          { id: 'target', t: 'area', l: '読者の悩み', ph: '例: 副業したいがスキルがない30代会社員' },
           { id: 'guarantee', t: 'check', l: '返金保証をアピール' }
         ],
-        build: (v) => `# 指示\nあなたはトップクラスのコンテンツプロデューサー兼セールスライターです。\n以下の【入力情報】と【条件】を元に、読者が思わず購入したくなる高品質なnote有料記事を執筆してください。\n\n# 入力情報\n- ジャンル: ${v.genre}\n- ターゲット年代: ${v.age}\n- 記事テーマ: ${v.theme}\n- ターゲットの悩み: ${v.target_detail}\n- 読者が得られる未来: ${v.benefit}\n- 著者の実績・権威性: ${v.authority}\n- 販売価格: ${v.price}円\n- 文字数目安: 無料部分 約${v.free_vol}字 / 有料部分 約${v.paid_vol}字\n${v.guarantee ? '- 特別オファー: 返金保証あり（記事内で強くアピールすること）' : ''}\n\n# 執筆条件\n1. PASONAの法則を用いて読者の感情を動かす構成にすること。\n2. 無料パートの最後（有料パートへの切り替わり部分）で、強烈な好奇心と「どうしても続きが読みたい」という欲求を仕掛けること。\n\n# 重要:出力フォーマット\n必ず以下の見出し記号を用いて4つのセクションに分けて出力してください。Markdown形式で美しく装飾すること。\n\n【タイトル】\n（キャッチーでクリックしたくなるタイトル案）\n\n【無料エリア】\n（無料部分の本文をここに記述）\n\n【有料エリア】\n（有料部分の本文をここに記述）\n\n【投稿設定案】\nハッシュタグ: （記事に最適なハッシュタグをスペース区切りで5個）\nカスタムURL: （記事テーマを表す短い英数字ハイフン繋ぎのURL）`, isOnePage: true },
-      
-      lp: { cat: 'mon', icon: '📄', name: '爆売れLP作成', desc: '高単価商品を成約させるセールスレター構成',
-        manual: '**【ツールの目的】**\n高単価商品を販売するための縦長のセールスページ（LP）の文章と構成案を作成します。',
-        fields: [ 
-          { id: 'prod', t: 'text', l: '商品名・価格', isMainMagic: true, ph: '例: AIコンテンツ販売マスター講座 (198,000円)' }, 
-          { id: 'bene', t: 'area', l: '商品のベネフィット・特徴', ph: '例: 会社に依存せず、自分の力で稼ぐスキルが身につく。' } 
+        build: (v) => `# note記事執筆指示\nテーマ「${v.theme}」について、読者の悩み「${v.target}」を解決し、共感を生んで購入を促す高品質なnote有料記事を執筆してください。\nPASONAの法則を用いて感情を動かしてください。\n${v.guarantee ? '※返金保証があることを強くアピールしてください。' : ''}` 
+      },  
+      lp: { cat: 'mon', icon: '📄', name: '爆売れLP作成', desc: '高単価商品を一撃で成約させるセールスコピー。',
+        fields: [
+          { id: 'prod', t: 'text', l: '商品名・価格', ph: '例: AIコンサル (10万円)', isMainMagic: true },
+          { id: 'bene', t: 'area', l: '最強のベネフィット', ph: '例: 会社に依存せず自由な収入と時間を手に入れる' }
         ],
-        build: (v) => `# 指示\nあなたは億を稼ぐダイレクト・レスポンス・コピーライターです。\n以下の【入力情報】をもとに、高単価商品を一撃で成約させるためのランディングページ（LP）の構成とセールスコピーを作成してください。\n\n# 入力情報\n- 商品名・価格: ${v.prod}\n- 商品のベネフィット・特徴: ${v.bene}\n\n# 条件\n- 読者の抱える「痛み」に深く共感し、この商品こそが唯一の解決策であると確信させること。\n- 以下の順番で構成すること：ヘッドコピー → 共感・問題提起 → 解決策の提示 → 商品内容 → 実績・権威性 → 推薦者の声（仮） → FAQ → 強烈なクロージング（行動喚起）。\n\n# 出力フォーマット\n各セクションごとにMarkdown形式で出力してください。`, isOnePage: true },
-      
-      backend: { cat: 'mon', icon: '💎', name: '高単価バックエンド企画', desc: '30万円〜の高額商材のアイデアを企画',
-        manual: '**【ツールの目的】**\nあなたの持っている知識やスキルを元に、「30万円以上で売れる高額商品」のアイデアを提案します。',
-        fields: [ { id: 'know', t: 'area', l: '自分の持つ知識・ノウハウ', ph: '例: 過去に3ヶ月で10kgのダイエットに成功し、リバウンドしていない経験がある。' } ],
-        build: (v) => `# 指示\nあなたは高単価商品構築のプロフェッショナルコンサルタントです。\n以下の【知識・ノウハウ】をベースに、30万円以上で販売できるバックエンド商品（コンサルティング、プログラム等）の企画案を作成してください。\n\n# 知識・ノウハウ\n${v.know}\n\n# 条件\n- 単なる「情報提供」ではなく、顧客の「人生を変えるサポート」としての価値を設計すること。\n- ターゲットが「これなら30万円払ってでも欲しい」と思う切り口を見つけること。\n\n# 出力フォーマット\n魅力的な企画案を3つ、以下の項目を含めて出力してください。\n- 商品名（仮称）\n- コンセプトとターゲット\n- 提供内容（期間、サポート内容等）\n- 高単価で売るための「セールスの切り口」`, isOnePage: true },
-      
-      closing: { cat: 'mon', icon: '💰', name: '心理的クロージング', desc: '「検討します」を撃破する成約台本',
-        manual: '**【ツールの目的】**\nセールスの最終局面で、お客様が「買わない理由」を口にした際に、それを優しく論破して成約に導くためのトーク台本を作成します。',
-        fields: [ { id: 'obj', t: 'area', l: '顧客の反論・言い訳', magic: '価格が高い、時間がない...', ph: '例: 興味はあるのですが、今は手持ちのお金がなくて…' } ],
-        build: (v) => `# 指示\nあなたは成約率90%を誇るトップセールスマンです。\n顧客からの以下の【反論・言い訳】に対して、論理的かつ感情的にアプローチし、今すぐ決断させるためのクロージングトーク台本を作成してください。\n\n# 顧客の反論・言い訳\n${v.obj}\n\n# 条件\n- 相手を否定せず、一度受け入れて共感（Yes, but話法など）してから切り返すこと。\n- 行動しないことによる「未来の損失」を実感させること。\n\n# 出力フォーマット\nそのままセールストークとして話せる（またはDMで送れる）スクリプト形式で出力してください。`, isOnePage: true },
-      
-      research: { cat: 'mon', icon: '🕵️', name: '競合リサーチ解剖', desc: 'ライバルの弱点を突き、勝てる戦略を立てる',
-        manual: '**【ツールの目的】**\nライバルの弱点を見つけ出し、「あなたの強み」を使ってどうやって勝つかの戦略を提案します。',
-        fields: [ 
-          { id: 'rival', t: 'area', l: 'ライバルのセールス文', ph: '例: (ここにライバルのLPの文章やコンセプトをコピペします)' }, 
-          { id: 'str', t: 'text', l: '自分の強み', ph: '例: 私は初心者向けにゼロから教えるサポートが得意です。' } 
+        build: (v) => `# LP作成指示\n商品「${v.prod}」を販売するためのランディングページ構成とコピーを作成してください。\nベネフィット「${v.bene}」を強調し、読者の抱える痛みに共感し、この商品こそが唯一の解決策であると確信させる構成にしてください。`
+      },  
+      sns: { cat: 'sns', icon: '📱', name: 'SNS無限集客ポスト', desc: 'バズと集客を両立する投稿文を生成。',
+        fields: [
+          { id: 'platform', t: 'select', l: '媒体', opts: ['X(Twitter)', 'Threads'] },
+          { id: 'content', t: 'area', l: '伝えたい内容', ph: '例: 継続が大事。完璧を目指さない。' }
         ],
-        build: (v) => `# 指示\nあなたは敏腕の事業戦略ストラテジストです。\n以下の【ライバルの情報】と【自分の強み】を分析し、市場で圧倒的に勝つためのブルーオーシャン戦略と商品コンセプトを提示してください。\n\n# 入力情報\n- ライバルのセールス文（コンセプト）: ${v.rival}\n- 自分の強み: ${v.str}\n\n# 出力フォーマット\n1. ライバルの分析（優れている点と、致命的な弱点・欠けている視点）\n2. 自分の強みを活かした差別化戦略\n3. 新しい商品コンセプトの提案`, isOnePage: true },
-      
-      competitor: { cat: 'mon', icon: '🌐', name: '競合サイト完全解剖', desc: 'サイトURLや特徴から集客・収益構造を予測',
-        manual: '**【ツールの目的】**\n気になるライバルサイトが「どうやってマネタイズしているか」を推測し、丸裸にします。',
-        fields: [ { id: 'url_desc', t: 'area', l: 'ライバルサイトの特徴やコンテンツ内容', ph: '例: 筋トレとプロテインのレビューに特化したブログ。' } ],
-        build: (v) => `# 指示\nあなたは凄腕のWebマーケティングアナリストです。\n以下の【ライバルサイトの特徴】を分析し、その裏側にある集客・収益構造を丸裸にしてください。\n\n# ライバルサイトの特徴\n${v.url_desc}\n\n# 出力フォーマット\n以下の項目について、プロの視点から推測と分析結果を出力してください。\n1. 狙っている主要ターゲットと検索キーワード\n2. マネタイズの導線（どうやって収益化しているか）\n3. 推定される弱点・機会損失\n4. このサイトを打ち負かすための具体的な競合優位戦略`, isOnePage: true },
-
-      cw_proposal: { cat: 'cw', icon: '🎯', name: 'CW案件獲得 提案文', badge: '神', desc: '採用率を極限まで高めるキラー提案文',
-        manual: '**【ツールの目的】**\nクラウドソーシングで案件に応募する際、クライアントが「この人に頼みたい！」と即決する圧倒的な提案文を作成します。',
-        fields: [ 
-          { id: 'job', t: 'area', l: '募集要項 (コピペ)', ph: '例: (ここにクラウドワークスの仕事内容をコピペします)' }, 
-          { id: 'skill', t: 'text', l: '自分の強み', isMainMagic: true, ph: '例: 納期を絶対に守り、連絡が早いです。' } 
+        build: (v) => `# ${v.platform}投稿作成指示\n「${v.content}」という内容をもとに、インプレッションとエンゲージメントが爆発する投稿文を3パターン作成してください。\nスマホでの読みやすさ、フック（最初の1行）のインパクトを最大化してください。`
+      },
+      image: { cat: 'sns', icon: '🎨', name: '画像生成AIプロンプト', desc: 'Midjourney等向けの英語の「呪文」を作成。', isImagePrompt: true, 
+        fields: [ { id: 'desc', t: 'text', l: '描きたい内容', ph: '例: サイバーパンクな未来の東京' } ],
+        build: (v) => v.desc
+      },
+      line: { cat: 'fun', icon: '💌', name: 'LINE教育ステップ', desc: '5日間でファン化して販売する自動導線。',
+        fields: [
+          { id: 'prod', t: 'text', l: '販売商品', ph: '例: 動画編集教材' },
+          { id: 'story', t: 'area', l: 'どん底からの成功ストーリー', ph: '例: 手取り15万から独立して月商100万' }
         ],
-        build: (v) => `# 指示\nあなたは提案営業のプロフェッショナルです。\n以下の【募集要項】に対し、私の【強み】を活かして、クライアントが「この人に頼みたい！」と即決するような圧倒的な提案文を作成してください。\n\n# 入力情報\n- 募集要項:\n${v.job}\n- 私の強み:\n${v.skill}\n\n# 条件\n- 相手の課題や求めていることを正確に読み取り、それにどう応えられるかを明確にすること。\n- 丁寧かつ自信に満ちたトーンで作成すること。\n- コピペしたようなテンプレ感を排除し、この案件のためだけに書かれたパーソナライズされた文章にすること。\n\n# 出力フォーマット\nそのままクラウドソーシングの応募メッセージとして送信できる形式で出力してください。`, isOnePage: true },
-      
-      cw_seo: { cat: 'cw', icon: '🔍', name: 'SEO特化ライティング', desc: 'Google上位を狙う高品質記事を生成',
-        manual: '**【ツールの目的】**\n指定したキーワードでGoogle検索の上位表示（SEO）を狙うための、質の高いブログ記事を作成します。',
-        fields: [ 
-          { id: 'kw', t: 'text', l: 'メインキーワード', ph: '例: 副業 初心者 おすすめ' }, 
-          { id: 'must', t: 'text', l: '必須ワード', ph: '例: AI, 自動化, 初期費用ゼロ' } 
-        ],
-        build: (v) => `# 指示\nあなたはGoogleの検索アルゴリズムを熟知したプロのSEOライターです。\n以下の【キーワード】で検索結果1位を獲得するための、読者の検索意図を完全に満たす高品質なブログ記事を執筆してください。\n\n# 入力情報\n- メインキーワード: ${v.kw}\n- 必ず含めるべき必須ワード: ${v.must}\n\n# 条件\n- 読者の潜在的な疑問（潜在ニーズ）まで先回りして答える網羅的な内容にすること。\n- 見出し（H2, H3）を論理的に構成すること。\n- 読みやすく、箇条書きなどを適宜用いること。\n\n# 出力フォーマット\nMarkdown形式で、記事のタイトル、見出し構成、そして本文を全て出力してください。`, isOnePage: true },
-      
-      cw_hunter: { cat: 'cw', icon: '🏹', name: '高単価案件ハンター', desc: '募集文から地雷案件と時給を予測',
-        manual: '**【ツールの目的】**\nクラウドワークス等の募集文から、その案件が「地雷」かどうか、想定時給はいくらかを自動判定します。',
-        fields: [ { id: 'job', t: 'area', l: '募集要項', ph: '例: (ここに募集要項をコピペして、受けるべきか判定させます)' } ],
-        build: (v) => `# 指示\nあなたはフリーランスを搾取から守るエージェントです。\n以下の【募集文】を分析し、時給換算の予測と、地雷クライアント（悪質・トラブルの元）である可能性を評価してください。\n\n# 募集文\n${v.job}\n\n# 出力フォーマット\n1. 想定される時給の目安（作業時間から逆算）\n2. 地雷クライアント度（100点満点中何点か、危険な兆候はあるか）\n3. 総合判定（この案件は受けるべきか、避けるべきか）`, isOnePage: true },
-      
-      cw_negotiate: { cat: 'cw', icon: '💬', name: '報酬・単価交渉AI', desc: '嫌われずに単価を上げる交渉文を作成',
-        manual: '**【ツールの目的】**\n既存のクライアントに対して、「角を立てず」に単価アップを交渉するための丁寧なメッセージを作成します。',
-        fields: [ { id: 'status', t: 'area', l: '現状と要望', ph: '例: 半年間継続して記事を納品している。文字単価を1.0円から1.5円に上げてほしい。' } ],
-        build: (v) => `# 指示\nあなたはビジネスマナーと交渉術のプロフェッショナルです。\n以下の【状況と要望】に基づき、クライアントとの良好な関係を保ちながら（角を立てずに）、単価アップを承諾してもらうための交渉メッセージを作成してください。\n\n# 状況と要望\n${v.status}\n\n# 条件\n- 今までのお礼と感謝を必ず述べること。\n- 単価を上げるだけの「正当な理由（クオリティの担保、工数の増加など）」を柔らかく伝えること。\n- もし断られても関係が悪化しないような逃げ道（選択肢）を用意すること。\n\n# 出力フォーマット\nそのまま送信できるビジネスメール（メッセージ）の形式。`, isOnePage: true },
-      
-      cw_translation: { cat: 'cw', icon: '🌍', name: '多言語翻訳・納品', desc: '海外情報を自然な日本語記事にまとめ直す',
-        manual: '**【ツールの目的】**\n海外のニュースや記事を「日本人が読んで違和感のない自然なブログ記事」として再構成します。',
-        fields: [ { id: 'foreign_text', t: 'area', l: '海外の記事・情報', ph: '例: (ここに英語などの海外ニュース記事をコピペします)' } ],
-        build: (v) => `# 指示\nあなたはプロの翻訳家であり、優れたWebライターです。\n以下の【外国語のテキスト】を単に直訳するのではなく、日本の読者がスラスラと読める「自然で魅力的なブログ記事」の形式に意訳し、再構成してください。\n\n# 外国語のテキスト\n${v.foreign_text}\n\n# 条件\n- 日本文化におけるコンテキスト（文脈）に合わせて適宜補足を入れること。\n- 見出しや箇条書きを使って読みやすく構成すること。\n\n# 出力フォーマット\nMarkdown形式で、記事のタイトル、見出し、本文を出力してください。`, isOnePage: true },
+        build: (v) => `# LINE教育ステップ作成指示\n商品「${v.prod}」を販売するために、公式LINE登録者を5日間教育しファン化するシナリオを作成してください。\nユーザーのストーリー「${v.story}」を織り込み、信頼構築からオファーまで繋げてください。`
+      },
+      webdev: { cat: 'fun', icon: '💻', name: 'Webアプリ開発支援', desc: 'アイデアからプロトタイプのコードを生成。',
+        fields: [ { id: 'idea', t: 'area', l: '作りたいツール案', ph: '例: 食材からレシピを提案するAIアプリ' } ],
+        build: (v) => `# Webアプリ開発指示\nアイデア「${v.idea}」を実現するための、要件定義と1枚のHTML（JavaScript, CSS含む）で動くプロトタイプコードの構造を設計してください。`
+      }
+    };  
+  
+    const CATEGORIES = [  
+      { id: 'mon', name: '📝 コンテンツ作成 ＆ 販売' },  
+      { id: 'sns', name: '🚀 集客 ＆ 画像生成' },  
+      { id: 'fun', name: '💬 セールス自動化 ＆ 開発' }  
+    ];  
+  
+    const LoadingCircle = () => div({ className: 'w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin' });
+    const ErrorAlert = ({ msg }) => div({ className: 'p-4 bg-brand-danger/10 border border-brand-danger/30 rounded-xl text-brand-danger text-sm font-bold animate-in' }, `⚠️ エラー: ${msg}`);
 
-      profile: { cat: 'sns', icon: '👤', name: 'バズるアカウント設計', desc: '名前、プロフ、コンセプトを一撃生成',
-        manual: '**【ツールの目的】**\nあなたの実績をもとに、SNSで「思わずフォローしたくなる」プロフィール文とコンセプトを作成します。',
-        fields: [ 
-          { id: 'genre', t: 'text', l: '発信ジャンル', ph: '例: 美容・ダイエット' }, 
-          { id: 'bg', t: 'area', l: '経歴・実績', ph: '例: 万年ダイエッターだったが、半年で15kg痩せて人生が変わった経験がある。' } 
-        ],
-        build: (v) => `# 指示\nあなたはSNSブランディングのトップコンサルタントです。\n以下の【入力情報】をもとに、ターゲットが「この人は有益だ、フォローしなければ」と思わず行動してしまうSNSアカウントの設計を行ってください。\n\n# 入力情報\n- 発信ジャンル: ${v.genre}\n- 経歴・実績: ${v.bg}\n\n# 出力フォーマット\n以下の要素を提案してください。\n1. アカウントのコンセプト（誰に、何を、どう届けるか）\n2. キャッチーなアカウント名（名前＋肩書き/実績）の候補3案\n3. プロフィール文（文字数制限を意識した、魅力的な自己紹介とフォローするメリットの提示）`, isOnePage: true },
-      
-      sns: { cat: 'sns', icon: '📱', name: 'SNS無限集客ポスト', desc: '反応率MAXの投稿文を生成',
-        manual: '**【ツールの目的】**\n言いたいことを入力するだけで、SNSのアルゴリズムに好まれ、インプレッションや「いいね」が爆発しやすい投稿文に変換します。',
-        fields: [ 
-          { id: 'platform', t: 'select', l: '媒体', opts: ['X(Twitter)', 'Threads', 'Instagram'] }, 
-          { id: 'content', t: 'area', l: '発信したい内容', ph: '例: 継続することが何よりも大事。最初から完璧を目指さないこと。' } 
-        ],
-        build: (v) => `# 指示\nあなたは【${v.platform}】のアルゴリズムとユーザー心理を熟知したインフルエンサーです。\n以下の【伝えたい内容】をもとに、インプレッション（表示回数）とエンゲージメント（いいね・リポスト）が爆発的に伸びる投稿文を3パターン作成してください。\n\n# 伝えたい内容\n${v.content}\n\n# 条件\n- パターン1: 結論から述べる「ノウハウ・箇条書き」型\n- パターン2: 共感を生む「ストーリー・自己開示」型\n- パターン3: 読者に問いかける「議論喚起」型\n- スマホで読んだ時の改行の美しさや、最初の1行（フック）のインパクトを最大化すること。\n\n# 出力フォーマット\nそのままコピー＆ペーストで投稿できるテキストを3パターン。`, isOnePage: true },
-      
-      video: { cat: 'sns', icon: '🎥', name: 'ショート動画台本', desc: 'TikTok/Shorts用の動画台本を作成',
-        manual: '**【ツールの目的】**\nTikTokやYouTube Shortsで最も重要な「最初の3秒のフック」を強烈にしたショート動画台本を作成します。',
-        fields: [ { id: 'theme', t: 'area', l: 'テーマ', ph: '例: 買って後悔した100均の便利グッズ3選' } ],
-        build: (v) => `# 指示\nあなたはTikTokとYouTube Shortsで数百万再生を連発させる動画プロデューサーです。\n以下の【テーマ】に基づく、60秒以内のショート動画の台本を作成してください。\n\n# テーマ\n${v.theme}\n\n# 条件\n- 冒頭の「0秒〜3秒」に、視聴者が絶対にスクロールする手を止める「強烈なフック（驚き、共感、結論の提示など）」を配置すること。\n- テンポよく展開し、最後まで飽きさせない構成にすること。\n- 最後に「保存」や「フォロー」を促すCTAを入れること。\n\n# 出力フォーマット\n【秒数目安】 | 【映像の指示・テロップ】 | 【音声・ナレーション】\nの形式で、表（Markdown）を使って台本を出力してください。`, isOnePage: true },
-      
-      yt_script: { cat: 'sns', icon: '🎙️', name: 'YouTube対話シナリオ', desc: 'ゆっくり解説等のキャラ掛け合い台本',
-        manual: '**【ツールの目的】**\nYouTubeの「ゆっくり解説」などに使える、2人のキャラクターによる掛け合い台本を作成します。',
-        fields: [ 
-          { id: 'theme', t: 'text', l: '解説テーマ', ph: '例: NISAとiDeCoの違いについて' }, 
-          { id: 'char', t: 'text', l: 'キャラ設定', ph: '例: 毒舌だが博識な先生と、おっちょこちょいな生徒' } 
-        ],
-        build: (v) => `# 指示\nあなたは人気YouTubeチャンネル（ゆっくり解説やVTuber風対談）のシナリオライターです。\n以下の【テーマ】と【キャラ設定】をもとに、視聴者が楽しく学べる対話形式のシナリオを作成してください。\n\n# 入力情報\n- 解説テーマ: ${v.theme}\n- キャラクター設定: ${v.char}\n\n# 条件\n- キャラクターの個性を存分に発揮させ、掛け合いのテンポを良くすること。\n- 専門用語はわかりやすく噛み砕いて説明すること。\n\n# 出力フォーマット\nキャラA: 「セリフ」\nキャラB: 「セリフ」\nの形式で台本を出力してください。`, isOnePage: true },
-      
-      image: { cat: 'sns', icon: '🎨', name: '画像生成AIプロンプト', desc: 'Midjourney等の英語プロンプトを作成',
-        manual: '**【ツールの目的】**\nMidjourneyなどの画像生成AIにコピペして使える、プロレベルの高画質な画像を生成するための「英語プロンプト」を作成します。',
-        fields: [ { id: 'desc', t: 'text', l: '描きたい内容', ph: '例: サイバーパンクな近未来の東京の街並み' } ],
-        build: (v) => `# 指示\nあなたはMidjourneyやStable Diffusionなどの画像生成AIを完璧に操るプロンプトエンジニアです。\nユーザーが求める【描きたい内容】を高画質・高精細なアート作品として出力させるための、英語のプロンプトを5パターン作成してください。\n\n# 描きたい内容\n${v.desc}\n\n# 条件\n- 被写体、背景、ライティング、カメラの画角、レンダリング手法（8k, unreal engine 5, cinematic lightingなど）を豊富に盛り込むこと。\n- アニメ風、写真風、イラスト風など、パターンのバリエーションを持たせること。\n\n# 出力フォーマット\nPattern 1: [英語のプロンプト]\nPattern 2: [英語のプロンプト]\n... と出力してください。日本語の解説も簡単に添えてください。`, isOnePage: true },
-      
-      eye_catch: { cat: 'sns', icon: '🖼️', name: 'アイキャッチ構成デザイン', desc: 'サムネイルの構成案を作成',
-        manual: '**【ツールの目的】**\nクリック率を劇的に上げるための、サムネイルの「デザイン構成」をAIが提案します。',
-        fields: [ { id: 'title', t: 'text', l: '記事/動画のタイトル', ph: '例: 月収100万を達成したルーティン' } ],
-        build: (v) => `# 指示\nあなたはクリック率（CTR）を高める天才デザイナーです。\n以下の【タイトル】のコンテンツに対する、思わずクリックしたくなるサムネイル（アイキャッチ画像）の構成案を作成してください。\n\n# タイトル\n${v.title}\n\n# 出力フォーマット\n以下の要素を具体的に提案してください。\n1. メインの画像・イラストのイメージ（人物の表情や背景など）\n2. サムネイルに乗せる「短くて強烈なキャッチコピー（文字）」\n3. 全体の配色（カラーパレット）やフォントのイメージ\n4. 各要素の配置構成（左に文字、右に人物など）`, isOnePage: true },
+    const FormInput = ({ f, val, onChange, onMagic, isMagicLoading }) => {  
+      const isMainMagic = f.isMainMagic;  
+      const value = val !== undefined ? val : (f.t === 'check' ? false : (f.opts ? f.opts[0] : ''));  
+  
+      const inputEl = () => {  
+        if (f.t === 'text') return el('input', { className: 'input-base', value, placeholder: f.ph||'', onChange: e => onChange(f.id, e.target.value) });  
+        if (f.t === 'area') return el('textarea', { className: 'input-base min-h-[100px] resize-y text-sm', value, placeholder: f.ph||'', onChange: e => onChange(f.id, e.target.value) });  
+        if (f.t === 'select') return el('select', { className: 'input-base text-sm', value, onChange: e => onChange(f.id, e.target.value) }, f.opts.map(o => el('option', { key: o, value: o, className: 'bg-bg-panel' }, o)));  
+        if (f.t === 'check') return el('label', { className: 'flex items-center gap-3 cursor-pointer p-2' },   
+          div({ className: 'w-10 h-6 bg-gray-700 rounded-full relative transition' },   
+            div({ className: 'absolute top-1 left-1 w-4 h-4 rounded-full transition ' + (value ? 'bg-brand left-5' : 'bg-gray-400') })  
+          ),  
+          el('input', { type: 'checkbox', className: 'hidden', checked: !!value, onChange: e => onChange(f.id, e.target.checked) }),  
+          span({ className: 'text-sm font-bold text-slate-300' }, '機能を有効にする')  
+        );  
+        return null;  
+      };  
+  
+      return div({ className: 'mb-6 animate-in relative' },  
+        isMagicLoading && isMainMagic && div({ className: 'absolute inset-0 bg-black/60 z-10 rounded-2xl flex items-center justify-center backdrop-blur-sm' }, el(LoadingCircle)),
+        div({ className: 'flex justify-between items-center mb-2 gap-2' },  
+          span({ className: 'text-xs font-black text-slate-400 tracking-wider' }, f.l),  
+          isMainMagic && button({   
+            onClick: () => onMagic(f.id),  
+            disabled: isMagicLoading,
+            className: 'bg-gradient-to-r from-brand-accent to-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg hover:brightness-110 transition disabled:opacity-50'  
+          }, '✨ 魔法で入力')
+        ),  
+        inputEl()  
+      );  
+    };  
+  
+    const UserSettingModal = ({ user, onClose }) => {
+        const [db, setDb] = useState(AppDB.get());
+        const uData = db.users[user];
+        const [keys, setKeys] = useState(uData.settings.keys);
+        const [aiModel, setAiModel] = useState(uData.settings.aiModel);
 
-      magnet: { cat: 'fun', icon: '🎁', name: '無料プレゼント量産', desc: 'LINE登録率を爆上げする特典の企画',
-        manual: '**【ツールの目的】**\n公式LINEやメルマガの登録者を増やすために配る「無料プレゼント」の魅力的な企画案と目次を作成します。',
-        fields: [ { id: 'know', t: 'area', l: '自分の持つノウハウ', ph: '例: インスタグラムでフォロワーを1万人にする方法' } ],
-        build: (v) => `# 指示\nあなたはリストマーケティングの専門家です。\n以下の【ノウハウ】をもとに、ターゲットが「喉から手が出るほど欲しがり、思わず公式LINEに登録してしまう」ようなリードマグネット（無料特典）の企画案を作成してください。\n\n# ノウハウ\n${v.know}\n\n# 出力フォーマット\n1. 無料特典の魅力的なタイトル案（3つ）\n2. 特典の形式（PDF、動画、テンプレートなど）と選定理由\n3. 特典の具体的な目次・コンテンツ構成案`, isOnePage: true },
-      
-      line: { cat: 'fun', icon: '💌', name: 'LINE教育ステップ', desc: '5日間でファン化して販売する自動導線',
-        manual: '**【ツールの目的】**\nLINE登録者を5日間教育し、最終的に商品の購入へ自然と誘導するための「ステップ配信メッセージ」を作成します。',
-        fields: [ 
-          { id: 'prod', t: 'text', l: '販売商品', ph: '例: ブログアフィリエイト教材' }, 
-          { id: 'detail', t: 'area', l: '商品の詳細', ph: '例: 初心者でも3ヶ月で月5万稼げるようになる完全マニュアル。' } 
-        ],
-        build: (v) => `# 指示\nあなたはDRM（ダイレクト・レスポンス・マーケティング）の達人です。\n以下の【商品情報】を販売するために、公式LINE登録者を5日間かけて教育し、最終日に販売へ繋げる「ステップ配信」のシナリオとメッセージ本文を作成してください。\n\n# 商品情報\n- 販売商品: ${v.prod}\n- 商品の詳細: ${v.detail}\n\n# 条件\n- 売り込み感を出さず、価値提供と信頼構築を先行させること。\n- 日が進むにつれて「自分にも必要だ」というパラダイムシフトを起こす構成にすること。\n\n# 出力フォーマット\n1日目〜5日目までの「配信の目的」と「メッセージ本文」を出力してください。`, isOnePage: true },
-      
-      funnel: { cat: 'fun', icon: '📉', name: 'ファネル診断コンサル', desc: '売上が上がらない原因を数字から特定',
-        manual: '**【ツールの目的】**\n各プロセスの数字を入れると、AIが離脱の原因（ボトルネック）を特定し、改善策を出します。',
-        fields: [ { id: 'num', t: 'area', l: '各工程の数字（インプレッション等）', ph: '例:\n・Xのインプレッション: 100,000\n・LPへのクリック: 100\n・商品購入: 0' } ],
-        build: (v) => `# 指示\nあなたはデータ分析に強い凄腕のマーケティングコンサルタントです。\n以下の【ファネルの数字】を分析し、どこに致命的なボトルネック（離脱ポイント）があるかを特定し、具体的な改善策を提案してください。\n\n# ファネルの数字\n${v.num}\n\n# 出力フォーマット\n1. ボトルネックの特定（なぜ売上が上がっていないか）\n2. CVR（遷移率・成約率）の評価\n3. 今すぐ実行すべき具体的な改善アクション（3つ）`, isOnePage: true },
-      
-      reply: { cat: 'fun', icon: '✨', name: 'LINE/DM 神返信', desc: '読者の心を掴む完璧な返信文を作成',
-        manual: '**【ツールの目的】**\n問い合わせや相談に対して、相手に寄り添いながら信頼関係を構築し、商品への興味を高める「完璧な返信文」を作成します。',
-        fields: [ { id: 'msg', t: 'area', l: '相手のメッセージ', ph: '例: 教材に興味があるのですが、パソコン初心者でも大丈夫でしょうか？' } ],
-        build: (v) => `# 指示\nあなたはカスタマーサクセスとクロージングのプロです。\n見込み客から送られてきた以下の【メッセージ】に対し、信頼関係を構築しつつ、最終的な行動（商品購入やアポ獲得）へ誘導する完璧な返信文を作成してください。\n\n# 相手のメッセージ\n${v.msg}\n\n# 条件\n- 相手の不安や状況に深く共感すること。\n- 押し売り感を出さず、「あなたのための提案」として自然に誘導すること。\n\n# 出力フォーマット\nトーン（熱量や距離感）の異なる3パターンの返信文を出力してください。`, isOnePage: true },
-      
-      interview: { cat: 'fun', icon: '🎤', name: 'AIインタビュー', desc: 'AIの質問に答えて一次情報を抽出',
-        manual: '**【ツールの目的】**\n「何を書けばいいかわからない」時に、AIが記者となってあなたにインタビューを行います。',
-        fields: [ { id: 'theme', t: 'text', l: 'テーマ', ph: '例: 挫折しない英語学習法について' } ],
-        build: (v) => `# 指示\nあなたはプロの編集者・インタビュアーです。\n私（ユーザー）から【テーマ】に関する独自の経験や一次情報を引き出し、最終的に高品質な記事を書き上げるためのインタビューを行ってください。\n\n# テーマ\n${v.theme}\n\n# 条件・ルール\n- 一度に全ての質問をせず、必ず「1問ずつ」質問してください。\n- 私が答えたら、その回答を深堀りする質問か、次の質問に移ってください。`, isOnePage: true },
-      
-      journey: { cat: 'fun', icon: '🗺️', name: 'カスタマージャーニー', desc: '認知から購入までの戦略マップを作成',
-        manual: '**【ツールの目的】**\nターゲットが商品を購入するまでの「心理と行動の変化」をマップ化して戦略を明確にします。',
-        fields: [ 
-          { id: 'tgt', t: 'text', l: 'ターゲット', ph: '例: 婚活に疲れた30代女性' }, 
-          { id: 'prod', t: 'text', l: '商品', ph: '例: パーソナル婚活コンサルティング' } 
-        ],
-        build: (v) => `# 指示\nあなたはマーケティング戦略家です。\n【ターゲット】が【商品】を認知し、興味を持ち、比較検討し、購入に至るまでの心理と行動のプロセスを「カスタマージャーニーマップ」として作成してください。\n\n# 入力情報\n- ターゲット: ${v.tgt}\n- 商品・サービス: ${v.prod}\n\n# 出力フォーマット\n以下の各フェーズについて「顧客の行動」「顧客の思考・感情」「企業側が提供すべきコンテンツ・施策」をMarkdownで出力してください。\n1. 認知（課題への気付き）\n2. 情報収集・興味関心\n3. 比較・検討\n4. 決断・購入`, isOnePage: true },
-      
-      webdev: { cat: 'fun', icon: '💻', name: 'Webアプリ開発支援', desc: 'アイデアからWebツールの要件定義とHTML構成',
-        manual: '**【ツールの目的】**\nアイデアを文字にするだけで、AIがプログラミングの要件定義と構成コードを作成します。',
-        fields: [ { id: 'idea', t: 'area', l: '作りたいツール案', ph: '例: 食材を入力すると、AIがレシピを提案してくれるWebアプリ' } ],
-        build: (v) => `# 指示\nあなたはフルスタックの天才エンジニアであり、プロダクトマネージャーです。\nユーザーの【ツール案】を実現するための、要件定義と1枚のHTML（JavaScript, CSS含む）で動くプロトタイプコードの構造を設計してください。\n\n# ツール案\n${v.idea}\n\n# 出力フォーマット\n1. 必要な機能の要件定義\n2. UI/UXの設計案\n3. プロトタイプとなるベースコード（HTML/TailwindCSS/JS）`, isOnePage: true }
-    };
-
-    const DEF_UNLOCKED = Object.keys(TOOLS);
-
-    const CATEGORIES = [
-      { id: 'omega', name: '🔥 オメガ特級ツール (全自動)' },
-      { id: 'mon', name: '📝 コンテンツ作成 ＆ 販売' },
-      { id: 'cw', name: '💼 クラウドワークス・仕事完遂' },
-      { id: 'sns', name: '🚀 集客 ＆ SNSアカウント設計' },
-      { id: 'fun', name: '💬 ファン化 ＆ セールス自動化' }
-    ];
-
-    /* =========================================================================
-       6. 共通UIコンポーネント
-       ========================================================================= */
-    const FormInput = ({ f, val, onChange, onMagic }) => {
-      const isMagic = f.magic || f.isMainMagic;
-      const value = val !== undefined ? val : (f.t === 'check' ? false : (f.opts ? f.opts[0] : ''));
-
-      const renderInput = () => {
-        if (f.t === 'text') return input({ className: 'input-base', value: value, placeholder: f.ph || '', onChange: e => onChange(f.id, e.target.value) });
-        if (f.t === 'area') return textarea({ className: 'input-base min-h-[120px] resize-y', value: value, placeholder: f.ph || '', onChange: e => onChange(f.id, e.target.value) });
-        if (f.t === 'select') return select({ className: 'input-base', value: value, onChange: e => onChange(f.id, e.target.value) }, f.opts.map(o => option({ key: o, value: o, className: 'bg-slate-900' }, o)));
-        if (f.t === 'check') return label({ className: 'flex items-center gap-3 cursor-pointer p-2' }, 
-          div({ className: 'w-10 h-6 bg-slate-800 rounded-full relative transition border border-white/10' }, 
-            div({ className: 'absolute top-1 left-1 w-4 h-4 rounded-full transition ' + (value ? 'bg-brand left-5' : 'bg-slate-500') })
-          ),
-          input({ type: 'checkbox', className: 'hidden', checked: !!value, onChange: e => onChange(f.id, e.target.checked) }),
-          span({ className: 'text-sm font-bold text-white/80' }, '機能を有効にする')
-        );
-        return null;
-      };
-
-      return div({ className: 'glass-panel rounded-2xl p-4 md:p-6 mb-4 md:mb-5 animate-in w-full' },
-        div({ className: 'flex flex-col sm:flex-row justify-between sm:items-center mb-3 gap-2' },
-          span({ className: 'text-[11px] md:text-xs font-black text-slate-400 tracking-widest uppercase break-words' }, f.l),
-          isMagic ? button({ 
-            onClick: () => onMagic(f.id, !!f.isMainMagic),
-            className: 'bg-gradient-to-r from-brand-accent to-red-500 text-white text-[10px] md:text-xs font-black px-4 py-1.5 rounded-full shadow-lg active:scale-95 transition hover:brightness-110 self-start sm:self-auto shrink-0'
-          }, '✨ 魔法の杖') : null
-        ),
-        renderInput()
-      );
-    };
-
-    /* =========================================================================
-       7. ツール実行エンジン
-       ========================================================================= */
-    const ToolCore = ({ tid, user, role, onBack }) => {
-      const conf = TOOLS[tid];
-      const [db, setDb] = useState(AppDB.get());
-      const uData = db.users[user];
-      const pid = uData.curProj;
-      const [vals, setVals] = useState(uData.projects[pid].data[tid] || {});
-      const [aiModel, setAiModel] = useState(uData.settings?.aiModel || 'chatgpt_free');
-      const [copied, setCopied] = useState({});
-      
-      const [res, setRes] = useState(uData.projects[pid].data[tid]?.res || '');
-      const [resTab, setResTab] = useState('edit');
-      const [showManual, setShowManual] = useState(false); 
-      const [generatedPrompt, setGeneratedPrompt] = useState('');
-
-      useEffect(() => { window.scrollTo(0, 0); }, []);
-
-      const update = (fid, v) => {
-        const nv = { ...vals, [fid]: v };
-        setVals(nv);
-        if (role !== 'admin') {
-          const ndb = AppDB.get();
-          ndb.users[user].projects[pid].data[tid] = nv;
-          AppDB.save(ndb);
-        }
-      };
-
-      const updateRes = (v) => {
-        setRes(v);
-        if (role !== 'admin') {
-          const ndb = AppDB.get();
-          if (!ndb.users[user].projects[pid].data[tid]) ndb.users[user].projects[pid].data[tid] = {};
-          ndb.users[user].projects[pid].data[tid].res = v;
-          AppDB.save(ndb);
-        }
-      };
-
-      const handleClear = () => {
-        if (confirm('入力内容とAIの回答をすべてリセットしますか？')) {
-          setVals({});
-          setGeneratedPrompt('');
-          updateRes('');
-        }
-      };
-
-      const handleMagic = (fid, isMain) => {
-        if (isMain) {
-          const currentVals = { ...vals };
-          conf.fields.forEach(f => {
-            if (f.t === 'select' && currentVals[f.id] === undefined) currentVals[f.id] = f.opts[0];
-          });
-          const magicSet = getRandomMagic(tid, currentVals);
-          if (magicSet) {
-            const newVals = { ...currentVals };
-            Object.keys(magicSet).forEach(k => { 
-                if(k !== 'age' && k !== 'genre') newVals[k] = magicSet[k];
-            });
-            setVals(newVals);
-            
-            if (role !== 'admin') {
-              const ndb = AppDB.get();
-              ndb.users[user].projects[pid].data[tid] = newVals;
-              AppDB.save(ndb);
-            }
-          }
-        } else {
-          const f = conf.fields.find(x => x.id === fid);
-          if (tid === 'closing' && fid === 'obj') {
-             const pool = MAGIC_DATA.closing_obj;
-             let nextVal;
-             let attempts = 0;
-             do {
-               nextVal = pool[Math.floor(Math.random() * pool.length)];
-               attempts++;
-             } while(attempts < 10 && nextVal === vals[fid]);
-             update(fid, nextVal);
-          } else if (f && f.magic) {
-             update(fid, f.magic);
-          }
-        }
-      };
-
-      const onGenerate = () => {
-        const userLimit = uData.customLimit !== null && uData.customLimit !== undefined ? uData.customLimit : db.config.defaultDailyLimit;
-        let canAccess = false;
-        
-        if (role === 'admin') canAccess = true;
-        else {
-          const systemVisible = db.config.toolVisibility[tid] !== false;
-          const isMaintenance = db.config.toolMaintenance[tid] === true;
-          const userPerm = uData.perms[tid];
-          const isPermitted = userPerm !== undefined ? userPerm : DEF_UNLOCKED.includes(tid);
-          if (systemVisible && isPermitted && !isMaintenance) {
-             if (userLimit === -1) canAccess = true;
-             else if (uData.usage.date !== new Date().toDateString() || uData.usage.count < userLimit) canAccess = true;
-          }
-        }
-
-        if (!canAccess) { alert('本日の無料枠を終了したか、このツールを利用できない状態です。'); return; }
-
-        if (role !== 'admin') {
-          const ndb = AppDB.get();
-          const today = new Date().toDateString();
-          if (ndb.users[user].usage.date !== today) ndb.users[user].usage = { date: today, count: 0 };
-          ndb.users[user].usage.count++;
-          AppDB.save(ndb);
-        }
-
-        const prefix = getAIPrefix(aiModel);
-        const prompt = prefix + "\n" + conf.build(vals) + "\n\n【最終出力ルール】\n・AIとしての前置き、挨拶、要約などは一切不要です。\n・指定されたフォーマットの本文のみを直接出力してください。";
-        
-        setGeneratedPrompt(prompt);
-        copyText(prompt, copied, setCopied, 'gen');
-      };
-
-      const generateNotePromo = (type) => {
-        const parsed = parseNoteRes(res);
-        const targetTitle = parsed.title || vals.theme || "（未定のタイトル）";
-        let prompt = '';
-        if (type === 'thumb') {
-          prompt = `以下のnote記事の内容にマッチするサムネイル（アイキャッチ）用の画像生成プロンプトを作成せよ。\n出力するプロンプトは画像生成AI（Midjourney等）でそのまま使える英語のプロンプトにすること。高画質で魅力的なライティングを指定せよ。\n\n記事タイトル: ${targetTitle}\n記事のテーマ: ${vals.theme || "（未設定）"}`;
-        } else if (type === 'sns') {
-          prompt = `以下のnote記事を宣伝し、購入（または閲覧）を促すSNS（X, Threads）用の投稿文を3パターン作成せよ。\n記事タイトル: ${targetTitle}\nターゲット: ${vals.target_detail || "（未設定）"}\nベネフィット: ${vals.benefit || "（未設定）"}`;
-        }
-        setGeneratedPrompt(prompt);
-        window.scrollTo({top: 300, behavior: 'smooth'});
-        copyText(prompt, copied, setCopied, type);
-      };
-
-      const header = div({ className: 'flex flex-col sm:flex-row justify-between sm:items-start sm:items-center mb-6 md:mb-8 pb-4 md:pb-6 border-b border-white/10 animate-in gap-4 pt-4 relative' },
-        div({ className: 'flex items-center gap-3 md:gap-4 w-full sm:w-auto' },
-          button({ onClick: onBack, className: 'glass-panel px-4 py-2 md:px-5 md:py-2.5 rounded-xl text-xs md:text-sm font-bold hover:bg-white/10 transition shrink-0' }, '← BACK'),
-          div(null, h1({ className: 'text-xl md:text-2xl font-black text-white break-words' }, conf.name), p({ className: 'text-[10px] md:text-xs text-brand font-bold uppercase tracking-widest mt-1 break-words' }, conf.desc))
-        ),
-        div({ className: 'flex items-center gap-2 self-end sm:self-auto' },
-          button({ onClick: () => setShowManual(true), className: 'bg-brand/20 text-brand border border-brand/30 hover:bg-brand/30 px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1' }, '📖 使い方を見る')
-        )
-      );
-
-      const manualModal = showManual ? div({ className: 'fixed inset-0 z-[200] flex items-center justify-center bg-black/80 p-4 md:p-6 animate-in' },
-        div({ className: 'glass-panel rounded-2xl md:rounded-[2rem] max-w-2xl w-full p-6 md:p-10 relative max-h-[90vh] overflow-y-auto' },
-          button({ onClick: () => setShowManual(false), className: 'absolute top-4 right-4 md:top-6 md:right-6 text-slate-400 hover:text-white text-xl md:text-2xl font-bold' }, '✕'),
-          el('h3', { className: 'text-xl md:text-2xl font-black text-brand-light mb-6 flex items-center gap-2 border-b border-white/10 pb-4' }, '📖 使い方マニュアル'),
-          div({ 
-            className: 'text-sm md:text-base text-slate-300 leading-relaxed whitespace-pre-wrap', 
-            dangerouslySetInnerHTML: renderMarkdown(conf.manual || 'このツールのマニュアルは準備中です。') 
-          }),
-          button({ onClick: () => setShowManual(false), className: 'w-full btn-gradient py-3 md:py-4 rounded-xl font-black mt-8 text-white text-sm md:text-base shadow-lg' }, '閉じる')
-        )
-      ) : null;
-
-      const aiModelSelector = div({ className: 'glass-panel rounded-2xl p-4 md:p-6 mb-4 md:mb-5 animate-in w-full border-brand/40 bg-brand/5' },
-        div({ className: 'flex flex-col sm:flex-row justify-between sm:items-center mb-3 gap-2' },
-          span({ className: 'text-[11px] md:text-xs font-black text-brand-light tracking-widest uppercase break-words' }, '🤖 使用するAIモデル (全ツール共通設定)'),
-        ),
-        select({ 
-          className: 'input-base !bg-black/60', 
-          value: aiModel, 
-          onChange: (e) => {
-            const newModel = e.target.value;
-            setAiModel(newModel);
+        const save = () => {
             const ndb = AppDB.get();
-            if(!ndb.users[user].settings) ndb.users[user].settings = {};
-            ndb.users[user].settings.aiModel = newModel;
+            ndb.users[user].settings.keys = keys;
+            ndb.users[user].settings.aiModel = aiModel;
             AppDB.save(ndb);
-          }
-        },
-          option({ value: 'chatgpt_free' }, 'ChatGPT (無料版)'),
-          option({ value: 'chatgpt_paid' }, 'ChatGPT Plus (有料版)'),
-          option({ value: 'claude_free' }, 'Claude 3 (無料版)'),
-          option({ value: 'claude_paid' }, 'Claude 3 Pro (有料版)'),
-          option({ value: 'gemini_free' }, 'Gemini (無料版)'),
-          option({ value: 'gemini_paid' }, 'Gemini Advanced (有料版)')
-        )
-      );
+            onClose();
+            window.location.reload(); 
+        };
 
-      const parsedNoteData = tid === 'note' ? parseNoteRes(res) : {};
+        const keyInput = (lang, provider, ph) => div({ className: 'mb-4' },
+            label({ className: 'block text-xs font-bold text-slate-400 mb-1.5' }, `${lang} APIキー (${provider})`),
+            el('input', { type: 'password', className: 'input-base !py-2.5 text-sm font-mono', placeholder: ph, value: keys[provider], onChange: e => setKeys({...keys, [provider]: e.target.value}) })
+        );
 
-      return div({ className: 'w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8' },
-        manualModal,
-        header,
-        aiModelSelector,
-        div({ className: 'space-y-4' }, conf.fields.map(f => el(FormInput, { key: f.id, f, val: vals[f.id], onChange: update, onMagic: handleMagic }))),
-        
-        div({ className: 'flex justify-end mt-2 mb-4' },
-          button({ onClick: handleClear, className: 'text-xs md:text-sm text-slate-400 hover:text-white transition flex items-center gap-1' }, '🗑️ 入力内容をクリア')
-        ),
-
-        button({ onClick: onGenerate, className: 'w-full py-4 md:py-6 rounded-2xl btn-gradient text-white font-black text-lg md:text-xl shadow-xl mt-4 break-words' }, copied.gen ? '✓ プロンプトを生成しました' : '📋 プロンプトを生成する'),
-        
-        generatedPrompt && div({ className: 'glass-panel rounded-2xl p-4 md:p-6 mt-6 mb-10 animate-in border-brand/50 relative' },
-          span({ className: 'block text-[10px] md:text-xs font-black text-brand-light tracking-widest uppercase mb-3' }, '📝 生成されたプロンプト (AIに投げる前に自由に編集・肉付けできます)'),
-          textarea({ className: 'input-base min-h-[200px] text-sm leading-relaxed !bg-black/50', value: generatedPrompt, onChange: e => setGeneratedPrompt(e.target.value) }),
-          button({ onClick: () => copyText(generatedPrompt, copied, setCopied, 'manual_copy'), className: 'w-full bg-brand hover:bg-brand-dark py-3 md:py-4 rounded-xl font-bold mt-4 transition text-white text-sm md:text-base shadow' }, copied.manual_copy ? '✓ コピーしました' : '📋 このプロンプトをコピーしてAIへ貼り付け')
-        ),
-        
-        div({ className: 'mb-8 md:mb-10' }), 
-
-        div({ className: 'glass-panel rounded-3xl p-6 md:p-8 animate-in w-full mb-10' },
-          div({ className: 'flex justify-between items-end mb-6 border-b border-white/10 pb-4 overflow-x-auto hide-scrollbar' },
-            div({ className: 'flex gap-2 min-w-max' },
-              button({ onClick: () => setResTab('edit'), className: `px-3 py-2 md:px-4 md:py-2 text-xs md:text-sm font-bold rounded-lg transition ${resTab === 'edit' ? 'bg-brand text-white' : 'text-slate-400 hover:bg-white/5'}` }, '✍️ 編集 (Markdown)'),
-              button({ onClick: () => setResTab('preview'), className: `px-3 py-2 md:px-4 md:py-2 text-xs md:text-sm font-bold rounded-lg transition ${resTab === 'preview' ? 'bg-brand text-white' : 'text-slate-400 hover:bg-white/5'}` }, '👁️ プレビュー'),
-              tid === 'note' && button({ onClick: () => setResTab('post'), className: `px-3 py-2 md:px-4 md:py-2 text-xs md:text-sm font-bold rounded-lg transition ${resTab === 'post' ? 'bg-brand text-white' : 'text-slate-400 hover:bg-white/5'}` }, '🚀 noteへ投稿')
-            ),
-            res && div({ className: 'shrink-0 ml-4' },
-              span({ className: 'text-xs md:text-sm text-slate-400 font-bold bg-black/40 px-3 py-1.5 rounded-lg' }, `📝 ${res.length}文字`)
-            )
-          ),
-          
-          resTab === 'edit' ? div({ className: 'space-y-4 animate-in' },
-            span({ className: 'block text-[10px] md:text-xs font-black text-slate-400 tracking-[0.2em] uppercase mb-2' }, '📥 AIの回答を貼り付けて保存・編集'),
-            textarea({ className: 'input-base min-h-[300px] md:min-h-[400px] text-sm md:text-base leading-relaxed', value: res, onChange: e => updateRes(e.target.value), placeholder: 'ここにAIからの回答を貼り付けてください。Markdownでの記述がプレビュー画面に反映されます。' }),
-            button({ onClick: () => copyText(res, copied, setCopied, 'ca'), className: 'w-full bg-white/10 hover:bg-white/20 py-3 md:py-4 rounded-xl font-black transition text-white text-sm md:text-base' }, copied.ca ? '✓ コピーしました' : '📋 マークダウン全文コピー'),
-            
-            res && div({ className: 'pt-6 mt-6 border-t border-white/10' },
-              span({ className: 'block text-xs md:text-sm font-black text-brand-light mb-4' }, '🤖 さらにAIでブラッシュアップ (プロンプト生成)'),
-              div({ className: 'flex flex-col sm:flex-row gap-3' },
-                button({ onClick: () => {
-                  const prompt = `以下の文章を、読者の感情をより強く揺さぶるように「熱量高く」書き直してください。\n\n${res}`;
-                  setGeneratedPrompt(prompt); 
-                  window.scrollTo({top: 300, behavior: 'smooth'}); 
-                  copyText(prompt, copied, setCopied, 're_heat');
-                }, className: 'flex-1 bg-brand-danger/20 hover:bg-brand-danger/30 text-brand-danger border border-brand-danger/30 py-3 md:py-4 rounded-xl text-sm md:text-base font-bold transition' }, copied.re_heat ? '✓ プロンプト生成済' : '🔥 熱量を上げる'),
-                button({ onClick: () => {
-                  const prompt = `以下の文章を、より読みやすく論理的に添削・推敲してください。適宜Markdownの見出し(#や##)や太字(**)を使用して装飾し、そのまま使える完成度にしてください。\n\n${res}`;
-                  setGeneratedPrompt(prompt);
-                  window.scrollTo({top: 300, behavior: 'smooth'});
-                  copyText(prompt, copied, setCopied, 're_edit');
-                }, className: 'flex-1 bg-brand-success/20 hover:bg-brand-success/30 text-brand-success border border-brand-success/30 py-3 md:py-4 rounded-xl text-sm md:text-base font-bold transition' }, copied.re_edit ? '✓ プロンプト生成済' : '📝 添削・装飾を追加')
-              )
-            )
-          ) : resTab === 'preview' ? div({ className: 'space-y-4 animate-in' },
-            span({ className: 'block text-[10px] md:text-xs font-black text-slate-400 tracking-[0.2em] uppercase mb-2' }, '👁️ 装飾付きプレビュー'),
-            div({ 
-              id: 'preview-content-box',
-              className: 'bg-slate-50 p-6 md:p-8 rounded-xl preview-content text-sm md:text-base overflow-x-auto shadow-inner min-h-[300px] md:min-h-[400px]',
-              dangerouslySetInnerHTML: renderMarkdown(res || 'プレビューする内容がありません。') 
-            }),
-            res && button({ onClick: () => copyRichText('preview-content-box', copied, setCopied, 'cr_rich'), className: 'w-full btn-gradient py-3 md:py-4 rounded-xl font-black transition text-white text-sm md:text-base shadow-lg' }, copied.cr_rich ? '✓ 装飾コピー済' : '📋 装飾(リッチテキスト)をそのままコピー')
-          ) : resTab === 'post' && tid === 'note' ? div({ className: 'space-y-6 animate-in' },
-            span({ className: 'block text-[10px] md:text-xs font-black text-slate-400 tracking-[0.2em] uppercase mb-2' }, '🚀 noteへ投稿する'),
-            p({ className: 'text-sm text-slate-300 mb-6' }, '以下のステップに沿ってコピーし、noteのエディタに貼り付けてください。'),
-            
-            div({ className: 'bg-black/30 p-4 rounded-xl border border-white/5' },
-              span({ className: 'block text-xs font-bold text-brand-light mb-2' }, 'Step 1. タイトル'),
-              div({ className: 'flex gap-2' },
-                input({ id: 'c-title-in', className: 'input-base flex-1 !py-2 text-sm', value: parsedNoteData.title, readOnly: true }),
-                button({ onClick: () => { document.getElementById('c-title-in').select(); document.execCommand('copy'); copyText('', copied, setCopied, 'c_title'); }, className: 'bg-white/10 hover:bg-white/20 px-4 rounded-lg text-xs font-bold text-white whitespace-nowrap transition' }, copied.c_title ? '✓ コピー済' : '📋 コピー')
-              )
-            ),
-
-            div({ className: 'bg-black/30 p-4 rounded-xl border border-white/5' },
-              div({ className: 'flex justify-between items-end mb-3' },
-                span({ className: 'block text-xs font-bold text-brand-light' }, 'Step 2. 無料エリア本文'),
-                button({ onClick: () => copyRichText('note-free-content', copied, setCopied, 'cr_free'), className: 'btn-gradient px-3 py-1.5 rounded text-xs font-bold text-white transition shadow' }, copied.cr_free ? '✓ 装飾コピー済' : '📋 装飾コピー')
-              ),
-              div({ 
-                id: 'note-free-content',
-                className: 'bg-slate-50 p-4 md:p-6 rounded-lg preview-content text-sm md:text-base overflow-x-auto shadow-inner max-h-[300px] overflow-y-auto',
-                dangerouslySetInnerHTML: renderMarkdown(parsedNoteData.free || '内容がありません') 
-              })
-            ),
-
-            div({ className: 'bg-black/30 p-4 rounded-xl border border-white/5' },
-              div({ className: 'flex justify-between items-end mb-3' },
-                span({ className: 'block text-xs font-bold text-brand-light' }, 'Step 3. 有料エリア本文'),
-                button({ onClick: () => copyRichText('note-paid-content', copied, setCopied, 'cr_paid'), className: 'btn-gradient px-3 py-1.5 rounded text-xs font-bold text-white transition shadow' }, copied.cr_paid ? '✓ 装飾コピー済' : '📋 装飾コピー')
-              ),
-              div({ 
-                id: 'note-paid-content',
-                className: 'bg-slate-50 p-4 md:p-6 rounded-lg preview-content text-sm md:text-base overflow-x-auto shadow-inner max-h-[300px] overflow-y-auto',
-                dangerouslySetInnerHTML: renderMarkdown(parsedNoteData.paid || '内容がありません') 
-              })
-            ),
-
-            div({ className: 'pt-4 border-t border-white/10' },
-              span({ className: 'block text-xs font-black text-slate-400 mb-3' }, '🚀 Step 4. 宣伝・集客素材を作る (プロンプト生成)'),
-              div({ className: 'flex flex-col sm:flex-row gap-3' },
-                button({ onClick: () => {
-                  generateNotePromo('thumb');
-                  window.scrollTo({top: 300, behavior: 'smooth'});
-                }, className: 'flex-1 bg-white/10 hover:bg-white/20 border border-white/20 py-3 md:py-4 rounded-xl text-sm md:text-base font-bold text-white shadow transition' }, copied.thumb ? '✓ プロンプト生成済' : '🎨 記事に合う画像・サムネ生成'),
-                button({ onClick: () => {
-                  generateNotePromo('sns');
-                  window.scrollTo({top: 300, behavior: 'smooth'});
-                }, className: 'flex-1 bg-white/10 hover:bg-white/20 border border-white/20 py-3 md:py-4 rounded-xl text-sm md:text-base font-bold text-white shadow transition' }, copied.sns ? '✓ プロンプト生成済' : '📱 告知用SNSポスト生成')
-              )
-            ),
-            
-            div({ className: 'pt-4 border-t border-white/10' },
-              span({ className: 'block text-xs font-bold text-brand-light mb-3' }, '⚙️ Step 5. 公開設定の自動入力サポート（任意）'),
-              p({ className: 'text-sm text-slate-300 mb-4' }, 'AIが記事内容から自動判別した設定案です。自由に書き換えてコピーしてください。'),
-              div({ className: 'bg-black/30 p-4 md:p-5 rounded-xl border border-white/5 space-y-4' },
-                div(null,
-                  span({ className: 'block text-[10px] font-bold text-slate-400 mb-1' }, '自動抽出された目次 (テキスト形式)'),
-                  div({ className: 'flex gap-2' },
-                    textarea({ className: 'input-base flex-1 !py-2 text-sm min-h-[100px] leading-relaxed', defaultValue: parsedNoteData.toc, id: 'auto-toc' }),
-                    button({ onClick: () => { document.getElementById('auto-toc').select(); document.execCommand('copy'); copyText('', copied, setCopied, 'c_toc'); }, className: 'bg-white/10 hover:bg-white/20 px-3 rounded-lg text-xs font-bold text-white transition' }, copied.c_toc ? '✓ コピー済' : 'コピー')
-                  )
-                ),
-                div(null,
-                  span({ className: 'block text-[10px] font-bold text-slate-400 mb-1' }, '推奨ハッシュタグ (5個程度)'),
-                  div({ className: 'flex gap-2' },
-                    input({ className: 'input-base flex-1 !py-2 text-sm text-brand-light font-bold', defaultValue: parsedNoteData.tags || `#${vals.genre ? vals.genre.split('・')[0] : '副業'} #初心者 #note収益化`, id: 'auto-tags' }),
-                    button({ onClick: () => { document.getElementById('auto-tags').select(); document.execCommand('copy'); copyText('', copied, setCopied, 'c_tags'); }, className: 'bg-white/10 hover:bg-white/20 px-3 rounded-lg text-xs font-bold text-white transition' }, copied.c_tags ? '✓ コピー済' : 'コピー')
-                  )
-                ),
-                div(null,
-                  span({ className: 'block text-[10px] font-bold text-slate-400 mb-1' }, 'カスタムURL案 (英数字ハイフン)'),
-                  div({ className: 'flex gap-2' },
-                    input({ className: 'input-base flex-1 !py-2 text-sm font-mono', defaultValue: parsedNoteData.url || 'ai-monetize-article', id: 'auto-url' }),
-                    button({ onClick: () => { document.getElementById('auto-url').select(); document.execCommand('copy'); copyText('', copied, setCopied, 'c_url'); }, className: 'bg-white/10 hover:bg-white/20 px-3 rounded-lg text-xs font-bold text-white transition' }, copied.c_url ? '✓ コピー済' : 'コピー')
-                  )
-                ),
-                div(null,
-                  span({ className: 'block text-[10px] font-bold text-slate-400 mb-1' }, '返金設定の自動判別'),
-                  div({ className: 'flex items-center gap-2 bg-black/50 p-2.5 rounded-lg border border-white/10' },
-                    span({ className: 'text-sm font-bold ' + (vals.guarantee ? 'text-brand-accent' : 'text-slate-400') }, vals.guarantee ? '✅ 「返金を受け付ける」をON推奨' : '無効でOK (設定不要)')
-                  )
-                ),
-                div(null,
-                  span({ className: 'block text-[10px] font-bold text-slate-400 mb-1' }, 'LINE等のCTA (無料エリア末尾用)'),
-                  div({ className: 'flex gap-2' },
-                    textarea({ className: 'input-base flex-1 !py-2 text-sm min-h-[60px]', defaultValue: '🎁 無料プレゼントはこちら👇\n公式LINE: https://lin.ee/xxxxxx', id: 'auto-cta' }),
-                    button({ onClick: () => { document.getElementById('auto-cta').select(); document.execCommand('copy'); copyText('', copied, setCopied, 'c_cta'); }, className: 'bg-white/10 hover:bg-white/20 px-3 rounded-lg text-xs font-bold text-white transition' }, copied.c_cta ? '✓ コピー済' : 'コピー')
-                  )
-                )
-              )
-            ),
-            
-            div({ className: 'pt-4 border-t border-white/10' },
-              span({ className: 'block text-xs font-bold text-brand-light mb-3' }, '✅ Step 6. 公開前の最終チェックリスト'),
-              div({ className: 'bg-black/30 p-4 md:p-5 rounded-xl border border-white/5 space-y-3' },
-                label({ className: 'flex items-start gap-3 cursor-pointer group' },
-                  input({ type: 'checkbox', className: 'mt-1 w-4 h-4 accent-brand rounded border-white/20 shrink-0' }),
-                  span({ className: 'text-sm text-slate-300 group-hover:text-white transition leading-snug' }, 'コピーした目次を無料エリアの冒頭に貼り付けた')
-                ),
-                label({ className: 'flex items-start gap-3 cursor-pointer group' },
-                  input({ type: 'checkbox', className: 'mt-1 w-4 h-4 accent-brand rounded border-white/20 shrink-0' }),
-                  span({ className: 'text-sm text-slate-300 group-hover:text-white transition leading-snug' }, 'ハッシュタグ(#)を5〜7個設定した')
-                ),
-                label({ className: 'flex items-start gap-3 cursor-pointer group' },
-                  input({ type: 'checkbox', className: 'mt-1 w-4 h-4 accent-brand rounded border-white/20 shrink-0' }),
-                  span({ className: 'text-sm text-slate-300 group-hover:text-white transition leading-snug' }, 'カスタムURLを英数字(例: ai-monetize)に変更した')
-                ),
-                label({ className: 'flex items-start gap-3 cursor-pointer group' },
-                  input({ type: 'checkbox', className: 'mt-1 w-4 h-4 accent-brand rounded border-white/20 shrink-0' }),
-                  span({ className: 'text-sm text-slate-300 group-hover:text-white transition leading-snug' }, '「返金を受け付ける」設定をONにした (※保証ありの場合)')
-                ),
-                label({ className: 'flex items-start gap-3 cursor-pointer group' },
-                  input({ type: 'checkbox', className: 'mt-1 w-4 h-4 accent-brand rounded border-white/20 shrink-0' }),
-                  span({ className: 'text-sm text-slate-300 group-hover:text-white transition leading-snug' }, '公式LINE等のリンク(CTA)を無料エリア末尾に設置した')
-                )
-              )
-            )
-          ) : null
-        )
-      );
-    };
-
-    /* =========================================================================
-       8. 問い合わせフォームコンポーネント
-       ========================================================================= */
-    const InquiryForm = ({ user, nickname }) => {
-      const [type, setType] = useState('bug');
-      const [text, setText] = useState('');
-      
-      const submit = () => {
-         if(!text.trim()) return alert('内容を入力してください');
-         const ndb = AppDB.get();
-         ndb.inquiries.unshift({
-            id: Date.now().toString(),
-            userId: user,
-            nickname: nickname,
-            type,
-            content: text,
-            status: 'pending',
-            createdAt: Date.now()
-         });
-         AppDB.save(ndb);
-         alert('送信しました。管理者にて確認いたします。\n貴重なご意見ありがとうございます！');
-         setText('');
-      };
-
-      return div({ className: 'max-w-4xl mx-auto mt-20 mb-10 animate-in' },
-        div({ className: 'glass-panel rounded-[2rem] p-6 md:p-10 border border-white/5' },
-          div({ className: 'mb-6 border-b border-white/10 pb-4' },
-            h2({ className: 'text-xl font-black text-white flex items-center gap-2' }, '💬 お問い合わせ / ご要望'),
-            p({ className: 'text-xs text-slate-400 mt-1' }, '不具合の報告や、追加してほしい機能のアイデアをお送りください。')
-          ),
-          div({ className: 'space-y-4' },
-            div(null,
-              span({ className: 'block text-[10px] font-black text-brand-light uppercase tracking-widest mb-2' }, '問い合わせ種別'),
-              select({ className: 'input-base !py-3', value: type, onChange: e => setType(e.target.value) },
-                option({ value: 'bug' }, '🐛 不具合の報告'),
-                option({ value: 'feature' }, '💡 機能追加のご要望'),
-                option({ value: 'other' }, '📝 その他・ご質問')
-              )
-            ),
-            div(null,
-              span({ className: 'block text-[10px] font-black text-brand-light uppercase tracking-widest mb-2' }, '内容'),
-              textarea({ className: 'input-base min-h-[120px]', placeholder: '具体的な状況やアイデアをご記入ください...', value: text, onChange: e => setText(e.target.value) })
-            ),
-            button({ onClick: submit, className: 'w-full bg-white/10 hover:bg-white/20 py-4 rounded-xl font-black transition text-white text-sm shadow-md' }, '送信する')
-          )
-        )
-      );
-    };
-
-    /* =========================================================================
-       9. 管理者ダッシュボード
-       ========================================================================= */
-    const AdminDash = (props) => {
-      const [db, setDb] = useState(AppDB.get());
-      const [tab, setTab] = useState('users');
-      const [editingUser, setEditingUser] = useState(null);
-
-      useEffect(() => { window.scrollTo(0, 0); }, []);
-
-      const users = Object.keys(db.users).filter(k => k !== 'admin');
-      const setVisible = (tid) => { const n = AppDB.get(); n.config.toolVisibility[tid] = !n.config.toolVisibility[tid]; AppDB.save(n); setDb(n); };
-      const setMaintenance = (tid) => { const n = AppDB.get(); n.config.toolMaintenance[tid] = !n.config.toolMaintenance[tid]; AppDB.save(n); setDb(n); };
-      const setStatus = (u, st) => { const n = AppDB.get(); n.users[u].status = st; AppDB.save(n); setDb(n); };
-      
-      const setPerm = (u, tid, val) => {
-        const n = AppDB.get();
-        if(!n.users[u].perms) n.users[u].perms = {};
-        n.users[u].perms[tid] = val;
-        AppDB.save(n);
-        setDb(n);
-      };
-
-      const setInquiryStatus = (id, status) => {
-        const n = AppDB.get();
-        const target = n.inquiries.find(i => i.id === id);
-        if (target) {
-          target.status = status;
-          AppDB.save(n);
-          setDb(n);
-        }
-      };
-
-      return div({ className: 'w-full max-w-6xl mx-auto animate-in px-4 sm:px-6 lg:px-8 pt-6' },
-        div({ className: 'flex flex-col md:flex-row justify-between items-center mb-8 gap-4 pb-4 md:pb-6 border-b border-white/10' },
-          h1({ className: 'text-2xl md:text-3xl font-black text-white tracking-tighter' }, '🎛️ DASHBOARD'),
-          div({ className: 'flex gap-2 md:gap-3 w-full md:w-auto justify-center' },
-            button({ onClick: props.onGoApp, className: 'flex-1 md:flex-none btn-gradient text-white px-4 md:px-8 py-2 md:py-3 rounded-full text-sm md:text-base font-black shadow-lg transition' }, '🚀 ツール起動'),
-            button({ onClick: props.onLogout, className: 'flex-1 md:flex-none bg-white/10 hover:bg-white/20 px-4 md:px-8 py-2 md:py-3 rounded-full text-sm md:text-base font-black text-white/50 transition' }, 'ログアウト')
-          )
-        ),
-        div({ className: 'flex gap-2 overflow-x-auto mb-6 md:mb-10 border-b border-white/5 hide-scrollbar whitespace-nowrap' },
-          [{id:'users', l:'👥 ユーザー管理'}, {id:'tools', l:'🛠 ツール管理'}, {id:'inquiries', l:'📩 問い合わせ'}, {id:'settings', l:'⚙️ 設定'}, {id:'errors', l:'🚨 エラーログ'}].map(t =>
-            button({ key: t.id, onClick: () => setTab(t.id), className: 'px-6 md:px-8 py-3 md:py-4 text-xs md:text-sm font-black transition-all ' + (tab===t.id ? 'border-brand text-brand border-b-2' : 'text-slate-500 border-b-2 border-transparent') }, t.l)
-          )
-        ),
-        
-        tab === 'errors' && div({ className: 'space-y-4 animate-in' },
-          (!db.errorLogs || db.errorLogs.length === 0) ? p({ className: 'text-slate-400 text-center py-10 font-bold' }, '現在、記録されているエラーはありません。素晴らしい！') :
-          db.errorLogs.map(err => 
-            div({ key: err.id, className: 'glass-panel p-5 md:p-6 rounded-2xl relative overflow-hidden border border-brand-danger/30' },
-              div({ className: 'flex justify-between items-start mb-3' },
-                span({ className: 'text-[10px] md:text-xs text-brand-danger font-black bg-brand-danger/20 px-2.5 py-1 rounded' }, err.source),
-                span({ className: 'text-[10px] text-slate-400' }, new Date(err.date).toLocaleString())
-              ),
-              p({ className: 'text-sm text-white font-mono break-all mb-4' }, err.message),
-              err.stack && div({ className: 'mt-2 pt-4 border-t border-white/10 relative' },
-                button({ 
-                  onClick: () => { navigator.clipboard.writeText(`Source: ${err.source}\nMessage: ${err.message}\n\nStack:\n${err.stack}`).then(() => alert('コピーしました')); },
-                  className: 'absolute -top-3 right-0 bg-white/10 hover:bg-white/20 px-3 py-1 rounded text-[10px] font-bold text-white transition'
-                }, '📋 コピー'),
-                textarea({ className: 'w-full bg-black/40 text-[10px] text-slate-400 font-mono p-3 rounded-lg h-24 outline-none resize-y', readOnly: true, value: err.stack })
-              )
-            )
-          )
-        ),
-
-        tab === 'settings' && div({ className: 'glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-10 animate-in' },
-          el('h2', { className: 'text-xl font-black text-white mb-6' }, '⚙️ システム全体設定'),
-          div({ className: 'bg-black/30 p-5 rounded-xl border border-white/5 max-w-md' },
-            label({ className: 'block text-xs font-bold text-brand-light mb-2' }, '一般ユーザーのデフォルト1日使用回数'),
-            div({ className: 'flex gap-2' },
-              input({ 
-                  type: 'number', 
-                  min: '0', 
-                  className: 'input-base flex-1', 
-                  value: db.config.defaultDailyLimit,
-                  onChange: e => {
-                      const n = AppDB.get();
-                      n.config.defaultDailyLimit = Number(e.target.value) || 0;
-                      AppDB.save(n);
-                      setDb(n);
-                  }
-              }),
-              span({ className: 'self-center text-slate-400 font-bold text-sm' }, '回')
-            ),
-            p({ className: 'text-xs text-slate-500 mt-2 leading-relaxed' }, '※ここで設定した回数が、全一般ユーザーの基本上限になります。（個別に制限を設定しているユーザーを除く）')
-          ),
-          div({ className: 'mt-8 border-t border-white/10 pt-6' },
-              button({
-                  onClick: () => {
-                      if(confirm('全ユーザーの「個別の使用回数制限」と「個別のツール権限」をすべてリセットし、デフォルト設定に戻します。よろしいですか？')) {
-                          const n = AppDB.get();
-                          Object.keys(n.users).forEach(u => {
-                              if (u !== 'admin') {
-                                  n.users[u].customLimit = null;
-                                  n.users[u].perms = {};
-                              }
-                          });
-                          AppDB.save(n);
-                          setDb(n);
-                          alert('全ユーザーの設定をリセットしました。');
-                      }
-                  },
-                  className: 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 px-4 py-2 rounded-lg text-xs font-bold transition'
-              }, '⚠️ 全ユーザーの個別設定をリセット')
-          )
-        ),
-
-        tab === 'tools' && div({ className: 'glass-panel rounded-2xl md:rounded-[2rem] p-4 md:p-10 animate-in overflow-x-auto' },
-          p({ className: 'text-brand-accent text-xs md:text-sm font-bold mb-6' }, '⚠️ ツールごとに「一覧への表示/非表示」と「メンテナンスモード（一覧には出るが使用不可）」を設定できます。'),
-          el('table', { className: 'w-full text-left min-w-[500px]' },
-            el('thead', { className: 'bg-white/5 border-b border-white/10' }, 
-              el('tr', null, 
-                el('th', { className: 'p-4 text-[10px] md:text-xs font-black text-slate-500' }, 'ツール名'),
-                el('th', { className: 'p-4 text-[10px] md:text-xs font-black text-slate-500 text-center' }, '表示状態 (非表示)'),
-                el('th', { className: 'p-4 text-[10px] md:text-xs font-black text-slate-500 text-center' }, 'メンテ中 (グレーアウト)')
-              )
-            ),
-            el('tbody', null, Object.keys(TOOLS).map(tid => 
-              el('tr', { key: tid, className: 'border-b border-white/5 hover:bg-white/5 transition' },
-                el('td', { className: 'p-4 flex items-center gap-3' }, span({ className: 'text-xl' }, TOOLS[tid].icon), span({ className: 'text-sm font-bold text-white' }, TOOLS[tid].name)),
-                el('td', { className: 'p-4 text-center' }, input({ type: 'checkbox', className: 'w-5 h-5 accent-brand cursor-pointer', checked: db.config.toolVisibility[tid] !== false, onChange: () => setVisible(tid) })),
-                el('td', { className: 'p-4 text-center' }, input({ type: 'checkbox', className: 'w-5 h-5 accent-red-500 cursor-pointer', checked: !!db.config.toolMaintenance[tid], onChange: () => setMaintenance(tid) }))
-              )
-            ))
-          )
-        ),
-
-        tab === 'inquiries' && div({ className: 'space-y-4 animate-in' },
-          db.inquiries.length === 0 ? p({ className: 'text-slate-400 text-center py-10 font-bold' }, '現在、問い合わせはありません') :
-          db.inquiries.map(inq => 
-            div({ key: inq.id, className: 'glass-panel p-5 md:p-6 rounded-2xl flex flex-col md:flex-row gap-4 justify-between items-start md:items-center' },
-              div({ className: 'flex-1 w-full' },
-                div({ className: 'flex flex-wrap items-center gap-2 md:gap-3 mb-3' },
-                  span({ className: 'px-2 py-1 rounded text-[10px] font-black ' + (inq.type==='bug'?'bg-red-500/20 text-red-400':inq.type==='feature'?'bg-blue-500/20 text-blue-400':'bg-gray-500/20 text-gray-400') }, inq.type === 'bug' ? '不具合報告' : inq.type === 'feature' ? '機能要望' : 'その他'),
-                  span({ className: 'text-[10px] text-slate-400' }, new Date(inq.createdAt).toLocaleString()),
-                  span({ className: 'text-[10px] font-bold text-brand-light bg-brand/10 px-2 py-0.5 rounded' }, `${inq.nickname} (${inq.userId})`)
-                ),
-                p({ className: 'text-sm text-white whitespace-pre-wrap leading-relaxed' }, inq.content)
-              ),
-              div({ className: 'shrink-0 mt-2 md:mt-0 w-full md:w-auto' },
-                select({ 
-                  className: 'w-full md:w-auto bg-black/60 border border-white/10 text-xs text-white p-2.5 rounded-lg outline-none font-bold ' + (inq.status==='resolved'?'text-brand-success':inq.status==='in_progress'?'text-brand-accent':'text-slate-300'),
-                  value: inq.status,
-                  onChange: (e) => setInquiryStatus(inq.id, e.target.value)
-                },
-                  option({ value: 'pending', className: 'text-slate-300' }, '未対応'),
-                  option({ value: 'in_progress', className: 'text-brand-accent' }, '対応中'),
-                  option({ value: 'resolved', className: 'text-brand-success' }, '完了')
-                )
-              )
-            )
-          )
-        ),
-
-        tab === 'users' && div({ className: 'glass-panel rounded-2xl md:rounded-[2rem] overflow-hidden animate-in overflow-x-auto' },
-          el('table', { className: 'w-full text-left min-w-[600px]' },
-            el('thead', { className: 'bg-white/5' }, el('tr', null, ['ニックネーム / @ユーザー名', '状態', '操作'].map(th => el('th', { className: 'p-4 md:p-6 text-[10px] md:text-xs font-black text-slate-500 uppercase' }, th)))),
-            el('tbody', { className: 'divide-y divide-white/5' }, users.map(k => el(Fragment, { key: k },
-              el('tr', { className: 'hover:bg-white/5 transition' },
-                el('td', { className: 'p-4 md:p-6 font-bold text-white text-xs md:text-sm' }, 
-                  div(null, span({ className: 'block mb-1' }, db.users[k].nickname || '未設定'), span({ className: 'text-[10px] text-brand-light font-normal' }, k))
-                ),
-                el('td', { className: 'p-4 md:p-6' }, span({ className: 'px-2 py-1 md:px-3 md:py-1 rounded-full text-[9px] md:text-[10px] font-black ' + (db.users[k].status==='approved'?'bg-brand-success/20 text-brand-success': db.users[k].status==='pending' ? 'bg-brand-accent/20 text-brand-accent' : 'bg-brand-danger/20 text-brand-danger') }, db.users[k].status.toUpperCase())),
-                el('td', { className: 'p-4 md:p-6 flex flex-wrap gap-2' },
-                  db.users[k].status !== 'approved' && button({ onClick: () => setStatus(k, 'approved'), className: 'text-brand-success font-black text-[10px] md:text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded transition' }, '許可'),
-                  db.users[k].status === 'approved' && button({ onClick: () => setStatus(k, 'rejected'), className: 'text-brand-danger font-black text-[10px] md:text-xs bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded transition' }, '権利剥奪'),
-                  db.users[k].status === 'approved' && button({ onClick: () => setEditingUser(editingUser === k ? null : k), className: 'text-white font-black text-[10px] md:text-xs bg-brand hover:bg-brand-dark px-3 py-1.5 rounded transition' }, editingUser === k ? '閉じる' : '⚙️ 設定')
-                )
-              ),
-              editingUser === k && el('tr', null,
-                el('td', { colSpan: 3, className: 'p-4 md:p-6 bg-black/40 border-b border-white/5' },
-                  div({ className: 'mb-6 p-4 bg-black/30 rounded-xl border border-white/5 flex flex-col sm:flex-row items-start sm:items-center gap-4' },
-                    span({ className: 'block text-xs font-bold text-brand-light' }, '⏱️ 1日の使用回数制限'),
-                    select({
-                        className: 'input-base !py-2 text-sm w-full sm:w-auto',
-                        value: db.users[k].customLimit === null ? 'default' : db.users[k].customLimit,
-                        onChange: e => {
-                            const val = e.target.value;
-                            const n = AppDB.get();
-                            n.users[k].customLimit = val === 'default' ? null : Number(val);
-                            AppDB.save(n);
-                            setDb(n);
-                        }
-                    },
-                        option({ value: 'default' }, `デフォルト設定に従う (${db.config.defaultDailyLimit}回)`),
-                        option({ value: '-1' }, '無制限 (∞)'),
-                        [1, 3, 5, 10, 20, 50, 100].map(num => option({ key: num, value: num }, `${num}回`))
+        return div({ className: 'fixed inset-0 z-[200] flex items-center justify-center bg-black/80 p-4 animate-in' },
+            div({ className: 'glass-panel rounded-3xl max-w-xl w-full p-8 relative flex flex-col max-h-[90vh]' },
+                button({ onClick: onClose, className: 'absolute top-5 right-5 text-slate-400 hover:text-white text-xl font-bold transition' }, '✕'),
+                h3({ className: 'text-xl font-black text-white mb-6 pb-4 border-b border-white/10' }, '⚙️ 個人設定 (APIキー登録)'),
+                div({ className: 'overflow-y-auto flex-1 pr-3 hide-scrollbar' },
+                    p({ className: 'text-xs text-brand-accent mb-6 bg-brand-accent/10 p-4 rounded-xl border border-brand-accent/20 leading-relaxed' }, '🔑 ここで登録したキーはブラウザ内にのみ保存されます。用途に応じて各AIがあなたのキーで動作します(BYOK)。'),
+                    keyInput('OpenAI (ChatGPT)', 'openai', 'sk-...'),
+                    keyInput('Anthropic (Claude)', 'anthropic', 'sk-ant-...'),
+                    keyInput('Google (Gemini)', 'google', 'AIza...'),
+                    div({ className: 'mt-8 pt-6 border-t border-white/10' },
+                        label({ className: 'block text-xs font-bold text-slate-400 mb-1.5' }, '🤖 デフォルトAIモデル'),
+                        el('select', { className: 'input-base !py-2.5 text-sm', value: aiModel, onChange: e => setAiModel(e.target.value) },
+                            option({ value: 'chatgpt_free' }, 'ChatGPT (無料版)'),
+                            option({ value: 'chatgpt_paid' }, 'ChatGPT Plus (有料版)'),
+                            option({ value: 'claude_free' }, 'Claude 3 (無料版)'),
+                            option({ value: 'claude_paid' }, 'Claude 3 Pro (有料版)'),
+                            option({ value: 'gemini_free' }, 'Gemini (無料版)'),
+                            option({ value: 'gemini_paid' }, 'Gemini Advanced (有料版)')
+                        )
                     )
-                  ),
-                  span({ className: 'block text-xs font-bold text-brand-light mb-4' }, '⚙️ このユーザーが使用できるツールを個別に設定'),
-                  div({ className: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3' },
-                    Object.keys(TOOLS).map(tid => {
-                      const hasPerm = db.users[k].perms[tid] !== undefined ? db.users[k].perms[tid] : DEF_UNLOCKED.includes(tid);
-                      return label({ key: tid, className: 'flex items-center gap-3 bg-white/5 p-3 rounded-lg cursor-pointer hover:bg-white/10 transition border border-white/5' },
-                        input({ type: 'checkbox', className: 'w-4 h-4 accent-brand rounded', checked: hasPerm, onChange: e => setPerm(k, tid, e.target.checked) }),
-                        span({ className: 'text-xs text-white' }, TOOLS[tid].name)
-                      );
-                    })
-                  )
-                )
-              )
-            )))
-          )
-        ),
-        div({ className: 'mt-10 md:mt-20 text-center opacity-50 pb-10' }, p({ className: 'text-[9px] md:text-[10px] font-black text-brand-gold tracking-[0.2em] md:tracking-[0.4em] uppercase' }, 'System Version: ' + SYS_VERSION))
-      );
-    };
-
-    /* =========================================================================
-       10. ユーザーダッシュボード (メイン)
-       ========================================================================= */
-    const MainApp = (props) => {
-      const [screen, setScreen] = useState('home');
-      const db = AppDB.get();
-      const uData = db.users[props.user];
-
-      const [expandedCats, setExpandedCats] = useState(() => {
-        const initial = {};
-        CATEGORIES.forEach((cat) => { initial[cat.id] = false; });
-        return initial;
-      });
-
-      useEffect(() => { window.scrollTo(0, 0); }, [screen]);
-
-      const openTool = (tid) => {
-        const isMaintenance = db.config.toolMaintenance[tid] === true;
-        const userPerm = uData.perms[tid];
-        const isPermitted = props.role === 'admin' || (userPerm !== undefined ? userPerm : DEF_UNLOCKED.includes(tid));
-        
-        if (isMaintenance && props.role !== 'admin') {
-          alert('現在メンテナンス中です。ご迷惑をおかけします。');
-          return;
-        }
-        if (!isPermitted) {
-          alert('🔒 管理者によってロックされています');
-          return;
-        }
-
-        const ndb = AppDB.get();
-        let recent = ndb.users[props.user].recentTools || [];
-        recent = recent.filter(t => t !== tid); 
-        recent.unshift(tid); 
-        if (recent.length > 6) recent.pop(); 
-        ndb.users[props.user].recentTools = recent;
-        AppDB.save(ndb);
-
-        setScreen(tid);
-      };
-
-      const toggleCat = (catId) => {
-        setExpandedCats(prev => ({ ...prev, [catId]: !prev[catId] }));
-      };
-
-      if (TOOLS[screen]) return el(ToolCore, { tid: screen, user: props.user, role: props.role, onBack: () => setScreen('home') });
-
-      const usage = (uData.usage.date === new Date().toDateString()) ? uData.usage.count : 0;
-      
-      const userLimit = uData.customLimit !== null && uData.customLimit !== undefined ? uData.customLimit : db.config.defaultDailyLimit;
-      const limitText = userLimit === -1 ? '∞' : userLimit;
-
-      const recent = uData.recentTools || [];
-      const recentVisible = recent.filter(tid => TOOLS[tid] && db.config.toolVisibility[tid] !== false);
-
-      return div({ className: 'w-full animate-in relative min-h-screen pb-20' },
-        div({ className: 'w-full flex justify-end items-center p-4 gap-2 flex-wrap z-50' },
-          props.role === 'admin' && button({ onClick: props.onGoAdmin, className: 'bg-brand-accent text-white px-4 py-2 md:px-5 md:py-2.5 rounded-full text-[10px] md:text-xs font-black shadow-lg shadow-brand-accent/30 active:scale-95 transition' }, '🎛️ 管理'),
-          div({ className: 'glass-panel px-4 py-2 md:px-5 md:py-2.5 rounded-full text-[10px] md:text-xs font-black text-white/50 border-white/10' }, 'LIMIT: ' + usage + ' / ' + limitText),
-          button({ onClick: props.onLogout, className: 'bg-white/5 hover:bg-white/10 px-4 py-2 md:px-5 md:py-2.5 rounded-full text-[10px] md:text-xs font-black text-white/50 transition' }, 'ログアウト')
-        ),
-        div({ className: 'text-center mt-6 md:mt-10 mb-12 md:mb-20 px-4' },
-          div({ className: 'inline-block glass-panel px-4 md:px-6 py-1.5 md:py-2 rounded-full mb-6 md:mb-8 mx-auto' }, 
-            span({ className: 'text-brand text-[9px] md:text-[10px] font-black tracking-[0.2em] md:tracking-[0.4em] uppercase' }, 'AI Content Pro Stable')
-          ),
-          h1({ className: 'text-4xl md:text-7xl font-black tracking-tighter mb-4 md:mb-8 leading-tight text-white' }, 'Content ', span({ className: 'text-brand' }, 'Master')),
-          p({ className: 'text-slate-400 text-xs md:text-base max-w-2xl mx-auto leading-relaxed' }, 'クラウドワークスから独自のコンテンツ販売まで、すべてを完全自動化。')
-        ),
-        
-        div({ className: 'px-4 sm:px-6 lg:px-8 pb-10' }, 
-          recentVisible.length > 0 && div({ className: 'mb-12 md:mb-16 max-w-6xl mx-auto animate-in' },
-            h2({ className: 'text-lg md:text-xl font-black text-white mb-6 flex items-center gap-3 md:gap-4' }, 
-              div({ className: 'w-1.5 md:w-2 h-6 md:h-8 bg-brand rounded-full' }), 
-              '🕒 最近使ったツール'
-            ),
-            div({ className: 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4' },
-              recentVisible.map(tid => {
-                const t = TOOLS[tid];
-                const isMaintenance = db.config.toolMaintenance[tid] === true;
-                const userPerm = uData.perms[tid];
-                const isPermitted = props.role === 'admin' || (userPerm !== undefined ? userPerm : DEF_UNLOCKED.includes(tid));
-                const canAccess = props.role === 'admin' || (isPermitted && !isMaintenance);
-
-                return div({ 
-                    key: 'recent-' + tid, 
-                    onClick: () => openTool(tid), 
-                    className: 'glass-panel p-4 md:p-5 rounded-xl md:rounded-2xl transition duration-300 hover:-translate-y-1 hover:border-brand/40 cursor-pointer relative overflow-hidden group flex flex-col items-center justify-center text-center ' + (canAccess?'':'opacity-50 grayscale') 
-                  },
-                  div({ className: 'text-3xl md:text-4xl mb-3 group-hover:scale-110 transition' }, t.icon),
-                  span({ className: 'text-xs md:text-sm font-bold text-white/90 group-hover:text-white line-clamp-2 leading-snug' }, t.name),
-                  isMaintenance && span({ className: 'absolute top-2 right-2 bg-brand-danger/20 text-brand-danger text-[8px] font-black px-1.5 py-0.5 rounded border border-brand-danger/30' }, 'メンテ中')
-                );
-              })
-            )
-          ),
-
-          CATEGORIES.map(cat => {
-            const visible = Object.keys(TOOLS).filter(k => TOOLS[k].cat === cat.id && db.config.toolVisibility[k] !== false);
-            if (visible.length === 0) return null;
-            
-            const isExpanded = expandedCats[cat.id];
-
-            return div({ key: cat.id, className: 'mb-6 md:mb-8 max-w-6xl mx-auto glass-panel rounded-2xl md:rounded-[2rem] overflow-hidden transition-all duration-300' },
-              div({ 
-                onClick: () => toggleCat(cat.id), 
-                className: 'p-5 md:p-8 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-colors select-none' 
-              },
-                h2({ className: 'text-lg md:text-xl font-black text-white flex items-center gap-3 md:gap-4 m-0' }, 
-                  div({ className: 'w-1.5 md:w-2 h-6 md:h-8 bg-brand rounded-full' }), 
-                  cat.name
                 ),
-                span({ className: 'text-slate-400 transform transition-transform duration-300 ' + (isExpanded ? 'rotate-180' : '') }, '▼')
-              ),
-              
-              isExpanded && div({ className: 'px-5 md:px-8 pb-6 md:pb-8 pt-0 animate-in' },
-                div({ className: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 border-t border-white/10 pt-6 md:pt-8' },
-                  visible.map(tid => {
-                    const t = TOOLS[tid];
-                    const isMaintenance = db.config.toolMaintenance[tid] === true;
-                    const userPerm = uData.perms[tid];
-                    const isPermitted = props.role === 'admin' || (userPerm !== undefined ? userPerm : DEF_UNLOCKED.includes(tid));
-                    const canAccess = props.role === 'admin' || (isPermitted && !isMaintenance);
-
-                    return div({ 
-                        key: tid, 
-                        onClick: () => openTool(tid), 
-                        className: 'bg-black/30 border border-white/5 rounded-2xl p-6 md:p-8 transition duration-300 hover:-translate-y-1 hover:border-brand/40 hover:bg-white/5 cursor-pointer relative overflow-hidden group ' + (canAccess?'':'opacity-50 grayscale') 
-                      },
-                        div({ className: 'flex justify-between items-start mb-4 md:mb-6' },
-                          div({ className: 'text-4xl md:text-5xl group-hover:scale-110 transition' }, t.icon),
-                          isMaintenance ? span({ className: 'bg-brand-danger/20 text-brand-danger text-[9px] md:text-[10px] font-black px-2 py-1 md:px-3 md:py-1.5 rounded-lg border border-brand-danger/30 shrink-0' }, '🚧 メンテ中') :
-                          t.badge && span({ className: 'bg-brand/10 text-brand text-[9px] md:text-[10px] font-black px-2 py-1 md:px-3 md:py-1.5 rounded-lg border border-brand/20 shrink-0' }, t.badge)
-                        ),
-                        h3({ className: 'text-lg md:text-xl font-black mb-2 md:mb-3 text-white/90 group-hover:text-white transition break-words' }, t.name),
-                        p({ className: 'text-xs md:text-sm text-slate-500 break-words' }, t.desc)
-                    );
-                  })
-                )
-              )
-            );
-          })
-        ),
-        
-        el(InquiryForm, { user: props.user, nickname: uData.nickname })
-      );
-    };
-
-    /* =========================================================================
-       11. ログイン・新規申請UI
-       ========================================================================= */
-    const AuthBox = (props) => {
-      const [nickname, setNickname] = useState('');
-      const [xId, setXId] = useState('@');
-      const [isL, setIsL] = useState(true);
-      const [err, setErr] = useState('');
-      
-      const [agreed, setAgreed] = useState(false);
-      const [showTerms, setShowTerms] = useState(false);
-
-      const handleXIdChange = (e) => {
-        let val = e.target.value;
-        if (!val.startsWith('@')) val = '@' + val.replace(/@/g, '');
-        setXId(val);
-      };
-
-      const login = () => {
-        setErr('');
-        const n = nickname.trim();
-        const x = xId.trim();
-        
-        const db = AppDB.get();
-        if (n === db.config.adminU && x.replace('@', '') === db.config.adminP) {
-          localStorage.setItem(SESS_KEY, JSON.stringify({ u: 'admin', r: 'admin' }));
-          props.onLogin('admin', 'admin');
-          return;
-        }
-
-        if (!n) return setErr('Xのニックネーム（表示名）を入力してください');
-        if (!x || x === '@') return setErr('Xのユーザー名（@ID）を入力してください');
-
-        if (isL) {
-          if (db.users[x] && db.users[x].status === 'approved' && db.users[x].nickname === n) {
-            localStorage.setItem(SESS_KEY, JSON.stringify({ u: x, r: 'approved' }));
-            props.onLogin(x, 'approved');
-          } else {
-            setErr('登録情報が見つからないか、管理者の承認待ち、または権利剥奪状態です。');
-          }
-        } else {
-          if (!agreed) return setErr('利用規約に同意してください。');
-          
-          if (db.users[x]) return setErr('この@ユーザー名は既に登録されています。');
-          db.users[x] = { nickname: n, status: 'pending', registeredAt: Date.now(), usage: { count: 0, date: '' }, perms: {}, brand: { plan: 'free', name: '' }, projects: { 'default': { name: 'デフォルト', data: {} } }, curProj: 'default', settings: { aiModel: 'chatgpt_free' }, recentTools: [], customLimit: null };
-          AppDB.save(db);
-          alert('申請が完了しました。管理者の承認をお待ちください。');
-          setIsL(true);
-        }
-      };
-
-      const termsModal = showTerms ? div({ className: 'fixed inset-0 z-[300] flex items-center justify-center bg-black/80 p-4 md:p-6 animate-in' },
-        div({ className: 'glass-panel rounded-2xl md:rounded-[2rem] max-w-2xl w-full p-6 md:p-8 relative max-h-[90vh] flex flex-col' },
-          button({ onClick: () => setShowTerms(false), className: 'absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold' }, '✕'),
-          el('h3', { className: 'text-lg md:text-xl font-black text-white mb-4 border-b border-white/10 pb-4' }, '📜 AI Content Pro 利用規約'),
-          div({ className: 'overflow-y-auto pr-2 text-xs md:text-sm text-slate-300 leading-relaxed space-y-4 flex-1' },
-            p(null, '本ツール（以下「本サービス」といいます）を利用する全てのユーザーは、以下の規約に同意したものとみなします。本サービスは厳重なセキュリティで監視されており、違反行為が発覚した場合は即座にアクセス権を剥奪し、状況により法的措置を取る場合があります。'),
-            
-            el('h4', { className: 'font-bold text-white mt-4' }, '第1条（禁止事項）'),
-            p(null, 'ユーザーは、本サービスの利用にあたり、以下の行為をしてはなりません。'),
-            el('ul', { className: 'list-disc pl-5 space-y-1' },
-              el('li', null, '本サービスのアクセスURL、ログイン情報（XのID等）を第三者に共有、譲渡、または貸与する行為。'),
-              el('li', null, '本サービスのソースコードの閲覧、抽出、複製、改変、リバースエンジニアリング、またはそれらを試みる行為。'),
-              el('li', null, '本サービスのアイデアや構造を模倣し、類似または競合するツール・サイトを開発、公開、販売する行為。'),
-              el('li', null, '本サービスのサーバーやネットワークシステムに過度な負荷をかける行為、および不正アクセス行為。'),
-              el('li', null, '本サービスを通じて生成したプロンプトや出力結果を、ツールそのものの機能として再販する行為（生成された「記事」や「構成」を自分のコンテンツとして販売することは許可されています）。')
-            ),
-
-            el('h4', { className: 'font-bold text-white mt-4' }, '第2条（権利の剥奪と免責）'),
-            el('ul', { className: 'list-disc pl-5 space-y-1' },
-              el('li', null, '管理者は、ユーザーが本規約に違反したと判断した場合、事前の通知なく当該ユーザーの利用権利を永久に剥奪できるものとします。'),
-              el('li', null, '本サービスを利用して生じた一切の損害（生成AIの出力内容によるトラブル等を含む）について、管理者は一切の責任を負いません。')
+                button({ onClick: save, className: 'w-full btn-gradient py-4 rounded-xl font-black mt-6 shadow-xl' }, '保存して閉じる')
             )
-          ),
-          div({ className: 'mt-6 pt-4 border-t border-white/10 text-center' },
-            button({ onClick: () => { setAgreed(true); setShowTerms(false); }, className: 'w-full btn-gradient py-3 rounded-xl font-bold text-white shadow-lg' }, '規約を確認して閉じる')
-          )
-        )
-      ) : null;
+        );
+    };
 
-      return div({ className: 'w-full max-w-md mx-auto mt-16 md:mt-24 animate-in px-4 pb-10' },
-        termsModal,
-        div({ className: 'glass-panel rounded-3xl md:rounded-[2.5rem] p-8 md:p-12 shadow-2xl text-center relative overflow-hidden' },
-          h2({ className: 'text-2xl md:text-3xl font-black mb-10 md:mb-12 tracking-tight text-white' }, 'AI Content Pro'),
-          div({ className: 'flex bg-black/40 p-1 md:p-1.5 rounded-xl mb-6 md:mb-8' },
-            button({ onClick: () => { setIsL(true); setErr(''); }, className: 'flex-1 py-2 md:py-3 rounded-lg text-xs md:text-sm font-bold transition ' + (isL ? 'bg-brand text-white' : 'text-white/50') }, 'ログイン'),
-            button({ onClick: () => { setIsL(false); setErr(''); }, className: 'flex-1 py-2 md:py-3 rounded-lg text-xs md:text-sm font-bold transition ' + (!isL ? 'bg-brand text-white' : 'text-white/50') }, '新規申請')
+    const ToolCore = ({ tid, user, role, onBack }) => {  
+      const conf = TOOLS[tid];  
+      const [db, setDb] = useState(AppDB.get());  
+      const uData = db.users[user];  
+      const userKeys = uData.settings.keys;
+      const [vals, setVals] = useState(uData.projects[uData.curProj].data[tid] || {});  
+      const [copied, setCopied] = useState({});  
+      const [res, setRes] = useState(uData.projects[uData.curProj].data[tid]?.res || '');  
+      const [error, setError] = useState('');
+      const [isLoading, setIsLoading] = useState(false);
+      const [isMagicLoading, setIsMagicLoading] = useState(false);
+      const [aiModel, setAiModel] = useState(uData.settings.aiModel);
+      const [imageAI, setImageAI] = useState('openai');
+
+      useEffect(() => { window.scrollTo(0, 0); }, []);  
+  
+      const updateRes = (v) => {  
+        setRes(v);  
+        if (role !== 'admin') {  
+          const ndb = AppDB.get();  
+          if (!ndb.users[user].projects[uData.curProj].data[tid]) ndb.users[user].projects[uData.curProj].data[tid] = {};  
+          ndb.users[user].projects[uData.curProj].data[tid].res = v;  
+          AppDB.save(ndb);  
+        }  
+      };  
+  
+      const handleMagic = async (fid) => {  
+        setIsMagicLoading(true);  setError('');
+        const keysToSend = { openai: userKeys.openai };
+        const reqFields = conf.fields.map(f => ({ id: f.id, l: f.l, ph: f.ph||"" }));
+        try {
+            const response = await fetch('/api/magic_generate', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tool_id: tid, fields: reqFields, user_keys: keysToSend, target_fid: fid })
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                const newVals = { ...vals, ...data.data };
+                setVals(newVals);
+                if (role !== 'admin') {  
+                    const ndb = AppDB.get(); ndb.users[user].projects[uData.curProj].data[tid] = newVals; AppDB.save(ndb);  
+                }
+            } else { setError(data.message); }
+        } catch (e) { setError('通信エラー: Pythonサーバーと接続できません。'); }
+        setIsMagicLoading(false);
+      };  
+  
+      const handleGenerate = async () => {  
+        setIsLoading(true); setError('');
+        const isImage = conf.isImagePrompt;
+        const prefix = isImage ? "" : getAIPrefix(aiModel);
+        const fullPrompt = prefix + conf.build(vals);
+        let keysToSend = {};
+        let aiProvider = 'openai';
+
+        if(isImage) {
+            aiProvider = imageAI; 
+            keysToSend = { [aiProvider]: userKeys[aiProvider] };
+        } else {
+            keysToSend = { openai: userKeys.openai };
+        }
+
+        try {
+            const endpoint = isImage ? '/api/magic_generate' : '/api/auto_generate';
+            const body = isImage ? 
+                { tool_id: tid, fields: conf.fields.map(f=>({...f, val:vals[f.id]||""})), user_keys: keysToSend, prompt_instruction: aiProvider } :
+                { prompt: fullPrompt, user_api_key: keysToSend.openai, ai_model: aiModel };
+
+            const response = await fetch(endpoint, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                updateRes(isImage ? data.data : data.result);
+            } else { setError(data.message); }
+        } catch (e) { setError('通信エラー: Pythonサーバーと接続できません。'); }
+        setIsLoading(false);
+      };  
+  
+      const copy = (text, key) => {
+          if (navigator.clipboard) navigator.clipboard.writeText(text);
+          setCopied({...copied, [key]: true});
+          setTimeout(() => setCopied(prev => ({...prev, [key]: false})), 2000);
+      };
+
+      return div({ className: 'flex flex-col lg:flex-row h-full animate-in' },  
+        div({ className: 'w-full lg:w-[400px] border-r border-white/10 p-6 md:p-8 overflow-y-auto hide-scrollbar shrink-0' },
+          div({ className: 'flex items-center gap-3 mb-8' },
+              button({ onClick: onBack, className: 'glass-panel px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-white/10' }, '←'),
+              h2({ className: 'text-xl font-black text-white' }, conf.name)
           ),
-          div({ className: 'space-y-4 md:space-y-5 text-left' },
-            div(null,
-              span({ className: 'block text-[10px] text-brand-light font-bold mb-1 ml-2' }, 'Xのニックネーム (表示名)'),
-              input({ className: 'input-base text-center', placeholder: '例: たろう | AI副業', value: nickname, onChange: e => setNickname(e.target.value) })
-            ),
-            div(null,
-              span({ className: 'block text-[10px] text-brand-light font-bold mb-1 ml-2' }, 'Xのユーザー名 (ID)'),
-              input({ className: 'input-base text-center font-mono', placeholder: '@username', value: xId, onChange: handleXIdChange })
-            ),
-            
-            !isL && div({ className: 'mt-4 pt-4 border-t border-white/10' },
-              label({ className: 'flex items-start gap-3 cursor-pointer group' },
-                input({ type: 'checkbox', className: 'mt-1 w-4 h-4 accent-brand rounded border-white/20 shrink-0 cursor-pointer', checked: agreed, onChange: e => setAgreed(e.target.checked) }),
-                div({ className: 'text-xs text-slate-300 leading-snug' }, 
-                  span({ 
-                    onClick: (e) => { e.preventDefault(); setShowTerms(true); }, 
-                    className: 'text-brand hover:underline font-bold' 
-                  }, '利用規約（禁止事項等）'),
-                  ' を確認し、同意します。違反時はアカウントが即時剥奪されることを承諾します。'
-                )
+          div({ className: 'space-y-6' }, 
+              conf.fields.map(f => el(FormInput, { 
+                  key: f.id, f, val: vals[f.id], 
+                  onChange: (id, v) => {
+                      const nv = { ...vals, [id]: v };
+                      setVals(nv);
+                      if (role !== 'admin') {  
+                          const ndb = AppDB.get(); ndb.users[user].projects[uData.curProj].data[tid] = nv; AppDB.save(ndb);  
+                      }
+                  }, onMagic: handleMagic, isMagicLoading 
+              }))
+          ),
+          button({ onClick: () => { setVals({}); updateRes(''); setError(''); }, className: 'text-xs text-slate-500 hover:text-white mt-4 w-full text-right' }, '🗑️ クリア'),
+
+          conf.isImagePrompt && div({ className: 'mt-8 pt-6 border-t border-white/10' },
+              label({ className: 'block text-xs font-bold text-slate-400 mb-2' }, '🔮 プロンプトを作成するAIを選択 (BYOK)'),
+              div({ className: 'flex gap-2' },
+                  ['openai', 'anthropic', 'google'].map(p => button({
+                      key: p, onClick: () => setImageAI(p),
+                      className: `flex-1 py-2 rounded-lg text-xs font-bold border transition ${imageAI === p ? 'bg-brand/20 border-brand text-white' : 'bg-black/30 border-white/5 text-slate-400 hover:bg-white/5'}`
+                  }, p.toUpperCase()))
               )
-            ),
+          ),
 
-            err && p({ className: 'text-brand-danger text-[10px] md:text-xs font-bold text-center' }, '❌ ' + err),
-            button({ onClick: login, className: 'w-full btn-gradient py-3 md:py-4 rounded-xl md:rounded-2xl text-white font-black text-base md:text-lg shadow-xl mt-2 md:mt-4' }, isL ? 'ログインする' : '申請を送信する')
-          )
+          button({ onClick: handleGenerate, disabled: isLoading || isMagicLoading, className: 'w-full btn-gradient py-4 rounded-xl font-black mt-8 text-lg flex items-center justify-center gap-3 shadow-2xl shadow-brand/20'
+          }, isLoading ? [el(LoadingCircle), '魔法をかけています...'] : [`✨ ${conf.isImagePrompt?'呪文':'コンテンツ'}を全自動生成`]),
+          error && div({ className: 'mt-4' }, el(ErrorAlert, { msg: error }))
+        ),
+
+        div({ className: 'flex-1 bg-black p-6 md:p-10 overflow-y-auto hide-scrollbar' },
+            res ? div({ className: 'animate-in' },
+                div({ className: 'flex justify-between items-center mb-6' },
+                    h3({ className: 'text-sm font-black text-slate-400 uppercase tracking-wider' }, '👀 生成結果'),
+                    div({ className: 'flex gap-2' },
+                        button({ onClick: () => copy(res, 'raw'), className: `glass-panel px-4 py-2 rounded-lg text-xs font-bold transition ${copied.raw ? 'text-brand-success' : 'text-slate-300'}` }, copied.raw ? '✓' : '📋 Rawコピー'),
+                        !conf.isImagePrompt && button({ onClick: () => {
+                            const el = document.getElementById('preview-content');
+                            if(el) {
+                                const range = document.createRange(); range.selectNodeContents(el);
+                                const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+                                document.execCommand('copy'); sel.removeAllRanges(); copy('', 'rich');
+                            }
+                        }, className: `btn-gradient px-4 py-2 rounded-lg text-xs font-bold transition ${copied.rich ? 'border-brand-success' : ''}` }, copied.rich ? '✓ コピー済' : '📋 装飾コピー')
+                    )
+                ),
+                div({ id: 'preview-content', className: 'bg-white p-6 md:p-8 rounded-2xl shadow-inner min-h-[400px] overflow-x-auto ' + (conf.isImagePrompt ? 'font-mono text-sm text-black whitespace-pre-wrap bg-gray-100' : 'preview-content text-black') }, 
+                    conf.isImagePrompt ? res : div({ dangerouslySetInnerHTML: renderMarkdown(res) })
+                )
+            ) : div({ className: 'flex h-full items-center justify-center text-center p-10' },
+                div({ className: 'text-slate-600' },
+                    div({ className: 'text-6xl mb-4' }, conf.icon),
+                    div({ className: 'font-bold' }, '左側のフォームを入力して'),
+                    div({ className: 'font-bold' }, '「全自動生成」ボタンを押してください')
+                )
+            )
         )
       );
-    };
+    };  
+  
+    const MainApp = (props) => {  
+      const [screen, setScreen] = useState('home');  
+      const [showSettings, setShowSettings] = useState(false);
+      const db = AppDB.get();  
+      const uData = db.users[props.user];  
+  
+      useEffect(() => { window.scrollTo(0, 0); }, [screen]);  
 
-    /* =========================================================================
-       12. Root マウント
-       ========================================================================= */
-    const App = () => {
-      const [auth, setAuth] = useState({ u: null, r: null });
-      const [goAdmin, setGoAdmin] = useState(false);
+      const openTool = (tid) => {  
+        const isPermitted = props.role === 'admin' || (uData.perms[tid] !== undefined ? uData.perms[tid] : true);  
+        if (!isPermitted) return alert('🔒 このツールはロックされています');  
+        setScreen(tid);  
+      };  
+  
+      if (TOOLS[screen]) return el(ToolCore, { tid: screen, user: props.user, role: props.role, onBack: () => setScreen('home') });  
+  
+      const Sidebar = () => div({ className: 'w-[260px] h-full bg-bg-panel border-r border-white/10 p-6 flex flex-col shrink-0' },
+          div({ className: 'flex items-center gap-2 mb-10' }, 
+              div({ className: 'w-3 h-8 bg-brand rounded-full' }),
+              h1({ className: 'text-2xl font-black text-white tracking-tighter' }, 'AICP Pro')
+          ),
+          div({ className: 'flex-1 space-y-2 overflow-y-auto hide-scrollbar' },
+              CATEGORIES.map(cat => [
+                  h2({ key: 'h-'+cat.id, className: 'text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-6 mb-2 ml-2' }, cat.name),
+                  Object.keys(TOOLS).filter(k=>TOOLS[k].cat===cat.id).map(tid => button({
+                      key: tid, onClick: () => openTool(tid),
+                      className: 'w-full text-left p-3 rounded-lg text-sm font-bold flex items-center gap-3 hover:bg-white/5 transition ' + (screen===tid?'bg-brand/10 text-white':'text-slate-300')
+                  }, span({className:'text-lg'}, TOOLS[tid].icon), TOOLS[tid].name))
+              ])
+          ),
+          div({ className: 'mt-10 pt-6 border-t border-white/10 space-y-3' },
+              button({ onClick: () => setShowSettings(true), className: 'w-full bg-white/5 hover:bg-white/10 p-3 rounded-lg text-sm font-bold text-slate-300 flex items-center gap-3 transition' }, '⚙️ 個人設定'),
+              button({ onClick: props.onLogout, className: 'w-full text-left p-3 rounded-lg text-sm font-bold text-slate-500 hover:text-white transition' }, '👋 ログアウト')
+          )
+      );
 
-      useEffect(() => {
-        const session = localStorage.getItem(SESS_KEY);
-        if (session) setAuth(JSON.parse(session));
-      }, []);
-
-      if (!auth.u) return el(AuthBox, { onLogin: (u, r) => setAuth({ u, r }) });
-      if (auth.r === 'admin' && goAdmin) return el(AdminDash, { onGoApp: () => setGoAdmin(false), onLogout: () => { localStorage.removeItem(SESS_KEY); setAuth({ u: null, r: null }); } });
-      
-      return el(MainApp, { user: auth.u, role: auth.r, onLogout: () => { localStorage.removeItem(SESS_KEY); setAuth({ u: null, r: null }); }, onGoAdmin: () => setGoAdmin(true) });
-    };
-
-    const container = document.getElementById('root');
-    const root = ReactDOM.createRoot(container);
-    root.render(el(ErrorBoundary, null, el(App)));
-
-  })();
-  </script>
-</body>
+      return div({ className: 'flex h-full animate-in' },  
+        el(Sidebar),
+        showSettings && el(UserSettingModal, { user: props.user, onClose: () => setShowSettings(false) }),
+        div({ className: 'flex-1 bg-bg h-full p-8 md:p-12 overflow-y-auto hide-scrollbar' },
+            screen === 'home' && div({ className: 'max-w-6xl mx-auto' },
+                div({ className: 'mb-12' },
+                    h1({ className: 'text-4xl md:text-5xl font-black text-white mb-3 tracking-tight' }, `こんにちは、${uData.nickname}さん`),
+                    p({ className: 'text-slate-400 text-lg' }, '今日はどのコンテンツを作成しますか？サイドバーからツールを選択してください。')
+                ),
+                CATEGORIES.map(cat => div({ key: 'p-'+cat.id, className: 'mb-12' },
+                    h2({ className: 'text-xl font-black text-slate-200 mb-6' }, cat.name),
+                    div({ className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' },
+                        Object.keys(TOOLS).filter(k=>TOOLS[k].cat===cat.id).map(tid => {
+                            const t = TOOLS[tid];
+                            return div({ key: tid, onClick: () => openTool(tid), className: 'glass-panel p-6 rounded-2xl cursor-pointer hover:-translate-y-1 hover:border-brand/40 transition-all group' },
+                                div({ className: 'flex justify-between items-start mb-4' },
+                                    div({ className: 'text-4xl group-hover:scale-110 transition' }, t.icon),
+                                    t.cat==='mon'&&span({className:'bg-brand/10 text-brand text-[10px] font-black px-3 py-1 rounded-full'},'収益化')
+                                ),
+                                h3({ className: 'text-lg font-black text-white mb-2' }, t.name),
+                                p({ className: 'text-xs text-slate-400 leading-relaxed line-clamp-2' }, t.desc)
+                            );
+                        })
+                    )
+                ))
+            )
+        )
+      );  
+    };  
+  
+    const AuthBox = (props) => {  
+      const [nickname, setNickname] = useState('');  
+      const [pass, setPass] = useState('');  
+      const [err, setErr] = useState('');  
+  
+      const login = () => {  
+        setErr('');  
+        const db = AppDB.get();  
+        if (nickname === db.config.adminU && pass === db.config.adminP) {  
+          localStorage.setItem(SESS_KEY, JSON.stringify({ u: 'admin', r: 'admin' }));  
+          props.onLogin('admin', 'admin');  
+          return;  
+        }  
+        if(nickname && db.users[nickname] && db.users[nickname].status === 'approved') {
+            localStorage.setItem(SESS_KEY, JSON.stringify({ u: nickname, r: 'approved' }));
+            props.onLogin(nickname, 'approved');
+        } else { setErr('ニックネームまたはパスワードが違います。'); }
+      };  
+  
+      return div({ className: 'w-full h-full flex items-center justify-center p-4' },  
+        div({ className: 'glass-panel rounded-3xl p-10 md:p-16 shadow-2xl text-center max-w-lg w-full' },  
+          h2({ className: 'text-3xl font-black mb-12 tracking-tight text-white' }, 'AI Content Pro'),  
+          div({ className: 'space-y-5 text-left' },  
+            input({ className: 'input-base text-center', placeholder: 'ニックネーム', value: nickname, onChange: e => setNickname(e.target.value) }),  
+            input({ type: 'password', className: 'input-base text-center font-mono', placeholder: 'パスワード', value: pass, onChange: e => setPass(e.target.value) }),  
+            err && p({ className: 'text-brand-danger text-xs font-bold text-center' }, err),  
+            button({ onClick: login, className: 'w-full btn-gradient py-4 rounded-xl text-lg mt-4' }, 'ログインする')  
+          )  
+        )  
+      );  
+    };  
+  
+    const App = () => {  
+      const [auth, setAuth] = useState({ u: null, r: null });  
+      useEffect(() => {  
+        const session = localStorage.getItem(SESS_KEY);  
+        if (session) setAuth(JSON.parse(session));  
+      }, []);  
+  
+      if (!auth.u) return el(AuthBox, { onLogin: (u, r) => setAuth({ u, r }) });  
+      return el(MainApp, { user: auth.u, role: auth.r, onLogout: () => { localStorage.removeItem(SESS_KEY); setAuth({ u: null, r: null }); } });  
+    };  
+  
+    ReactDOM.createRoot(document.getElementById('root')).render(el(App));  
+  })();  
+  </script>  
+</body>  
 </html>
